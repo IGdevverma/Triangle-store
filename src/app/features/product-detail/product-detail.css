@@ -1,0 +1,42 @@
+.product-detail {
+  display: flex;
+  gap: 50px;
+
+  max-width: 1000px;
+
+  margin: 50px auto;
+
+  padding: 20px;
+}
+
+.product-detail img {
+  width: 400px;
+
+  border-radius: 12px;
+}
+
+.details {
+  flex: 1;
+}
+
+.details h1 {
+  margin-bottom: 20px;
+}
+
+.details h2 {
+  margin-bottom: 30px;
+}
+
+.details button {
+  background: #ff4d4d;
+
+  color: white;
+
+  border: none;
+
+  padding: 15px 30px;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
