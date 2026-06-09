@@ -66,3 +66,31 @@
 .checkout-btn:hover {
   opacity: 0.9;
 }
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+
+  margin-top: 15px;
+}
+
+.quantity-controls button {
+  width: 35px;
+  height: 35px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  background: #f4f4f4;
+
+  font-size: 18px;
+}
+
+.quantity-controls span {
+  font-size: 18px;
+  font-weight: bold;
+}

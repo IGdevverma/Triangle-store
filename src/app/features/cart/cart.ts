@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CartService } from '../../services/cart';
-import { Product } from '../../models/product';
+import { CartService, CartItem } from '../../services/cart';
 
 @Component({
   selector: 'app-cart',
@@ -12,12 +11,12 @@ import { Product } from '../../models/product';
 })
 export class Cart {
 
-  cartItems: Product[] = [];
+  cartItems: CartItem[] = [];
   total = 0;
 
   constructor(private cartService: CartService) {
 
-    
+
 
     this.cartService.cart$.subscribe(items => {
       this.cartItems = items;
@@ -29,4 +28,13 @@ export class Cart {
   removeItem(id: number) {
     this.cartService.removeFromCart(id);
   }
+  increase(id: number) {
+    this.cartService.increaseQuantity(id);
+  }
+  decrease(id: number) {
+    this.cartService.decreaseQuantity(id);
+  }
+
+  
+
 }
