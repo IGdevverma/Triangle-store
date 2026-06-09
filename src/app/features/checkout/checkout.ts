@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart';
 import { RouterLink } from '@angular/router';
+import { OrderService } from '../../services/order';
 
 
 
@@ -30,7 +31,8 @@ export class Checkout {
   orderPlaced = false;
 
   constructor(private fb: FormBuilder,
-    private cartService: CartService) {
+    private cartService: CartService,
+    private orderService: OrderService) {
 
     this.checkoutForm = this.fb.group({
 
@@ -50,13 +52,28 @@ export class Checkout {
 
     if (this.checkoutForm.valid) {
 
-      this.orderPlaced = true;
-        this.cartService.clearCart();
+      this.orderService.addOrder({
 
-      // Clear the cart after placing the order
+        id: Date.now(),
+
+        items: this.cartService.getCartItems(),
+
+        total: this.cartService.getTotal(),
+
+        date: new Date().toLocaleDateString()
+
+      });
+
+      this.cartService.clearCart();
+
+      this.orderPlaced = true;
 
     }
 
+  }
+  get paymentMethod() {
+
+    return this.checkoutForm.get('paymentMethod')?.value;
   }
 
 }

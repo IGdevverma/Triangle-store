@@ -25,6 +25,40 @@
             </option>
 
         </select>
+        <!-- UPI Options -->
+
+        <div *ngIf="paymentMethod === 'UPI'">
+
+            <h3>Select UPI App</h3>
+
+            <label>
+                <input type="radio" name="upi">
+                Google Pay
+            </label>
+
+            <label>
+                <input type="radio" name="upi">
+                PhonePe
+            </label>
+
+            <label>
+                <input type="radio" name="upi">
+                Paytm
+            </label>
+
+        </div>
+
+        <!-- Card Fields -->
+
+        <div *ngIf="paymentMethod === 'Card'">
+
+            <input type="text" placeholder="Card Number">
+
+            <input type="text" placeholder="Expiry Date">
+
+            <input type="password" placeholder="CVV">
+
+        </div>
 
         <button type="submit">
 

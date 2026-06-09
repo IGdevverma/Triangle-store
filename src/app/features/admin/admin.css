@@ -1,0 +1,145 @@
+.admin-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.admin-container h1 {
+    font-size: 42px;
+    margin-bottom: 30px;
+    color: #111;
+}
+
+/* Form Card */
+.form-card {
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    margin-bottom: 40px;
+}
+
+.form-card h2 {
+    margin-bottom: 25px;
+    color: #222;
+}
+
+.form-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 15px;
+}
+
+.form-group input {
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    font-size: 15px;
+    outline: none;
+    transition: 0.3s;
+}
+
+.form-group input:focus {
+    border-color: #ff4d5a;
+    box-shadow: 0 0 0 4px rgba(255,77,90,0.15);
+}
+
+.form-btn {
+    margin-top: 25px;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    background: #ff4d5a;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.form-btn:hover {
+    background: #e63b47;
+    transform: translateY(-2px);
+}
+
+/* Table */
+.table-wrapper {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+th {
+    background: #111;
+    color: white;
+    padding: 18px;
+    text-align: left;
+    font-size: 15px;
+}
+
+td {
+    padding: 18px;
+    border-bottom: 1px solid #eee;
+    font-size: 15px;
+}
+
+tr:hover {
+    background: #fafafa;
+}
+
+/* Buttons */
+.action-btn {
+    border: none;
+    padding: 10px 16px;
+    border-radius: 10px;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    margin-right: 10px;
+    transition: 0.3s;
+}
+
+.edit-btn {
+    background: #2196f3;
+}
+
+.edit-btn:hover {
+    background: #1976d2;
+}
+
+.delete-btn {
+    background: #ff4d5a;
+}
+
+.delete-btn:hover {
+    background: #e63b47;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container h1 {
+        font-size: 32px;
+    }
+
+    th,
+    td {
+        padding: 12px;
+    }
+
+    .action-btn {
+        display: block;
+        margin-bottom: 8px;
+        width: 100%;
+    }
+}

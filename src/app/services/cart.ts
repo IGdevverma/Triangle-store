@@ -163,5 +163,10 @@ export class CartService {
     );
 
   }
+  getCartItems(): CartItem[] {
+
+    return this.cartItems;
+
+  }
 
 }

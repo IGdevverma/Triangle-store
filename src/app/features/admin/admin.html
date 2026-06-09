@@ -1,0 +1,105 @@
+<div class="admin-container">
+
+    <h1>Admin Dashboard</h1>
+
+    <!-- Form Card -->
+    <div class="form-card">
+
+        <h2>
+            {{ editing ? 'Edit Product' : 'Add Product' }}
+        </h2>
+
+        <div class="form-group">
+
+            <input
+                type="text"
+                placeholder="Name"
+                [(ngModel)]="newProduct.name"
+            >
+
+            <input
+                type="number"
+                placeholder="Price"
+                [(ngModel)]="newProduct.price"
+            >
+
+            <input
+                type="text"
+                placeholder="Image URL"
+                [(ngModel)]="newProduct.image"
+            >
+
+            <input
+                type="text"
+                placeholder="Category"
+                [(ngModel)]="newProduct.category"
+            >
+
+        </div>
+
+        <button
+            class="form-btn"
+            *ngIf="!editing"
+            (click)="addProduct()"
+        >
+            Add Product
+        </button>
+
+        <button
+            class="form-btn"
+            *ngIf="editing"
+            (click)="updateProduct()"
+        >
+            Update Product
+        </button>
+
+    </div>
+
+    <!-- Products Table -->
+    <div class="table-wrapper">
+
+        <table>
+
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Actions</th>
+            </tr>
+
+            <tr *ngFor="let product of products">
+
+                <td>{{ product.id }}</td>
+
+                <td>{{ product.name }}</td>
+
+                <td>₹{{ product.price }}</td>
+
+                <td>{{ product.category }}</td>
+
+                <td>
+
+                    <button
+                        class="action-btn edit-btn"
+                        (click)="editProduct(product)"
+                    >
+                        Edit
+                    </button>
+
+                    <button
+                        class="action-btn delete-btn"
+                        (click)="deleteProduct(product.id)"
+                    >
+                        Delete
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
