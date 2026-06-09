@@ -1,0 +1,82 @@
+.checkout-container {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 40px;
+
+  background: white;
+
+  border-radius: 12px;
+
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.checkout-container h1 {
+  margin-bottom: 30px;
+}
+
+.checkout-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.checkout-container input,
+.checkout-container textarea {
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.checkout-container button {
+  padding: 15px;
+
+  border: none;
+
+  background: black;
+
+  color: white;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.success-message {
+  margin-top: 30px;
+
+  color: green;
+
+  font-weight: bold;
+
+  font-size: 22px;
+}
+.success-message {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.success-message h2 {
+  color: green;
+  margin-bottom: 15px;
+}
+
+.success-message a {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+
+  background: black;
+  color: white;
+
+  text-decoration: none;
+
+  border-radius: 8px;
+}
+
+.checkout-container select {
+  padding: 15px;
+
+  border: 1px solid #ddd;
+
+  border-radius: 8px;
+}

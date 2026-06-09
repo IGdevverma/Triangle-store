@@ -1,55 +1,73 @@
 <div class="cart-container">
 
     <h1>Shopping Cart</h1>
+    <div *ngIf="cartItems.length === 0" class="empty-cart">
 
-    <div class="cart-item" *ngFor="let item of cartItems">
+        <h2>🛒 Your cart is empty</h2>
 
-        <div class="item-details">
+        <p>Add some products to get started.</p>
 
-            <h3>{{ item.name }}</h3>
+        <a routerLink="/">
+            Continue Shopping
+        </a>
 
-            <p>₹{{ item.price }}</p>
+    </div>
 
-            <div class="quantity-controls">
+    <div *ngIf="cartItems.length > 0">
 
-                <button (click)="decrease(item.id)">
+        <div class="cart-item" *ngFor="let item of cartItems">
 
-                    -
+            <div class="item-details">
 
-                </button>
+                <h3>{{ item.name }}</h3>
 
-                <span>
+                <p>₹{{ item.price }}</p>
 
-                    {{ item.quantity }}
+                <div class="quantity-controls">
 
-                </span>
+                    <button (click)="decrease(item.id)">
+                        -
+                    </button>
 
-                <button (click)="increase(item.id)">
+                    <span>
+                        {{ item.quantity }}
+                    </span>
 
-                    +
+                    <button (click)="increase(item.id)">
+                        +
+                    </button>
 
-                </button>
+                </div>
 
             </div>
 
+            <button (click)="removeItem(item.id)">
+                Remove
+            </button>
+
         </div>
 
-        <button (click)="removeItem(item.id)">
+        <div class="cart-summary">
 
-            Remove
+            <h3>Subtotal: ₹{{ total }}</h3>
 
-        </button>
+            <p>Delivery: Free</p>
+
+            <p>Discount: ₹0</p>
+
+            <hr>
+
+            <h2>Total: ₹{{ total }}</h2>
+
+            <button class="checkout-btn"
+                routerLink="/checkout">
+                Proceed to Checkout
+            </button>
+
+        </div>
 
     </div>
 
-    <div class="cart-summary">
 
-        <h2>Total: ₹{{ total }}</h2>
-
-        <button class="checkout-btn">
-            Proceed to Checkout
-        </button>
-
-    </div>
 
 </div>

@@ -1,0 +1,56 @@
+<div class="checkout-container">
+
+    <h1>Checkout</h1>
+
+    <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()">
+
+        <input type="text" placeholder="Full Name" formControlName="name">
+
+        <input type="email" placeholder="Email" formControlName="email">
+
+        <textarea rows="4" placeholder="Address" formControlName="address">
+    </textarea>
+        <select formControlName="paymentMethod">
+
+            <option value="COD">
+                Cash on Delivery
+            </option>
+
+            <option value="UPI">
+                UPI
+            </option>
+
+            <option value="Card">
+                Credit / Debit Card
+            </option>
+
+        </select>
+
+        <button type="submit">
+
+            Place Order
+
+        </button>
+
+    </form>
+    <div class="success-message" *ngIf="orderPlaced">
+
+        <h2>🎉 Order Placed Successfully!</h2>
+
+        <p>
+            Thank you for shopping with Triangle Sports.
+        </p>
+
+        <p>
+            Your order has been confirmed.
+        </p>
+
+        <a routerLink="/">
+
+            Continue Shopping
+
+        </a>
+
+    </div>
+
+</div>

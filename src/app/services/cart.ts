@@ -12,12 +12,21 @@ export interface CartItem extends Product {
   providedIn: 'root'
 })
 export class CartService {
-
   private cartItems: CartItem[] = [];
 
   private cartSubject = new BehaviorSubject<CartItem[]>([]);
 
   cart$ = this.cartSubject.asObservable();
+
+  clearCart() {
+
+    this.cartItems = [];
+
+    this.cartSubject.next([]);
+
+    localStorage.removeItem('cart');
+
+  }
 
   constructor() {
 
