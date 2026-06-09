@@ -1,36 +1,62 @@
 <section class="hero">
 
-  <div class="hero-content">
-    <p class="subtitle">NEW SEASON COLLECTION</p>
+    <div class="hero-content">
+        <p class="subtitle">NEW SEASON COLLECTION</p>
 
-    <h1>
-      Performance<br>
-      Meets Style
-    </h1>
+        <h1>
+            Performance<br>
+            Meets Style
+        </h1>
 
-    <p class="description">
-      Premium sportswear designed for athletes who never stop.
-    </p>
+        <p class="description">
+            Premium sportswear designed for athletes who never stop.
+        </p>
 
-    <button>
-      SHOP NOW
-    </button>
-  </div>
+        <button>
+            SHOP NOW
+        </button>
+    </div>
 
 </section>
 
 <section class="categories">
 
-  <div class="category-card">
-    Men
-  </div>
+    <div class="category-card">
+        Men
+    </div>
 
-  <div class="category-card">
-    Women
-  </div>
+    <div class="category-card">
+        Women
+    </div>
 
-  <div class="category-card">
-    Accessories
-  </div>
+    <div class="category-card">
+        Accessories
+    </div>
+
+</section>
+
+<section class="featured-products">
+
+    <h2>Featured Products</h2>
+
+    <div class="products-grid">
+
+        <div class="product-card" *ngFor="let product of products">
+
+            <img [src]="product.image" [alt]="product.name">
+
+            <h3>{{ product.name }}</h3>
+
+            <p>₹{{ product.price }}</p>
+
+            <button (click)="addToCart(product)">
+
+                Add to Cart
+
+            </button>
+
+        </div>
+
+    </div>
 
 </section>
