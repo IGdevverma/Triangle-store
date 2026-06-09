@@ -13,23 +13,55 @@ export class CartService {
 
   cart$ = this.cartSubject.asObservable();
 
+  constructor() {
+
+    const savedCart = localStorage.getItem('cart');
+
+    if (savedCart) {
+
+      this.cartItems = JSON.parse(savedCart);
+
+      this.cartSubject.next(this.cartItems);
+
+    }
+
+  }
+
   addToCart(product: Product) {
     this.cartItems.push(product);
     this.cartSubject.next(this.cartItems);
   }
 
   removeFromCart(productId: number) {
+
     this.cartItems = this.cartItems.filter(
+
       item => item.id !== productId
+
     );
 
     this.cartSubject.next(this.cartItems);
+
+    localStorage.setItem(
+
+      'cart',
+
+      JSON.stringify(this.cartItems)
+
+    );
+
   }
 
   getTotal(): number {
+
     return this.cartItems.reduce(
+
       (total, item) => total + item.price,
+
       0
+
     );
+
   }
+
 }

@@ -17,6 +17,8 @@ export class Cart {
 
   constructor(private cartService: CartService) {
 
+    
+
     this.cartService.cart$.subscribe(items => {
       this.cartItems = items;
       this.total = this.cartService.getTotal();

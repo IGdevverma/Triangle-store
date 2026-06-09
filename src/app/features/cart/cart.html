@@ -1,15 +1,33 @@
-<h1>Shopping Cart</h1>
+<div class="cart-container">
 
-<div *ngFor="let item of cartItems">
+  <h1>Shopping Cart</h1>
 
-  <h3>{{ item.name }}</h3>
+  <div
+    class="cart-item"
+    *ngFor="let item of cartItems">
 
-  <p>₹{{ item.price }}</p>
+    <div class="item-details">
 
-  <button (click)="removeItem(item.id)">
-    Remove
-  </button>
+      <h3>{{ item.name }}</h3>
+
+      <p>₹{{ item.price }}</p>
+
+    </div>
+
+    <button (click)="removeItem(item.id)">
+      Remove
+    </button>
+
+  </div>
+
+  <div class="cart-summary">
+
+    <h2>Total: ₹{{ total }}</h2>
+
+    <button class="checkout-btn">
+      Proceed to Checkout
+    </button>
+
+  </div>
 
 </div>
-
-<h2>Total: ₹{{ total }}</h2>
