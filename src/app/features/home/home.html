@@ -35,13 +35,28 @@
 
 </section>
 
+<div class="filters">
+
+    <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterProducts()">
+
+    <select [(ngModel)]="selectedCategory" (change)="filterProducts()">
+
+        <option value="All">All</option>
+        <option value="Men">Men</option>
+        <option value="Women">Women</option>
+        <option value="Accessories">Accessories</option>
+
+    </select>
+
+</div>
+
 <section class="featured-products">
 
     <h2>Featured Products</h2>
 
     <div class="products-grid">
 
-        <div class="product-card" *ngFor="let product of products">
+        <div class="product-card" *ngFor="let product of filteredProducts">
 
             <img [src]="product.image" [alt]="product.name">
 

@@ -4,17 +4,23 @@ import { Product } from '../../models/product';
 import { ProductService } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
 export class Home implements OnInit {
 
   products: Product[] = [];
+  searchTerm = '';
+
+  selectedCategory = 'All';
+
+  filteredProducts: Product[] = [];
 
   constructor(
 
@@ -31,6 +37,7 @@ export class Home implements OnInit {
       next: (data) => {
 
         this.products = data;
+        this.filteredProducts = data;
 
       },
 
@@ -52,7 +59,29 @@ export class Home implements OnInit {
 
   }
 
+  filterProducts() {
 
+    this.filteredProducts = this.products.filter(product => {
 
+      
+
+      const matchesSearch =
+
+        product.name.toLowerCase()
+
+          .includes(this.searchTerm.toLowerCase());
+
+      const matchesCategory =
+
+        this.selectedCategory === 'All' ||
+
+        product.category === this.selectedCategory;
+
+      return matchesSearch && matchesCategory;
+
+    });
+       console.log(this.filteredProducts);
+  }
+ 
 
 }
