@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { CartService } from '../../services/cart';
 import { Product } from '../../models/product';
 
@@ -14,7 +13,6 @@ import { Product } from '../../models/product';
 export class Cart {
 
   cartItems: Product[] = [];
-
   total = 0;
 
   constructor(private cartService: CartService) {
