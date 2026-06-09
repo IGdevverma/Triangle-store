@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Product } from '../../models/product';
+import { ProductService } from '../../services/product';
 
 @Component({
   selector: 'app-home',
@@ -8,50 +10,37 @@ import { CommonModule } from '@angular/common';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home {
+export class Home implements OnInit {
 
-  products = [
+  products: Product[] = [];
 
-    {
+  constructor(private productService: ProductService) { }
 
-      id: 1,
+  ngOnInit(): void {
 
-      name: 'Training T-Shirt',
+    this.productService.getProducts().subscribe({
 
-      price: 999,
+      next: (data) => {
 
-      image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500'
+        this.products = data;
 
-    },
+      },
 
-    {
+      error: (err) => {
 
-      id: 2,
+        console.error('Error fetching products:', err);
 
-      name: 'Running Shorts',
+      }
 
-      price: 799,
+    });
 
-      image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500'
+  }
 
-    },
-
-    {
-
-      id: 3,
-
-      name: 'Sports Shoes',
-
-      price: 2999,
-
-      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500'
-
-    }
-
-  ];
-
-  addToCart(product: any) {
+  addToCart(product: Product) {
     alert(product.name + ' added to cart');
   }
+
+
+
 
 }
