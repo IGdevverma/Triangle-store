@@ -9,6 +9,7 @@ import { Login } from './features/login/login';
 import { authGuard } from './guards/auth-guard';
 import { Wishlist } from './features/wishlist/wishlist';
 import { RequestQuote } from './features/request-quote/request-quote';
+import { DealerRegistration } from './features/dealer-registration/dealer-registration';
 
 export const routes: Routes = [
   {
@@ -67,6 +68,10 @@ export const routes: Routes = [
   {
     path: 'request-quote',
     component: RequestQuote
+  },
+  {
+    path: 'dealer-registration',
+    component: DealerRegistration
   }
 
 ];

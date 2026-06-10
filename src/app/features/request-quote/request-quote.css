@@ -1,52 +1,46 @@
 .quote-container {
 
     max-width: 1200px;
-
     margin: 50px auto;
-
     padding: 20px;
 
     display: grid;
-
     grid-template-columns: 1fr 1fr;
-
     gap: 50px;
 }
+
+/* Quote Info */
 
 .quote-info h1 {
 
     font-size: 42px;
-
     margin-bottom: 20px;
 }
 
 .quote-info p {
 
     color: #666;
-
     line-height: 1.8;
-
     margin-bottom: 25px;
 }
 
 .quote-info ul {
 
     list-style: none;
-
     padding: 0;
 }
 
 .quote-info li {
 
     margin-bottom: 15px;
-
     font-size: 18px;
 }
+
+/* Quote Form */
 
 .quote-form {
 
     background: white;
-
     padding: 30px;
 
     border-radius: 20px;
@@ -54,7 +48,6 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 
     display: flex;
-
     flex-direction: column;
 
     gap: 15px;
@@ -84,7 +77,16 @@
     border-radius: 10px;
 
     cursor: pointer;
+
+    transition: 0.3s;
 }
+
+.quote-form button:hover {
+
+    background: #ff4d5a;
+}
+
+/* Success Message */
 
 .success {
 
@@ -99,83 +101,80 @@
     font-weight: 600;
 }
 
-@media (max-width: 768px) {
+/* WhatsApp Button */
 
-    .quote-container {
-
-        grid-template-columns: 1fr;
-    }
-
-}
 .whatsapp-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
 
-  width: 60px;
-  height: 60px;
+    position: fixed;
 
-  background: #25D366;
-  color: white;
+    bottom: 20px;
 
-  border-radius: 50%;
+    right: 20px;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    width: 60px;
 
-  font-size: 30px;
-  text-decoration: none;
+    height: 60px;
 
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    background: #25D366;
 
-  z-index: 999;
+    color: white;
+
+    border-radius: 50%;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 30px;
+
+    text-decoration: none;
+
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+    z-index: 999;
 }
 
 .whatsapp-btn:hover {
-  transform: scale(1.1);
+
+    transform: scale(1.1);
 }
-.whatsapp-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
 
-  width: 60px;
-  height: 60px;
+/* Factory Info */
 
-  background: #25D366;
-  color: white;
-
-  border-radius: 50%;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  font-size: 30px;
-  text-decoration: none;
-
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-
-  z-index: 999;
-}
 .factory-info {
-  margin-top: 40px;
-  padding: 25px;
-  background: #f8f8f8;
-  border-radius: 12px;
+
+    grid-column: 1 / -1;
+
+    margin-top: 20px;
+
+    padding: 25px;
+
+    background: #f8f8f8;
+
+    border-radius: 12px;
 }
 
 .factory-info h2 {
-  margin-bottom: 20px;
-  color: #222;
+
+    margin-bottom: 20px;
+
+    color: #222;
 }
 
 .factory-info p {
-  margin: 10px 0;
-  line-height: 1.6;
+
+    margin: 10px 0;
+
+    line-height: 1.6;
 }
+
+/* Manufacturing Process */
+
 .process-section {
+
+    grid-column: 1 / -1;
 
     margin-top: 60px;
 }
@@ -183,29 +182,38 @@
 .process-section h2 {
 
     text-align: center;
+
     margin-bottom: 40px;
 }
 
 .process-grid {
 
     display: grid;
+
     grid-template-columns: repeat(4, 1fr);
+
     gap: 25px;
 }
 
 .process-card {
 
     background: white;
+
     padding: 25px;
+
     border-radius: 15px;
+
     text-align: center;
+
     box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 }
 
 .process-card span {
 
     display: inline-block;
+
     width: 50px;
+
     height: 50px;
 
     line-height: 50px;
@@ -213,9 +221,11 @@
     border-radius: 50%;
 
     background: black;
+
     color: white;
 
     font-weight: bold;
+
     margin-bottom: 15px;
 }
 
@@ -227,12 +237,240 @@
 .process-card p {
 
     color: #666;
+
+    line-height: 1.6;
+}
+
+/* Dealer Section */
+
+.dealer-section {
+
+    grid-column: 1 / -1;
+
+    margin-top: 80px;
+
+    padding: 40px;
+
+    background: #f8f8f8;
+
+    border-radius: 20px;
+}
+
+.dealer-section h2 {
+
+    text-align: center;
+
+    margin-bottom: 15px;
+}
+
+.dealer-section p {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-bottom: 25px;
+}
+
+.dealer-form {
+
+    max-width: 700px;
+
+    margin: auto;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.dealer-form input,
+.dealer-form textarea {
+
+    padding: 14px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+}
+
+.dealer-form button {
+
+    background: black;
+
+    color: white;
+
+    border: none;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
+}
+
+.dealer-form button:hover {
+
+    background: #ff4d5a;
+}
+
+.dealer-success {
+
+    color: green;
+
+    font-weight: 600;
+
+    text-align: center;
+
+    margin-top: 20px;
+}
+
+/* Responsive */
+
+@media (max-width: 768px) {
+
+    .quote-container {
+
+        grid-template-columns: 1fr;
+    }
+
+    .process-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .quote-info h1 {
+
+        font-size: 32px;
+    }
+
+    .dealer-section {
+
+        padding: 25px;
+    }
+
+}
+.gallery-section {
+
+    grid-column: 1 / -1;
+
+    margin-top: 80px;
+}
+
+.gallery-section h2 {
+
+    text-align: center;
+
+    margin-bottom: 10px;
+}
+
+.gallery-section p {
+
+    text-align: center;
+
+    color: #666;
+
+    margin-bottom: 30px;
+}
+
+.gallery-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 20px;
+}
+
+.gallery-grid img {
+
+    width: 100%;
+
+    height: 250px;
+
+    object-fit: cover;
+
+    border-radius: 15px;
+
+    transition: 0.3s;
+}
+
+.gallery-grid img:hover {
+
+    transform: scale(1.03);
+}
+
+@media (max-width: 768px) {
+
+    .gallery-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+}
+.why-us-section {
+
+    grid-column: 1 / -1;
+
+    margin-top: 80px;
+}
+
+.why-us-section h2 {
+
+    text-align: center;
+
+    margin-bottom: 40px;
+}
+
+.why-grid {
+
+    display: grid;
+
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 25px;
+}
+
+.why-card {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 15px;
+
+    text-align: center;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.why-card span {
+
+    font-size: 40px;
+
+    display: block;
+
+    margin-bottom: 15px;
+}
+
+.why-card h3 {
+
+    margin-bottom: 10px;
+}
+
+.why-card p {
+
+    color: #666;
+
     line-height: 1.6;
 }
 
 @media (max-width: 768px) {
 
-    .process-grid {
+    .why-grid {
 
         grid-template-columns: 1fr;
     }

@@ -1,8 +1,13 @@
 <div class="quote-container">
+
+    <!-- WhatsApp Button -->
     <a href="https://wa.me/916398235747" class="whatsapp-btn" target="_blank">
+
         💬
+
     </a>
 
+    <!-- Manufacturing Info -->
     <div class="quote-info">
 
         <h1>Bulk Manufacturing Enquiry</h1>
@@ -29,6 +34,7 @@
 
     </div>
 
+    <!-- Quote Form -->
     <form class="quote-form" [formGroup]="quoteForm" (ngSubmit)="submitQuote()">
 
         <h2>Request a Quote</h2>
@@ -47,25 +53,15 @@
                 Select Product
             </option>
 
-            <option>
-                T-Shirts
-            </option>
+            <option>T-Shirts</option>
 
-            <option>
-                Lowers
-            </option>
+            <option>Lowers</option>
 
-            <option>
-                Sleeves
-            </option>
+            <option>Sleeves</option>
 
-            <option>
-                Teamwear
-            </option>
+            <option>Teamwear</option>
 
-            <option>
-                Tighty
-            </option>
+            <option>Tighty</option>
 
         </select>
 
@@ -81,7 +77,87 @@
         </button>
 
     </form>
+    <section class="gallery-section">
+
+        <h2>Inside Triangle Sports</h2>
+
+        <p>
+            A glimpse of our manufacturing excellence.
+        </p>
+
+        <div class="gallery-grid">
+
+            <img src="https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?w=800">
+
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?w=800">
+
+            <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800">
+
+            <img src="https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800">
+
+            <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=800">
+
+            <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?w=800">
+
+        </div>
+
+    </section>
+    <section class="why-us-section">
+
+        <h2>Why Choose Triangle Sports?</h2>
+
+        <div class="why-grid">
+
+            <div class="why-card">
+                <span>🏭</span>
+                <h3>Own Manufacturing Unit</h3>
+                <p>Complete cut-to-pack production under one roof.</p>
+            </div>
+
+            <div class="why-card">
+                <span>🧵</span>
+                <h3>Premium Fabrics</h3>
+                <p>High-quality materials for maximum comfort.</p>
+            </div>
+
+            <div class="why-card">
+                <span>🎨</span>
+                <h3>Custom Branding</h3>
+                <p>Printing, embroidery and private labelling available.</p>
+            </div>
+
+            <div class="why-card">
+                <span>🚚</span>
+                <h3>Fast Delivery</h3>
+                <p>Timely dispatch across India.</p>
+            </div>
+
+            <div class="why-card">
+                <span>📦</span>
+                <h3>MOQ from 100 Pieces</h3>
+                <p>Flexible bulk order quantities.</p>
+            </div>
+
+            <div class="why-card">
+                <span>✅</span>
+                <h3>Quality Control</h3>
+                <p>Every product passes strict inspection.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- Quote Success -->
+    <div class="success" *ngIf="submitted">
+
+        ✅ Redirecting you to WhatsApp...
+
+    </div>
+
+    <!-- Factory Information -->
     <section class="factory-info">
+
         <h2>Contact Our Manufacturing Team</h2>
 
         <p><strong>Company:</strong> Triangle Sports</p>
@@ -91,12 +167,20 @@
         <p><strong>Email:</strong> trianindustriespvtltd@gmail.com</p>
 
         <p>
+
             <strong>Address:</strong><br>
+
             47,89, Shivam Vihar,<br>
+
             Raj Nagar Extension,<br>
+
             Ghaziabad, Uttar Pradesh – 201003
+
         </p>
+
     </section>
+
+    <!-- Manufacturing Process -->
     <section class="process-section">
 
         <h2>Our Manufacturing Process</h2>
@@ -155,14 +239,49 @@
 
     </section>
 
+    <!-- Dealer Registration -->
+    <section class="dealer-section">
+
+        <h2>Become a Dealer / Distributor</h2>
+
+        <p>
+            Join Triangle Sports and become an authorised dealer in your city.
+        </p>
+
+        <form [formGroup]="dealerForm" (ngSubmit)="submitDealer()" class="dealer-form">
+
+            <input type="text" placeholder="Full Name" formControlName="fullName">
+
+            <input type="text" placeholder="Business Name" formControlName="businessName">
+
+            <input type="email" placeholder="Email" formControlName="email">
+
+            <input type="text" placeholder="Phone Number" formControlName="phone">
+
+            <input type="text" placeholder="City" formControlName="city">
+
+            <input type="text" placeholder="State" formControlName="state">
+
+            <textarea rows="3" placeholder="Business Experience" formControlName="experience">
+            </textarea>
+
+            <textarea rows="3" placeholder="Additional Message" formControlName="message">
+            </textarea>
+
+            <button type="submit">
+
+                Apply as Dealer
+
+            </button>
+
+        </form>
+
+        <p *ngIf="dealerSubmitted" class="dealer-success">
+
+            ✅ Redirecting you to WhatsApp...
+
+        </p>
+
+    </section>
+
 </div>
-
-<div class="success" *ngIf="submitted">
-
-    ✅ Redirecting you to WhatsApp...
-
-</div>
-<a href="https://wa.me/916398235747?text=Hello%20Triangle%20Sports,%20I%20want%20a%20manufacturing%20quote."
-    class="whatsapp-btn" target="_blank">
-    💬
-</a>

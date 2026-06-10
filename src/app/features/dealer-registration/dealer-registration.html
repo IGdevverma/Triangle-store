@@ -1,0 +1,92 @@
+<div class="dealer-container">
+
+    <div class="dealer-info">
+
+        <h1>Become a Triangle Sports Dealer</h1>
+
+        <p>
+            Join our growing network of dealers and distributors
+            across India.
+        </p>
+
+        <ul>
+
+            <li>✔ Attractive Margins</li>
+
+            <li>✔ Bulk Manufacturing Support</li>
+
+            <li>✔ Private Label Options</li>
+
+            <li>✔ Marketing Assistance</li>
+
+            <li>✔ Fast Dispatch</li>
+
+        </ul>
+
+    </div>
+
+    <form
+        class="dealer-form"
+        [formGroup]="dealerForm"
+        (ngSubmit)="submitApplication()">
+
+        <input
+            type="text"
+            placeholder="Full Name"
+            formControlName="fullName">
+
+        <input
+            type="text"
+            placeholder="Business Name"
+            formControlName="businessName">
+
+        <input
+            type="email"
+            placeholder="Email"
+            formControlName="email">
+
+        <input
+            type="text"
+            placeholder="Phone Number"
+            formControlName="phone">
+
+        <input
+            type="text"
+            placeholder="City"
+            formControlName="city">
+
+        <input
+            type="text"
+            placeholder="State"
+            formControlName="state">
+
+        <textarea
+            rows="4"
+            placeholder="Previous Experience"
+            formControlName="experience">
+        </textarea>
+
+        <textarea
+            rows="4"
+            placeholder="Additional Message"
+            formControlName="message">
+        </textarea>
+
+        <button type="submit">
+
+            Apply Now
+
+        </button>
+
+    </form>
+
+</div>
+
+<div
+    class="success-message"
+    *ngIf="submitted">
+
+    🎉 Thank you for your interest!
+    Our team will contact you shortly.
+
+</div>

@@ -16,19 +16,29 @@ import {
 })
 export class RequestQuote {
 
+  // Manufacturing Quote Form
   quoteForm: FormGroup;
 
   submitted = false;
 
+  // Dealer Form
+  dealerForm: FormGroup;
+
+  dealerSubmitted = false;
+
   constructor(private fb: FormBuilder) {
 
+    // Quote Form
     this.quoteForm = this.fb.group({
 
       name: ['', Validators.required],
 
       company: [''],
 
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [
+        Validators.required,
+        Validators.email
+      ]],
 
       phone: ['', Validators.required],
 
@@ -40,15 +50,45 @@ export class RequestQuote {
 
     });
 
+    // Dealer Form
+    this.dealerForm = this.fb.group({
+
+      fullName: ['', Validators.required],
+
+      businessName: ['', Validators.required],
+
+      email: [
+        '',
+        [
+          Validators.required,
+          Validators.email
+        ]
+      ],
+
+      phone: ['', Validators.required],
+
+      city: ['', Validators.required],
+
+      state: ['', Validators.required],
+
+      experience: [''],
+
+      message: ['']
+
+    });
+
   }
 
+  // Manufacturing Quote
   submitQuote() {
 
     if (this.quoteForm.valid) {
 
       const form = this.quoteForm.value;
 
-      const message = `Hello Triangle Sports,
+      const whatsappMessage = `Hello Triangle Sports,
+
+Manufacturing Enquiry
 
 Name: ${form.name}
 Company: ${form.company}
@@ -60,16 +100,51 @@ Quantity: ${form.quantity}
 Requirements:
 ${form.message}`;
 
-      const whatsappNumber = '916398235747';
-
       const url =
-        `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+        `https://wa.me/916398235747?text=${encodeURIComponent(whatsappMessage)}`;
 
       window.open(url, '_blank');
 
       this.submitted = true;
 
       this.quoteForm.reset();
+
+    }
+
+  }
+
+  // Dealer Registration
+  submitDealer() {
+
+    if (this.dealerForm.valid) {
+
+      const form = this.dealerForm.value;
+
+      const whatsappMessage = `Hello Triangle Sports,
+
+Dealer Registration Request
+
+Name: ${form.fullName}
+Business: ${form.businessName}
+Email: ${form.email}
+Phone: ${form.phone}
+City: ${form.city}
+State: ${form.state}
+
+Experience:
+${form.experience}
+
+Message:
+${form.message}`;
+
+      const url =
+        `https://wa.me/916398235747?text=${encodeURIComponent(whatsappMessage)}`;
+
+      window.open(url, '_blank');
+
+      this.dealerSubmitted = true;
+
+      this.dealerForm.reset();
 
     }
 
