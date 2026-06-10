@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 import { OrderService } from '../../services/order';
-import { Order } from '../../models/order';
+import { Order } from '../../models/orders';
 
 @Component({
   selector: 'app-orders',

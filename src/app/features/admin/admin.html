@@ -2,103 +2,150 @@
 
     <h1>Admin Dashboard</h1>
 
+    <!-- Stats Cards -->
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+
+            <h2>{{ totalProducts }}</h2>
+
+            <p>Total Products</p>
+
+        </div>
+
+        <div class="stat-card">
+
+            <h2>{{ totalCategories }}</h2>
+
+            <p>Categories</p>
+
+        </div>
+
+    </div>
+
+    <!-- Search -->
+
+    <div class="search-box">
+
+        <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm">
+
+    </div>
+
     <!-- Form Card -->
+
     <div class="form-card">
 
         <h2>
+
             {{ editing ? 'Edit Product' : 'Add Product' }}
+
         </h2>
 
         <div class="form-group">
 
-            <input
-                type="text"
-                placeholder="Name"
-                [(ngModel)]="newProduct.name"
-            >
+            <input type="text" placeholder="Name" [(ngModel)]="newProduct.name">
 
-            <input
-                type="number"
-                placeholder="Price"
-                [(ngModel)]="newProduct.price"
-            >
+            <input type="number" placeholder="Price" [(ngModel)]="newProduct.price">
 
-            <input
-                type="text"
-                placeholder="Image URL"
-                [(ngModel)]="newProduct.image"
-            >
+            <input type="text" placeholder="Image URL" [(ngModel)]="newProduct.image">
 
-            <input
-                type="text"
-                placeholder="Category"
-                [(ngModel)]="newProduct.category"
-            >
+            <input type="text" placeholder="Category" [(ngModel)]="newProduct.category">
 
         </div>
 
-        <button
-            class="form-btn"
-            *ngIf="!editing"
-            (click)="addProduct()"
-        >
+        <button class="form-btn" *ngIf="!editing" (click)="addProduct()">
+
             Add Product
+
         </button>
 
-        <button
-            class="form-btn"
-            *ngIf="editing"
-            (click)="updateProduct()"
-        >
+        <button class="form-btn" *ngIf="editing" (click)="updateProduct()">
+
             Update Product
+
         </button>
 
     </div>
 
     <!-- Products Table -->
+
     <div class="table-wrapper">
 
         <table>
 
-            <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
-                <th>Category</th>
-                <th>Actions</th>
-            </tr>
+            <thead>
 
-            <tr *ngFor="let product of products">
+                <tr>
 
-                <td>{{ product.id }}</td>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Actions</th>
 
-                <td>{{ product.name }}</td>
+                </tr>
 
-                <td>₹{{ product.price }}</td>
+            </thead>
 
-                <td>{{ product.category }}</td>
+            <tbody>
 
-                <td>
+                <tr *ngFor="let product of filteredProducts">
 
-                    <button
-                        class="action-btn edit-btn"
-                        (click)="editProduct(product)"
-                    >
-                        Edit
-                    </button>
+                    <td>{{ product.id }}</td>
 
-                    <button
-                        class="action-btn delete-btn"
-                        (click)="deleteProduct(product.id)"
-                    >
-                        Delete
-                    </button>
+                    <td>{{ product.name }}</td>
 
-                </td>
+                    <td>₹{{ product.price }}</td>
 
-            </tr>
+                    <td>{{ product.category }}</td>
+
+                    <td>
+
+                        <button class="action-btn edit-btn" (click)="editProduct(product)">
+
+                            Edit
+
+                        </button>
+
+                        <button class="action-btn delete-btn" (click)="deleteProduct(product.id)">
+
+                            Delete
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
 
         </table>
+
+    </div>
+
+
+    <div class="pagination">
+
+        <button (click)="previousPage()" [disabled]="currentPage === 1">
+
+            Previous
+
+        </button>
+
+        <span>
+
+            Page {{ currentPage }}
+            of
+            {{ totalPages }}
+
+        </span>
+
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages">
+
+            Next
+
+        </button>
 
     </div>
 

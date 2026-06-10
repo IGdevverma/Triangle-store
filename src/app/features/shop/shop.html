@@ -1,0 +1,175 @@
+<div class="shop-page">
+
+    <div class="sidebar">
+
+        <h2>Filters</h2>
+
+        <h3>Category</h3>
+
+        <label>
+            <input type="radio" name="category" value="All" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+
+            All
+        </label>
+
+        <label>
+            <input type="radio" name="category" value="Men" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+
+            Men
+        </label>
+
+        <label>
+            <input type="radio" name="category" value="Women" [(ngModel)]="selectedCategory"
+                (change)="filterProducts()">
+
+            Women
+        </label>
+
+        <label>
+            <input type="radio" name="category" value="Accessories" [(ngModel)]="selectedCategory"
+                (change)="filterProducts()">
+
+            Accessories
+        </label>
+
+        <h3>Price</h3>
+
+        <label>
+            <input type="radio" name="price" value="" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+
+            All
+        </label>
+
+        <label>
+            <input type="radio" name="price" value="under1000" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+
+            Under ₹1000
+        </label>
+
+        <label>
+            <input type="radio" name="price" value="1000to3000" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+
+            ₹1000 – ₹3000
+        </label>
+
+        <label>
+            <input type="radio" name="price" value="above3000" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+
+            Above ₹3000
+        </label>
+
+    </div>
+
+    <div class="products-area">
+
+        <div class="shop-header">
+
+            <h1>Shop</h1>
+
+            <select [(ngModel)]="selectedSort" (change)="filterProducts()">
+
+                <option value="latest">
+
+                    Latest
+
+                </option>
+
+                <option value="lowToHigh">
+
+                    Price: Low to High
+
+                </option>
+
+                <option value="highToLow">
+
+                    Price: High to Low
+
+                </option>
+
+            </select>
+
+        </div>
+
+        <div class="products-grid">
+
+            <div class="product-card" *ngFor="let product of filteredProducts">
+
+                <div class="image-container">
+
+                    <img [src]="product.image" [alt]="product.name" class="product-image"
+                        [routerLink]="['/product', product.id]">
+
+                    <div class="hover-actions">
+
+                        <button class="wishlist-btn" (click)="toggleWishlist(product)">
+
+                            {{ isWishlisted(product.id) ? '❤️' : '🤍' }}
+
+                        </button>
+
+                        <button class="quick-view-btn" (click)="openQuickView(product)">
+
+                            👁
+
+                        </button>
+
+                        <button class="cart-hover-btn" (click)="addToCart(product)">
+
+                            🛒
+
+                        </button>
+                      
+
+                    </div>
+
+                </div>
+
+                <h3>{{ product.name }}</h3>
+
+                <p>₹{{ product.price }}</p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- Quick View Modal -->
+
+<div class="modal-overlay" *ngIf="selectedProduct">
+
+    <div class="quick-view-modal">
+
+        <button class="close-btn" (click)="closeQuickView()">
+
+            ✕
+
+        </button>
+
+        <img [src]="selectedProduct.image" [alt]="selectedProduct.name">
+
+        <h2>{{ selectedProduct.name }}</h2>
+
+        <p class="price">
+
+            ₹{{ selectedProduct.price }}
+
+        </p>
+
+        <p>
+
+            Category:
+            {{ selectedProduct.category }}
+
+        </p>
+
+        <button class="modal-cart-btn" (click)="addToCart(selectedProduct)">
+
+            Add to Cart
+
+        </button>
+
+    </div>
+
+</div>

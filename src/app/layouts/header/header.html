@@ -9,6 +9,35 @@
     <li>Women</li>
     <li>Accessories</li>
     <li>Sale</li>
-    <li><a routerLink="/cart">Cart ({{ cartCount }})</a></li>
+    <li routerLink="/shop">
+
+      Shop
+
+    </li>
+
+    <li *ngIf="!isLoggedIn()">
+      <a routerLink="/login">Login</a>
+    </li>
+
+    <li *ngIf="isLoggedIn()">
+      <a (click)="logout()" style="cursor: pointer;">
+        Logout
+      </a>
+    </li>
+
+    <li>
+      <a routerLink="/cart">
+        Cart ({{ cartCount }})
+      </a>
+    </li>
+    <li>
+
+      <a routerLink="/wishlist">
+
+        ❤️ Wishlist ({{ wishlistCount }})
+
+      </a>
+
+    </li>
   </ul>
 </nav>

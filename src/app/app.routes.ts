@@ -3,8 +3,11 @@ import { Home } from './features/home/home';
 import { Cart } from './features/cart/cart';
 import { ProductDetail } from './features/product-detail/product-detail';
 import { Checkout } from './features/checkout/checkout';
-import { Orders } from './features/orders/orders';
+import { Orders } from './features/order/order';
 import { Admin } from './features/admin/admin';
+import { Login } from './features/login/login';
+import { authGuard } from './guards/auth-guard';
+import { Wishlist } from './features/wishlist/wishlist';
 
 export const routes: Routes = [
   {
@@ -30,13 +33,35 @@ export const routes: Routes = [
     path: 'checkout',
     component: Checkout
   },
-  
+
   {
     path: 'orders',
     component: Orders
   },
   {
     path: 'admin',
-    component: Admin
+    component: Admin,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'login',
+    component: Login
+
+  },
+  {
+
+    path: 'shop',
+
+    loadComponent: () =>
+
+      import('./features/shop/shop')
+
+        .then(m => m.Shop)
+
+  },
+  {
+    path: 'wishlist',
+    component: Wishlist
   }
+
 ];

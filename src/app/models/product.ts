@@ -10,4 +10,12 @@ export interface Product {
 
   category: string;
 
+  description?: string;
+
+  fabric?: string;
+
+  type?: string;
+
+  stock?: boolean;
+
 }

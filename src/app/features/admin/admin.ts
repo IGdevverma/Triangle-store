@@ -14,6 +14,14 @@ import { Product } from '../../models/product';
 })
 export class Admin implements OnInit {
 
+  searchTerm = '';
+  currentPage = 1;
+
+  itemsPerPage = 5;
+
+  totalProducts = 0;
+  totalCategories = 0;
+
   products: Product[] = [];
   newProduct: Product = {
     id: 0,
@@ -22,6 +30,21 @@ export class Admin implements OnInit {
     image: '',
     category: ''
   };
+  get totalPages(): number {
+
+    return Math.ceil(
+
+      this.products.filter(product =>
+
+        product.name
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase())
+
+      ).length / this.itemsPerPage
+
+    );
+
+  }
 
   constructor(
     private productService: ProductService
@@ -40,7 +63,34 @@ export class Admin implements OnInit {
 
         this.products = data;
 
+        this.totalProducts = data.length;
+
+        this.totalCategories =
+          new Set(
+            data.map(product => product.category)
+          ).size;
+
       });
+
+  }
+
+  get filteredProducts() {
+
+    const filtered = this.products.filter(product =>
+
+      product.name
+        .toLowerCase()
+        .includes(this.searchTerm.toLowerCase())
+
+    );
+
+    const start =
+      (this.currentPage - 1) * this.itemsPerPage;
+
+    return filtered.slice(
+      start,
+      start + this.itemsPerPage
+    );
 
   }
 
@@ -110,6 +160,25 @@ export class Admin implements OnInit {
           this.loadProducts();
 
         });
+
+    }
+
+  }
+
+  previousPage() {
+
+    if (this.currentPage > 1) {
+
+      this.currentPage--;
+
+    }
+
+  }
+  nextPage() {
+
+    if (this.currentPage < this.totalPages) {
+
+      this.currentPage++;
 
     }
 

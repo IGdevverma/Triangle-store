@@ -21,6 +21,8 @@ export class Home implements OnInit {
   selectedCategory = 'All';
 
   filteredProducts: Product[] = [];
+  selectedPrice = '';
+
 
   constructor(
 
@@ -63,25 +65,48 @@ export class Home implements OnInit {
 
     this.filteredProducts = this.products.filter(product => {
 
-      
-
       const matchesSearch =
-
-        product.name.toLowerCase()
-
+        product.name
+          .toLowerCase()
           .includes(this.searchTerm.toLowerCase());
 
       const matchesCategory =
-
         this.selectedCategory === 'All' ||
-
         product.category === this.selectedCategory;
 
-      return matchesSearch && matchesCategory;
+      let matchesPrice = true;
+
+      if (this.selectedPrice === 'under1000') {
+
+        matchesPrice = product.price < 1000;
+
+      }
+
+      else if (this.selectedPrice === '1000to3000') {
+
+        matchesPrice =
+          product.price >= 1000 &&
+          product.price <= 3000;
+
+      }
+
+      else if (this.selectedPrice === 'above3000') {
+
+        matchesPrice = product.price > 3000;
+
+      }
+
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesPrice
+      );
 
     });
-       console.log(this.filteredProducts);
+
+    
+
   }
- 
+
 
 }

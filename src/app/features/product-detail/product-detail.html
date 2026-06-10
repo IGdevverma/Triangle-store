@@ -1,18 +1,242 @@
 <div *ngIf="product" class="product-detail">
 
-  <img
-    [src]="product.image"
-    [alt]="product.name">
+  <!-- Product Images -->
+  <div class="product-images">
 
+    <img class="main-image" [src]="selectedImage" [alt]="product.name">
+
+    <div class="thumbnail-images">
+
+      <img *ngFor="let image of productImages" [src]="image" [class.active-thumb]="selectedImage === image"
+        (click)="selectedImage = image">
+
+    </div>
+
+  </div>
+
+  <!-- Product Details -->
   <div class="details">
 
     <h1>{{ product.name }}</h1>
 
     <h2>₹{{ product.price }}</h2>
 
-    <button (click)="addToCart()">
+    <p>Category: {{ product.category }}</p>
+
+    <!-- Size -->
+    <div class="size-selector">
+
+      <h3>Select Size</h3>
+
+      <button *ngFor="let size of sizes" [class.active]="selectedSize === size" (click)="selectedSize = size">
+
+        {{ size }}
+
+      </button>
+
+    </div>
+
+    <!-- Quantity -->
+    <div class="quantity-selector">
+
+      <h3>Quantity</h3>
+
+      <div class="quantity-box">
+
+        <button (click)="decreaseQuantity()" [disabled]="quantity === 1">
+
+          −
+
+        </button>
+
+        <span>{{ quantity }}</span>
+
+        <button (click)="increaseQuantity()">
+
+          +
+
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- Stock -->
+    <div class="stock-status">
+
+      <span *ngIf="product.stock" class="in-stock">
+        ✔ In Stock
+      </span>
+
+      <span *ngIf="!product.stock" class="out-stock">
+        ✖ Out of Stock
+      </span>
+
+    </div>
+
+    <!-- Add to Cart -->
+    <button class="add-cart-btn" (click)="addToCart()">
+
       Add to Cart
+
     </button>
+
+  </div>
+
+</div>
+
+<!-- Tabs -->
+<div class="tabs-section" *ngIf="product">
+
+  <div class="tab-header">
+
+    <button [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+
+      Description
+
+    </button>
+
+    <button [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
+
+      Reviews ({{ reviews.length }})
+
+    </button>
+
+  </div>
+
+  <!-- Description -->
+  <div *ngIf="activeTab === 'description'" class="tab-content">
+
+    <div class="info-grid">
+
+      <div>
+
+        <span>Type</span>
+
+        <h4>{{ product.type }}</h4>
+
+      </div>
+
+      <div>
+
+        <span>Fabric</span>
+
+        <h4>{{ product.fabric }}</h4>
+
+      </div>
+
+    </div>
+
+    <div class="product-details">
+
+      <span>Product Details</span>
+
+      <p>• {{ product.description }}</p>
+
+      <p>• Four-way stretch increases mobility and adds comfort.</p>
+
+      <p>• Textured fabric adds to a classic look.</p>
+
+      <p>• Embossed contrast TYKA bird logo.</p>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- Reviews -->
+  <div *ngIf="activeTab === 'reviews'" class="tab-content">
+    <div class="rating-summary">
+
+      <h2>
+
+        {{ averageRating.toFixed(1) }}
+
+        <span>/5</span>
+
+      </h2>
+
+      <p>
+
+        {{ reviews.length }} Review(s)
+
+      </p>
+
+      <div class="rating-stars">
+
+        {{ '★'.repeat(roundedRating) }}
+
+      </div>
+
+    </div>
+
+    <div class="review-form">
+
+      <input type="text" placeholder="Your Name" [(ngModel)]="newReview.name">
+
+      <select [(ngModel)]="newReview.rating">
+
+        <option [ngValue]="5">★★★★★</option>
+        <option [ngValue]="4">★★★★</option>
+        <option [ngValue]="3">★★★</option>
+        <option [ngValue]="2">★★</option>
+        <option [ngValue]="1">★</option>
+
+      </select>
+
+      <textarea rows="4" placeholder="Write your review" [(ngModel)]="newReview.comment">
+
+      </textarea>
+
+      <button (click)="submitReview()">
+
+        Submit Review
+
+      </button>
+
+    </div>
+
+    <div *ngFor="let review of reviews" class="review-card">
+
+      <h4>{{ review.name }}</h4>
+
+      <p class="stars">
+
+        {{ '★'.repeat(review.rating) }}
+
+      </p>
+
+      <p>{{ review.comment }}</p>
+
+    </div>
+
+    <p *ngIf="reviews.length === 0">
+
+      No reviews yet.
+
+    </p>
+
+  </div>
+
+</div>
+
+<!-- Related Products -->
+<div class="related-section" *ngIf="relatedProducts.length">
+
+  <h2>Related Products</h2>
+
+  <div class="related-grid">
+
+    <div class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item.id]">
+
+      <img [src]="item.image" [alt]="item.name">
+
+      <h4>{{ item.name }}</h4>
+
+      <p>₹{{ item.price }}</p>
+
+    </div>
 
   </div>
 
