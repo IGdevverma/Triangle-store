@@ -2,88 +2,227 @@
 
     <h1>Checkout</h1>
 
-    <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()">
+    <div class="checkout-grid">
 
-        <input type="text" placeholder="Full Name" formControlName="name">
+        <!-- Checkout Form -->
 
-        <input type="email" placeholder="Email" formControlName="email">
+        <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()">
 
-        <textarea rows="4" placeholder="Address" formControlName="address">
-    </textarea>
-        <select formControlName="paymentMethod">
+            <input type="text" placeholder="Full Name" formControlName="name">
+            <small class="error" *ngIf="checkoutForm.get('name')?.touched &&
 
-            <option value="COD">
-                Cash on Delivery
-            </option>
+              checkoutForm.get('name')?.invalid">
 
-            <option value="UPI">
-                UPI
-            </option>
+                Full Name is required.
 
-            <option value="Card">
-                Credit / Debit Card
-            </option>
+            </small>
 
-        </select>
-        <!-- UPI Options -->
+            <input type="email" placeholder="Email" formControlName="email">
+            <small class="error" *ngIf="checkoutForm.get('email')?.touched &&
 
-        <div *ngIf="paymentMethod === 'UPI'">
+              checkoutForm.get('email')?.errors?.['required']">
 
-            <h3>Select UPI App</h3>
+                Email is required.
 
-            <label>
-                <input type="radio" name="upi">
-                Google Pay
-            </label>
+            </small>
 
-            <label>
-                <input type="radio" name="upi">
-                PhonePe
-            </label>
+            <small class="error" *ngIf="checkoutForm.get('email')?.touched &&
 
-            <label>
-                <input type="radio" name="upi">
-                Paytm
-            </label>
+              checkoutForm.get('email')?.errors?.['email']">
+
+                Please enter a valid email.
+
+            </small>
+
+            <textarea rows="4" placeholder="Address" formControlName="address">
+            </textarea>
+            <small class="error" *ngIf="checkoutForm.get('address')?.touched &&
+
+              checkoutForm.get('address')?.invalid">
+
+                Address is required.
+
+            </small>
+
+            <select formControlName="paymentMethod">
+
+                <option value="COD">
+                    Cash on Delivery
+                </option>
+
+                <option value="UPI">
+                    UPI
+                </option>
+
+                <option value="Card">
+                    Credit / Debit Card
+                </option>
+
+            </select>
+
+            <!-- UPI Options -->
+
+            <div *ngIf="paymentMethod === 'UPI'">
+
+                <h3>Select UPI App</h3>
+
+                <label>
+                    <input type="radio" name="upi">
+                    Google Pay
+                </label>
+
+                <label>
+                    <input type="radio" name="upi">
+                    PhonePe
+                </label>
+
+                <label>
+                    <input type="radio" name="upi">
+                    Paytm
+                </label>
+
+            </div>
+
+            <!-- Card Fields -->
+
+            <div *ngIf="paymentMethod === 'Card'">
+
+                <input type="text" placeholder="Card Number">
+
+                <input type="text" placeholder="Expiry Date">
+
+                <input type="password" placeholder="CVV">
+
+            </div>
+
+            <button type="submit">
+
+                Place Order
+
+            </button>
+
+        </form>
+
+        <!-- Order Summary -->
+
+        <div class="order-summary">
+
+            <h2>Order Summary</h2>
+
+            <div class="summary-row">
+
+                <span>Subtotal</span>
+
+                <span>₹{{ subtotal }}</span>
+
+            </div>
+
+            <div class="summary-row">
+
+                <span>Shipping</span>
+
+                <span>₹{{ shipping }}</span>
+
+            </div>
+
+            <div class="summary-row">
+
+                <span>GST (18%)</span>
+
+                <span>₹{{ gst }}</span>
+
+            </div>
+
+            <div class="coupon-section">
+
+                <input type="text" placeholder="Enter Coupon Code" [(ngModel)]="couponCode">
+
+                <button type="button" (click)="applyCoupon()">
+
+                    Apply
+
+                </button>
+
+            </div>
+
+            <div class="summary-row discount" *ngIf="discount > 0">
+
+                <span>
+
+                    Discount ({{ discount }}%)
+
+                </span>
+
+                <span>
+
+                    -₹{{ discountAmount }}
+
+                </span>
+
+            </div>
+
+            <hr>
+
+            <div class="summary-row total">
+
+                <span>Grand Total</span>
+
+                <span>₹{{ grandTotal }}</span>
+
+            </div>
 
         </div>
 
-        <!-- Card Fields -->
+    </div>
 
-        <div *ngIf="paymentMethod === 'Card'">
+    <!-- Success Message -->
 
-            <input type="text" placeholder="Card Number">
+    <div class="success-overlay" *ngIf="orderPlaced">
 
-            <input type="text" placeholder="Expiry Date">
+        <div class="success-popup">
 
-            <input type="password" placeholder="CVV">
+            <div class="success-icon">
+
+                ✅
+
+            </div>
+
+            <h2>
+
+                Order Placed Successfully!
+
+            </h2>
+
+            <p>
+
+                Thank you for shopping with Triangle Sports.
+
+            </p>
+
+            <p>
+
+                Order ID:
+                <strong>{{ generatedOrderId }}</strong>
+
+            </p>
+
+            <div class="popup-actions">
+
+                <a routerLink="/" class="popup-btn">
+
+                    Continue Shopping
+
+                </a>
+
+                <a routerLink="/orders" class="popup-btn secondary">
+
+                    View Orders
+
+                </a>
+
+            </div>
 
         </div>
-
-        <button type="submit">
-
-            Place Order
-
-        </button>
-
-    </form>
-    <div class="success-message" *ngIf="orderPlaced">
-
-        <h2>🎉 Order Placed Successfully!</h2>
-
-        <p>
-            Thank you for shopping with Triangle Sports.
-        </p>
-
-        <p>
-            Your order has been confirmed.
-        </p>
-
-        <a routerLink="/">
-
-            Continue Shopping
-
-        </a>
 
     </div>
 

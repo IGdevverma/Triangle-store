@@ -2,7 +2,7 @@ import { CartItem } from '../services/cart';
 
 export interface Order {
 
-  id: number;
+  id: string;
 
   items: CartItem[];
 

@@ -1,0 +1,93 @@
+<div class="orders-container">
+
+    <h1>Order History</h1>
+
+    <div *ngIf="orders.length === 0" class="empty-orders">
+
+        <h2>No Orders Found</h2>
+
+        <p>You haven't placed any orders yet.</p>
+
+    </div>
+
+    <div class="order-card"
+         *ngFor="let order of orders">
+
+        <div class="order-header">
+
+            <div>
+
+                <span>Order ID</span>
+
+                <h3>#{{ order.id }}</h3>
+
+            </div>
+
+            <div>
+
+                <span>Order Date</span>
+
+                <h3>{{ order.date }}</h3>
+
+            </div>
+
+            <div>
+
+                <span>Total Amount</span>
+
+                <h3>₹{{ order.total }}</h3>
+
+            </div>
+
+            <div>
+
+                <span>Status</span>
+
+                <h3 class="status">
+
+                    Delivered
+
+                </h3>
+
+            </div>
+
+        </div>
+
+        <!-- Products -->
+
+        <div class="products-section">
+
+            <h4>Products Ordered</h4>
+
+            <div class="product-item"
+                 *ngFor="let item of order.items">
+
+                <img [src]="item.image"
+                     [alt]="item.name">
+
+                <div class="product-info">
+
+                    <p>{{ item.name }}</p>
+
+                    <small>
+
+                        Quantity:
+                        {{ item.quantity }}
+
+                    </small>
+
+                </div>
+
+                <div class="product-price">
+
+                    ₹{{ item.price }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -8,8 +8,8 @@ import { Order } from '../../models/orders';
   selector: 'app-orders',
   standalone: true,
   imports: [CommonModule ],
-  templateUrl: './orders.html',
-  styleUrl: './orders.css'
+  templateUrl: './order.html',
+  styleUrl: './order.css'
 })
 export class Orders {
 
