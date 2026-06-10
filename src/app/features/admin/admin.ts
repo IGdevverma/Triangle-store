@@ -16,11 +16,12 @@ export class Admin implements OnInit {
 
   searchTerm = '';
   currentPage = 1;
-
+  showModal = false;
   itemsPerPage = 5;
-
+  inventoryValue = 0;
   totalProducts = 0;
   totalCategories = 0;
+  mostExpensiveProduct = '';
 
   products: Product[] = [];
   newProduct: Product = {
@@ -55,7 +56,6 @@ export class Admin implements OnInit {
     this.loadProducts();
 
   }
-
   loadProducts() {
 
     this.productService.getProducts()
@@ -63,12 +63,25 @@ export class Admin implements OnInit {
 
         this.products = data;
 
+        
+
         this.totalProducts = data.length;
 
-        this.totalCategories =
-          new Set(
-            data.map(product => product.category)
-          ).size;
+        this.totalCategories = new Set(
+          data.map(product => product.category)
+        ).size;
+
+        this.inventoryValue = data.reduce(
+          (sum, product) => sum + product.price,
+          0
+        );
+
+        const expensive = data.reduce(
+          (prev, current) =>
+            prev.price > current.price ? prev : current
+        );
+
+        this.mostExpensiveProduct = expensive.name;
 
       });
 
@@ -101,6 +114,15 @@ export class Admin implements OnInit {
 
   addProduct() {
 
+    if (!this.isFormValid()) {
+
+      alert('Please fill all fields correctly.');
+
+      return;
+
+    }
+    this.showModal = false;
+
     this.productService.addProduct(this.newProduct)
       .subscribe(() => {
 
@@ -121,12 +143,22 @@ export class Admin implements OnInit {
   editProduct(product: Product) {
 
     this.editing = true;
+    this.showModal = true;
 
     this.newProduct = { ...product };
 
   }
 
   updateProduct() {
+
+    if (!this.isFormValid()) {
+
+      alert('Please fill all fields correctly.');
+
+      return;
+
+    }
+    this.showModal = false;
 
     this.productService.updateProduct(
       this.newProduct.id,
@@ -181,6 +213,39 @@ export class Admin implements OnInit {
       this.currentPage++;
 
     }
+
+  }
+
+  isFormValid(): boolean {
+
+    return !!(
+
+      this.newProduct.name.trim() &&
+      this.newProduct.price > 0 &&
+      this.newProduct.image.trim() &&
+      this.newProduct.category.trim()
+
+    );
+
+  }
+  openAddModal() {
+
+    this.editing = false;
+
+    this.showModal = true;
+
+    this.newProduct = {
+      id: 0,
+      name: '',
+      price: 0,
+      image: '',
+      category: ''
+    };
+
+  }
+  closeModal() {
+
+    this.showModal = false;
 
   }
 
