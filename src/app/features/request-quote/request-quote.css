@@ -1,0 +1,240 @@
+.quote-container {
+
+    max-width: 1200px;
+
+    margin: 50px auto;
+
+    padding: 20px;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 50px;
+}
+
+.quote-info h1 {
+
+    font-size: 42px;
+
+    margin-bottom: 20px;
+}
+
+.quote-info p {
+
+    color: #666;
+
+    line-height: 1.8;
+
+    margin-bottom: 25px;
+}
+
+.quote-info ul {
+
+    list-style: none;
+
+    padding: 0;
+}
+
+.quote-info li {
+
+    margin-bottom: 15px;
+
+    font-size: 18px;
+}
+
+.quote-form {
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 20px;
+
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 15px;
+}
+
+.quote-form input,
+.quote-form select,
+.quote-form textarea {
+
+    padding: 14px;
+
+    border: 1px solid #ddd;
+
+    border-radius: 10px;
+}
+
+.quote-form button {
+
+    background: black;
+
+    color: white;
+
+    border: none;
+
+    padding: 14px;
+
+    border-radius: 10px;
+
+    cursor: pointer;
+}
+
+.success {
+
+    text-align: center;
+
+    margin: 30px auto;
+
+    color: green;
+
+    font-size: 20px;
+
+    font-weight: 600;
+}
+
+@media (max-width: 768px) {
+
+    .quote-container {
+
+        grid-template-columns: 1fr;
+    }
+
+}
+.whatsapp-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  width: 60px;
+  height: 60px;
+
+  background: #25D366;
+  color: white;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 30px;
+  text-decoration: none;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+  z-index: 999;
+}
+
+.whatsapp-btn:hover {
+  transform: scale(1.1);
+}
+.whatsapp-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+
+  width: 60px;
+  height: 60px;
+
+  background: #25D366;
+  color: white;
+
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 30px;
+  text-decoration: none;
+
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+
+  z-index: 999;
+}
+.factory-info {
+  margin-top: 40px;
+  padding: 25px;
+  background: #f8f8f8;
+  border-radius: 12px;
+}
+
+.factory-info h2 {
+  margin-bottom: 20px;
+  color: #222;
+}
+
+.factory-info p {
+  margin: 10px 0;
+  line-height: 1.6;
+}
+.process-section {
+
+    margin-top: 60px;
+}
+
+.process-section h2 {
+
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.process-grid {
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.process-card {
+
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+}
+
+.process-card span {
+
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+
+    line-height: 50px;
+
+    border-radius: 50%;
+
+    background: black;
+    color: white;
+
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.process-card h3 {
+
+    margin-bottom: 12px;
+}
+
+.process-card p {
+
+    color: #666;
+    line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+
+    .process-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+}

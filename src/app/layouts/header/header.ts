@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
+import { ThemeService } from '../../services/theme';
 import { CartService } from '../../services/cart';
 import { AuthService } from '../../services/auth';
 import { WishlistService } from '../../services/wishlist';
@@ -22,8 +22,9 @@ export class Header implements OnInit {
     private cartService: CartService,
     private authService: AuthService,
     private wishlistService: WishlistService,
-    private router: Router
-  ) {}
+    private router: Router,
+    private themeService: ThemeService
+  ) { }
 
   ngOnInit(): void {
 
@@ -55,6 +56,11 @@ export class Header implements OnInit {
     this.authService.logout();
 
     this.router.navigate(['/login']);
+
+  }
+  toggleTheme() {
+
+    this.themeService.toggleTheme();
 
   }
 

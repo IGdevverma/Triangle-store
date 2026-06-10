@@ -1,0 +1,168 @@
+<div class="quote-container">
+    <a href="https://wa.me/916398235747" class="whatsapp-btn" target="_blank">
+        💬
+    </a>
+
+    <div class="quote-info">
+
+        <h1>Bulk Manufacturing Enquiry</h1>
+
+        <p>
+            Looking for a reliable cut-to-pack sportswear manufacturer?
+            Triangle Sports provides complete manufacturing solutions
+            for brands, schools, academies and distributors.
+        </p>
+
+        <ul>
+
+            <li>✔ MOQ Starting from 100 Pieces</li>
+
+            <li>✔ Private Label Manufacturing</li>
+
+            <li>✔ Custom Printing & Embroidery</li>
+
+            <li>✔ Premium Fabrics</li>
+
+            <li>✔ Fast Production & Delivery</li>
+
+        </ul>
+
+    </div>
+
+    <form class="quote-form" [formGroup]="quoteForm" (ngSubmit)="submitQuote()">
+
+        <h2>Request a Quote</h2>
+
+        <input type="text" placeholder="Your Name" formControlName="name">
+
+        <input type="text" placeholder="Company Name" formControlName="company">
+
+        <input type="email" placeholder="Email" formControlName="email">
+
+        <input type="text" placeholder="Phone Number" formControlName="phone">
+
+        <select formControlName="product">
+
+            <option value="">
+                Select Product
+            </option>
+
+            <option>
+                T-Shirts
+            </option>
+
+            <option>
+                Lowers
+            </option>
+
+            <option>
+                Sleeves
+            </option>
+
+            <option>
+                Teamwear
+            </option>
+
+            <option>
+                Tighty
+            </option>
+
+        </select>
+
+        <input type="number" placeholder="Required Quantity" formControlName="quantity">
+
+        <textarea rows="4" placeholder="Additional Requirements" formControlName="message">
+        </textarea>
+
+        <button type="submit">
+
+            Submit Enquiry
+
+        </button>
+
+    </form>
+    <section class="factory-info">
+        <h2>Contact Our Manufacturing Team</h2>
+
+        <p><strong>Company:</strong> Triangle Sports</p>
+
+        <p><strong>Phone / WhatsApp:</strong> +91 6398235747</p>
+
+        <p><strong>Email:</strong> trianindustriespvtltd@gmail.com</p>
+
+        <p>
+            <strong>Address:</strong><br>
+            47,89, Shivam Vihar,<br>
+            Raj Nagar Extension,<br>
+            Ghaziabad, Uttar Pradesh – 201003
+        </p>
+    </section>
+    <section class="process-section">
+
+        <h2>Our Manufacturing Process</h2>
+
+        <div class="process-grid">
+
+            <div class="process-card">
+                <span>01</span>
+                <h3>Fabric Selection</h3>
+                <p>Premium quality fabrics are sourced and inspected.</p>
+            </div>
+
+            <div class="process-card">
+                <span>02</span>
+                <h3>Pattern Making</h3>
+                <p>Accurate patterns are prepared for production.</p>
+            </div>
+
+            <div class="process-card">
+                <span>03</span>
+                <h3>Cutting</h3>
+                <p>Fabric is cut precisely according to specifications.</p>
+            </div>
+
+            <div class="process-card">
+                <span>04</span>
+                <h3>Printing / Embroidery</h3>
+                <p>Custom logos and branding are applied.</p>
+            </div>
+
+            <div class="process-card">
+                <span>05</span>
+                <h3>Stitching</h3>
+                <p>Experienced tailors ensure premium finishing.</p>
+            </div>
+
+            <div class="process-card">
+                <span>06</span>
+                <h3>Quality Check</h3>
+                <p>Every piece undergoes strict inspection.</p>
+            </div>
+
+            <div class="process-card">
+                <span>07</span>
+                <h3>Packing</h3>
+                <p>Products are packed professionally.</p>
+            </div>
+
+            <div class="process-card">
+                <span>08</span>
+                <h3>Dispatch</h3>
+                <p>Orders are shipped on time across India.</p>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+<div class="success" *ngIf="submitted">
+
+    ✅ Redirecting you to WhatsApp...
+
+</div>
+<a href="https://wa.me/916398235747?text=Hello%20Triangle%20Sports,%20I%20want%20a%20manufacturing%20quote."
+    class="whatsapp-btn" target="_blank">
+    💬
+</a>

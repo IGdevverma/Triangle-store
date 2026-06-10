@@ -1,10 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { LoadingService } from '../../services/loading';
 import { CartService } from '../../services/cart';
 import { ProductService } from '../../services/product';
+import { NotificationService } from '../../services/notification';
+
 import { Product } from '../../models/product';
 
 @Component({
@@ -23,11 +25,13 @@ export class ProductDetail implements OnInit {
   selectedImage = '';
 
   relatedProducts: Product[] = [];
+
   sizes = ['S', 'M', 'L', 'XL'];
+
   productImages: string[] = [];
+
   activeTab: 'description' | 'reviews' = 'description';
 
-  // Reviews
   reviews: any[] = [];
 
   newReview = {
@@ -39,7 +43,9 @@ export class ProductDetail implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private notificationService: NotificationService,
+    private loadingService: LoadingService
   ) { }
 
   ngOnInit(): void {
@@ -70,7 +76,7 @@ export class ProductDetail implements OnInit {
           this.reviews = JSON.parse(savedReviews);
         }
 
-        // Related products
+        // Related Products
         this.productService.getProducts()
           .subscribe(products => {
 
@@ -84,16 +90,21 @@ export class ProductDetail implements OnInit {
           });
 
       });
+
   }
 
   increaseQuantity() {
+
     this.quantity++;
+
   }
 
   decreaseQuantity() {
 
     if (this.quantity > 1) {
+
       this.quantity--;
+
     }
 
   }
@@ -104,7 +115,9 @@ export class ProductDetail implements OnInit {
 
       this.cartService.addToCart(this.product);
 
-      alert(this.product.name + ' added to cart');
+      this.notificationService.show(
+        this.product.name + ' added to cart'
+      );
 
     }
 
@@ -150,16 +163,23 @@ export class ProductDetail implements OnInit {
   get averageRating(): number {
 
     if (this.reviews.length === 0) {
+
       return 0;
+
     }
 
     const total = this.reviews.reduce(
+
       (sum, review) => sum + review.rating,
+
       0
+
     );
 
     return total / this.reviews.length;
+
   }
+
   get roundedRating(): number {
 
     return Math.round(this.averageRating);

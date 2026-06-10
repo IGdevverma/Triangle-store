@@ -9,7 +9,13 @@
     <li>Women</li>
     <li>Accessories</li>
     <li>Sale</li>
+    <li>
+      <a routerLink="/request-quote">
+        Manufacturing
+      </a>
+    </li>
     <li routerLink="/shop">
+
 
       Shop
 
@@ -37,7 +43,16 @@
         ❤️ Wishlist ({{ wishlistCount }})
 
       </a>
+    <li>
+
+      <button class="theme-btn" (click)="toggleTheme()">
+
+        🌙
+
+      </button>
 
     </li>
+
+
   </ul>
 </nav>

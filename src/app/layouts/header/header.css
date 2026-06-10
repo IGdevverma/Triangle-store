@@ -27,3 +27,22 @@
 .nav-links li:hover {
   color: #ff4d4d;
 }
+.theme-btn {
+
+    border: none;
+
+    background: black;
+
+    color: white;
+
+    padding: 8px 14px;
+
+    border-radius: 8px;
+
+    cursor: pointer;
+}
+
+.theme-btn:hover {
+
+    opacity: 0.9;
+}

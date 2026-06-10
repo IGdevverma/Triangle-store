@@ -7,7 +7,7 @@ import { Order } from '../../models/orders';
 @Component({
   selector: 'app-orders',
   standalone: true,
-  imports: [CommonModule ],
+  imports: [CommonModule],
   templateUrl: './order.html',
   styleUrl: './order.css'
 })
@@ -18,7 +18,7 @@ export class Orders {
   constructor(private orderService: OrderService) {
 
     this.orders = this.orderService.getOrders();
-
+    
   }
 
 }

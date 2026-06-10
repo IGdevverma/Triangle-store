@@ -8,6 +8,7 @@ import { Admin } from './features/admin/admin';
 import { Login } from './features/login/login';
 import { authGuard } from './guards/auth-guard';
 import { Wishlist } from './features/wishlist/wishlist';
+import { RequestQuote } from './features/request-quote/request-quote';
 
 export const routes: Routes = [
   {
@@ -62,6 +63,10 @@ export const routes: Routes = [
   {
     path: 'wishlist',
     component: Wishlist
+  },
+  {
+    path: 'request-quote',
+    component: RequestQuote
   }
 
 ];

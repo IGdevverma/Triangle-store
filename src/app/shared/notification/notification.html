@@ -1,0 +1,10 @@
+<div class="toast"
+     *ngIf="notificationService.message$ | async as message">
+
+    <div *ngIf="message">
+
+        {{ message }}
+
+    </div>
+
+</div>

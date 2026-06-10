@@ -6,6 +6,8 @@ import { Product } from '../../models/product';
 import { ProductService } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { WishlistService } from '../../services/wishlist';
+import { NotificationService } from '../../services/notification';
+import { LoadingService } from '../../services/loading';
 
 @Component({
   selector: 'app-shop',
@@ -26,18 +28,34 @@ export class Shop implements OnInit {
   constructor(
     private productService: ProductService,
     private cartService: CartService,
-    private wishlistService: WishlistService
+    private wishlistService: WishlistService,
+    private notificationService: NotificationService,
+    private loadingService: LoadingService
   ) { }
 
   ngOnInit(): void {
 
-    this.productService.getProducts().subscribe(data => {
+    this.loadingService.show();
 
-      this.products = data;
-      this.filteredProducts = data;
-      this.filterProducts();
+    this.productService.getProducts().subscribe({
 
+      next: (data) => {
 
+        this.products = data;
+
+        this.filteredProducts = data;
+
+        this.filterProducts();
+
+        this.loadingService.hide();
+
+      },
+
+      error: () => {
+
+        this.loadingService.hide();
+
+      }
 
     });
 
@@ -110,45 +128,47 @@ export class Shop implements OnInit {
 
 
 
-addToCart(product: Product) {
+  addToCart(product: Product) {
 
-  this.cartService.addToCart(product);
+    this.cartService.addToCart(product);
 
-  alert(product.name + ' added to cart');
-
-}
-
-toggleWishlist(product: Product) {
-
-  if (this.isWishlisted(product.id)) {
-
-    this.wishlistService.removeFromWishlist(product.id);
+    this.notificationService.show(
+      product.name + ' added to cart'
+    );
 
   }
 
-  else {
+  toggleWishlist(product: Product) {
 
-    this.wishlistService.addToWishlist(product);
+    if (this.isWishlisted(product.id)) {
+
+      this.wishlistService.removeFromWishlist(product.id);
+
+    }
+
+    else {
+
+      this.wishlistService.addToWishlist(product);
+
+    }
 
   }
 
-}
+  isWishlisted(id: number) {
 
-isWishlisted(id: number) {
+    return this.wishlistService.isInWishlist(id);
 
-  return this.wishlistService.isInWishlist(id);
+  }
+  openQuickView(product: Product) {
 
-}
-openQuickView(product: Product) {
+    this.selectedProduct = product;
 
-  this.selectedProduct = product;
+  }
 
-}
+  closeQuickView() {
 
-closeQuickView() {
+    this.selectedProduct = null;
 
-  this.selectedProduct = null;
-
-}
+  }
 
 }
