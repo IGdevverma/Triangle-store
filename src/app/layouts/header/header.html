@@ -1,58 +1,216 @@
-<nav class="navbar">
-  <div class="logo">
-    Triangle Sports
-  </div>
+<nav class="navbar" [class.scrolled]="isScrolled">
 
-  <ul class="nav-links">
-    <li routerLink="/">Home</li>
-    <li>Men</li>
-    <li>Women</li>
-    <li>Accessories</li>
-    <li>Sale</li>
-    <li>
-      <a routerLink="/request-quote">
-        Manufacturing
-      </a>
-    </li>
-    <li routerLink="/shop">
+    <div class="logo" routerLink="/">
+        Triangle Sports
+    </div>
 
+    <ul class="nav-links">
 
-      Shop
+        <li routerLink="/">
+            Home
+        </li>
 
-    </li>
+        <li>
+            Men
+        </li>
 
-    <li *ngIf="!isLoggedIn()">
-      <a routerLink="/login">Login</a>
-    </li>
+        <li>
+            Women
+        </li>
 
-    <li *ngIf="isLoggedIn()">
-      <a (click)="logout()" style="cursor: pointer;">
-        Logout
-      </a>
-    </li>
+        <li>
+            Accessories
+        </li>
 
-    <li>
-      <a routerLink="/cart">
-        Cart ({{ cartCount }})
-      </a>
-    </li>
-    <li>
+        <li>
+            Sale
+        </li>
 
-      <a routerLink="/wishlist">
+        <li>
+            <a routerLink="/request-quote">
+                Manufacturing
+            </a>
+        </li>
 
-        ❤️ Wishlist ({{ wishlistCount }})
+        <li routerLink="/shop">
+            Shop
+        </li>
 
-      </a>
-    <li>
+        <!-- Cart -->
+        <li (click)="toggleCart()">
 
-      <button class="theme-btn" (click)="toggleTheme()">
+            🛒 Cart ({{ cartCount }})
 
-        🌙
+        </li>
 
-      </button>
+        <!-- Wishlist -->
+        <li>
 
-    </li>
+            <a routerLink="/wishlist">
 
+                ❤️ Wishlist ({{ wishlistCount }})
 
-  </ul>
+            </a>
+
+        </li>
+
+        <!-- Login -->
+
+        <li *ngIf="!isLoggedIn()">
+
+            <a routerLink="/login">
+
+                Login
+
+            </a>
+
+        </li>
+
+        <!-- Logout -->
+
+        <li *ngIf="isLoggedIn()">
+
+            <a (click)="logout()"
+               style="cursor:pointer">
+
+                Logout
+
+            </a>
+
+        </li>
+
+        <!-- Theme -->
+
+        <li>
+
+            <button
+                class="theme-btn"
+                (click)="toggleTheme()">
+
+                🌙
+
+            </button>
+
+        </li>
+
+    </ul>
+
 </nav>
+
+
+<!-- Cart Drawer -->
+
+<div class="cart-drawer"
+     [class.open]="isCartOpen">
+
+    <!-- Header -->
+
+    <div class="drawer-header">
+
+        <h3>
+            Your Cart
+        </h3>
+
+        <button (click)="toggleCart()">
+            ✕
+        </button>
+
+    </div>
+
+    <!-- Body -->
+
+    <div class="drawer-body">
+
+        <!-- Empty Cart -->
+
+        <div
+            class="empty-cart"
+            *ngIf="cartItems.length === 0">
+
+            <p>🛒 Your cart is empty</p>
+
+        </div>
+
+        <!-- Cart Items -->
+
+        <div
+            class="cart-item"
+            *ngFor="let item of cartItems">
+
+            <img
+                [src]="item.image"
+                [alt]="item.name">
+
+            <div class="item-details">
+
+                <h4>
+                    {{ item.name }}
+                </h4>
+
+                <p class="price">
+                    ₹{{ item.price }}
+                </p>
+
+                <div class="quantity-controls">
+
+                    <button
+                        (click)="decrease(item.id)">
+
+                        −
+
+                    </button>
+
+                    <span>
+                        {{ item.quantity }}
+                    </span>
+
+                    <button
+                        (click)="increase(item.id)">
+
+                        +
+
+                    </button>
+
+                </div>
+
+            </div>
+
+            <button
+                class="remove-btn"
+                (click)="removeItem(item.id)">
+
+                ✕
+
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+
+    <div
+        class="drawer-footer"
+        *ngIf="cartItems.length > 0">
+
+        <div class="total-row">
+
+            <span>Total</span>
+
+            <strong>
+                ₹{{ total }}
+            </strong>
+
+        </div>
+
+        <button
+            class="checkout-btn"
+            (click)="goToCheckout()">
+
+            Proceed to Checkout
+
+        </button>
+
+    </div>
+
+</div>

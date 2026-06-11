@@ -148,6 +148,133 @@
 
     </section>
 
+    <section class="faq-section">
+
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+
+            <button class="faq-question" (click)="toggleFaq(1)">
+
+                What is your MOQ?
+            </button>
+
+            <div class="faq-answer" *ngIf="activeFaq === 1">
+
+                MOQ starts from 100 pieces.
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <button class="faq-question" (click)="toggleFaq(2)">
+
+                What is the production time?
+            </button>
+
+            <div class="faq-answer" *ngIf="activeFaq === 2">
+
+                Usually 7–15 working days depending on quantity.
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <button class="faq-question" (click)="toggleFaq(3)">
+
+                Do you provide custom logo printing?
+            </button>
+
+            <div class="faq-answer" *ngIf="activeFaq === 3">
+
+                Yes, we provide printing and embroidery services.
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <button class="faq-question" (click)="toggleFaq(4)">
+
+                Do you offer private label manufacturing?
+            </button>
+
+            <div class="faq-answer" *ngIf="activeFaq === 4">
+
+                Yes, complete private label manufacturing is available.
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <button class="faq-question" (click)="toggleFaq(5)">
+
+                Do you deliver across India?
+            </button>
+
+            <div class="faq-answer" *ngIf="activeFaq === 5">
+
+                Yes, we dispatch orders all over India.
+            </div>
+
+        </div>
+
+        <div class="faq-item">
+
+            <button class="faq-question" (click)="toggleFaq(6)">
+
+                Can I get samples before bulk production?
+            </button>
+
+            <div class="faq-answer" *ngIf="activeFaq === 6">
+
+                Yes, sample arrangements can be discussed.
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="brands-section">
+
+        <h2>Brands & Institutions We've Worked With</h2>
+
+        <p>
+            Trusted by leading institutions and corporate clients.
+        </p>
+
+        <div class="brands-grid">
+
+            <div class="brand-card" *ngFor="let brand of brands">
+
+                <h3>{{ brand.name }}</h3>
+
+                <span>{{ brand.type }}</span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="map-section">
+
+        <h2>Visit Our Factory</h2>
+
+        <p>
+            We welcome schools, academies, dealers and corporate clients
+            to visit our manufacturing facility.
+        </p>
+
+        <iframe src="https://www.google.com/maps?q=47,89+Shivam+Vihar+Raj+Nagar+Extension+Ghaziabad+201003&output=embed"
+            width="100%" height="400" style="border:0;" loading="lazy" allowfullscreen>
+        </iframe>
+
+    </section>
+
     <!-- Quote Success -->
     <div class="success" *ngIf="submitted">
 

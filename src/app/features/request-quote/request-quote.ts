@@ -149,5 +149,43 @@ ${form.message}`;
     }
 
   }
+  activeFaq: number | null = null;
+  brands = [
+
+    {
+      name: 'Tata 1mg',
+      type: 'Corporate Healthcare'
+    },
+
+    {
+      name: 'AJIO',
+      type: 'Fashion & Retail'
+    },
+
+    {
+      name: 'O.P. Jindal Global University',
+      type: 'Educational Institution'
+    },
+
+    {
+      name: 'IIT Roorkee',
+      type: 'Educational Institution'
+    }
+
+  ];
+
+  toggleFaq(index: number) {
+
+    if (this.activeFaq === index) {
+
+      this.activeFaq = null;
+
+    } else {
+
+      this.activeFaq = index;
+
+    }
+
+  }
 
 }

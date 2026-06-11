@@ -1,7 +1,13 @@
-<section class="hero">
+<!-- Hero Slider -->
+<section class="hero-slider">
 
-    <div class="hero-content">
-        <p class="subtitle">NEW SEASON COLLECTION</p>
+    <img [src]="sliderImages[currentSlide]" class="slider-image" alt="Triangle Sports Banner">
+
+    <div class="overlay">
+
+        <p class="subtitle">
+            TRIANGLE SPORTS
+        </p>
 
         <h1>
             Performance<br>
@@ -9,31 +15,119 @@
         </h1>
 
         <p class="description">
-            Premium sportswear designed for athletes who never stop.
+            Premium sportswear for athletes and complete manufacturing solutions.
         </p>
 
-        <button>
-            SHOP NOW
-        </button>
+        <div class="hero-buttons">
+
+            <a routerLink="/shop" class="hero-btn">
+
+                Shop Now
+            </a>
+
+            <a routerLink="/request-quote" class="hero-btn secondary">
+
+                Manufacturing
+            </a>
+
+        </div>
+
+    </div>
+
+    <button class="nav prev" (click)="prevSlide()">
+
+        ❮
+
+    </button>
+
+    <button class="nav next" (click)="nextSlide()">
+
+        ❯
+
+    </button>
+
+    <div class="dots">
+
+        <span *ngFor="let image of sliderImages; let i = index" [class.active]="i === currentSlide"
+            (click)="goToSlide(i)">
+
+        </span>
+
     </div>
 
 </section>
 
-<section class="categories">
+<!-- Business Categories -->
 
-    <div class="category-card">
-        Men
+<section class="business-categories">
+
+    <div class="category-card large">
+
+        <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1200" alt="Triangle Sports Collection">
+
+        <div class="overlay">
+
+            <h2>Triangle Sports Collection</h2>
+
+            <p>
+                Shop T-Shirts, Lowers & Activewear
+            </p>
+
+        </div>
+
     </div>
 
     <div class="category-card">
-        Women
+
+        <img src="https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200" alt="Compression Sleeves">
+
+        <div class="overlay">
+
+            <h3>Compression Sleeves</h3>
+
+            <p>
+                Premium Performance Sleeves
+            </p>
+
+        </div>
+
     </div>
 
     <div class="category-card">
-        Accessories
+
+        <img src="https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1200" alt="Teamwear">
+
+        <div class="overlay">
+
+            <h3>Teamwear & Lowers</h3>
+
+            <p>
+                Sports Kits & Team Apparel
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="category-card">
+
+        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=1200" alt="Manufacturing">
+
+        <div class="overlay">
+
+            <h3>Manufacturing Services</h3>
+
+            <p>
+                Private Label & Bulk Orders
+            </p>
+
+        </div>
+
     </div>
 
 </section>
+
+<!-- Filters -->
 
 <div class="filters">
 
@@ -42,54 +136,149 @@
     <select [(ngModel)]="selectedCategory" (change)="filterProducts()">
 
         <option value="All">All</option>
+
         <option value="Men">Men</option>
+
         <option value="Women">Women</option>
+
         <option value="Accessories">Accessories</option>
 
     </select>
 
 </div>
 
+<!-- Featured Products -->
 
+<section class="featured-products">
 
-    <!-- Products -->
+    <div class="featured-header">
 
-    <div class="products-section">
-        <div class="products-section">
+        <h2>Featured Products</h2>
 
-            <section class="featured-products">
+        <p>
+            Discover premium sportswear designed for performance,
+            comfort and everyday style.
+        </p>
 
-                <h2>Featured Products</h2>
+    </div>
 
-                <div class="products-grid">
+    <div class="featured-wrapper">
 
-                    <div class="product-card" *ngFor="let product of filteredProducts">
+        <button class="slider-arrow left" (click)="prevFeatured()">
+            ❮
+        </button>
 
-                        <img [src]="product.image" [alt]="product.name">
+        <div class="products-grid">
 
-                        <h3>{{ product.name }}</h3>
+            <div class="product-card" *ngFor="let product of displayedProducts">
 
-                        <p>₹{{ product.price }}</p>
+                <img [src]="product.image" [alt]="product.name">
 
-                        <button (click)="addToCart(product)">
+                <div class="product-info">
 
-                            Add to Cart
+                    <h3>{{ product.name }}</h3>
 
-                        </button>
+                    <p>₹{{ product.price }}</p>
 
-                        <button class="details-btn" [routerLink]="['/product', product.id]">
+                    <button (click)="addToCart(product)">
+                        Add to Cart
+                    </button>
 
-                            View Details
-
-                        </button>
-
-                    </div>
+                    <button class="details-btn" [routerLink]="['/product', product.id]">
+                        View Details
+                    </button>
 
                 </div>
 
-            </section>
+            </div>
+
+        </div>
+
+        <button class="slider-arrow right" (click)="nextFeatured()">
+            ❯
+        </button>
+
+    </div>
+
+</section>
+<!-- Performance Video -->
+
+<section class="performance-video">
+
+    <video controls autoplay muted loop playsinline>
+        <source src="/videos/hero.mp4" type="video/mp4">
+    </video>
+
+    <div class="video-overlay">
+
+        <p class="subtitle">
+            TRIANGLE SPORTS
+        </p>
+
+        <h2>
+            Built For<br>
+            Performance
+        </h2>
+
+        <p>
+            From premium sportswear to complete manufacturing solutions,
+            we help athletes and brands perform at their best.
+        </p>
+
+        <a routerLink="/request-quote" class="hero-btn">
+            Start Manufacturing
+        </a>
+
+    </div>
+
+</section>
+
+<!-- Testimonials -->
+
+<section class="testimonials">
+
+    <div class="section-header">
+
+        <h2>
+            What Our Clients Say
+        </h2>
+
+        <p>
+            Trusted by institutions and brands across India.
+        </p>
+
+    </div>
+
+    <div class="testimonial-grid">
+
+        <div class="testimonial-card" *ngFor="let item of testimonials">
+
+            <div class="quote">
+
+                ★★★★★
+
+            </div>
+
+            <p class="review">
+
+                "{{ item.review }}"
+
+            </p>
+
+            <h3>
+
+                {{ item.company }}
+
+            </h3>
+
+            <span>
+
+                {{ item.author }}
+
+            </span>
 
         </div>
 
     </div>
 
+</section>
