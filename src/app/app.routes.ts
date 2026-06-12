@@ -72,6 +72,14 @@ export const routes: Routes = [
   {
     path: 'dealer-registration',
     component: DealerRegistration
-  }
+  },
+  {
+    path: 'about',
+
+    loadComponent: () =>
+
+      import('./features/about/about')
+        .then(m => m.About)
+  },
 
 ];
