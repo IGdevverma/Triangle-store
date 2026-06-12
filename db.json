@@ -32,6 +32,24 @@
       "fabric": "Mesh & Rubber",
       "type": "Running Shoes",
       "stock": true
+    },
+    {
+      "id": 4,
+      "name": "Triangle Track Pant",
+      "price": 2999,
+      "category": "Men",
+      "image": "assets/products/IMG_7788.jpg",
+      "images": [
+        "assets/products/IMG_7779.jpg",
+        "assets/products/IMG_7781.jpg",
+        "assets/products/IMG_7790.jpg",
+        "assets/products/IMG_7791.jpg"
+      ],
+      "description": "Comfy lower and light weight",
+      "fabric": "Dry-Fit",
+      "type": "Running Lower",
+      "stock": true,
+      "showOnHome": false
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

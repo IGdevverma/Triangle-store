@@ -1,216 +1,339 @@
 <nav class="navbar" [class.scrolled]="isScrolled">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Logo -->
 
-    <div class="logo" routerLink="/">
-        Triangle Sports
+  <div class="logo" routerLink="/">
+    <img src="trianglepng.png" alt="Triangle Sports">
+  </div>
+
+  <!-- Mobile Hamburger -->
+
+  <div class="hamburger" (click)="toggleMenu()">
+    ☰
+  </div>
+
+  <!-- Center Menu -->
+
+  <ul class="nav-menu" [class.active]="isMenuOpen">
+
+    <li routerLink="/">NEW ARRIVALS</li>
+
+    <li class="dropdown">
+
+      MEN <span class="arrow">▾</span>
+
+      <div class="mega-menu">
+
+        <div class="mega-column">
+
+          <h4>Topwear</h4>
+
+          <a routerLink="/shop">T-Shirts</a>
+          <a routerLink="/shop">Jerseys</a>
+          <a routerLink="/shop">Compression Wear</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Bottomwear</h4>
+
+          <a routerLink="/shop">Shorts</a>
+          <a routerLink="/shop">Track Pants</a>
+          <a routerLink="/shop">Lowers</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Shop By Sport</h4>
+
+          <a routerLink="/shop">Cricket</a>
+          <a routerLink="/shop">Gym</a>
+          <a routerLink="/shop">Running</a>
+
+        </div>
+
+      </div>
+
+    </li>
+    <li class="dropdown">
+
+      WOMEN <span class="arrow">▾</span>
+
+      <div class="mega-menu">
+
+        <div class="mega-column">
+
+          <h4>Topwear</h4>
+
+          <a routerLink="/shop">T-Shirts</a>
+          <a routerLink="/shop">Jerseys</a>
+          <a routerLink="/shop">Compression Wear</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Bottomwear</h4>
+
+          <a routerLink="/shop">Shorts</a>
+          <a routerLink="/shop">Track Pants</a>
+          <a routerLink="/shop">Lowers</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Shop By Sport</h4>
+
+          <a routerLink="/shop">Cricket</a>
+          <a routerLink="/shop">Gym</a>
+          <a routerLink="/shop">Running</a>
+
+        </div>
+
+      </div>
+
+    </li>
+    <li class="dropdown">
+
+      ACCESSORIES <span class="arrow">▾</span>
+
+      <div class="mega-menu">
+
+        <div class="mega-column">
+
+          <h4>Performance</h4>
+
+          <a routerLink="/shop">Compression Sleeves</a>
+          <a routerLink="/shop">Arm Sleeves</a>
+          <a routerLink="/shop">Wrist Bands</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Training Gear</h4>
+
+          <a routerLink="/shop">Gym Gloves</a>
+          <a routerLink="/shop">Head Bands</a>
+          <a routerLink="/shop">Sports Socks</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Essentials</h4>
+
+          <a routerLink="/shop">Caps</a>
+          <a routerLink="/shop">Water Bottles</a>
+          <a routerLink="/shop">Gym Bags</a>
+
+        </div>
+        <div class="mega-column">
+
+          <h4>Custom Orders</h4>
+
+          <a routerLink="/request-quote">Custom Caps</a>
+          <a routerLink="/request-quote">Team Accessories</a>
+          <a routerLink="/request-quote">Bulk Orders</a>
+
+        </div>
+
+      </div>
+
+    </li>
+
+    <li routerLink="/request-quote">
+      DESIGN YOUR OWN
+    </li>
+
+  </ul>
+
+  <!-- Right Icons -->
+
+  <div class="nav-icons">
+
+    <!-- Login -->
+    <div *ngIf="!isLoggedIn()" routerLink="/login">
+      <i class="fa-solid fa-user"></i>
+      <span>Sign in</span>
     </div>
 
-    <ul class="nav-links">
+    <!-- Logout -->
+    <div *ngIf="isLoggedIn()" (click)="logout()">
+      <i class="fa-solid fa-user"></i>
+      <span>Logout</span>
+    </div>
 
-        <li routerLink="/">
-            Home
-        </li>
+    <!--Search-->
+    <div (click)="toggleSearch()">
 
-        <li>
-            Men
-        </li>
+      <i class="fa-solid fa-magnifying-glass" routerLink="/shop"></i>
 
-        <li>
-            Women
-        </li>
+    </div>
 
-        <li>
-            Accessories
-        </li>
+    <!-- Cart -->
+    <div (click)="toggleCart()">
+      <i class="fa-solid fa-cart-shopping"></i>
 
-        <li>
-            Sale
-        </li>
+      <span class="cart-badge">
+        {{ cartCount }}
+      </span>
 
-        <li>
-            <a routerLink="/request-quote">
-                Manufacturing
-            </a>
-        </li>
+      <span>Cart</span>
+    </div>
 
-        <li routerLink="/shop">
-            Shop
-        </li>
-
-        <!-- Cart -->
-        <li (click)="toggleCart()">
-
-            🛒 Cart ({{ cartCount }})
-
-        </li>
-
-        <!-- Wishlist -->
-        <li>
-
-            <a routerLink="/wishlist">
-
-                ❤️ Wishlist ({{ wishlistCount }})
-
-            </a>
-
-        </li>
-
-        <!-- Login -->
-
-        <li *ngIf="!isLoggedIn()">
-
-            <a routerLink="/login">
-
-                Login
-
-            </a>
-
-        </li>
-
-        <!-- Logout -->
-
-        <li *ngIf="isLoggedIn()">
-
-            <a (click)="logout()"
-               style="cursor:pointer">
-
-                Logout
-
-            </a>
-
-        </li>
-
-        <!-- Theme -->
-
-        <li>
-
-            <button
-                class="theme-btn"
-                (click)="toggleTheme()">
-
-                🌙
-
-            </button>
-
-        </li>
-
-    </ul>
+  </div>
 
 </nav>
 
+<div class="search-drawer" [class.open]="isSearchOpen">
 
-<!-- Cart Drawer -->
+  <div class="search-box">
 
-<div class="cart-drawer"
-     [class.open]="isCartOpen">
+    <input type="text" placeholder="Search products...">
 
-    <!-- Header -->
+    <button>
+      <div class="search-wrapper">
 
-    <div class="drawer-header">
+        <input *ngIf="isSearchOpen" type="text" placeholder="Search products..." [(ngModel)]="searchTerm"
+          (keyup.enter)="searchProducts()">
 
-        <h3>
-            Your Cart
-        </h3>
+        <i class="fa-solid fa-magnifying-glass" (click)="toggleSearch()">
+        </i>
 
-        <button (click)="toggleCart()">
-            ✕
-        </button>
+      </div>
+    </button>
 
-    </div>
+    <span class="close-search" (click)="toggleSearch()">
+      ✕
+    </span>
 
-    <!-- Body -->
+  </div>
 
-    <div class="drawer-body">
+</div>
 
-        <!-- Empty Cart -->
 
-        <div
-            class="empty-cart"
-            *ngIf="cartItems.length === 0">
+<!-- ================= CART DRAWER ================= -->
 
-            <p>🛒 Your cart is empty</p>
+<div class="cart-drawer" [class.open]="isCartOpen">
 
-        </div>
+  <!-- Header -->
 
-        <!-- Cart Items -->
+  <div class="drawer-header">
 
-        <div
-            class="cart-item"
-            *ngFor="let item of cartItems">
+    <h3>
 
-            <img
-                [src]="item.image"
-                [alt]="item.name">
+      Your Cart
 
-            <div class="item-details">
+    </h3>
 
-                <h4>
-                    {{ item.name }}
-                </h4>
+    <button (click)="toggleCart()">
 
-                <p class="price">
-                    ₹{{ item.price }}
-                </p>
+      ✕
 
-                <div class="quantity-controls">
+    </button>
 
-                    <button
-                        (click)="decrease(item.id)">
+  </div>
 
-                        −
+  <!-- Body -->
 
-                    </button>
+  <div class="drawer-body">
 
-                    <span>
-                        {{ item.quantity }}
-                    </span>
+    <!-- Empty -->
 
-                    <button
-                        (click)="increase(item.id)">
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
 
-                        +
+      <p>
 
-                    </button>
+        🛒 Your cart is empty
 
-                </div>
-
-            </div>
-
-            <button
-                class="remove-btn"
-                (click)="removeItem(item.id)">
-
-                ✕
-
-            </button>
-
-        </div>
+      </p>
 
     </div>
 
-    <!-- Footer -->
+    <!-- Items -->
 
-    <div
-        class="drawer-footer"
-        *ngIf="cartItems.length > 0">
+    <div class="cart-item" *ngFor="let item of cartItems">
 
-        <div class="total-row">
+      <img [src]="item.image" [alt]="item.name">
 
-            <span>Total</span>
+      <div class="item-details">
 
-            <strong>
-                ₹{{ total }}
-            </strong>
+        <h4>
+
+          {{ item.name }}
+
+        </h4>
+
+        <p class="price">
+
+          ₹{{ item.price }}
+
+        </p>
+
+        <div class="quantity-controls">
+
+          <button (click)="decrease(item.id)">
+
+            −
+
+          </button>
+
+          <span>
+
+            {{ item.quantity }}
+
+          </span>
+
+          <button (click)="increase(item.id)">
+
+            +
+
+          </button>
 
         </div>
 
-        <button
-            class="checkout-btn"
-            (click)="goToCheckout()">
+      </div>
 
-            Proceed to Checkout
+      <button class="remove-btn" (click)="removeItem(item.id)">
 
-        </button>
+        ✕
+
+      </button>
 
     </div>
+
+  </div>
+
+  <!-- Footer -->
+
+  <div class="drawer-footer" *ngIf="cartItems.length > 0">
+
+    <div class="total-row">
+
+      <span>
+
+        Total
+
+      </span>
+
+      <strong>
+
+        ₹{{ total }}
+
+      </strong>
+
+    </div>
+
+    <button class="checkout-btn" (click)="goToCheckout()">
+
+      Proceed to Checkout
+
+    </button>
+
+  </div>
 
 </div>

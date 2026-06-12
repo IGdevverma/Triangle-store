@@ -85,13 +85,17 @@ export class Home implements OnInit {
       next: (data) => {
 
         this.products = data;
-        this.filteredProducts = data;
+
+        // Home page par sirf wahi products dikhana
+        // jinka showOnHome false nahi hai
+        this.filteredProducts = data.filter(
+          product => product.showOnHome !== false
+        );
 
         /* Featured Products */
         this.updateFeaturedProducts();
 
       },
-
       error: (err) => {
 
         console.error(

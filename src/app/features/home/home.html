@@ -129,23 +129,7 @@
 
 <!-- Filters -->
 
-<div class="filters">
 
-    <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterProducts()">
-
-    <select [(ngModel)]="selectedCategory" (change)="filterProducts()">
-
-        <option value="All">All</option>
-
-        <option value="Men">Men</option>
-
-        <option value="Women">Women</option>
-
-        <option value="Accessories">Accessories</option>
-
-    </select>
-
-</div>
 
 <!-- Featured Products -->
 
@@ -170,23 +154,18 @@
 
         <div class="products-grid">
 
-            <div class="product-card" *ngFor="let product of displayedProducts">
+            <div class="product-card" *ngFor="let product of filteredProducts">
 
-                <img [src]="product.image" [alt]="product.name">
-
+                <img [src]="product.image" [alt]="product.name" routerLink="/shop" class="clickable-image">
                 <div class="product-info">
 
                     <h3>{{ product.name }}</h3>
 
                     <p>₹{{ product.price }}</p>
 
-                    <button (click)="addToCart(product)">
-                        Add to Cart
-                    </button>
 
-                    <button class="details-btn" [routerLink]="['/product', product.id]">
-                        View Details
-                    </button>
+
+
 
                 </div>
 
@@ -201,6 +180,79 @@
     </div>
 
 </section>
+
+<section class="best-sellers">
+
+    <div class="best-header">
+        <h2>Best Seller Products</h2>
+
+        <p>
+            Gear up with the champions' choice. Our best sellers bring
+            the winning spirit to you.
+        </p>
+    </div>
+
+    <div class="best-grid">
+
+        <div class="best-card" *ngFor="let product of filteredProducts | slice:0:3">
+
+            <img [src]="product.image" [alt]="product.name">
+
+            <h3>{{ product.name }}</h3>
+
+            <p>₹{{ product.price }}</p>
+
+        </div>
+
+        <!-- Right Banner -->
+        <div class="best-banner">
+            <img src="https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=600" alt="Sports Banner">
+        </div>
+
+    </div>
+
+</section>
+
+<section class="services-section">
+
+    <div class="service-item">
+        <i class="fa-solid fa-box"></i>
+
+        <div>
+            <h3>Free Shipping</h3>
+            <p>Free Shipping for prepaid orders</p>
+        </div>
+    </div>
+
+    <div class="service-item">
+        <i class="fa-solid fa-arrow-rotate-right"></i>
+
+        <div>
+            <h3>Easy Exchange</h3>
+            <p>Hassle-free exchange process for your convenience.</p>
+        </div>
+    </div>
+
+    <div class="service-item">
+        <i class="fa-solid fa-headphones"></i>
+
+        <div>
+            <h3>Full Support</h3>
+            <p>We provide complete support until your product is delivered.</p>
+        </div>
+    </div>
+
+    <div class="service-item">
+        <i class="fa-regular fa-credit-card"></i>
+
+        <div>
+            <h3>Flexible Payment</h3>
+            <p>Pay with Multiple Credit Cards.</p>
+        </div>
+    </div>
+
+</section>
+
 <!-- Performance Video -->
 
 <section class="performance-video">

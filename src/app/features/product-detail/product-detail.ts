@@ -59,13 +59,11 @@ export class ProductDetail implements OnInit {
 
         this.product = data;
 
-        this.selectedImage = data.image;
+        this.productImages = data.images?.length
+          ? data.images
+          : [data.image];
 
-        this.productImages = [
-          data.image,
-          data.image,
-          data.image
-        ];
+        this.selectedImage = this.productImages[0];
 
         // Load reviews
         const savedReviews = localStorage.getItem(

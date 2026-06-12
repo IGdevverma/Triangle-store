@@ -66,24 +66,20 @@
 
             <h1>Shop</h1>
 
+            <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterProducts()">
+
             <select [(ngModel)]="selectedSort" (change)="filterProducts()">
 
                 <option value="latest">
-
                     Latest
-
                 </option>
 
                 <option value="lowToHigh">
-
                     Price: Low to High
-
                 </option>
 
                 <option value="highToLow">
-
                     Price: High to Low
-
                 </option>
 
             </select>
@@ -118,7 +114,7 @@
                             🛒
 
                         </button>
-                      
+
 
                     </div>
 

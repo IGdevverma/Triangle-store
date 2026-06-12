@@ -3,11 +3,20 @@
   <!-- Product Images -->
   <div class="product-images">
 
-    <img class="main-image" [src]="selectedImage" [alt]="product.name">
+    <!-- Main Image -->
+    <img
+      class="main-image"
+      [src]="selectedImage"
+      [alt]="product.name">
 
+    <!-- Thumbnails -->
     <div class="thumbnail-images">
 
-      <img *ngFor="let image of productImages" [src]="image" [class.active-thumb]="selectedImage === image"
+      <img
+        *ngFor="let image of productImages"
+        [src]="image"
+        [alt]="product.name"
+        [class.active-thumb]="selectedImage === image"
         (click)="selectedImage = image">
 
     </div>
@@ -21,14 +30,19 @@
 
     <h2>₹{{ product.price }}</h2>
 
-    <p>Category: {{ product.category }}</p>
+    <p class="category">
+      Category: {{ product.category }}
+    </p>
 
     <!-- Size -->
     <div class="size-selector">
 
       <h3>Select Size</h3>
 
-      <button *ngFor="let size of sizes" [class.active]="selectedSize === size" (click)="selectedSize = size">
+      <button
+        *ngFor="let size of sizes"
+        [class.active]="selectedSize === size"
+        (click)="selectedSize = size">
 
         {{ size }}
 
@@ -43,7 +57,9 @@
 
       <div class="quantity-box">
 
-        <button (click)="decreaseQuantity()" [disabled]="quantity === 1">
+        <button
+          (click)="decreaseQuantity()"
+          [disabled]="quantity === 1">
 
           −
 
@@ -64,18 +80,28 @@
     <!-- Stock -->
     <div class="stock-status">
 
-      <span *ngIf="product.stock" class="in-stock">
+      <span
+        *ngIf="product.stock"
+        class="in-stock">
+
         ✔ In Stock
+
       </span>
 
-      <span *ngIf="!product.stock" class="out-stock">
+      <span
+        *ngIf="!product.stock"
+        class="out-stock">
+
         ✖ Out of Stock
+
       </span>
 
     </div>
 
     <!-- Add to Cart -->
-    <button class="add-cart-btn" (click)="addToCart()">
+    <button
+      class="add-cart-btn"
+      (click)="addToCart()">
 
       Add to Cart
 
@@ -86,17 +112,23 @@
 </div>
 
 <!-- Tabs -->
-<div class="tabs-section" *ngIf="product">
+<div
+  class="tabs-section"
+  *ngIf="product">
 
   <div class="tab-header">
 
-    <button [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+    <button
+      [class.active]="activeTab === 'description'"
+      (click)="activeTab = 'description'">
 
       Description
 
     </button>
 
-    <button [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
+    <button
+      [class.active]="activeTab === 'reviews'"
+      (click)="activeTab = 'reviews'">
 
       Reviews ({{ reviews.length }})
 
@@ -105,7 +137,9 @@
   </div>
 
   <!-- Description -->
-  <div *ngIf="activeTab === 'description'" class="tab-content">
+  <div
+    *ngIf="activeTab === 'description'"
+    class="tab-content">
 
     <div class="info-grid">
 
@@ -137,16 +171,17 @@
 
       <p>• Textured fabric adds to a classic look.</p>
 
-      <p>• Embossed contrast TYKA bird logo.</p>
+      <p>• Embossed contrast Triangle logo.</p>
 
     </div>
 
   </div>
 
-
-
   <!-- Reviews -->
-  <div *ngIf="activeTab === 'reviews'" class="tab-content">
+  <div
+    *ngIf="activeTab === 'reviews'"
+    class="tab-content">
+
     <div class="rating-summary">
 
       <h2>
@@ -171,9 +206,13 @@
 
     </div>
 
+    <!-- Review Form -->
     <div class="review-form">
 
-      <input type="text" placeholder="Your Name" [(ngModel)]="newReview.name">
+      <input
+        type="text"
+        placeholder="Your Name"
+        [(ngModel)]="newReview.name">
 
       <select [(ngModel)]="newReview.rating">
 
@@ -185,7 +224,10 @@
 
       </select>
 
-      <textarea rows="4" placeholder="Write your review" [(ngModel)]="newReview.comment">
+      <textarea
+        rows="4"
+        placeholder="Write your review"
+        [(ngModel)]="newReview.comment">
 
       </textarea>
 
@@ -197,7 +239,10 @@
 
     </div>
 
-    <div *ngFor="let review of reviews" class="review-card">
+    <!-- Reviews List -->
+    <div
+      *ngFor="let review of reviews"
+      class="review-card">
 
       <h4>{{ review.name }}</h4>
 
@@ -222,15 +267,22 @@
 </div>
 
 <!-- Related Products -->
-<div class="related-section" *ngIf="relatedProducts.length">
+<div
+  class="related-section"
+  *ngIf="relatedProducts.length">
 
   <h2>Related Products</h2>
 
   <div class="related-grid">
 
-    <div class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item.id]">
+    <div
+      class="related-card"
+      *ngFor="let item of relatedProducts"
+      [routerLink]="['/product', item.id]">
 
-      <img [src]="item.image" [alt]="item.name">
+      <img
+        [src]="item.image"
+        [alt]="item.name">
 
       <h4>{{ item.name }}</h4>
 

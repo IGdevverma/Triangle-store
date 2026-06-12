@@ -5,12 +5,13 @@ import { ThemeService } from '../../services/theme';
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService } from '../../services/auth';
 import { WishlistService } from '../../services/wishlist';
-
+import { ActivatedRoute } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, FormsModule],
   templateUrl: './header.html',
   styleUrl: './header.css',
 })
@@ -22,7 +23,9 @@ export class Header implements OnInit {
   isCartOpen = false;
   cartCount = 0;
   wishlistCount = 0;
-  
+  searchTerm = '';
+  filterProducts: any;
+
   @HostListener('window:scroll')
   onWindowScroll() {
     this.isScrolled = window.scrollY > 50;
@@ -33,10 +36,25 @@ export class Header implements OnInit {
     private authService: AuthService,
     private wishlistService: WishlistService,
     private router: Router,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private route: ActivatedRoute,
+
+
   ) { }
 
   ngOnInit(): void {
+
+    this.route.queryParams.subscribe(params => {
+
+      if (params['search']) {
+
+        this.searchTerm = params['search'];
+
+        this.filterProducts();
+
+      }
+
+    });
 
     this.cartService.cart$.subscribe(items => {
 
@@ -109,6 +127,37 @@ export class Header implements OnInit {
     this.isCartOpen = false;
 
     this.router.navigate(['/checkout']);
+
+  }
+  isMenuOpen = false;
+
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+  }
+
+
+  isSearchOpen = false;
+
+  toggleSearch() {
+    this.isSearchOpen = !this.isSearchOpen;
+  }
+
+  searchProducts() {
+
+    if (this.searchTerm.trim()) {
+
+      this.router.navigate(
+        ['/shop'],
+        {
+          queryParams: {
+            search: this.searchTerm
+          }
+        }
+      );
+
+      this.isSearchOpen = false;
+
+    }
 
   }
 }

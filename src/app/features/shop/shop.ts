@@ -24,6 +24,7 @@ export class Shop implements OnInit {
   selectedProduct: Product | null = null;
   selectedPrice = '';
   selectedSort = 'latest';
+  searchTerm = '';
 
   constructor(
     private productService: ProductService,
@@ -68,6 +69,10 @@ export class Shop implements OnInit {
       const matchesCategory =
         this.selectedCategory === 'All' ||
         product.category === this.selectedCategory;
+      const matchesSearch =
+        product.name
+          .toLowerCase()
+          .includes(this.searchTerm.toLowerCase());
 
       let matchesPrice = true;
 
@@ -91,8 +96,11 @@ export class Shop implements OnInit {
 
       }
 
-      return matchesCategory && matchesPrice;
-
+      return (
+        matchesCategory &&
+        matchesPrice &&
+        matchesSearch
+      );
     });
     if (this.selectedSort === 'lowToHigh') {
 
