@@ -1,42 +1,31 @@
 {
   "products": [
     {
-      "id": 1,
+      "id": "1",
       "name": "Training T-Shirt",
       "price": 999,
       "category": "Men",
-      "image": "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500",
+      "image": "assets/products/Tshirt.jpg",
       "description": "Basic cotton round neck tee for training and casual wear.",
       "fabric": "92% Polyester 8% Elastane",
       "type": "Cotton Elastane",
       "stock": true
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "Running Shorts",
       "price": 799,
-      "category": "Women",
-      "image": "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=500",
+      "category": "Men",
+      "image": "assets/products/short.jpg",
       "description": "Comfortable running shorts designed for daily workouts.",
       "fabric": "100% Polyester",
       "type": "Sports Fabric",
       "stock": true
     },
     {
-      "id": 3,
-      "name": "Sports Shoes",
-      "price": 2999,
-      "category": "Accessories",
-      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500",
-      "description": "Lightweight sports shoes built for maximum comfort.",
-      "fabric": "Mesh & Rubber",
-      "type": "Running Shoes",
-      "stock": true
-    },
-    {
-      "id": 4,
+      "id": "4",
       "name": "Triangle Track Pant",
-      "price": 2999,
+      "price": 1999,
       "category": "Men",
       "image": "assets/products/IMG_7788.jpg",
       "images": [
@@ -50,6 +39,36 @@
       "type": "Running Lower",
       "stock": true,
       "showOnHome": false
+    },
+    {
+      "id": "5",
+      "name": "Sleeves",
+      "price": 199,
+      "image": "assets/products/Hand!.jpg",
+      "category": "Men"
+    },
+    {
+      "id": "6",
+      "name": "Vest",
+      "price": 499,
+      "image": "assets/products/Sando.jpg",
+      "category": "Men"
+    },
+    {
+      "id": "7",
+      "name": "Women Track Pant",
+      "price": 1299,
+      "image": "assets/products/women.jpeg",
+      "category": "Women",
+      "stock": true
+    },
+    {
+      "id": "uT93ayPpCeY",
+      "name": "Women Jogger",
+      "price": 1999,
+      "image": "assets/products/Jogger.jpeg",
+      "category": "Women",
+      "stock": true
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

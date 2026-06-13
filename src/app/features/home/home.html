@@ -154,7 +154,7 @@
 
         <div class="products-grid">
 
-            <div class="product-card" *ngFor="let product of filteredProducts">
+            <div class="product-card" *ngFor="let product of displayedProducts">
 
                 <img [src]="product.image" [alt]="product.name" routerLink="/shop" class="clickable-image">
                 <div class="product-info">

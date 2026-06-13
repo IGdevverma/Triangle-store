@@ -143,12 +143,14 @@ export class Home implements OnInit {
 
   }
 
+
+
   /* ================= FEATURED PRODUCTS ================= */
 
   updateFeaturedProducts() {
 
     this.displayedProducts =
-      this.products.slice(
+      this.filteredProducts.slice(
         this.featuredIndex,
         this.featuredIndex + 3
       );
@@ -159,7 +161,7 @@ export class Home implements OnInit {
 
     if (
       this.featuredIndex + 3 <
-      this.products.length
+      this.filteredProducts.length
     ) {
 
       this.featuredIndex++;
@@ -184,7 +186,7 @@ export class Home implements OnInit {
 
       this.featuredIndex =
         Math.max(
-          this.products.length - 3,
+          this.filteredProducts.length - 3,
           0
         );
 
@@ -213,6 +215,9 @@ export class Home implements OnInit {
 
     this.filteredProducts =
       this.products.filter(product => {
+
+        const showOnHome =
+          product.showOnHome !== false;
 
         const matchesSearch =
           product.name
@@ -265,6 +270,8 @@ export class Home implements OnInit {
 
         return (
 
+          showOnHome &&
+
           matchesSearch &&
 
           matchesCategory &&
@@ -274,6 +281,10 @@ export class Home implements OnInit {
         );
 
       });
+
+    this.featuredIndex = 0;
+
+    this.updateFeaturedProducts();
 
   }
 

@@ -29,7 +29,13 @@ export class Admin implements OnInit {
     name: '',
     price: 0,
     image: '',
-    category: ''
+    category: '',
+    description: '',
+    fabric: '',
+    type: '',
+    stock: true,
+    showOnHome: true
+
   };
   get totalPages(): number {
 
@@ -63,7 +69,7 @@ export class Admin implements OnInit {
 
         this.products = data;
 
-        
+
 
         this.totalProducts = data.length;
 

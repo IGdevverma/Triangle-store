@@ -119,16 +119,38 @@
                 {{ editing ? 'Edit Product' : 'Add Product' }}
 
             </h2>
-
             <div class="form-group">
 
-                <input type="text" placeholder="Name" [(ngModel)]="newProduct.name">
+                <input type="text" placeholder="Product Name" [(ngModel)]="newProduct.name">
 
                 <input type="number" placeholder="Price" [(ngModel)]="newProduct.price">
 
                 <input type="text" placeholder="Image URL" [(ngModel)]="newProduct.image">
 
                 <input type="text" placeholder="Category" [(ngModel)]="newProduct.category">
+
+                <textarea placeholder="Description" [(ngModel)]="newProduct.description">
+    </textarea>
+
+                <input type="text" placeholder="Fabric" [(ngModel)]="newProduct.fabric">
+
+                <input type="text" placeholder="Type" [(ngModel)]="newProduct.type">
+
+                <label class="checkbox-label">
+
+                    <input type="checkbox" [(ngModel)]="newProduct.stock">
+
+                    In Stock
+
+                </label>
+
+                <label class="checkbox-label">
+
+                    <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
+
+                    Show on Home Page
+
+                </label>
 
             </div>
 
