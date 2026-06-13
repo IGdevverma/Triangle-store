@@ -9,7 +9,19 @@
       "description": "Basic cotton round neck tee for training and casual wear.",
       "fabric": "92% Polyester 8% Elastane",
       "type": "Cotton Elastane",
-      "stock": true
+      "stock": true,
+      "sku": "211209",
+      "colors": [
+        "#ffffff",
+        "#3f3f7f",
+        "#d85f8d",
+        "#5bc0de"
+      ],
+      "tags": [
+        "Sports",
+        "Premium"
+      ],
+      "taxText": "Inclusive of all taxes"
     },
     {
       "id": "2",
@@ -52,7 +64,8 @@
       "name": "Vest",
       "price": 499,
       "image": "assets/products/Sando.jpg",
-      "category": "Men"
+      "category": "Men",
+      "stock": true
     },
     {
       "id": "7",
@@ -68,6 +81,15 @@
       "price": 1999,
       "image": "assets/products/Jogger.jpeg",
       "category": "Women",
+      "stock": true
+    },
+    {
+      "id": "-DpXA626M-c",
+      "name": "Compress Tighty",
+      "price": 1999,
+      "image": "assets/products/Compress.jpg",
+      "category": "Men",
+      "fabric": "Dry Fit",
       "stock": true
     }
   ],

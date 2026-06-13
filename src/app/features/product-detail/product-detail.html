@@ -1,75 +1,89 @@
-<div *ngIf="product" class="product-detail">
+<div class="breadcrumb" *ngIf="product">
 
-  <!-- Product Images -->
-  <div class="product-images">
+  HOME / {{ product.category }} / {{ product.name }}
 
-    <!-- Main Image -->
-    <img
-      class="main-image"
-      [src]="selectedImage"
-      [alt]="product.name">
+</div>
+
+<div *ngIf="product" class="product-detail-wrapper">
+
+  <!-- LEFT -->
+
+  <div class="product-image-section">
+
+    <div class="image-zoom-container" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom()">
+
+      <img class="main-image" [src]="selectedImage" [alt]="product?.name" [style.transform]="zoomTransform"
+        [style.transform-origin]="zoomOrigin">
+
+    </div>
 
     <!-- Thumbnails -->
     <div class="thumbnail-images">
 
-      <img
-        *ngFor="let image of productImages"
-        [src]="image"
-        [alt]="product.name"
-        [class.active-thumb]="selectedImage === image"
-        (click)="selectedImage = image">
+      <img *ngFor="let image of productImages" [src]="image" [alt]="product?.name"
+        [class.active-thumb]="selectedImage === image" (click)="selectedImage = image">
 
     </div>
 
   </div>
 
-  <!-- Product Details -->
-  <div class="details">
+  <!-- RIGHT -->
+
+  <div class="product-info-section">
 
     <h1>{{ product.name }}</h1>
 
-    <h2>₹{{ product.price }}</h2>
+    <div class="rating">
 
-    <p class="category">
-      Category: {{ product.category }}
-    </p>
+      <span *ngFor="let star of [1,2,3,4,5]">
+        {{ star <= roundedRating ? '★' : '☆' }} </span>
 
-    <!-- Size -->
-    <div class="size-selector">
-
-      <h3>Select Size</h3>
-
-      <button
-        *ngFor="let size of sizes"
-        [class.active]="selectedSize === size"
-        (click)="selectedSize = size">
-
-        {{ size }}
-
-      </button>
+          <span class="review-count">
+            ({{ reviews.length }} Reviews)
+          </span>
 
     </div>
 
-    <!-- Quantity -->
-    <div class="quantity-selector">
+    <div class="price">
+      ₹{{ product.price }}
+    </div>
 
-      <h3>Quantity</h3>
+    <p class="tax-text">
+      {{ product.taxText || 'Inclusive of all taxes' }}
+    </p>
 
-      <div class="quantity-box">
+    <p class="description">
+      {{ product.description }}
+    </p>
 
-        <button
-          (click)="decreaseQuantity()"
-          [disabled]="quantity === 1">
+    <!-- Colors -->
 
-          −
+    <div class="color-section" *ngIf="product.colors?.length">
 
-        </button>
+      <h3>Color:</h3>
 
-        <span>{{ quantity }}</span>
+      <div class="colors">
 
-        <button (click)="increaseQuantity()">
+        <span *ngFor="let color of product.colors" class="color-dot" [style.background]="color">
 
-          +
+        </span>
+
+      </div>
+
+    </div>
+
+    <!-- Sizes -->
+
+    <div class="size-section">
+
+      <h3>Size: {{ selectedSize }}</h3>
+
+      <div class="sizes">
+
+        <button *ngFor="let size of ['XS','S','M','L','XL','XXL','XXXL']" [class.active]="selectedSize === size"
+          (click)="selectedSize = size">
+
+          {{ size }}
 
         </button>
 
@@ -77,58 +91,79 @@
 
     </div>
 
-    <!-- Stock -->
-    <div class="stock-status">
+    <!-- Quantity -->
 
-      <span
-        *ngIf="product.stock"
-        class="in-stock">
+    <div class="cart-row">
 
-        ✔ In Stock
+      <span class="qty-label">Qty:</span>
 
-      </span>
+      <button (click)="decreaseQuantity()">−</button>
 
-      <span
-        *ngIf="!product.stock"
-        class="out-stock">
+      <span>{{ quantity }}</span>
 
-        ✖ Out of Stock
+      <button (click)="increaseQuantity()">+</button>
+
+      <span class="stock" [class.in-stock]="product.stock">
+
+        {{ product.stock ? 'In stock' : 'Out of stock' }}
 
       </span>
 
     </div>
 
-    <!-- Add to Cart -->
-    <button
-      class="add-cart-btn"
-      (click)="addToCart()">
+    <!-- Buttons -->
 
-      Add to Cart
+    <button class="cart-btn" (click)="addToCart()">
+
+      ADD TO CART
 
     </button>
+
+    <button class="buy-btn" (click)="buyNow()">
+
+      BUY NOW
+
+    </button>
+
+    <!-- Meta -->
+
+    <div class="meta">
+
+      <p>
+        SKU:
+        <strong>{{ product.sku }}</strong>
+      </p>
+
+      <p>
+        Categories:
+        <strong>{{ product.category }}</strong>
+      </p>
+
+      <p *ngIf="product.tags?.length">
+        Tags:
+        <strong>
+          {{ product.tags?.join(', ') }}
+        </strong>
+      </p>
+
+    </div>
 
   </div>
 
 </div>
 
 <!-- Tabs -->
-<div
-  class="tabs-section"
-  *ngIf="product">
+<div class="tabs-section" *ngIf="product">
 
   <div class="tab-header">
 
-    <button
-      [class.active]="activeTab === 'description'"
-      (click)="activeTab = 'description'">
+    <button [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
 
       Description
 
     </button>
 
-    <button
-      [class.active]="activeTab === 'reviews'"
-      (click)="activeTab = 'reviews'">
+    <button [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
 
       Reviews ({{ reviews.length }})
 
@@ -137,9 +172,7 @@
   </div>
 
   <!-- Description -->
-  <div
-    *ngIf="activeTab === 'description'"
-    class="tab-content">
+  <div *ngIf="activeTab === 'description'" class="tab-content">
 
     <div class="info-grid">
 
@@ -178,9 +211,7 @@
   </div>
 
   <!-- Reviews -->
-  <div
-    *ngIf="activeTab === 'reviews'"
-    class="tab-content">
+  <div *ngIf="activeTab === 'reviews'" class="tab-content">
 
     <div class="rating-summary">
 
@@ -209,10 +240,7 @@
     <!-- Review Form -->
     <div class="review-form">
 
-      <input
-        type="text"
-        placeholder="Your Name"
-        [(ngModel)]="newReview.name">
+      <input type="text" placeholder="Your Name" [(ngModel)]="newReview.name">
 
       <select [(ngModel)]="newReview.rating">
 
@@ -224,10 +252,7 @@
 
       </select>
 
-      <textarea
-        rows="4"
-        placeholder="Write your review"
-        [(ngModel)]="newReview.comment">
+      <textarea rows="4" placeholder="Write your review" [(ngModel)]="newReview.comment">
 
       </textarea>
 
@@ -240,9 +265,7 @@
     </div>
 
     <!-- Reviews List -->
-    <div
-      *ngFor="let review of reviews"
-      class="review-card">
+    <div *ngFor="let review of reviews" class="review-card">
 
       <h4>{{ review.name }}</h4>
 
@@ -267,22 +290,15 @@
 </div>
 
 <!-- Related Products -->
-<div
-  class="related-section"
-  *ngIf="relatedProducts.length">
+<div class="related-section" *ngIf="relatedProducts.length">
 
   <h2>Related Products</h2>
 
   <div class="related-grid">
 
-    <div
-      class="related-card"
-      *ngFor="let item of relatedProducts"
-      [routerLink]="['/product', item.id]">
+    <div class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item.id]">
 
-      <img
-        [src]="item.image"
-        [alt]="item.name">
+      <img [src]="item.image" [alt]="item.name">
 
       <h4>{{ item.name }}</h4>
 

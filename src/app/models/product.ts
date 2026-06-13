@@ -11,5 +11,13 @@ export interface Product {
   type?: string;
   stock?: boolean;
   showOnHome?: boolean; 
+  quantity?: number;
+  selectedSize?: string;
+  sku?: string;
+  colors?: string[];
+  tags?: string[];
+  taxText?: string;
+
+  
 
 }

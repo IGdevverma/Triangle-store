@@ -33,6 +33,15 @@
                 Please enter a valid email.
 
             </small>
+            <input type="tel" placeholder="Phone Number" formControlName="phone">
+
+            <small class="error" *ngIf="
+    checkoutForm.get('phone')?.touched &&
+    checkoutForm.get('phone')?.invalid">
+
+                Enter valid 10 digit phone number.
+
+            </small>
 
             <textarea rows="4" placeholder="Address" formControlName="address">
             </textarea>
@@ -124,6 +133,12 @@
                 <span>₹{{ shipping }}</span>
 
             </div>
+            <p class="free-shipping" *ngIf="subtotal < 1999">
+
+                Add ₹{{1999-subtotal}}
+                more for FREE SHIPPING.
+
+            </p>
 
             <div class="summary-row">
 
@@ -163,6 +178,23 @@
 
             <hr>
 
+            <div class="summary-products">
+
+                <div class="summary-item" *ngFor="let item of cartItems">
+
+                    <span>
+                        {{ item.name }}
+                        × {{ item.quantity }}
+                    </span>
+
+                    <span>
+                        ₹{{ item.price * item.quantity }}
+                    </span>
+
+                </div>
+
+            </div>
+
             <div class="summary-row total">
 
                 <span>Grand Total</span>
@@ -174,6 +206,8 @@
         </div>
 
     </div>
+
+ 
 
     <!-- Success Message -->
 

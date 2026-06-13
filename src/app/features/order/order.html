@@ -10,8 +10,7 @@
 
     </div>
 
-    <div class="order-card"
-         *ngFor="let order of orders">
+    <div class="order-card" *ngFor="let order of orders">
 
         <div class="order-header">
 
@@ -43,11 +42,46 @@
 
                 <span>Status</span>
 
-                <h3 class="status">
+                <h3 class="status" [ngClass]="order.status?.toLowerCase()">
 
-                    Delivered
+                    {{ order.status }}
 
                 </h3>
+
+                <div class="tracking">
+
+                    <div class="step active">
+
+                        ✔ Order Placed
+
+                    </div>
+
+                    <div class="step" [class.active]="
+            order.status !== 'Cancelled'
+        ">
+
+                        ✔ Processing
+
+                    </div>
+
+                    <div class="step" [class.active]="
+            order.status === 'Shipped' ||
+            order.status === 'Delivered'
+        ">
+
+                        ✔ Shipped
+
+                    </div>
+
+                    <div class="step" [class.active]="
+            order.status === 'Delivered'
+        ">
+
+                        ✔ Delivered
+
+                    </div>
+
+                </div>
 
             </div>
 
@@ -59,11 +93,9 @@
 
             <h4>Products Ordered</h4>
 
-            <div class="product-item"
-                 *ngFor="let item of order.items">
+            <div class="product-item" *ngFor="let item of order.items">
 
-                <img [src]="item.image"
-                     [alt]="item.name">
+                <img [src]="item.image" [alt]="item.name">
 
                 <div class="product-info">
 
@@ -89,5 +121,6 @@
         </div>
 
     </div>
+
 
 </div>

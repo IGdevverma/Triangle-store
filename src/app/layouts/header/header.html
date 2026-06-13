@@ -16,7 +16,7 @@
 
   <ul class="nav-menu" [class.active]="isMenuOpen">
 
-    <li routerLink="/">NEW ARRIVALS</li>
+
 
     <li class="dropdown">
 
@@ -171,6 +171,20 @@
     <div (click)="toggleSearch()">
 
       <i class="fa-solid fa-magnifying-glass" routerLink="/shop"></i>
+
+    </div>
+    <!-- Wishlist -->
+    <div routerLink="/wishlist" class="wishlist-icon">
+
+      <i class="fa-regular fa-heart"></i>
+
+      <span class="wishlist-badge" *ngIf="wishlistCount > 0">
+
+        {{ wishlistCount }}
+
+      </span>
+
+      <span>Wishlist</span>
 
     </div>
 

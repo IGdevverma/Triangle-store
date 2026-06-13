@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order';
+
 
 
 
@@ -12,7 +13,8 @@ import {
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators
+  Validators,
+
 } from '@angular/forms';
 
 @Component({
@@ -29,8 +31,9 @@ import {
 })
 
 
-export class Checkout {
+export class Checkout implements OnInit {
 
+  cartItems: any[] = [];
   checkoutForm: FormGroup;
   orderPlaced = false;
   generatedOrderId = '';
@@ -46,6 +49,19 @@ export class Checkout {
     this.checkoutForm = this.fb.group({
 
       name: ['', Validators.required],
+      phone: [
+
+        '',
+
+        [
+
+          Validators.required,
+
+          Validators.pattern('^[0-9]{10}$')
+
+        ]
+
+      ],
 
       email: ['', [Validators.required, Validators.email]],
 
@@ -54,6 +70,21 @@ export class Checkout {
       paymentMethod: ['COD', Validators.required]
 
     });
+
+  }
+
+  ngOnInit(): void {
+
+    const savedData =
+      localStorage.getItem('customerInfo');
+
+    if (savedData) {
+
+      this.checkoutForm.patchValue(
+        JSON.parse(savedData)
+      );
+
+    }
 
   }
 
@@ -66,18 +97,20 @@ export class Checkout {
       return;
 
     }
+    localStorage.setItem(
+      'customerInfo',
+      JSON.stringify(this.checkoutForm.value)
+    );
 
     const orderId = 'TS' + Date.now();
 
     this.orderService.addOrder({
 
       id: orderId,
-
       items: this.cartService.getCartItems(),
-
       total: this.grandTotal,
-
-      date: new Date().toLocaleDateString()
+      date: new Date().toLocaleDateString(),
+      status: 'Processing'
 
     });
     this.generatedOrderId = orderId;
@@ -100,7 +133,7 @@ export class Checkout {
 
   get shipping(): number {
 
-    return this.subtotal > 0 ? 99 : 0;
+    return this.subtotal >= 1999 ? 0 : 99;
 
   }
 

@@ -6,6 +6,7 @@ import { LoadingService } from '../../services/loading';
 import { CartService } from '../../services/cart';
 import { ProductService } from '../../services/product';
 import { NotificationService } from '../../services/notification';
+import { Router } from '@angular/router';
 
 import { Product } from '../../models/product';
 
@@ -19,7 +20,8 @@ import { Product } from '../../models/product';
 export class ProductDetail implements OnInit {
 
   product?: Product;
-
+  zoomTransform = 'scale(1)';
+  zoomOrigin = 'center center';
   selectedSize = 'M';
   quantity = 1;
   selectedImage = '';
@@ -45,7 +47,8 @@ export class ProductDetail implements OnInit {
     private productService: ProductService,
     private cartService: CartService,
     private notificationService: NotificationService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
@@ -54,38 +57,57 @@ export class ProductDetail implements OnInit {
       this.route.snapshot.paramMap.get('id')
     );
 
+    // Loading start
+    this.loadingService.show();
+
     this.productService.getProductById(id)
-      .subscribe(data => {
+      .subscribe({
 
-        this.product = data;
+        next: (data) => {
 
-        this.productImages = data.images?.length
-          ? data.images
-          : [data.image];
+          this.product = data;
 
-        this.selectedImage = this.productImages[0];
+          this.productImages = data.images?.length
+            ? data.images
+            : [data.image];
 
-        // Load reviews
-        const savedReviews = localStorage.getItem(
-          `reviews_${data.id}`
-        );
+          this.selectedImage = this.productImages[0];
 
-        if (savedReviews) {
-          this.reviews = JSON.parse(savedReviews);
+          // Load reviews
+          const savedReviews = localStorage.getItem(
+            `reviews_${data.id}`
+          );
+
+          if (savedReviews) {
+            this.reviews = JSON.parse(savedReviews);
+          }
+
+          // Related Products
+          this.productService.getProducts()
+            .subscribe(products => {
+
+              this.relatedProducts = products
+                .filter(p =>
+                  p.category === data.category &&
+                  p.id !== data.id
+                )
+                .slice(0, 4);
+
+            });
+
+          // Loading stop
+          this.loadingService.hide();
+
+        },
+
+        error: (err) => {
+
+          console.error('Error loading product:', err);
+
+          // Error aaye tab bhi loader hide
+          this.loadingService.hide();
+
         }
-
-        // Related Products
-        this.productService.getProducts()
-          .subscribe(products => {
-
-            this.relatedProducts = products
-              .filter(p =>
-                p.category === data.category &&
-                p.id !== data.id
-              )
-              .slice(0, 4);
-
-          });
 
       });
 
@@ -111,13 +133,24 @@ export class ProductDetail implements OnInit {
 
     if (this.product) {
 
-      this.cartService.addToCart(this.product);
+      this.cartService.addToCart({
+        ...this.product,
+        quantity: this.quantity,
+        selectedSize: this.selectedSize
+      });
 
       this.notificationService.show(
         this.product.name + ' added to cart'
       );
 
     }
+
+  }
+  buyNow() {
+
+    this.addToCart();
+
+    this.router.navigate(['/checkout']);
 
   }
 
@@ -184,4 +217,24 @@ export class ProductDetail implements OnInit {
 
   }
 
+  onMouseMove(event: MouseEvent) {
+
+    const container = event.currentTarget as HTMLElement;
+
+    const rect = container.getBoundingClientRect();
+
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
+
+    this.zoomOrigin = `${x}% ${y}%`;
+
+    this.zoomTransform = 'scale(2)';
+  }
+
+  resetZoom() {
+
+    this.zoomTransform = 'scale(1)';
+    this.zoomOrigin = 'center center';
+
+  }
 }
