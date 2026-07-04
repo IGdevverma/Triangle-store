@@ -125,6 +125,61 @@
 
     </button>
 
+    <div class="delivery-section">
+
+      <h4>Delivery</h4>
+
+      <!-- Amazon Style -->
+      <div *ngIf="isPincodeSaved; else enterPincode">
+
+        <p>
+
+          Deliver to
+          <strong>{{ pincode }}</strong>
+
+        </p>
+
+        <p>{{ deliveryMessage }}</p>
+
+        <p *ngIf="deliveryCharge === 0" class="free">
+
+          Free Delivery
+
+        </p>
+
+        <p *ngIf="deliveryCharge > 0">
+
+          Delivery Charges:
+          ₹{{ deliveryCharge }}
+
+        </p>
+
+        <button class="change-btn" (click)="changePincode()">
+
+          Change
+
+        </button>
+
+      </div>
+
+      <!-- First Time -->
+      <ng-template #enterPincode>
+
+        <div class="delivery-box">
+
+          <input type="text" maxlength="6" placeholder="Enter Pincode" [(ngModel)]="pincode">
+
+          <button (click)="checkDelivery()">
+
+            Check
+
+          </button>
+
+        </div>
+
+      </ng-template>
+
+    </div>
     <!-- Meta -->
 
     <div class="meta">

@@ -1,0 +1,36 @@
+<div class="builder-page">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>Kit Builder</h2>
+
+        <ul>
+            <li *ngFor="let category of categories" [routerLink]="['/team-kit-designer', category.slug]">
+                {{ category.name }}
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+
+        <div class="breadcrumb">
+            Kit Builder » Select a kit
+        </div>
+
+        <div class="kits-grid">
+
+            <div class="kit-card" *ngFor="let kit of kits" [routerLink]="['/team-kit-designer', kit.slug]">
+
+                <img [src]="kit.image" [alt]="kit.name">
+
+                <div class="kit-name">
+                    {{ kit.name }}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+</div>

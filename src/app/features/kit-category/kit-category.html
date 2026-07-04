@@ -1,0 +1,57 @@
+<div class="builder-page">
+
+    <div class="sidebar">
+
+        <h2>Kit Builder</h2>
+
+        <ul>
+            <li>Sublimated 2.0</li>
+            <li routerLink="/team-kit-designer/football">
+
+                Football
+
+            </li>
+            <li routerLink="/team-kit-designer/basketball">
+
+                Basketball
+
+            </li>
+            <li>Hockey</li>
+            <li routerLink="/team-kit-designer/cricket">
+
+                Cricket Whites
+
+            </li>
+            <li>Training</li>
+            <li>Leisure</li>
+        </ul>
+
+    </div>
+
+    <div class="main-content">
+
+        <div class="breadcrumb">
+
+            Kit Builder » Cricket Whites
+
+        </div>
+
+        <div class="kits-grid">
+
+            <div class="kit-card" *ngFor="let item of products" [routerLink]="['/team-kit-customize', item.slug]">
+
+                <img [src]="item.image">
+
+                <div class="kit-name">
+
+                    {{ item.name }}
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

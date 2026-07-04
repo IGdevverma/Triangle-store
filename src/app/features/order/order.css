@@ -172,38 +172,58 @@
     color:white;
 }
 
-.tracking{
-    display:flex;
-    gap:20px;
-    margin-top:25px;
-    flex-wrap:wrap;
+.tracking-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 25px;
+    position: relative;
 }
 
-.step{
-    color:#aaa;
-    font-weight:600;
+.tracking-line::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 10%;
+    right: 10%;
+    height: 3px;
+    background: #ddd;
+    z-index: 0;
 }
 
-.step.active{
-    color:green;
+.track-step {
+    position: relative;
+    z-index: 1;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    color: #bbb;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.status{
-    color:green;
+.circle {
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: #ddd;
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 10px;
 }
 
-.status.cancelled{
-    color:red;
+.track-step.active {
+    color: green;
 }
 
-.status.processing{
-    color:orange;
-}
-
-.status.shipped{
-    color:#2196f3;
-}
-
-.status.delivered{
-    color:green;
+.track-step.active .circle {
+    background: green;
 }

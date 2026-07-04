@@ -7,7 +7,7 @@ import { Order } from '../models/orders';
 export class OrderService {
 
   private orders: Order[] = JSON.parse(localStorage.getItem('orders') || '[]');
-  
+
 
   constructor() {
 
@@ -39,6 +39,21 @@ export class OrderService {
 
     return this.orders;
 
+  }
+
+  updateOrderStatus(orderId: string, status: string) {
+
+    const order = this.orders.find(o => o.id === orderId);
+
+    if (order) {
+
+      order.status = status;
+
+      localStorage.setItem(
+        'orders',
+        JSON.stringify(this.orders)
+      );
+    }
   }
 
 }

@@ -3,95 +3,65 @@
     color: #111;
 }
 
-/* ================= TOP SECTION ================= */
+/* ================= NEWSLETTER SECTION ================= */
 
-.footer-top {
+.newsletter-section {
     background: #000;
     color: #fff;
-    padding: 20px 100px 30px;
+    padding: 40px 8%;
     display: grid;
     grid-template-columns: 1.4fr 1fr;
-    gap: 60px;
-    align-items: start;
-
-
+    gap: 30px;
+    align-items: center;
 }
 
-/* ================= NEWSLETTER ================= */
-
-.newsletter,
-.help-section {
+.newsletter-left,
+.newsletter-right {
     min-width: 300px;
 }
 
-.newsletter h2 {
-    font-size: 30px;
+/* ================= LEFT ================= */
+
+.newsletter-left h2 {
+    font-size: 42px;
     line-height: 1.2;
     font-weight: 700;
-    max-width: 450px;
-    margin-bottom: 20px;
-
-
-
-
+    margin-bottom: 12px;
 }
 
-.newsletter p {
-    font-size: 18px;
+.newsletter-left p {
+    font-size: 12px;
     color: #d8d8d8;
+    line-height: 1.5;
+    margin-bottom: 12px;
 
-    margin-bottom: 25px;
+  
+
 }
 
-.newsletter small {
+.newsletter-left small {
     color: #8f8f8f;
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: 14px;
+    line-height: 1.7;
 }
 
-
-
-
-/* ================= SUBSCRIBE BOX ================= */
+/* ================= SUBSCRIBE ================= */
 
 .subscribe-box {
-
     display: flex;
-    background: #fff;
     overflow: hidden;
-    max-width: 700px;
+    border-radius: 12px;
     margin: 15px 0;
-    border-radius: 14px;
-
-
-
-
-
-
-
-
-
+    max-width: 480px;
 }
 
 .subscribe-box input {
-
     flex: 1;
-    height: 56px;
+    height: 46px;
     border: none;
     outline: none;
-    padding: 0 28px;
-    font-size: 18px;
-
-
-
-
-
-
-
-
-
-
-
+    padding: 0 18px;
+    font-size: 14px;
 }
 
 .subscribe-box input::placeholder {
@@ -99,93 +69,59 @@
 }
 
 .subscribe-box button {
-
-    width: 160px;
-    height: 56px;
+    width: 130px;
     border: none;
-    font-size: 18px;
+    height: 46px;
     background: #ff4d4d;
     color: #fff;
+    font-size: 15px;
     font-weight: 600;
     cursor: pointer;
     transition: .3s;
-
-
-
-
-
-
-
-
-
-
-
 }
 
 .subscribe-box button:hover {
-
     background: #e63939;
-
 }
 
-/* ================= HELP SECTION ================= */
+/* ================= RIGHT ================= */
 
-.help-section {
-    padding-top: 10px;
-}
-
-.help-section h2 {
-    font-size: 36px;
-    font-weight: 700;
-
-    margin-bottom: 25px;
-}
-
-.help-section h3 {
-    font-size: 24px;
-    font-weight: 700;
-
+.newsletter-right h2 {
+    font-size: 22px;
     margin-bottom: 12px;
 }
 
-.help-section p {
-    color: #bdbdbd;
-
+.newsletter-right h3 {
     font-size: 18px;
+    margin-bottom: 8px;
+}
 
-    line-height: 1.5;
-
-    margin-bottom: 20px;
+.newsletter-right p {
+    color: #bdbdbd;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 12px;
 }
 
 /* ================= SOCIAL ================= */
 
 .social-icons {
     display: flex;
-
-    gap: 18px;
-
-    margin-bottom: 40px;
+    gap: 12px;
+    margin: 15px 0;
 }
 
 .social-icons a {
-    width: 64px;
-    height: 64px;
-
-    border: 1px solid rgba(255, 255, 255, .25);
-
+    width: 42px;
+    height: 42px;
+    border: 1px solid rgba(255,255,255,.25);
     border-radius: 50%;
-
     display: flex;
     justify-content: center;
     align-items: center;
-
     color: white;
-
+    font-size: 16px;
     text-decoration: none;
-
-    font-size: 24px;
-
     transition: .3s;
 }
 
@@ -195,16 +131,23 @@
     border-color: white;
 }
 
-/* ================= BOTTOM SECTION ================= */
+.social-text {
+    color: #bdbdbd;
+    font-size: 13px;
+}
 
-.footer-bottom {
-    padding: 70px 100px;
+.social-text strong {
+    color: #fff;
+}
 
+/* ================= FOOTER LINKS ================= */
+
+.footer-links {
+    background: #f8f8f8;
+    padding: 70px 8%;
     display: grid;
-
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-
-    gap: 60px;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 50px;
 }
 
 .footer-column {
@@ -214,126 +157,128 @@
 
 .footer-column h3 {
     font-size: 20px;
-
     margin-bottom: 25px;
 }
 
 .footer-column p {
     color: #444;
-
     line-height: 1.8;
 }
 
 .footer-column a {
     text-decoration: none;
-
     color: #444;
-
-    margin-bottom: 16px;
-
-    transition: all 0.3s ease;
+    margin-bottom: 14px;
+    transition: .3s;
 }
 
 .footer-column a:hover {
     color: #ff4d4d;
-
     padding-left: 6px;
 }
 
-.social-text {
-    color: #bdbdbd;
+/* ================= COMPANY ================= */
 
-    font-size: 18px;
+.company img {
+    margin-bottom: 20px;
 }
 
-.social-text strong {
-    color: white;
+.company p {
+    margin-bottom: 12px;
 }
 
 /* ================= COPYRIGHT ================= */
 
-.copyright {
-    border-top: 1px solid #e5e5e5;
+.footer-bottom {
+  background: #f8f8f8;
 
-    padding: 30px 100px;
+    border-top: 1px solid #dcdcdc;
+
+    padding: 25px 90px;
 
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     flex-wrap: wrap;
 
     gap: 20px;
 }
 
-.copyright p {
-    margin: 0;
-
+.footer-bottom p {
     color: #555;
+    margin: 0;
 }
 
 .payment-icons {
     display: flex;
+    align-items: center;
+    gap: 15px;
+}
 
-    gap: 20px;
+.payment-icons img {
+    object-fit: contain;
+}
 
-    font-weight: 600;
+.policies {
+    display: flex;
+    gap: 25px;
+}
 
+.policies a {
     color: #444;
+    text-decoration: none;
+    transition: .3s;
+}
+
+.policies a:hover {
+    color: #ff4d4d;
 }
 
 /* ================= MOBILE ================= */
 
 @media (max-width: 768px) {
 
-    .footer-top {
+    .newsletter-section {
+        grid-template-columns: 1fr;
+        padding: 50px 25px;
+    }
 
-        padding: 60px 100px;
-
+    .footer-links {
+        grid-template-columns: 1fr;
+        padding: 50px 25px;
+        gap: 40px;
     }
 
     .footer-bottom {
-        grid-template-columns: 1fr;
-
-        gap: 60px;
-
-        padding: 60px 25px;
-    }
-
-    .newsletter h2,
-    .help-section h2 {
-        font-size: 44px;
-    }
-
-    .help-section h3 {
-        font-size: 34px;
+        flex-direction: column;
+        text-align: center;
+        padding: 25px;
     }
 
     .subscribe-box {
         flex-direction: column;
-        margin: 20px 0;
     }
 
     .subscribe-box input,
     .subscribe-box button {
         width: 100%;
-        height: 20px;
+        height: 55px;
     }
 
-    .copyright {
-        flex-direction: column;
-
-        text-align: center;
-
-        padding: 25px;
+    .newsletter-left h2,
+    .newsletter-right h2 {
+        font-size: 32px;
     }
-}
-.newsletter p,
-.newsletter small,
-.social-text {
-    margin: 0;
-}
 
-.help-section h2,
-.help-section h3 {
-    margin-top: 0;
+    .newsletter-right h3 {
+        font-size: 24px;
+    }
+
+    .policies {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
 }

@@ -1,0 +1,118 @@
+<div class="customizer-layout">
+
+    <!-- LEFT PANEL -->
+    <div class="controls">
+
+        <h2>Customise Design</h2>
+
+        <button class="view-btn"
+                (click)="showBack = !showBack">
+            {{ showBack ? 'View Front' : 'View Back' }}
+        </button>
+
+        <details open>
+            <summary>Colour Settings</summary>
+
+            <label>Primary Colour</label>
+            <input type="color"
+                   [(ngModel)]="primaryColor">
+
+            <label>Secondary Colour</label>
+            <input type="color"
+                   [(ngModel)]="secondaryColor">
+        </details>
+
+        <details>
+            <summary>Club Logo</summary>
+
+            <input type="file"
+                   (change)="uploadLogo($event)">
+        </details>
+
+        <details>
+            <summary>Front Logo</summary>
+
+            <input type="file">
+        </details>
+
+        <details>
+            <summary>Sleeves Logo</summary>
+
+            <input type="file">
+        </details>
+
+        <details>
+            <summary>Name & Number</summary>
+
+            <label>Team Name</label>
+            <input type="text"
+                   [(ngModel)]="teamName">
+
+            <label>Player Name</label>
+            <input type="text"
+                   [(ngModel)]="playerName">
+
+            <label>Player Number</label>
+            <input type="text"
+                   [(ngModel)]="playerNumber">
+        </details>
+
+    </div>
+
+
+    <!-- PREVIEW -->
+    <div class="preview">
+
+        <div class="preview-section">
+
+            <img class="jersey-image"
+                 [src]="showBack ? backImage : frontImage">
+
+            <img *ngIf="logoUrl"
+                 class="logo-overlay"
+                 [src]="logoUrl">
+
+            <div class="team-overlay">
+                {{ teamName }}
+            </div>
+
+            <div class="number-overlay">
+                {{ playerNumber }}
+            </div>
+
+            <div class="player-overlay">
+                {{ playerName }}
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- QUOTE -->
+    <div class="quote">
+
+        <h2>Manufacturing Quote</h2>
+
+        <p>
+            Price/Piece:
+            ₹{{ pricePerPiece }}
+        </p>
+
+        <p>
+            Quantity:
+            {{ quantity }}
+        </p>
+
+        <h3>
+            Total:
+            ₹{{ totalPrice }}
+        </h3>
+
+        <button>
+            Request Quote
+        </button>
+
+    </div>
+
+</div>

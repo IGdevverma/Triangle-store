@@ -48,36 +48,34 @@
 
                 </h3>
 
-                <div class="tracking">
+                <div class="tracking-line">
 
-                    <div class="step active">
+                    <div class="track-step" [class.active]="true">
 
-                        ✔ Order Placed
-
-                    </div>
-
-                    <div class="step" [class.active]="
-            order.status !== 'Cancelled'
-        ">
-
-                        ✔ Processing
+                        <div class="circle">✓</div>
+                        <span>Placed</span>
 
                     </div>
 
-                    <div class="step" [class.active]="
-            order.status === 'Shipped' ||
-            order.status === 'Delivered'
-        ">
+                    <div class="track-step" [class.active]="order.status !== 'Cancelled'">
 
-                        ✔ Shipped
+                        <div class="circle">✓</div>
+                        <span>Processing</span>
 
                     </div>
 
-                    <div class="step" [class.active]="
-            order.status === 'Delivered'
-        ">
+                    <div class="track-step" [class.active]="order.status === 'Shipped' ||
+                          order.status === 'Delivered'">
 
-                        ✔ Delivered
+                        <div class="circle">✓</div>
+                        <span>Shipped</span>
+
+                    </div>
+
+                    <div class="track-step" [class.active]="order.status === 'Delivered'">
+
+                        <div class="circle">✓</div>
+                        <span>Delivered</span>
 
                     </div>
 

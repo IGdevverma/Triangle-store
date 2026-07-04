@@ -25,22 +25,28 @@ export class ProductDetail implements OnInit {
   selectedSize = 'M';
   quantity = 1;
   selectedImage = '';
-
   relatedProducts: Product[] = [];
-
   sizes = ['S', 'M', 'L', 'XL'];
-
   productImages: string[] = [];
-
   activeTab: 'description' | 'reviews' = 'description';
-
   reviews: any[] = [];
-
   newReview = {
     name: '',
     rating: 5,
     comment: ''
+
+
+
+
+
+
+
+
   };
+  pincode = '';
+  deliveryMessage = '';
+  deliveryCharge = 99;
+  isPincodeSaved = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -110,6 +116,17 @@ export class ProductDetail implements OnInit {
         }
 
       });
+
+    const savedPincode = localStorage.getItem('deliveryPincode');
+
+    if (savedPincode) {
+
+      this.pincode = savedPincode;
+
+      this.isPincodeSaved = true;
+
+      this.checkDelivery();
+    }
 
   }
 
@@ -236,5 +253,64 @@ export class ProductDetail implements OnInit {
     this.zoomTransform = 'scale(1)';
     this.zoomOrigin = 'center center';
 
+  }
+
+  checkDelivery() {
+
+    if (!this.pincode || this.pincode.length !== 6) {
+
+      this.deliveryMessage = 'Enter a valid Pincode';
+
+      return;
+    }
+
+    localStorage.setItem(
+      'deliveryPincode',
+      this.pincode
+    );
+
+    this.isPincodeSaved = true;
+
+    const today = new Date();
+    const deliveryDate = new Date();
+
+    if (
+      this.pincode.startsWith('201') ||
+      this.pincode.startsWith('110')
+    ) {
+
+      deliveryDate.setDate(today.getDate() + 2);
+
+      this.deliveryCharge = 0;
+
+    } else {
+
+      deliveryDate.setDate(today.getDate() + 5);
+
+      this.deliveryCharge = 99;
+    }
+
+    this.deliveryMessage =
+      `Get it by ${deliveryDate.toLocaleDateString(
+        'en-IN',
+        {
+          weekday: 'long',
+          day: 'numeric',
+          month: 'long'
+        }
+      )}`;
+  }
+
+  changePincode() {
+
+    localStorage.removeItem('deliveryPincode');
+
+    this.pincode = '';
+
+    this.deliveryMessage = '';
+
+    this.deliveryCharge = 99;
+
+    this.isPincodeSaved = false;
   }
 }

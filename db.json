@@ -68,22 +68,6 @@
       "stock": true
     },
     {
-      "id": "7",
-      "name": "Women Track Pant",
-      "price": 1299,
-      "image": "assets/products/women.jpeg",
-      "category": "Women",
-      "stock": true
-    },
-    {
-      "id": "uT93ayPpCeY",
-      "name": "Women Jogger",
-      "price": 1999,
-      "image": "assets/products/Jogger.jpeg",
-      "category": "Women",
-      "stock": true
-    },
-    {
       "id": "-DpXA626M-c",
       "name": "Compress Tighty",
       "price": 1999,

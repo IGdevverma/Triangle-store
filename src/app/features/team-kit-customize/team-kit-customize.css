@@ -1,0 +1,211 @@
+.customizer-layout {
+    max-width: 1500px;
+    margin: 40px auto;
+    padding: 0 30px;
+
+    display: grid;
+    grid-template-columns: 300px 1fr 280px;
+    gap: 40px;
+}
+
+
+/* LEFT */
+
+.controls {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+}
+
+.controls h2 {
+    margin-bottom: 25px;
+}
+
+.view-btn {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 25px;
+
+    border: none;
+    background: #222;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.view-btn:hover {
+    background: #7B2CBF;
+}
+
+details {
+    border: 1px solid #ddd;
+    margin-bottom: 15px;
+}
+
+summary {
+    background: #333;
+    color: white;
+    padding: 16px;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+details label {
+    display: block;
+    margin: 15px;
+    margin-bottom: 8px;
+}
+
+details input,
+details select {
+    width: calc(100% - 30px);
+    margin: 0 15px 15px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    font-size: 15px;
+}
+
+input[type="color"] {
+    height: 50px;
+    padding: 5px;
+}
+
+
+/* PREVIEW */
+
+.preview {
+    display: flex;
+    justify-content: center;
+}
+
+.preview-section {
+    position: relative;
+    width: 550px;
+}
+
+.jersey-image {
+    width: 100%;
+    display: block;
+}
+
+
+/* LOGO */
+
+.logo-overlay {
+    position: absolute;
+
+    top: 110px;
+    left: 240px;
+
+    width: 70px;
+    height: 70px;
+
+    object-fit: contain;
+}
+
+
+/* TEAM */
+
+.team-overlay {
+    position: absolute;
+
+    top: 220px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+
+/* NUMBER */
+
+.number-overlay {
+    position: absolute;
+
+    top: 300px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+    font-size: 90px;
+    font-weight: 700;
+}
+
+
+/* PLAYER */
+
+.player-overlay {
+    position: absolute;
+
+    top: 430px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: white;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+
+/* QUOTE */
+
+.quote {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.08);
+
+    height: fit-content;
+}
+
+.quote h2 {
+    margin-bottom: 20px;
+}
+
+.quote p {
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.quote h3 {
+    margin: 25px 0;
+    font-size: 28px;
+}
+
+.quote button {
+    width: 100%;
+    padding: 15px;
+
+    border: none;
+    background: black;
+    color: white;
+
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.quote button:hover {
+    background: #7B2CBF;
+}
+
+
+/* MOBILE */
+
+@media(max-width: 1100px) {
+
+    .customizer-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-section {
+        width: 100%;
+        max-width: 500px;
+    }
+}

@@ -10,6 +10,9 @@ import { authGuard } from './guards/auth-guard';
 import { Wishlist } from './features/wishlist/wishlist';
 import { RequestQuote } from './features/request-quote/request-quote';
 import { DealerRegistration } from './features/dealer-registration/dealer-registration';
+import { TeamKitDesigner } from './features/team-kit-designer/team-kit-designer';
+import { KitCategory } from './features/kit-category/kit-category';
+import { TeamKitCustomize } from './features/team-kit-customize/team-kit-customize';
 
 export const routes: Routes = [
   {
@@ -81,5 +84,20 @@ export const routes: Routes = [
       import('./features/about/about')
         .then(m => m.About)
   },
+  {
+    path: 'team-kit-designer',
+    loadComponent: () =>
+      import('./features/team-kit-designer/team-kit-designer')
+        .then(m => m.TeamKitDesigner)
+  },
+  
+  {
+    path: 'team-kit-designer/:category',
+    component: KitCategory
+  },
+  {
+    path: 'team-kit-customize/:slug',
+    component: TeamKitCustomize
+  }
 
 ];

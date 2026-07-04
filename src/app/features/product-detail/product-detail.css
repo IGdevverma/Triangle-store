@@ -533,3 +533,87 @@
 .image-zoom-container:hover .main-image {
     transform: scale(1.5);
 }
+.delivery-section {
+    margin: 35px 0;
+}
+
+.delivery-section h4 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.delivery-box {
+    display: flex;
+    gap: 12px;
+}
+
+.delivery-box input {
+    flex: 1;
+    height: 48px;
+
+    padding: 0 15px;
+
+    border: 1px solid #ddd;
+    border-radius: 8px;
+
+    font-size: 15px;
+}
+
+.delivery-box button {
+    padding: 0 24px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: black;
+    color: white;
+
+    cursor: pointer;
+}
+
+.delivery-box button:hover {
+    background: #222;
+}
+
+.delivery-result {
+    margin-top: 15px;
+
+    line-height: 1.8;
+}
+
+.delivery-result strong {
+    color: black;
+}
+
+.free {
+    color: green;
+    font-weight: 600;
+}
+.change-btn {
+
+    margin-top: 12px;
+
+    background: none;
+
+    border: none;
+
+    color: #007185;
+
+    cursor: pointer;
+
+    font-weight: 600;
+
+    padding: 0;
+}
+
+.change-btn:hover {
+
+    text-decoration: underline;
+}
+
+.free {
+
+    color: green;
+
+    font-weight: 600;
+}
