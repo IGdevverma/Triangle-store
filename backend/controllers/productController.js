@@ -1,51 +1,96 @@
+const ApiFeatures = require("../utils/apiFeatures");
 const Product = require("../models/Product");
+const asyncHandler = require("../middleware/asyncHandler");
+const ErrorHandler = require("../utils/errorHandler");
 
 // Create Product
-const createProduct = async (req, res) => {
-  try {
+const createProduct = asyncHandler(async (req, res) => {
+
     const product = await Product.create(req.body);
 
     res.status(201).json({
-      success: true,
-      message: "Product Created Successfully",
-      product,
+        success: true,
+        message: "Product Created Successfully",
+        product
     });
 
-  } catch (error) {
-
-    res.status(500).json({
-      success: false,
-      message: error.message,
-    });
-
-  }
-};
+});
 
 // Get All Products
-const getProducts = async (req, res) => {
+const getProducts = asyncHandler(async (req, res) => {
 
-  try {
+    const resultPerPage = 8;
 
-    const products = await Product.find();
+    const totalProducts = await Product.countDocuments();
+
+    const apiFeature = new ApiFeatures(Product.find(), req.query)
+        .search()
+        .filter()
+        .sort()
+        .pagination(resultPerPage);
+
+    const products = await apiFeature.query;
 
     res.status(200).json({
-      success: true,
-      count: products.length,
-      products,
+        success: true,
+        totalProducts,
+        count: products.length,
+        products
     });
 
-  } catch (error) {
+});
 
-    res.status(500).json({
-      success: false,
-      message: error.message,
+// Get Single Product
+const getProductById = asyncHandler(async (req, res) => {
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        return next(new ErrorHandler("Product not found", 404));
+    }
+
+    res.status(200).json({
+        success: true,
+        product
     });
 
-  }
+});
 
-};
+// Update Product
+const updateProduct = asyncHandler(async (req, res) => {
+
+    const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+
+    res.status(200).json({
+        success: true,
+        product
+    });
+
+});
+
+// Delete Product
+const deleteProduct = asyncHandler(async (req, res) => {
+
+    await Product.findByIdAndDelete(req.params.id);
+
+    res.status(200).json({
+        success: true,
+        message: "Product Deleted Successfully"
+    });
+
+});
 
 module.exports = {
-  createProduct,
-  getProducts,
+    createProduct,
+    getProducts,
+    getProductById,
+    updateProduct,
+    deleteProduct,
 };
