@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-
+import { Chart } from 'chart.js/auto';
 import { ProductService } from '../../services/product';
 import { Product } from '../../models/product';
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'app-admin',
@@ -12,7 +13,12 @@ import { Product } from '../../models/product';
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
-export class Admin implements OnInit {
+
+
+export class Admin implements OnInit, AfterViewInit {
+
+  @ViewChild('salesCanvas')
+  salesCanvas!: ElementRef<HTMLCanvasElement>;
 
   searchTerm = '';
   currentPage = 1;
@@ -20,22 +26,41 @@ export class Admin implements OnInit {
   itemsPerPage = 5;
   inventoryValue = 0;
   totalProducts = 0;
+  totalStock = 0;
   totalCategories = 0;
   mostExpensiveProduct = '';
+  selectedFile!: File;
+  imagePreview = '';
+  lowStockProducts: Product[] = [];
+  availableColors = [
+    'Black',
+    'White',
+    'Red',
+    'Blue',
+    'Green',
+    'Grey',
+    'Navy'
+  ];
+
+
 
   products: Product[] = [];
   newProduct: Product = {
-    id: 0,
     name: '',
     price: 0,
     image: '',
     category: '',
+    brand: '',
     description: '',
     fabric: '',
     type: '',
-    stock: true,
+    sku: '',
+    discount: 0,
+    colors: [],
+    sizes: [],
+    status: 'Active',
+    stock: 0,
     showOnHome: true
-
   };
   get totalPages(): number {
 
@@ -56,40 +81,60 @@ export class Admin implements OnInit {
   constructor(
     private productService: ProductService
   ) { }
-
   ngOnInit(): void {
 
     this.loadProducts();
 
   }
-  loadProducts() {
 
-    this.productService.getProducts()
-      .subscribe(data => {
+  ngAfterViewInit(): void {
+
+    this.createSalesChart();
+
+
+
+  }
+  loadProducts() {
+    this.productService.getProducts().subscribe({
+
+      next: (response: any) => {
+
+        const data: Product[] = response.products;
 
         this.products = data;
 
-
-
         this.totalProducts = data.length;
+        this.totalStock = data.reduce(
+          (sum, product) => sum + (product.stock ?? 0),
+          0
+        );
+        this.lowStockProducts = data.filter(
+          product => (product.stock ?? 0) <= 5
+        );
 
         this.totalCategories = new Set(
-          data.map(product => product.category)
+          data.map((product: Product) => product.category)
         ).size;
 
         this.inventoryValue = data.reduce(
-          (sum, product) => sum + product.price,
+          (sum: number, product: Product) => sum + product.price,
           0
         );
 
         const expensive = data.reduce(
-          (prev, current) =>
+          (prev: Product, current: Product) =>
             prev.price > current.price ? prev : current
         );
 
         this.mostExpensiveProduct = expensive.name;
 
-      });
+      },
+
+      error: (err) => {
+        console.error(err);
+      }
+
+    });
 
   }
 
@@ -127,24 +172,65 @@ export class Admin implements OnInit {
       return;
 
     }
-    this.showModal = false;
+    console.log('Stock:', this.newProduct.stock);
 
-    this.productService.addProduct(this.newProduct)
-      .subscribe(() => {
+    console.log('Type:', typeof this.newProduct.stock);
+    const formData = new FormData();
 
-        this.loadProducts();
+    formData.append('name', this.newProduct.name);
 
-        this.newProduct = {
-          id: 0,
-          name: '',
-          price: 0,
-          image: '',
-          category: ''
-        };
+    formData.append('price', this.newProduct.price.toString());
 
-      });
+    formData.append('category', this.newProduct.category);
+
+    formData.append('description', this.newProduct.description || '');
+
+    formData.append('fabric', this.newProduct.fabric || '');
+
+    formData.append('type', this.newProduct.type || '');
+    console.log('Stock:', this.newProduct.stock);
+    console.log('Type:', typeof this.newProduct.stock);
+
+    formData.append('stock', String(this.newProduct.stock));
+
+    formData.append('showOnHome', String(this.newProduct.showOnHome));
+
+    formData.append('image', this.selectedFile);
+
+    this.productService.addProduct(formData).subscribe(() => {
+
+      this.loadProducts();
+
+      this.closeModal();
+
+      this.newProduct = {
+
+        name: '',
+
+        price: 0,
+
+        image: '',
+
+        category: '',
+
+        description: '',
+
+        fabric: '',
+
+        type: '',
+
+        stock: 0,
+
+        showOnHome: true
+
+      };
+
+      this.imagePreview = '';
+
+    });
 
   }
+
 
   editProduct(product: Product) {
 
@@ -152,22 +238,25 @@ export class Admin implements OnInit {
     this.showModal = true;
 
     this.newProduct = { ...product };
+    this.imagePreview =
+      'http://localhost:8000/uploads/' + product.image;
 
   }
 
   updateProduct() {
+    
 
     if (!this.isFormValid()) {
 
       alert('Please fill all fields correctly.');
 
       return;
-
     }
-    this.showModal = false;
 
+
+    this.showModal = false;
     this.productService.updateProduct(
-      this.newProduct.id,
+      this.newProduct._id!,
       this.newProduct
     ).subscribe(() => {
 
@@ -176,7 +265,7 @@ export class Admin implements OnInit {
       this.editing = false;
 
       this.newProduct = {
-        id: 0,
+        _id: '',
         name: '',
         price: 0,
         image: '',
@@ -188,7 +277,7 @@ export class Admin implements OnInit {
   }
 
 
-  deleteProduct(id: number) {
+  deleteProduct(id: string) {
 
     if (confirm('Delete this product?')) {
 
@@ -222,14 +311,34 @@ export class Admin implements OnInit {
 
   }
 
+  get pages(): number[] {
+
+    return Array.from(
+
+      { length: this.totalPages },
+
+      (_, i) => i + 1
+
+    );
+
+  }
+
+  goToPage(page: number) {
+
+    this.currentPage = page;
+
+  }
   isFormValid(): boolean {
 
     return !!(
 
       this.newProduct.name.trim() &&
       this.newProduct.price > 0 &&
-      this.newProduct.image.trim() &&
-      this.newProduct.category.trim()
+      this.newProduct.category.trim() &&
+      (
+        this.selectedFile ||
+        this.editing
+      )
 
     );
 
@@ -241,17 +350,143 @@ export class Admin implements OnInit {
     this.showModal = true;
 
     this.newProduct = {
-      id: 0,
       name: '',
+
       price: 0,
+
       image: '',
-      category: ''
+
+      category: '',
+
+      description: '',
+
+      fabric: '',
+
+      type: '',
+
+      stock: 0,
+
+      showOnHome: true
     };
 
   }
   closeModal() {
 
     this.showModal = false;
+
+  }
+
+  toggleColor(color: string) {
+
+    if (!this.newProduct.colors) {
+      this.newProduct.colors = [];
+    }
+
+    const index = this.newProduct.colors.indexOf(color);
+
+    if (index > -1) {
+
+      this.newProduct.colors.splice(index, 1);
+
+    } else {
+
+      this.newProduct.colors.push(color);
+
+    }
+
+  }
+
+  onFileSelected(event: any) {
+
+    if (event.target.files.length > 0) {
+
+      this.selectedFile = event.target.files[0];
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+
+        this.imagePreview = reader.result as string;
+
+      };
+
+      reader.readAsDataURL(this.selectedFile);
+
+    }
+
+  }
+
+  createSalesChart() {
+
+    new Chart(this.salesCanvas.nativeElement, {
+
+      type: 'line',
+
+      data: {
+
+        labels: [
+
+          'Jan',
+
+          'Feb',
+
+          'Mar',
+
+          'Apr',
+
+          'May',
+
+          'Jun'
+
+        ],
+
+        datasets: [
+
+          {
+
+            label: 'Sales',
+
+            data: [
+
+              12000,
+
+              19000,
+
+              15000,
+
+              25000,
+
+              21000,
+
+              30000
+
+            ],
+
+            borderColor: '#7C3AED',
+
+            backgroundColor: 'rgba(124,58,237,0.15)',
+
+            fill: true,
+
+            tension: 0.4
+
+          }
+
+        ]
+
+      },
+
+      options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false
+
+      }
+
+    });
+
+
 
   }
 

@@ -158,9 +158,11 @@
 
         <div class="products-grid">
 
-            <div class="product-card" *ngFor="let product of displayedProducts">
+            <div class="product-card" *ngFor="let product of displayedProducts"
+                [routerLink]="['/product', product._id]">
 
-                <img [src]="product.image" [alt]="product.name" routerLink="/shop" class="clickable-image">
+                <img [src]="'http://localhost:8000/uploads/' + product.image" [alt]="product.name"
+                    [routerLink]="['/product', product._id]" class="clickable-image">
                 <div class="product-info">
 
                     <h3>{{ product.name }}</h3>

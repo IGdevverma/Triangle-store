@@ -25,7 +25,7 @@
 
                 <div class="quantity-controls">
 
-                    <button (click)="decrease(item.id)">
+                    <button (click)="decrease(item.id!)">
                         -
                     </button>
 
@@ -33,7 +33,7 @@
                         {{ item.quantity }}
                     </span>
 
-                    <button (click)="increase(item.id)">
+                    <button (click)="increase(item.id!)">
                         +
                     </button>
 
@@ -41,7 +41,7 @@
 
             </div>
 
-            <button (click)="removeItem(item.id)">
+            <button (click)="removeItem(item.id!)">
                 Remove
             </button>
 

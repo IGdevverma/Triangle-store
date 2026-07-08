@@ -13,6 +13,7 @@ import { DealerRegistration } from './features/dealer-registration/dealer-regist
 import { TeamKitDesigner } from './features/team-kit-designer/team-kit-designer';
 import { KitCategory } from './features/kit-category/kit-category';
 import { TeamKitCustomize } from './features/team-kit-customize/team-kit-customize';
+import { AdminOrders } from './features/admin-orders/admin-orders';
 
 export const routes: Routes = [
   {
@@ -90,7 +91,7 @@ export const routes: Routes = [
       import('./features/team-kit-designer/team-kit-designer')
         .then(m => m.TeamKitDesigner)
   },
-  
+
   {
     path: 'team-kit-designer/:category',
     component: KitCategory
@@ -98,6 +99,11 @@ export const routes: Routes = [
   {
     path: 'team-kit-customize/:slug',
     component: TeamKitCustomize
-  }
+  },
+  {
+    path: 'admin-orders',
+    component: AdminOrders,
+    canActivate: [authGuard]
+  },
 
 ];

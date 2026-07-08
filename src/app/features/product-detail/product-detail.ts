@@ -59,63 +59,61 @@ export class ProductDetail implements OnInit {
 
   ngOnInit(): void {
 
-    const id = Number(
-      this.route.snapshot.paramMap.get('id')
-    );
+    const id = this.route.snapshot.paramMap.get('id');
+    if (!id) return;
 
-    // Loading start
     this.loadingService.show();
 
-    this.productService.getProductById(id)
-      .subscribe({
+    this.productService.getProductById(id!).subscribe({
 
-        next: (data) => {
+      next: (response: any) => {
 
-          this.product = data;
+        const data: Product = response.product;
 
-          this.productImages = data.images?.length
-            ? data.images
-            : [data.image];
+        this.product = data;
 
-          this.selectedImage = this.productImages[0];
+        this.productImages =
+          data.images?.length ? data.images : [data.image];
 
-          // Load reviews
-          const savedReviews = localStorage.getItem(
-            `reviews_${data.id}`
-          );
+        this.selectedImage = this.productImages[0];
 
-          if (savedReviews) {
-            this.reviews = JSON.parse(savedReviews);
-          }
+        const savedReviews = localStorage.getItem(
+          `reviews_${data._id}`
+        );
 
-          // Related Products
-          this.productService.getProducts()
-            .subscribe(products => {
-
-              this.relatedProducts = products
-                .filter(p =>
-                  p.category === data.category &&
-                  p.id !== data.id
-                )
-                .slice(0, 4);
-
-            });
-
-          // Loading stop
-          this.loadingService.hide();
-
-        },
-
-        error: (err) => {
-
-          console.error('Error loading product:', err);
-
-          // Error aaye tab bhi loader hide
-          this.loadingService.hide();
-
+        if (savedReviews) {
+          this.reviews = JSON.parse(savedReviews);
         }
 
-      });
+        this.productService.getProducts().subscribe({
+
+          next: (res: any) => {
+
+            const products: Product[] = res.products;
+
+            this.relatedProducts = products
+              .filter((p: Product) =>
+                p.category === data.category &&
+                p._id !== data._id
+              )
+              .slice(0, 4);
+
+            this.loadingService.hide();
+          }
+
+        });
+
+      },
+
+      error: (err) => {
+
+        console.error('Error loading product:', err);
+
+        this.loadingService.hide();
+
+      }
+
+    });
 
     const savedPincode = localStorage.getItem('deliveryPincode');
 
@@ -126,6 +124,7 @@ export class ProductDetail implements OnInit {
       this.isPincodeSaved = true;
 
       this.checkDelivery();
+
     }
 
   }
@@ -188,7 +187,7 @@ export class ProductDetail implements OnInit {
 
       localStorage.setItem(
 
-        `reviews_${this.product?.id}`,
+        `reviews_${this.product?._id}`,
 
         JSON.stringify(this.reviews)
 

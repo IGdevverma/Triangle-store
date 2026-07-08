@@ -8,26 +8,22 @@ import { Observable } from 'rxjs';
 })
 export class ProductService {
 
-  private apiUrl = 'http://localhost:3000/products';
+  private apiUrl = 'http://localhost:8000/api/products';
 
   constructor(private http: HttpClient) { }
 
-  getProducts(): Observable<Product[]> {
-
-    return this.http.get<Product[]>(this.apiUrl);
-
+  getProducts(): Observable<any> {
+    return this.http.get<any>('http://localhost:8000/api/products');
   }
-  getProductById(id: number): Observable<Product> {
+  getProductById(id: string): Observable<any> {
 
-    return this.http.get<Product>(
-
-      `http://localhost:3000/products/${id}`
-
+    return this.http.get<any>(
+      `${this.apiUrl}/${id}`
     );
 
   }
 
-  addProduct(product: Product): Observable<Product> {
+  addProduct(product: FormData): Observable<Product> {
 
     return this.http.post<Product>(
 
@@ -41,7 +37,7 @@ export class ProductService {
 
   updateProduct(
 
-    id: number,
+    id: string,
 
     product: Product
 
@@ -57,7 +53,7 @@ export class ProductService {
 
   }
 
-  deleteProduct(id: number): Observable<void> {
+  deleteProduct(id: string): Observable<void> {
 
     return this.http.delete<void>(
 

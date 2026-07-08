@@ -40,11 +40,11 @@ export class Shop implements OnInit {
 
     this.productService.getProducts().subscribe({
 
-      next: (data) => {
+      next: (response: any) => {
 
-        this.products = data;
+        this.products = response.products;
 
-        this.filteredProducts = data;
+        this.filteredProducts = response.products;
 
         this.filterProducts();
 
@@ -124,11 +124,7 @@ export class Shop implements OnInit {
 
     else if (this.selectedSort === 'latest') {
 
-      this.filteredProducts.sort(
-
-        (a, b) => b.id - a.id
-
-      );
+      this.filteredProducts = [...this.filteredProducts];
 
     }
 
@@ -148,9 +144,9 @@ export class Shop implements OnInit {
 
   toggleWishlist(product: Product) {
 
-    if (this.isWishlisted(product.id)) {
+    if (product.id && this.isWishlisted(product.id)) {
 
-      this.wishlistService.removeFromWishlist(product.id);
+       this.wishlistService.removeFromWishlist(product.id);
 
     }
 
@@ -162,7 +158,7 @@ export class Shop implements OnInit {
 
   }
 
-  isWishlisted(id: number) {
+  isWishlisted(id: string) {
 
     return this.wishlistService.isInWishlist(id);
 

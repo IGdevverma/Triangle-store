@@ -8,7 +8,7 @@ import { NotificationService } from '../../services/notification';
 @Component({
   selector: 'app-wishlist',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule],
   templateUrl: './wishlist.html',
   styleUrl: './wishlist.css'
 })
@@ -32,7 +32,7 @@ export class Wishlist implements OnInit {
 
   }
 
-  remove(id: number) {
+  remove(id: string) {
 
     this.wishlistService.removeFromWishlist(id);
 
@@ -42,7 +42,7 @@ export class Wishlist implements OnInit {
 
     this.cartService.addToCart(product);
 
-    this.wishlistService.removeFromWishlist(product.id);
+    this.wishlistService.removeFromWishlist(product.id!);
 
     this.notificationService.show(
 

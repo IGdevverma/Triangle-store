@@ -5,7 +5,9 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Create Product
 const createProduct = asyncHandler(async (req, res) => {
-
+    if (req.file) {
+        req.body.image = req.file.filename;
+    }
     const product = await Product.create(req.body);
 
     res.status(201).json({

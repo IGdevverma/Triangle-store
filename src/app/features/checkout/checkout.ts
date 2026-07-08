@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order';
+import { Order } from '../../models/orders';
 
 
 
@@ -49,23 +50,27 @@ export class Checkout implements OnInit {
     this.checkoutForm = this.fb.group({
 
       name: ['', Validators.required],
-      phone: [
 
-        '',
+      phone: ['', [
+        Validators.required,
+        Validators.pattern('^[0-9]{10}$')
+      ]],
 
-        [
-
-          Validators.required,
-
-          Validators.pattern('^[0-9]{10}$')
-
-        ]
-
-      ],
-
-      email: ['', [Validators.required, Validators.email]],
+      email: ['', [
+        Validators.required,
+        Validators.email
+      ]],
 
       address: ['', Validators.required],
+
+      city: ['', Validators.required],
+
+      state: ['', Validators.required],
+
+      pincode: ['', [
+        Validators.required,
+        Validators.pattern('^[0-9]{6}$')
+      ]],
 
       paymentMethod: ['COD', Validators.required]
 
@@ -104,19 +109,60 @@ export class Checkout implements OnInit {
 
     const orderId = 'TS' + Date.now();
 
-    this.orderService.addOrder({
+    const order: Order = {
 
-      id: orderId,
+      customerName: this.checkoutForm.value.name,
+
+      email: this.checkoutForm.value.email,
+
+      phone: this.checkoutForm.value.phone,
+
+      address: this.checkoutForm.value.address,
+
+      city: this.checkoutForm.value.city,
+
+      state: this.checkoutForm.value.state,
+
+      pincode: this.checkoutForm.value.pincode,
+
+      paymentMethod: this.checkoutForm.value.paymentMethod,
+
+      paymentStatus: 'Pending',
+
+      orderStatus: 'Processing',
+
       items: this.cartService.getCartItems(),
+
       total: this.grandTotal,
-      date: new Date().toLocaleDateString(),
-      status: 'Processing'
+
+      date: new Date().toISOString()
+
+    };
+
+    this.orderService.addOrder(order).subscribe({
+
+      next: (response) => {
+
+        console.log('Order placed successfully', response);
+
+        this.generatedOrderId = orderId;
+
+        this.cartService.clearCart();
+
+        this.orderPlaced = true;
+
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+        alert('Failed to place order.');
+
+      }
 
     });
-    this.generatedOrderId = orderId;
-    this.cartService.clearCart();
 
-    this.orderPlaced = true;
 
   }
   get paymentMethod() {

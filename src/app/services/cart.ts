@@ -78,7 +78,7 @@ export class CartService {
 
   }
 
-  removeFromCart(productId: number) {
+  removeFromCart(productId: string) {
 
     this.cartItems = this.cartItems.filter(
 
@@ -99,7 +99,7 @@ export class CartService {
   }
 
 
-  increaseQuantity(productId: number) {
+  increaseQuantity(productId: string) {
 
     const item = this.cartItems.find(
       i => i.id === productId
@@ -117,7 +117,7 @@ export class CartService {
     }
   }
 
-  decreaseQuantity(productId: number) {
+  decreaseQuantity(productId: string) {
 
     const item = this.cartItems.find(
 

@@ -18,7 +18,7 @@
 
                 <span>Order ID</span>
 
-                <h3>#{{ order.id }}</h3>
+                <h3>#{{ order._id }}</h3>
 
             </div>
 
@@ -26,7 +26,7 @@
 
                 <span>Order Date</span>
 
-                <h3>{{ order.date }}</h3>
+                <h3>{{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}</h3>
 
             </div>
 
@@ -42,9 +42,9 @@
 
                 <span>Status</span>
 
-                <h3 class="status" [ngClass]="order.status?.toLowerCase()">
+                <h3 class="status" [ngClass]="order.orderStatus?.toLowerCase()">
 
-                    {{ order.status }}
+                    {{ order.orderStatus }}
 
                 </h3>
 
@@ -57,22 +57,22 @@
 
                     </div>
 
-                    <div class="track-step" [class.active]="order.status !== 'Cancelled'">
+                    <div class="track-step" [class.active]="order.orderStatus !== 'Cancelled'">
 
                         <div class="circle">✓</div>
                         <span>Processing</span>
 
                     </div>
 
-                    <div class="track-step" [class.active]="order.status === 'Shipped' ||
-                          order.status === 'Delivered'">
+                    <div class="track-step" [class.active]="order.orderStatus === 'Shipped' ||
+                          order.orderStatus === 'Delivered'">
 
                         <div class="circle">✓</div>
                         <span>Shipped</span>
 
                     </div>
 
-                    <div class="track-step" [class.active]="order.status === 'Delivered'">
+                    <div class="track-step" [class.active]="order.orderStatus === 'Delivered'">
 
                         <div class="circle">✓</div>
                         <span>Delivered</span>
@@ -93,7 +93,7 @@
 
             <div class="product-item" *ngFor="let item of order.items">
 
-                <img [src]="item.image" [alt]="item.name">
+                <img [src]="'http://localhost:8000/uploads/' + item.image" [alt]="item.name">
 
                 <div class="product-info">
 

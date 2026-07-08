@@ -1,23 +1,26 @@
 export interface Product {
+  id?: string;
+  _id?: string;
 
-  id: number;
   name: string;
   price: number;
   image: string;
-  images?: string[]; 
+  images?: string[];
+
   category: string;
+  status?: string;
   description?: string;
   fabric?: string;
   type?: string;
-  stock?: boolean;
-  showOnHome?: boolean; 
+  brand?: string;
+  stock?: number;
+  showOnHome?: boolean;
+  discount?: number;
   quantity?: number;
   selectedSize?: string;
+  sizes?: string[];
   sku?: string;
   colors?: string[];
   tags?: string[];
   taxText?: string;
-
-  
-
 }

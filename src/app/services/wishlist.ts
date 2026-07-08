@@ -43,7 +43,7 @@ export class WishlistService {
 
   }
 
-  removeFromWishlist(id: number) {
+  removeFromWishlist(id: string) {
 
     this.wishlistItems = this.wishlistItems.filter(
       item => item.id !== id
@@ -53,7 +53,7 @@ export class WishlistService {
 
   }
 
-  isInWishlist(id: number): boolean {
+  isInWishlist(id: string): boolean {
 
     return this.wishlistItems.some(
       item => item.id === id

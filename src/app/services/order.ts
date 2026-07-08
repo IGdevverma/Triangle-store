@@ -1,4 +1,7 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
 import { Order } from '../models/orders';
 
 @Injectable({
@@ -6,54 +9,41 @@ import { Order } from '../models/orders';
 })
 export class OrderService {
 
-  private orders: Order[] = JSON.parse(localStorage.getItem('orders') || '[]');
 
 
-  constructor() {
 
-    const savedOrders = localStorage.getItem('orders');
+  private apiUrl = 'http://localhost:8000/api/orders';
 
-    if (savedOrders) {
+  constructor(private http: HttpClient) { }
 
-      this.orders = JSON.parse(savedOrders);
+  addOrder(order: Order): Observable<Order> {
 
-    }
-
-  }
-
-  addOrder(order: Order) {
-
-    this.orders.push(order);
-
-    localStorage.setItem(
-
-      'orders',
-
-      JSON.stringify(this.orders)
-
+    return this.http.post<Order>(
+      this.apiUrl,
+      order
     );
 
   }
 
-  getOrders(): Order[] {
+  getOrders(): Observable<any> {
 
-    return this.orders;
+    return this.http.get<any>(
+      this.apiUrl
+    );
 
   }
+  updateOrderStatus(orderId: string, status: string): Observable<any> {
 
-  updateOrderStatus(orderId: string, status: string) {
+    return this.http.put(
 
-    const order = this.orders.find(o => o.id === orderId);
+      `${this.apiUrl}/${orderId}`,
 
-    if (order) {
+      {
+        orderStatus: status
+      }
 
-      order.status = status;
+    );
 
-      localStorage.setItem(
-        'orders',
-        JSON.stringify(this.orders)
-      );
-    }
   }
 
 }

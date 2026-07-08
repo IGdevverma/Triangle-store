@@ -82,19 +82,18 @@ export class Home implements OnInit {
     /* Load Products */
     this.productService.getProducts().subscribe({
 
-      next: (data) => {
+      next: (response: any) => {
 
-        this.products = data;
+        this.products = response.products.map((p: any) => ({
+          ...p,
+          image: 'http://localhost:8000/uploads/' + p.image
+        }));
 
-        // Home page par sirf wahi products dikhana
-        // jinka showOnHome false nahi hai
-        this.filteredProducts = data.filter(
-          product => product.showOnHome !== false
+        this.filteredProducts = response.products.filter(
+          (product: Product) => product.showOnHome !== false
         );
 
-        /* Featured Products */
         this.updateFeaturedProducts();
-
       },
       error: (err) => {
 
@@ -285,6 +284,20 @@ export class Home implements OnInit {
     this.featuredIndex = 0;
 
     this.updateFeaturedProducts();
+
+  }
+
+  getImageUrl(image: string): string {
+
+    if (!image) {
+      return 'assets/no-image.png';
+    }
+
+    if (image.startsWith('http')) {
+      return image;
+    }
+
+    return `http://localhost:8000/uploads/${image}`;
 
   }
 

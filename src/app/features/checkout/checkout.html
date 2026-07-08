@@ -53,6 +53,33 @@
 
             </small>
 
+            <input type="text" placeholder="City" formControlName="city">
+
+            <small class="error" *ngIf="checkoutForm.get('city')?.touched &&
+           checkoutForm.get('city')?.invalid">
+
+                City is required.
+
+            </small>
+
+            <input type="text" placeholder="State" formControlName="state">
+
+            <small class="error" *ngIf="checkoutForm.get('state')?.touched &&
+           checkoutForm.get('state')?.invalid">
+
+                State is required.
+
+            </small>
+
+            <input type="text" placeholder="Pincode" formControlName="pincode">
+
+            <small class="error" *ngIf="checkoutForm.get('pincode')?.touched &&
+           checkoutForm.get('pincode')?.invalid">
+
+                Enter a valid 6 digit pincode.
+
+            </small>
+
             <select formControlName="paymentMethod">
 
                 <option value="COD">
@@ -207,7 +234,7 @@
 
     </div>
 
- 
+
 
     <!-- Success Message -->
 

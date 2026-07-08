@@ -27,13 +27,13 @@ export class Cart {
 
   }
 
-  removeItem(id: number) {
+  removeItem(id: string) {
     this.cartService.removeFromCart(id);
   }
-  increase(id: number) {
+  increase(id: string) {
     this.cartService.increaseQuantity(id);
   }
-  decrease(id: number) {
+  decrease(id: string) {
     this.cartService.decreaseQuantity(id);
   }
 

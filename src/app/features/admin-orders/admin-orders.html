@@ -1,0 +1,73 @@
+<div class="orders-container">
+
+    <h1>Admin Orders</h1>
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Order ID</th>
+
+                <th>Customer</th>
+
+                <th>Total</th>
+
+                <th>Date</th>
+
+                <th>Status</th>
+
+                <th>Action</th>
+
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            <tr *ngFor="let order of orders">
+
+                <td>{{ order._id }}</td>
+
+                <td>{{ order.customerName }}</td>
+
+                <td>₹{{ order.total }}</td>
+
+                <td>{{ order.createdAt | date:'dd MMM yyyy' }}</td>
+
+                <td>
+
+                    <select [(ngModel)]="order.orderStatus">
+
+                        <option value="Processing">
+                            Processing
+                        </option>
+
+                        <option value="Shipped">
+                            Shipped
+                        </option>
+
+                        <option value="Delivered">
+                            Delivered
+                        </option>
+
+                    </select>
+
+                </td>
+
+                <td>
+
+                    <button (click)="updateStatus(order)">
+                        Update
+                    </button>
+
+                </td>
+
+            </tr>
+
+        </tbody>
+
+    </table>
+
+</div>

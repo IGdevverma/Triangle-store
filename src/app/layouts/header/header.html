@@ -290,7 +290,7 @@
 
         <div class="quantity-controls">
 
-          <button (click)="decrease(item.id)">
+          <button (click)="decrease(item.id!)">
 
             −
 
@@ -302,7 +302,7 @@
 
           </span>
 
-          <button (click)="increase(item.id)">
+          <button (click)="increase(item.id!)">
 
             +
 
@@ -312,7 +312,7 @@
 
       </div>
 
-      <button class="remove-btn" (click)="removeItem(item.id)">
+      <button class="remove-btn" (click)="removeItem(item.id!)">
 
         ✕
 
