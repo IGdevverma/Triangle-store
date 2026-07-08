@@ -2,6 +2,50 @@
 
     <h1>Admin Orders</h1>
 
+    <div class="stats-container">
+
+        <div class="stat-card">
+            <h3>Total Orders</h3>
+            <span>{{ totalOrders }}</span>
+        </div>
+
+        <div class="stat-card">
+            <h3>Processing</h3>
+            <span>
+                {{ pendingOrders }}
+            </span>
+        </div>
+
+        <div class="stat-card">
+            <h3>Shipped</h3>
+            <span>{{ shippedOrders }}</span>>
+        </div>
+
+        <div class="stat-card">
+            <h3>Delivered</h3>
+            <span>
+                {{ deliveredOrders }}
+            </span>
+        </div>
+
+    </div>
+
+    <div class="toolbar">
+
+        <input type="text" placeholder="Search by Customer or Order ID" [(ngModel)]="searchTerm"
+            (input)="filterOrders()">
+
+        <select [(ngModel)]="selectedStatus" (change)="filterOrders()">
+
+            <option value="">All Orders</option>
+            <option value="Processing">Processing</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+
+        </select>
+
+    </div>
     <table>
 
         <thead>
@@ -20,13 +64,14 @@
 
                 <th>Action</th>
 
+                <th>Payment</th>
+
             </tr>
 
         </thead>
 
         <tbody>
-
-            <tr *ngFor="let order of orders">
+            <tr *ngFor="let order of filteredOrders">
 
                 <td>{{ order._id }}</td>
 
@@ -36,21 +81,38 @@
 
                 <td>{{ order.createdAt | date:'dd MMM yyyy' }}</td>
 
+                <td>{{ order.paymentMethod }}</td>
+
                 <td>
 
                     <select [(ngModel)]="order.orderStatus">
 
-                        <option value="Processing">
-                            Processing
-                        </option>
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Packed">Packed</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
 
-                        <option value="Shipped">
-                            Shipped
-                        </option>
+                    </select>
 
-                        <option value="Delivered">
-                            Delivered
-                        </option>
+                </td>
+                <td>
+
+                    <span class="status-badge" [ngClass]="order.orderStatus.toLowerCase()">
+
+                        {{ order.orderStatus }}
+
+                    </span>
+
+                    <br><br>
+
+                    <select [(ngModel)]="order.orderStatus">
+
+                        <option value="Processing">Processing</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
 
                     </select>
 
@@ -58,7 +120,7 @@
 
                 <td>
 
-                    <button (click)="updateStatus(order)">
+                    <button class="update-btn" (click)="updateStatus(order)">
                         Update
                     </button>
 

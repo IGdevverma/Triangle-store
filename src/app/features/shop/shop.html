@@ -92,8 +92,9 @@
 
                 <div class="image-container">
 
-                    <img [src]="product.image" [alt]="product.name" class="product-image"
-                        [routerLink]="['/product', product.id]">
+                    <img [src]="'https://triangle-store-api.onrender.com/uploads/' + product.image" [alt]="product.name"
+                        class="product-image">
+                    [routerLink]="['/product', product.id]">
 
                     <div class="hover-actions">
 
@@ -143,7 +144,8 @@
 
         </button>
 
-        <img [src]="'https://triangle-store-api.onrender.com/uploads/' + selectedProduct.image" [alt]="selectedProduct.name">
+        <img [src]="'https://triangle-store-api.onrender.com/uploads/' + selectedProduct.image"
+            [alt]="selectedProduct.name">
 
         <h2>{{ selectedProduct.name }}</h2>
 
