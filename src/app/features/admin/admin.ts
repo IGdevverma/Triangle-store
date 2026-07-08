@@ -239,7 +239,7 @@ export class Admin implements OnInit, AfterViewInit {
 
     this.newProduct = { ...product };
     this.imagePreview =
-      'http://localhost:8000/uploads/' + product.image;
+      'https://triangle-store-api.onrender.com/uploads/' + product.image;
 
   }
 

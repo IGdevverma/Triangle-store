@@ -12,7 +12,7 @@ export class OrderService {
 
 
 
-  private apiUrl = 'http://localhost:8000/api/orders';
+  private apiUrl = 'https://triangle-store-api.onrender.com/api/orders';
 
   constructor(private http: HttpClient) { }
 

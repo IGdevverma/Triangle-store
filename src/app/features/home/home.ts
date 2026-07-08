@@ -86,7 +86,7 @@ export class Home implements OnInit {
 
         this.products = response.products.map((p: any) => ({
           ...p,
-          image: 'http://localhost:8000/uploads/' + p.image
+          image: 'https://triangle-store-api.onrender.com/uploads/' + p.image
         }));
 
         this.filteredProducts = response.products.filter(
@@ -297,7 +297,7 @@ export class Home implements OnInit {
       return image;
     }
 
-    return `http://localhost:8000/uploads/${image}`;
+    return `https://triangle-store-api.onrender.com/uploads/${image}`;
 
   }
 

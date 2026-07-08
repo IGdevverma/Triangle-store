@@ -8,12 +8,12 @@ import { Observable } from 'rxjs';
 })
 export class ProductService {
 
-  private apiUrl = 'http://localhost:8000/api/products';
+  private apiUrl = 'https://triangle-store-api.onrender.com/api/products';
 
   constructor(private http: HttpClient) { }
 
   getProducts(): Observable<any> {
-    return this.http.get<any>('http://localhost:8000/api/products');
+    return this.http.get<any>(this.apiUrl);
   }
   getProductById(id: string): Observable<any> {
 
