@@ -24,6 +24,8 @@ export class Admin implements OnInit, AfterViewInit {
   currentPage = 1;
   showModal = false;
   itemsPerPage = 5;
+  selectedStock = 'All';
+  selectedSort = 'Newest';
   inventoryValue = 0;
   totalProducts = 0;
   totalStock = 0;
@@ -64,17 +66,25 @@ export class Admin implements OnInit, AfterViewInit {
   };
   get totalPages(): number {
 
-    return Math.ceil(
-
-      this.products.filter(product =>
-
-        product.name
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase())
-
-      ).length / this.itemsPerPage
-
+    let filtered = this.products.filter(product =>
+      product.name
+        .toLowerCase()
+        .includes(this.searchTerm.toLowerCase())
     );
+
+    if (this.selectedStock === 'In Stock') {
+      filtered = filtered.filter(product => (product.stock ?? 0) > 0);
+    }
+
+    if (this.selectedStock === 'Out of Stock') {
+      filtered = filtered.filter(product => (product.stock ?? 0) === 0);
+    }
+
+    if (this.selectedStock === 'Low Stock') {
+      filtered = filtered.filter(product => (product.stock ?? 0) <= 5);
+    }
+
+    return Math.ceil(filtered.length / this.itemsPerPage);
 
   }
 
@@ -140,16 +150,47 @@ export class Admin implements OnInit, AfterViewInit {
 
   get filteredProducts() {
 
-    const filtered = this.products.filter(product =>
-
+    let filtered = this.products.filter(product =>
       product.name
         .toLowerCase()
         .includes(this.searchTerm.toLowerCase())
-
     );
 
-    const start =
-      (this.currentPage - 1) * this.itemsPerPage;
+    // Stock Filter
+    if (this.selectedStock === 'In Stock') {
+      filtered = filtered.filter(product => (product.stock ?? 0) > 0);
+    }
+
+    if (this.selectedStock === 'Out of Stock') {
+      filtered = filtered.filter(product => (product.stock ?? 0) === 0);
+    }
+
+    if (this.selectedStock === 'Low Stock') {
+      filtered = filtered.filter(product => (product.stock ?? 0) <= 5);
+    }
+
+    // Sorting
+    switch (this.selectedSort) {
+
+      case 'Price Low → High':
+        filtered.sort((a, b) => a.price - b.price);
+        break;
+
+      case 'Price High → Low':
+        filtered.sort((a, b) => b.price - a.price);
+        break;
+
+      case 'Name A → Z':
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+
+      case 'Stock Highest':
+        filtered.sort((a, b) => (b.stock ?? 0) - (a.stock ?? 0));
+        break;
+
+    }
+
+    const start = (this.currentPage - 1) * this.itemsPerPage;
 
     return filtered.slice(
       start,
@@ -197,6 +238,16 @@ export class Admin implements OnInit, AfterViewInit {
 
     formData.append('image', this.selectedFile);
 
+    console.log("Name:", formData.get('name'));
+
+    console.log("Price:", formData.get('price'));
+
+    console.log("Category:", formData.get('category'));
+
+    console.log("Description:", formData.get('description'));
+
+    console.log("Image:", formData.get('image'));
+
     this.productService.addProduct(formData).subscribe(() => {
 
       this.loadProducts();
@@ -239,12 +290,12 @@ export class Admin implements OnInit, AfterViewInit {
 
     this.newProduct = { ...product };
     this.imagePreview =
-      'https://triangle-store-api.onrender.com/uploads/' + product.image;
+      product.image.startsWith('http') ? product.image : '';
 
   }
 
   updateProduct() {
-    
+
 
     if (!this.isFormValid()) {
 

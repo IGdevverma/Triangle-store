@@ -12,15 +12,15 @@
 
     <div class="image-zoom-container" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom()">
 
-      <img class="main-image" [src]="'https://triangle-store-api.onrender.com/uploads/' + selectedImage" [alt]="product?.name"
-        [style.transform]="zoomTransform" [style.transform-origin]="zoomOrigin">
+      <img class="main-image" [src]="selectedImage" [alt]="product?.name" [style.transform]="zoomTransform"
+        [style.transform-origin]="zoomOrigin">
 
     </div>
 
     <!-- Thumbnails -->
     <div class="thumbnail-images">
 
-      <img *ngFor="let image of productImages" [src]="'https://triangle-store-api.onrender.com/uploads/' + image" [alt]="product?.name"
+      <img *ngFor="let image of productImages" [src]="image" [alt]="product?.name"
         [class.active-thumb]="selectedImage === image" (click)="selectedImage = image">
 
     </div>
@@ -353,7 +353,7 @@
 
     <div class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item._id]">
 
-      <img [src]="'https://triangle-store-api.onrender.com/uploads/' + item.image" [alt]="item.name">
+      <img [src]="item.image" [alt]="item.name">
 
       <h4>{{ item.name }}</h4>
 

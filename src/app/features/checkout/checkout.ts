@@ -107,7 +107,7 @@ export class Checkout implements OnInit {
       JSON.stringify(this.checkoutForm.value)
     );
 
-    const orderId = 'TS' + Date.now();
+
 
     const order: Order = {
 
@@ -143,13 +143,14 @@ export class Checkout implements OnInit {
 
       next: (response) => {
 
-        console.log('Order placed successfully', response);
+        console.log("Response:", response);
 
-        this.generatedOrderId = orderId;
+        this.generatedOrderId = response.order._id;
 
         this.cartService.clearCart();
 
         this.orderPlaced = true;
+        console.log("Popup State:", this.orderPlaced);
 
       },
 

@@ -65,31 +65,29 @@
 
             <div class="filters">
 
-                <select>
+                <select [(ngModel)]="selectedStock">
 
-                    <option>All Categories</option>
-
-                    <option>T-Shirts</option>
-
-                    <option>Hoodies</option>
-
-                    <option>Shorts</option>
-
-                    <option>Tracksuits</option>
-
-                    <option>Shoes</option>
-
-                    <option>Accessories</option>
-
-                </select>
-
-                <select>
-
-                    <option>All Stock</option>
+                    <option>All</option>
 
                     <option>In Stock</option>
 
                     <option>Out of Stock</option>
+
+                    <option>Low Stock</option>
+
+                </select>
+
+                <select [(ngModel)]="selectedSort">
+
+                    <option>Newest</option>
+
+                    <option>Price Low → High</option>
+
+                    <option>Price High → Low</option>
+
+                    <option>Name A → Z</option>
+
+                    <option>Stock Highest</option>
 
                 </select>
 
@@ -268,7 +266,7 @@
 
                             <div class="product-info">
 
-                                <img [src]="'https://triangle-store-api.onrender.com/uploads/' + product.image" class="product-img">
+                                <img [src]="product.image" [alt]="product.name">
 
                                 <div>
 

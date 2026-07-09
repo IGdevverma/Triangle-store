@@ -2,61 +2,72 @@ const sendEmail = require("../utils/sendEmail");
 const Order = require("../models/Order");
 
 // Create Order
+// Create Order
 const createOrder = async (req, res) => {
 
     try {
 
+        console.log(req.body);
+
         const order = await Order.create(req.body);
 
         console.log("Customer Email:", order.email);
-
         console.log("Customer Name:", order.customerName);
-        await sendEmail({
-            to: order.email,
-            subject: "🎉 Order Confirmed - Triangle Sports",
-            html: `
-    <h2>Thank you for shopping with Triangle Sports!</h2>
 
-    <p>Hello <b>${order.customerName}</b>,</p>
+        // Send email (order save hone ke baad)
+        try {
 
-    <p>Your order has been placed successfully.</p>
+            await sendEmail({
+                to: order.email,
+                subject: "🎉 Order Confirmed - Triangle Sports",
+                html: `
+                    <h2>Thank you for shopping with Triangle Sports!</h2>
 
-    <hr>
+                    <p>Hello <b>${order.customerName}</b>,</p>
 
-    <p><b>Order ID:</b> ${order._id}</p>
+                    <p>Your order has been placed successfully.</p>
 
-    <p><b>Total:</b> ₹${order.total}</p>
+                    <hr>
 
-    <p><b>Payment:</b> ${order.paymentMethod}</p>
+                    <p><b>Order ID:</b> ${order._id}</p>
 
-    <p><b>Status:</b> ${order.orderStatus}</p>
+                    <p><b>Total:</b> ₹${order.total}</p>
 
-    <br>
+                    <p><b>Payment:</b> ${order.paymentMethod}</p>
 
-    <p>We'll notify you once your order is shipped.</p>
+                    <p><b>Status:</b> ${order.orderStatus}</p>
 
-    <h3>Triangle Sports ❤️</h3>
-  `
-        });
-        console.log("✅ Order confirmation email sent to:", order.email);
+                    <br>
+
+                    <p>We'll notify you once your order is shipped.</p>
+
+                    <h3>Triangle Sports ❤️</h3>
+                `
+            });
+
+            console.log("✅ Order confirmation email sent to:", order.email);
+
+        } catch (err) {
+
+            console.error("❌ Email failed:", err.message);
+
+        }
 
         res.status(201).json({
 
             success: true,
-
             message: "Order Placed Successfully",
-
             order
 
         });
 
     } catch (error) {
-         console.error("EMAIL ERROR:", error);
+
+        console.error("ORDER ERROR:", error);
 
         res.status(500).json({
 
             success: false,
-
             message: error.message
 
         });
@@ -64,6 +75,9 @@ const createOrder = async (req, res) => {
     }
 
 };
+
+
+
 
 // Get All Orders
 

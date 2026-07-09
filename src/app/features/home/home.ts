@@ -84,10 +84,7 @@ export class Home implements OnInit {
 
       next: (response: any) => {
 
-        this.products = response.products.map((p: any) => ({
-          ...p,
-          image: 'https://triangle-store-api.onrender.com/uploads/' + p.image
-        }));
+       this.products = response.products;
 
         this.filteredProducts = response.products.filter(
           (product: Product) => product.showOnHome !== false
@@ -297,7 +294,7 @@ export class Home implements OnInit {
       return image;
     }
 
-    return `https://triangle-store-api.onrender.com/uploads/${image}`;
+    return image;
 
   }
 
