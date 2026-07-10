@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, BehaviorSubject, tap } from 'rxjs';
 import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
@@ -9,6 +9,10 @@ import { HttpHeaders } from '@angular/common/http';
 export class AuthService {
 
   private apiUrl = 'http://localhost:8000/api/auth';
+  private currentUserSubject = new BehaviorSubject<any>(this.getUser());
+
+  currentUser$ = this.currentUserSubject.asObservable();
+
 
   constructor(private http: HttpClient) { }
 
@@ -24,6 +28,7 @@ export class AuthService {
           'user',
           JSON.stringify(response.user)
         );
+        this.currentUserSubject.next(response.user);
 
       })
 
@@ -44,6 +49,7 @@ export class AuthService {
 
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this.currentUserSubject.next(null);
 
   }
 
@@ -90,6 +96,7 @@ export class AuthService {
           JSON.stringify(response.user)
 
         );
+        this.currentUserSubject.next(response.user);
 
       })
 

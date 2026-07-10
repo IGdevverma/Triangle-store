@@ -1,4 +1,4 @@
-import { Component, OnInit, HostListener, ElementRef  } from '@angular/core';
+import { Component, OnInit, HostListener, ElementRef } from '@angular/core';
 import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../services/theme';
@@ -56,7 +56,12 @@ export class Header implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.user = this.authService.getUser();
+    this.authService.currentUser$.subscribe(user => {
+
+      this.user = user;
+
+    });
+    console.log('Header User:', this.user);
 
     this.route.queryParams.subscribe(params => {
 
@@ -168,9 +173,9 @@ export class Header implements OnInit {
 
   }
 
-  
 
-  
+
+
 
 
   isSearchOpen = false;
