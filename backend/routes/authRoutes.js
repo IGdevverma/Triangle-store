@@ -9,7 +9,8 @@ router.get("/test", (req, res) => {
 const {
     registerUser,
     loginUser,
-    updateProfile
+    updateProfile,
+    createAdmin
 } = require("../controllers/authController");
 
 const {
@@ -19,6 +20,13 @@ const {
 router.post("/register", registerUser);
 
 router.post("/login", loginUser);
+router.get(
+
+    "/create-admin",
+
+    createAdmin
+
+);
 
 router.put(
 

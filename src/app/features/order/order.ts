@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { OnInit } from '@angular/core';
 import { OrderService } from '../../services/order';
 import { Order } from '../../models/orders';
 import { CartService } from '../../services/cart';
@@ -15,6 +14,7 @@ import { CartService } from '../../services/cart';
 export class Orders implements OnInit {
 
   orders: Order[] = [];
+  isLoading = true;
 
   constructor(
     private orderService: OrderService,
@@ -27,7 +27,7 @@ export class Orders implements OnInit {
       next: (response) => {
 
         this.orders = response.orders;
-         
+
 
       },
 
@@ -90,6 +90,42 @@ export class Orders implements OnInit {
       });
 
   }
+  hasOrders(): boolean {
 
+    return this.orders.length > 0;
 
+  }
+
+  getStatusClass(status: string): string {
+
+    switch (status) {
+
+      case 'Delivered':
+        return 'delivered';
+
+      case 'Processing':
+        return 'processing';
+
+      case 'Cancelled':
+        return 'cancelled';
+
+      default:
+        return 'pending';
+
+    }
+
+  }
+  formatDate(date: string): string {
+
+    return new Date(date).toLocaleDateString('en-IN', {
+
+      day: 'numeric',
+
+      month: 'short',
+
+      year: 'numeric'
+
+    });
+
+  }
 }

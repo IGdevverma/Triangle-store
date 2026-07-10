@@ -1,3 +1,4 @@
+
 const User = require("../models/User");
 
 // Register User
@@ -74,7 +75,7 @@ const registerUser = async (req, res) => {
 // Login User
 
 const loginUser = async (req, res) => {
-
+    console.log("Request Body:", req.body);
     try {
 
         const { email, password } = req.body;
@@ -89,7 +90,7 @@ const loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({ email }).select("+password");
-
+        console.log("User:", user);
         if (!user) {
 
             return res.status(401).json({
@@ -100,7 +101,7 @@ const loginUser = async (req, res) => {
         }
 
         const isMatched = await user.comparePassword(password);
-
+        console.log("Password Matched:", isMatched);
         if (!isMatched) {
 
             return res.status(401).json({
@@ -189,12 +190,72 @@ const updateProfile = async (req, res) => {
     }
 
 };
+// Create Admin (Development Only)
+
+const createAdmin = async (req, res) => {
+
+    try {
+
+        const existingAdmin = await User.findOne({
+
+            email: "admin@tyka.com"
+
+        });
+
+        if (existingAdmin) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Admin already exists"
+
+            });
+
+        }
+
+        const admin = await User.create({
+
+            name: "Admin",
+
+            email: "admin@tyka.com",
+
+            password: "ALPHA.OP12",
+
+            role: "admin"
+
+        });
+
+        res.status(201).json({
+
+            success: true,
+
+            message: "Admin created successfully",
+
+            admin
+
+        });
+
+    } catch (error) {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
 
 module.exports = {
 
     registerUser,
 
     loginUser,
-    updateProfile
+    updateProfile,
+    createAdmin
 
 };

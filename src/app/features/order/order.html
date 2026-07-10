@@ -1,8 +1,13 @@
 <div class="orders-container">
 
     <h1>Order History</h1>
+    <div *ngIf="isLoading" class="loading">
 
-    <div *ngIf="orders.length === 0" class="empty-orders">
+        Loading Orders...
+
+    </div>
+
+    <div *ngIf="!isLoading && !hasOrders()" class="empty-orders">
 
         <h2>No Orders Found</h2>
 
@@ -26,7 +31,7 @@
 
                 <span>Order Date</span>
 
-                <h3>{{ order.createdAt | date:'dd MMM yyyy, hh:mm a' }}</h3>
+                {{ formatDate(order.createdAt!) }}
 
             </div>
 
@@ -42,7 +47,7 @@
 
                 <span>Status</span>
 
-                <h3 class="status" [ngClass]="order.orderStatus?.toLowerCase()">
+                <h3 class="status" [ngClass]="getStatusClass(order.orderStatus)">
 
                     {{ order.orderStatus }}
 
@@ -117,8 +122,26 @@
             </div>
 
         </div>
+        <div class="order-actions">
+
+            <button class="buy-btn" (click)="buyAgain(order)">
+
+                Buy Again
+
+            </button>
+            <button class="cancel-btn" *ngIf="order.orderStatus !== 'Delivered' &&
+
+               order.orderStatus !== 'Cancelled'" (click)="cancelOrder(order._id!)">
+
+                Cancel Order
+
+            </button>
+
+        </div>
 
     </div>
+
+
 
 
 </div>
