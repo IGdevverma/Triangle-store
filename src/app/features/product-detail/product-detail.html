@@ -56,7 +56,7 @@
 
       </span>
 
-      <span class="discount-badge"  *ngIf="product.discount && product.discount > 0">
+      <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
 
         {{ product.discount }}% OFF
 
@@ -260,7 +260,7 @@
       <p *ngIf="product.tags?.length">
         Tags:
         <strong>
-          {{ product.tags.join(', ') }}
+          {{ product.tags ? product.tags.join(', ') : '' }}
         </strong>
       </p>
 

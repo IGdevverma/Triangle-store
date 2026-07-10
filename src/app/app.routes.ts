@@ -18,6 +18,7 @@ import { Register } from './features/register/register';
 import { Profile } from './features/profile/profile';
 import { Dashboard } from './features/dashboard/dashboard';
 import { EditProfile } from './features/edit-profile/edit-profile';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -49,9 +50,13 @@ export const routes: Routes = [
     component: Orders
   },
   {
+
     path: 'admin',
+
     component: Admin,
-    canActivate: [authGuard]
+
+    canActivate: [adminGuard]
+
   },
   {
     path: 'login',
