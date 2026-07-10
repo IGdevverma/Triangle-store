@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order';
 import { Order } from '../../models/orders';
 import { Router } from '@angular/router';
+import { Payment } from '../../services/payment';
 
 
 
@@ -45,11 +46,13 @@ export class Checkout implements OnInit {
   isPlacingOrder = false;
 
 
-  constructor(private fb: FormBuilder,
+  constructor(
+    private fb: FormBuilder,
     private cartService: CartService,
     private router: Router,
-    private orderService: OrderService) {
-
+    private orderService: OrderService,
+    private paymentService: Payment
+  ) {
     this.checkoutForm = this.fb.group({
 
       name: ['', Validators.required],
@@ -96,6 +99,10 @@ export class Checkout implements OnInit {
 
   }
 
+
+
+
+
   placeOrder() {
 
     if (this.checkoutForm.invalid) {
@@ -106,6 +113,21 @@ export class Checkout implements OnInit {
 
     }
     this.isPlacingOrder = true;
+    this.paymentService.createOrder(this.grandTotal).subscribe({
+
+      next: (response) => {
+
+        console.log('Razorpay Order:', response);
+
+      },
+
+      error: (error) => {
+
+        console.error(error);
+
+      }
+
+    });
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)

@@ -1,15 +1,17 @@
-
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
-const authRoutes = require("./routes/authRoutes");
+
+
 
 // ✅ Sabse pehle .env load karo
 dotenv.config();
-
+console.log(process.env.RAZORPAY_KEY_ID);
 // Ab baaki imports
 const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
@@ -35,6 +37,7 @@ app.use(express.json());
 app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/payment", paymentRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", require("./routes/authRoutes"));
 // Test Route

@@ -58,6 +58,10 @@ export class ProductDetail implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
 
     const id = this.route.snapshot.paramMap.get('id');
     if (!id) return;
