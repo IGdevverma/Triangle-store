@@ -190,65 +190,7 @@ const updateProfile = async (req, res) => {
     }
 
 };
-// Create Admin (Development Only)
 
-const createAdmin = async (req, res) => {
-
-    try {
-
-        const existingAdmin = await User.findOne({
-
-            email: "admin@tyka.com"
-
-        });
-
-        if (existingAdmin) {
-
-            return res.status(400).json({
-
-                success: false,
-
-                message: "Admin already exists"
-
-            });
-
-        }
-
-        const admin = await User.create({
-
-            name: "Admin",
-
-            email: "admin@tyka.com",
-
-            password: "ALPHA.OP12",
-
-            role: "admin"
-
-        });
-
-        res.status(201).json({
-
-            success: true,
-
-            message: "Admin created successfully",
-
-            admin
-
-        });
-
-    } catch (error) {
-
-        res.status(500).json({
-
-            success: false,
-
-            message: error.message
-
-        });
-
-    }
-
-};
 
 module.exports = {
 
@@ -256,6 +198,6 @@ module.exports = {
 
     loginUser,
     updateProfile,
-    createAdmin
+    
 
 };
