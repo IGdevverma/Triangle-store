@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
+const authRoutes = require("./routes/authRoutes");
 
 // ✅ Sabse pehle .env load karo
 dotenv.config();
@@ -35,7 +36,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
+app.use("/api/auth", require("./routes/authRoutes"));
 // Test Route
 app.get("/", (req, res) => {
   res.send("🚀 Triangle Sports Backend Running");

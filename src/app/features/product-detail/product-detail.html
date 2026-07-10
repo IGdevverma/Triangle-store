@@ -4,7 +4,7 @@
 
 </div>
 
-<div *ngIf="product" class="product-detail-wrapper">
+<div *ngIf="product as product" class="product-detail-wrapper">
 
   <!-- LEFT -->
 
@@ -44,8 +44,24 @@
 
     </div>
 
-    <div class="price">
-      ₹{{ product.price }}
+    <div class="price-section">
+
+      <span class="current-price">
+        ₹{{ product.price }}
+      </span>
+
+      <span class="old-price" *ngIf="product.discount && product.discount > 0">
+
+        ₹{{ product.price + (product.price * product.discount / (100 - product.discount)) | number:'1.0-0' }}
+
+      </span>
+
+      <span class="discount-badge"  *ngIf="product.discount && product.discount > 0">
+
+        {{ product.discount }}% OFF
+
+      </span>
+
     </div>
 
     <p class="tax-text">
@@ -60,13 +76,20 @@
 
     <div class="color-section" *ngIf="product.colors?.length">
 
-      <h3>Color:</h3>
+      <h3>Available Colors</h3>
 
       <div class="colors">
 
-        <span *ngFor="let color of product.colors" class="color-dot" [style.background]="color">
+        <div class="color-item" *ngFor="let color of product.colors">
 
-        </span>
+          <span class="color-dot" [style.background]="color">
+          </span>
+
+          <span class="color-name">
+            {{ color }}
+          </span>
+
+        </div>
 
       </div>
 
@@ -105,7 +128,17 @@
 
       <span class="stock" [class.in-stock]="product.stock">
 
-        {{ product.stock ? 'In stock' : 'Out of stock' }}
+        <span *ngIf="product?.stock! > 10" class="in-stock">
+          🟢 In Stock
+        </span>
+
+        <span *ngIf="product?.stock! > 0 && product?.stock! <= 10" class="low-stock">
+          🟡 Only {{ product?.stock }} left
+        </span>
+
+        <span *ngIf="product?.stock === 0" class="out-stock">
+          🔴 Out of Stock
+        </span>
 
       </span>
 
@@ -178,6 +211,36 @@
         </div>
 
       </ng-template>
+
+    </div>
+
+    <div class="delivery-estimate">
+
+      <h4>Estimated Delivery</h4>
+
+      <p>
+        🚚 Delivery between
+        <strong>12 Jul - 15 Jul</strong>
+      </p>
+
+    </div>
+
+    <div class="product-specs">
+
+      <p>
+        <strong>SKU:</strong>
+        {{ product.sku }}
+      </p>
+
+      <p>
+        <strong>Fabric:</strong>
+        {{ product.fabric }}
+      </p>
+
+      <p>
+        <strong>Type:</strong>
+        {{ product.type }}
+      </p>
 
     </div>
     <!-- Meta -->

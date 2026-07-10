@@ -4,7 +4,7 @@ import { CartService } from '../../services/cart';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order';
 import { Order } from '../../models/orders';
-
+import { Router } from '@angular/router';
 
 
 
@@ -25,7 +25,8 @@ import {
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
-    FormsModule
+    FormsModule,
+
   ],
   templateUrl: './checkout.html',
   styleUrl: './checkout.css'
@@ -41,10 +42,12 @@ export class Checkout implements OnInit {
   couponCode = '';
   discount = 0;
   discountAmount = 0;
+  isPlacingOrder = false;
 
 
   constructor(private fb: FormBuilder,
     private cartService: CartService,
+    private router: Router,
     private orderService: OrderService) {
 
     this.checkoutForm = this.fb.group({
@@ -79,7 +82,7 @@ export class Checkout implements OnInit {
   }
 
   ngOnInit(): void {
-
+    this.cartItems = this.cartService.getCartItems();
     const savedData =
       localStorage.getItem('customerInfo');
 
@@ -102,6 +105,7 @@ export class Checkout implements OnInit {
       return;
 
     }
+    this.isPlacingOrder = true;
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)
@@ -150,11 +154,25 @@ export class Checkout implements OnInit {
         this.cartService.clearCart();
 
         this.orderPlaced = true;
+        this.isPlacingOrder = false;
+        localStorage.removeItem('customerInfo');
+        this.checkoutForm.reset({
+
+          paymentMethod: 'COD'
+
+        });
+        this.couponCode = '';
+
+        this.discount = 0;
+
+        this.discountAmount = 0;
+        localStorage.removeItem('customerInfo');
         console.log("Popup State:", this.orderPlaced);
 
       },
 
       error: (error) => {
+        this.isPlacingOrder = false;
 
         console.error(error);
 
@@ -232,6 +250,13 @@ export class Checkout implements OnInit {
     this.discountAmount = Math.round(
       (this.subtotal * this.discount) / 100
     );
+
+  }
+  continueShopping() {
+
+    this.orderPlaced = false;
+
+    this.router.navigate(['/']);
 
   }
 

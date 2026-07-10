@@ -1,0 +1,151 @@
+.account-page{
+
+    max-width:1200px;
+
+    margin:50px auto;
+
+    padding:0 20px;
+}
+
+.page-title{
+
+    font-size:38px;
+
+    font-weight:700;
+
+    margin-bottom:35px;
+}
+
+.account-grid{
+
+    display:grid;
+
+    grid-template-columns:320px 1fr;
+
+    gap:30px;
+}
+
+/* Left Card */
+
+.profile-card{
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:40px 30px;
+
+    text-align:center;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+}
+
+.avatar{
+
+    width:90px;
+
+    height:90px;
+
+    border-radius:50%;
+
+    background:#e11d48;
+
+    color:#fff;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-size:36px;
+
+    font-weight:700;
+
+    margin:0 auto 20px;
+}
+
+.profile-card h2{
+
+    margin:10px 0;
+}
+
+.profile-card p{
+
+    color:#777;
+
+    margin-bottom:20px;
+}
+
+.role{
+
+    display:inline-block;
+
+    padding:8px 18px;
+
+    border-radius:20px;
+
+    background:#f3f4f6;
+
+    font-size:14px;
+
+    font-weight:600;
+}
+
+/* Right Menu */
+
+.account-menu{
+
+    background:#fff;
+
+    border-radius:16px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+
+    overflow:hidden;
+}
+
+.account-menu a{
+
+    display:flex;
+
+    align-items:center;
+
+    padding:20px 25px;
+
+    text-decoration:none;
+
+    color:#222;
+
+    font-size:17px;
+
+    border-bottom:1px solid #eee;
+
+    transition:.25s;
+}
+
+.account-menu a:last-child{
+
+    border-bottom:none;
+}
+
+.account-menu a:hover{
+
+    background:#fafafa;
+
+    color:#e11d48;
+
+    padding-left:35px;
+}
+
+/* Responsive */
+
+@media(max-width:768px){
+
+.account-grid{
+
+grid-template-columns:1fr;
+
+}
+
+}

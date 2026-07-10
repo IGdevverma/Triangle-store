@@ -62,7 +62,9 @@ export class Admin implements OnInit, AfterViewInit {
     sizes: [],
     status: 'Active',
     stock: 0,
-    showOnHome: true
+    showOnHome: true,
+    availableColors: ''
+
   };
   get totalPages(): number {
 
@@ -229,6 +231,14 @@ export class Admin implements OnInit, AfterViewInit {
     formData.append('fabric', this.newProduct.fabric || '');
 
     formData.append('type', this.newProduct.type || '');
+    formData.append(
+      'availableColors',
+      this.newProduct.availableColors || ''
+    );
+    formData.append(
+      'colors',
+      JSON.stringify(this.newProduct.colors)
+    );
     console.log('Stock:', this.newProduct.stock);
     console.log('Type:', typeof this.newProduct.stock);
 
@@ -237,6 +247,7 @@ export class Admin implements OnInit, AfterViewInit {
     formData.append('showOnHome', String(this.newProduct.showOnHome));
 
     formData.append('image', this.selectedFile);
+
 
     console.log("Name:", formData.get('name'));
 
@@ -269,7 +280,7 @@ export class Admin implements OnInit, AfterViewInit {
         fabric: '',
 
         type: '',
-
+        availableColors: '',
         stock: 0,
 
         showOnHome: true
@@ -414,6 +425,7 @@ export class Admin implements OnInit, AfterViewInit {
       fabric: '',
 
       type: '',
+      availableColors: '',
 
       stock: 0,
 

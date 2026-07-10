@@ -1,18 +1,54 @@
 <div class="login-container">
 
     <div class="login-card">
+        <img src="trianglepng.png" class="login-logo" alt="Triangle Sports">
 
-        <h1>Admin Login</h1>
+        <h1>Welcome Back</h1>
 
-        <input type="email" placeholder="Email" [(ngModel)]="email">
+        <p class="login-subtitle">
+            Sign in to your Triangle Sports account
+        </p>
 
-        <input type="password" placeholder="Password" [(ngModel)]="password">
+        <label>Email Address</label>
 
+        <input type="email" placeholder="Enter your email" [(ngModel)]="email">
+
+        <label>Password</label>
+
+        <div class="password-box">
+
+            <input [type]="showPassword ? 'text' : 'password'" placeholder="Enter your password" [(ngModel)]="password">
+
+            <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
+                (click)="showPassword=!showPassword">
+            </i>
+
+        </div>
+        <div class="forgot-password">
+
+            <a href="#">Forgot Password?</a>
+
+        </div>
         <button (click)="login()">
             Login
         </button>
         <p class="error" *ngIf="errorMessage">
+
             {{ errorMessage }}
+
+        </p>
+
+        
+        <p class="register-link">
+
+            Don't have an account?
+
+            <a routerLink="/register">
+
+                Create Account
+
+            </a>
+
         </p>
 
     </div>

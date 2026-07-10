@@ -469,7 +469,7 @@
 
                                 <label>SKU</label>
 
-                                <input type="text" placeholder="TS-101">
+                                <input type="text" value="Auto Generated" readonly>
 
                             </div>
 
@@ -495,6 +495,8 @@
                             <div class="full-width">
 
                                 <label>Available Colors</label>
+                                <input type="text" placeholder="Black, White, Grey"
+                                    [(ngModel)]="newProduct.availableColors">
 
                                 <div class="color-list">
 

@@ -19,30 +19,50 @@ export class Login {
   password = '';
 
   errorMessage = '';
+  showPassword = false;
 
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
+
+
 
   login() {
 
-    const success = this.authService.login(
-      this.email,
-      this.password
-    );
+    this.authService.login({
 
-    if (success) {
+      email: this.email,
 
-      this.router.navigate(['/admin']);
+      password: this.password
 
-    } else {
+    }).subscribe({
 
-      this.errorMessage =
-        'Invalid email or password';
+      next: (response) => {
 
-    }
+        if (response.user.role === 'admin') {
+
+          this.router.navigate(['/admin']);
+
+        } else {
+
+          this.router.navigate(['/shop']);
+
+        }
+
+      },
+
+      error: () => {
+
+        this.errorMessage =
+          'Invalid email or password';
+
+      }
+
+    });
 
   }
+
+
 
 }

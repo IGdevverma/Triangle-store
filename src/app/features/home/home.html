@@ -141,11 +141,13 @@
 
     <div class="featured-header">
 
-        <h2>Featured Products</h2>
+        <h2>Featured Collection</h2>
 
         <p>
-            Discover premium sportswear designed for performance,
-            comfort and everyday style.
+
+            Discover our best-selling performance apparel crafted for athletes,
+            gym enthusiasts, and everyday training.
+
         </p>
 
     </div>
@@ -157,21 +159,40 @@
         </button>
 
         <div class="products-grid">
-
             <div class="product-card" *ngFor="let product of displayedProducts"
                 [routerLink]="['/product', product._id]">
 
-                <img [src]="product.image" [alt]="product.name" [routerLink]="['/product', product._id]"
-                    class="clickable-image">
+                <div class="product-image">
+
+                    <img [src]="product.image" [alt]="product.name">
+
+                    <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
+
+                        SAVE {{ product.discount }}%
+
+                    </span>
+
+                </div>
+
                 <div class="product-info">
 
                     <h3>{{ product.name }}</h3>
 
-                    <p>₹{{ product.price }}</p>
+                    <div class="price-box">
 
+                        <span class="current-price">
 
+                            ₹{{ product.price }}
 
+                        </span>
 
+                        <span class="old-price" *ngIf="product.discount">
+
+                            ₹{{ (product.price/(1-product.discount/100)) | number:'1.0-0' }}
+
+                        </span>
+
+                    </div>
 
                 </div>
 
@@ -181,6 +202,16 @@
 
         <button class="slider-arrow right" (click)="nextFeatured()">
             ❯
+        </button>
+
+    </div>
+
+    <div class="view-all-container">
+
+        <button class="view-all-btn" routerLink="/shop">
+
+            View All Products
+
         </button>
 
     </div>

@@ -131,9 +131,9 @@
 
             </div>
 
-            <button type="submit">
+            <button type="submit" [disabled]="isPlacingOrder">
 
-                Place Order
+                {{ isPlacingOrder ? 'Placing Order...' : 'Place Order' }}
 
             </button>
 
@@ -269,10 +269,8 @@
 
             <div class="popup-actions">
 
-                <a routerLink="/" class="popup-btn">
-
+                <a class="popup-btn" (click)="continueShopping()">
                     Continue Shopping
-
                 </a>
 
                 <a routerLink="/orders" class="popup-btn secondary">

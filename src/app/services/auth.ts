@@ -1,39 +1,99 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+import { HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private readonly ADMIN_EMAIL = 'admin@tyka.com';
+  private apiUrl = 'http://localhost:8000/api/auth';
 
-  private readonly ADMIN_PASSWORD = '123456';
+  constructor(private http: HttpClient) { }
 
-  login(email: string, password: string): boolean {
+  login(data: { email: string; password: string }): Observable<any> {
 
-    if (
-      email === this.ADMIN_EMAIL &&
-      password === this.ADMIN_PASSWORD
-    ) {
+    return this.http.post<any>(`${this.apiUrl}/login`, data).pipe(
 
-      localStorage.setItem('isLoggedIn', 'true');
+      tap((response) => {
 
-      return true;
+        localStorage.setItem('token', response.token);
 
-    }
+        localStorage.setItem(
+          'user',
+          JSON.stringify(response.user)
+        );
 
-    return false;
+      })
+
+    );
+
+  }
+
+  register(data: any): Observable<any> {
+
+    return this.http.post<any>(
+      `${this.apiUrl}/register`,
+      data
+    );
+
   }
 
   logout() {
 
-    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
 
   }
 
   isLoggedIn(): boolean {
 
-    return localStorage.getItem('isLoggedIn') === 'true';
+    return !!localStorage.getItem('token');
+
+  }
+
+  getUser() {
+
+    const user = localStorage.getItem('user');
+
+    return user ? JSON.parse(user) : null;
+
+  }
+
+  updateProfile(data: any): Observable<any> {
+
+    const token = localStorage.getItem('token');
+
+    const headers = new HttpHeaders({
+
+      Authorization: `Bearer ${token}`
+
+    });
+
+    return this.http.put<any>(
+
+      `${this.apiUrl}/profile`,
+
+      data,
+
+      { headers }
+
+    ).pipe(
+
+      tap((response) => {
+
+        localStorage.setItem(
+
+          'user',
+
+          JSON.stringify(response.user)
+
+        );
+
+      })
+
+    );
 
   }
 

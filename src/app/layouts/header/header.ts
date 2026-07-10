@@ -1,12 +1,12 @@
-import { Component, OnInit, HostListener } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Component, OnInit, HostListener, ElementRef  } from '@angular/core';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { ThemeService } from '../../services/theme';
 import { CartService, CartItem } from '../../services/cart';
 import { AuthService } from '../../services/auth';
 import { WishlistService } from '../../services/wishlist';
-import { ActivatedRoute } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-header',
@@ -24,11 +24,23 @@ export class Header implements OnInit {
   cartCount = 0;
   wishlistCount = 0;
   searchTerm = '';
-  filterProducts: any;
+
+  user: { name: string; role: string } | null = null;
+  isUserMenuOpen = false;
 
   @HostListener('window:scroll')
   onWindowScroll() {
     this.isScrolled = window.scrollY > 50;
+  }
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent) {
+
+    if (!this.elementRef.nativeElement.contains(event.target)) {
+
+      this.isUserMenuOpen = false;
+
+    }
+
   }
 
   constructor(
@@ -38,11 +50,13 @@ export class Header implements OnInit {
     private router: Router,
     private themeService: ThemeService,
     private route: ActivatedRoute,
+    private elementRef: ElementRef,
 
 
   ) { }
 
   ngOnInit(): void {
+    this.user = this.authService.getUser();
 
     this.route.queryParams.subscribe(params => {
 
@@ -50,7 +64,7 @@ export class Header implements OnInit {
 
         this.searchTerm = params['search'];
 
-        this.filterProducts();
+
 
       }
 
@@ -79,17 +93,29 @@ export class Header implements OnInit {
 
   }
 
-  isLoggedIn() {
-
+  isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
-
   }
 
   logout() {
 
     this.authService.logout();
 
-    this.router.navigate(['/login']);
+    this.user = null;
+    this.isUserMenuOpen = false;
+
+    this.router.navigate(['/']);
+
+  }
+  getUserName(): string {
+
+    return this.user?.name || '';
+
+  }
+
+  isAdmin(): boolean {
+
+    return this.user?.role === 'admin';
 
   }
   toggleTheme() {
@@ -102,6 +128,7 @@ export class Header implements OnInit {
   toggleCart() {
     this.isCartOpen = !this.isCartOpen;
   }
+
 
 
   removeItem(productId: string) {
@@ -135,6 +162,16 @@ export class Header implements OnInit {
     this.isMenuOpen = !this.isMenuOpen;
   }
 
+  toggleUserMenu() {
+
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+
+  }
+
+  
+
+  
+
 
   isSearchOpen = false;
 
@@ -156,8 +193,9 @@ export class Header implements OnInit {
       );
 
       this.isSearchOpen = false;
-
+      this.searchTerm = '';
     }
+
 
   }
 }

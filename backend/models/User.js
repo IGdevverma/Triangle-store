@@ -26,7 +26,17 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["user", "admin"],
         default: "user"
-    }
+    },
+    phone: {
+        type: String,
+        default: ""
+    },
+
+    gender: {
+        type: String,
+        enum: ["Male", "Female", "Other"],
+        default: "Male"
+    },
 
 }, {
     timestamps: true
@@ -44,7 +54,7 @@ userSchema.pre("save", async function () {
 
 });
 
-userSchema.methods.getJWTToken = function(){
+userSchema.methods.getJWTToken = function () {
 
     return jwt.sign(
 
@@ -58,9 +68,9 @@ userSchema.methods.getJWTToken = function(){
 
 };
 
-userSchema.methods.comparePassword = async function(password){
+userSchema.methods.comparePassword = async function (password) {
 
-    return await bcrypt.compare(password,this.password);
+    return await bcrypt.compare(password, this.password);
 
 };
 

@@ -5,29 +5,31 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Create Product
 const createProduct = asyncHandler(async (req, res) => {
-  try {
-    console.log("========== CREATE PRODUCT ==========");
-    console.log("FILE:", req.file);
+    try {
+        console.log("========== CREATE PRODUCT ==========");
+        console.log("FILE:", req.file);
 
-    if (req.file) {
-      console.log("PATH:", req.file.path);
-      console.log("FILENAME:", req.file.filename);
+        if (req.file) {
+            console.log("PATH:", req.file.path);
+            console.log("FILENAME:", req.file.filename);
 
-      req.body.image = req.file.path;
+            req.body.image = req.file.path;
+        }
+
+        console.log("BODY:", req.body);
+        const sku = "TS-" + Date.now();
+
+        req.body.sku = sku;
+        const product = await Product.create(req.body);
+
+        res.status(201).json({
+            success: true,
+            product,
+        });
+    } catch (err) {
+        console.error("CREATE PRODUCT ERROR:", err);
+        throw err;
     }
-
-    console.log("BODY:", req.body);
-
-    const product = await Product.create(req.body);
-
-    res.status(201).json({
-      success: true,
-      product,
-    });
-  } catch (err) {
-    console.error("CREATE PRODUCT ERROR:", err);
-    throw err;
-  }
 });
 
 // Get All Products

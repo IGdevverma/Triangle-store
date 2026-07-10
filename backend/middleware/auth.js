@@ -4,7 +4,16 @@ const asyncHandler = require("./asyncHandler");
 
 exports.isAuthenticatedUser = asyncHandler(async (req, res, next) => {
 
-    const token = req.headers.authorization;
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({
+            success: false,
+            message: "Please Login First"
+        });
+    }
+
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
         return res.status(401).json({

@@ -50,7 +50,7 @@ const productSchema = new mongoose.Schema(
 
     sku: {
       type: String,
-      default: "",
+      unique: true,
     },
 
     fabric: {
@@ -89,6 +89,10 @@ const productSchema = new mongoose.Schema(
     showOnHome: {
       type: Boolean,
       default: false,
+    },
+    availableColors: {
+      type: String,
+      default: ""
     },
   },
   {

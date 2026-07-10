@@ -14,6 +14,10 @@ import { TeamKitDesigner } from './features/team-kit-designer/team-kit-designer'
 import { KitCategory } from './features/kit-category/kit-category';
 import { TeamKitCustomize } from './features/team-kit-customize/team-kit-customize';
 import { AdminOrders } from './features/admin-orders/admin-orders';
+import { Register } from './features/register/register';
+import { Profile } from './features/profile/profile';
+import { Dashboard } from './features/dashboard/dashboard';
+import { EditProfile } from './features/edit-profile/edit-profile';
 
 export const routes: Routes = [
   {
@@ -105,5 +109,22 @@ export const routes: Routes = [
     component: AdminOrders,
     canActivate: [authGuard]
   },
-
+  {
+    path: 'register',
+    component: Register
+  },
+  {
+    path: 'profile',
+    component: Profile,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'dashboard',
+    component: Dashboard
+  },
+  {
+    path: 'profile/edit',
+    component: EditProfile,
+    canActivate: [authGuard]
+  },
 ];

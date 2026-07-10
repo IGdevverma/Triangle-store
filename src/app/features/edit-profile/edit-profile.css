@@ -1,0 +1,145 @@
+.edit-profile-page{
+
+    min-height:100vh;
+
+    background:#f8f9fb;
+
+    padding:60px 20px;
+}
+
+.profile-card{
+
+    max-width:700px;
+
+    margin:auto;
+
+    background:#fff;
+
+    padding:45px;
+
+    border-radius:18px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.avatar{
+
+    width:100px;
+
+    height:100px;
+
+    border-radius:50%;
+
+    background:#e11d48;
+
+    color:#fff;
+
+    font-size:38px;
+
+    font-weight:700;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    margin:0 auto 20px;
+}
+
+.profile-card h2{
+
+    text-align:center;
+
+    margin-bottom:40px;
+
+    font-size:30px;
+}
+
+.form-group{
+
+    margin-bottom:24px;
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:10px;
+
+    font-weight:600;
+
+    color:#444;
+}
+
+.form-group input,
+.form-group select{
+
+    width:100%;
+
+    height:52px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    padding:0 16px;
+
+    font-size:15px;
+
+    outline:none;
+
+    transition:.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus{
+
+    border-color:#e11d48;
+
+    box-shadow:0 0 0 3px rgba(225,29,72,.15);
+}
+
+button{
+
+    width:100%;
+
+    height:55px;
+
+    background:#e11d48;
+
+    color:white;
+
+    border:none;
+
+    border-radius:10px;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+button:hover{
+
+    background:#c9184a;
+}
+
+@media(max-width:768px){
+
+.profile-card{
+
+padding:30px 20px;
+
+}
+
+.profile-card h2{
+
+font-size:24px;
+
+}
+
+}

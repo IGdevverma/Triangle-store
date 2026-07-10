@@ -1,0 +1,60 @@
+<div class="register-container">
+
+    <div class="register-card">
+
+        <h1>Create Account</h1>
+
+        <p class="subtitle">
+            Join Triangle Sports
+        </p>
+
+        <input
+            type="text"
+            placeholder="Full Name"
+            [(ngModel)]="name">
+
+        <input
+            type="email"
+            placeholder="Email"
+            [(ngModel)]="email">
+        
+        <input
+              type="tel"
+              placeholder="Phone Number"
+              [(ngModel)]="phone">
+
+        <input
+            type="password"
+            placeholder="Password"
+            [(ngModel)]="password">
+
+        <input
+            type="password"
+            placeholder="Confirm Password"
+            [(ngModel)]="confirmPassword">
+
+        <button (click)="register()">
+            Create Account
+        </button>
+
+        <p class="success" *ngIf="successMessage">
+            {{ successMessage }}
+        </p>
+
+        <p class="error" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </p>
+
+        <p class="login-link">
+
+            Already have an account?
+
+            <a routerLink="/login">
+                Login
+            </a>
+
+        </p>
+
+    </div>
+
+</div>

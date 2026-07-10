@@ -40,7 +40,7 @@
 
           <a routerLink="/shop">Shorts</a>
           <a routerLink="/shop">Track Pants</a>
-         
+
 
         </div>
 
@@ -79,7 +79,7 @@
 
           <a routerLink="/shop">Shorts</a>
           <a routerLink="/shop">Track Pants</a>
-          
+
 
         </div>
 
@@ -106,7 +106,7 @@
 
           <h4>Performance</h4>
 
-         
+
           <a routerLink="/shop">Arm Sleeves</a>
           <a routerLink="/shop">Wrist Bands</a>
 
@@ -155,22 +155,107 @@
 
   <div class="nav-icons">
 
-    <!-- Login -->
-    <div *ngIf="!isLoggedIn()" routerLink="/login">
-      <i class="fa-solid fa-user"></i>
-      <span>Sign in</span>
-    </div>
+    <!-- User Menu -->
 
-    <!-- Logout -->
-    <div *ngIf="isLoggedIn()" (click)="logout()">
+    <div class="user-menu" (click)="toggleUserMenu()">
+
       <i class="fa-solid fa-user"></i>
-      <span>Logout</span>
+
+      <span>
+
+        {{ isLoggedIn() ? getUserName() : 'Sign In' }}
+
+      </span>
+
+      <i class="fa-solid fa-chevron-down"></i>
+
+      <div class="user-dropdown" *ngIf="isUserMenuOpen">
+
+        <!-- Guest -->
+
+        <ng-container *ngIf="!isLoggedIn()">
+
+          <a routerLink="/login">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Login</span>
+          </a>
+
+
+
+          <a routerLink="/register">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Signup
+
+          </a>
+
+        </ng-container>
+
+        <!-- Logged In -->
+
+        <ng-container *ngIf="isLoggedIn()">
+
+          <!-- Admin -->
+
+          <ng-container *ngIf="isAdmin(); else userMenu">
+
+            <a routerLink="/admin">
+              <i class="fa-solid fa-gauge"></i>
+              <span>Dashboard</span>
+            </a>
+
+            <a routerLink="/admin-orders">
+              <i class="fa-solid fa-box"></i>
+              <span>Manage Orders</span>
+            </a>
+
+          </ng-container>
+
+          <!-- User -->
+
+          <ng-template #userMenu>
+
+
+
+
+            <a routerLink="/profile/edit">
+              <i class="fa-solid fa-user-pen"></i>
+              <span> Profile</span>
+            </a>
+
+            <a routerLink="/orders">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>My Orders</span>
+            </a>
+
+            <a routerLink="/dashboard">
+
+              <i class="fa-solid fa-gauge-high"></i>
+
+              <span>Dashboard</span>
+
+            </a>
+
+          </ng-template>
+
+          <hr>
+
+          <a (click)="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </a>
+
+        </ng-container>
+
+      </div>
+
     </div>
 
     <!--Search-->
     <div (click)="toggleSearch()">
 
-      <i class="fa-solid fa-magnifying-glass" routerLink="/shop"></i>
+      <i class="fa-solid fa-magnifying-glass"></i>
 
     </div>
     <!-- Wishlist -->
@@ -189,14 +274,22 @@
     </div>
 
     <!-- Cart -->
-    <div (click)="toggleCart()">
-      <i class="fa-solid fa-cart-shopping"></i>
+    <div class="cart-icon" (click)="toggleCart()">
 
-      <span class="cart-badge">
-        {{ cartCount }}
-      </span>
+      <div class="cart-wrapper">
+
+        <i class="fa-solid fa-cart-shopping"></i>
+
+        <span class="cart-badge">
+
+          {{ cartCount }}
+
+        </span>
+
+      </div>
 
       <span>Cart</span>
+
     </div>
 
   </div>
@@ -207,9 +300,9 @@
 
   <div class="search-box">
 
-    <input type="text" placeholder="Search products...">
 
-    <button>
+
+    <button (click)="searchProducts()">
       <div class="search-wrapper">
 
         <input *ngIf="isSearchOpen" type="text" placeholder="Search products..." [(ngModel)]="searchTerm"

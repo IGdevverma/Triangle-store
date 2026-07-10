@@ -1,0 +1,55 @@
+<div class="account-page">
+
+  <h1 class="page-title">My Account</h1>
+
+  <div class="account-grid">
+
+    <!-- Left Card -->
+    <div class="profile-card">
+
+      <div class="avatar">
+        {{ user?.name?.charAt(0) }}
+      </div>
+
+      <h2>{{ user?.name }}</h2>
+
+      <p>{{ user?.email }}</p>
+
+      <span class="role">
+        {{ user?.role | titlecase }}
+      </span>
+
+    </div>
+
+    <!-- Right Menu -->
+    <div class="account-menu">
+
+      <a routerLink="/profile/edit">
+        👤 Personal Information
+      </a>
+
+      <a routerLink="/orders">
+        📦 My Orders
+      </a>
+
+      <a routerLink="/wishlist">
+        ❤️ Wishlist
+      </a>
+
+      <a>
+        📍 Saved Addresses
+      </a>
+
+      <a>
+        🔒 Change Password
+      </a>
+
+      <a (click)="logout()">
+        🚪 Logout
+      </a>
+
+    </div>
+
+  </div>
+
+</div>
