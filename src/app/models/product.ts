@@ -13,7 +13,7 @@ export interface Product {
   fabric?: string;
   type?: string;
   brand?: string;
-  stock?: number;
+  stock: number;
   showOnHome?: boolean;
   discount?: number;
   quantity?: number;

@@ -110,8 +110,11 @@
                                 👁
                             </button>
 
-                            <button class="cart-hover-btn" (click)="addToCart(product)">
-                                🛒
+                            <button class="cart-hover-btn" (click)="addToCart(product)"
+                                [disabled]="product.stock === 0">
+
+                                {{ product.stock === 0 ? '❌' : '🛒' }}
+
                             </button>
 
                         </div>
@@ -119,6 +122,22 @@
                     </div>
 
                     <h3>{{ product.name }}</h3>
+
+                    <h3>{{ product.name }}</h3>
+
+                    <p class="stock in-stock" *ngIf="product.stock > 5">
+                        🟢 In Stock
+                    </p>
+
+                    <p class="stock low-stock" *ngIf="product.stock > 0 && product.stock <= 5">
+                        🟡 Only {{ product.stock }} left
+                    </p>
+
+                    <p class="stock out-stock" *ngIf="product.stock === 0">
+                        🔴 Out of Stock
+                    </p>
+
+                    <p>₹{{ product.price }}</p>
 
                     <p>₹{{ product.price }}</p>
 
@@ -158,9 +177,10 @@
 
             </p>
 
-            <button class="modal-cart-btn" (click)="addToCart(selectedProduct)">
+            <button class="modal-cart-btn" (click)="addToCart(selectedProduct)"
+                [disabled]="selectedProduct.stock === 0">
 
-                Add to Cart
+                {{ selectedProduct.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
 
             </button>
 

@@ -331,7 +331,8 @@ export class Admin implements OnInit, AfterViewInit {
         name: '',
         price: 0,
         image: '',
-        category: ''
+        category: '',
+        stock: 0,
       };
 
     });

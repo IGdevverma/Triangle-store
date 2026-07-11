@@ -146,16 +146,12 @@
 
     <!-- Buttons -->
 
-    <button class="cart-btn" (click)="addToCart()">
-
-      ADD TO CART
-
+    <button class="cart-btn" (click)="addToCart()" [disabled]="product?.stock === 0">
+      {{ product?.stock === 0 ? 'OUT OF STOCK' : 'ADD TO CART' }}
     </button>
 
-    <button class="buy-btn" (click)="buyNow()">
-
+    <button class="buy-btn" (click)="buyNow()" [disabled]="product?.stock === 0">
       BUY NOW
-
     </button>
 
     <div class="delivery-section">
@@ -421,6 +417,17 @@
       <h4>{{ item.name }}</h4>
 
       <p>₹{{ item.price }}</p>
+      <span class="related-stock" *ngIf="item.stock! > 0">
+
+        In Stock
+
+      </span>
+
+      <span class="related-stock out" *ngIf="item.stock === 0">
+
+        Out of Stock
+
+      </span>
 
     </div>
 

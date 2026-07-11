@@ -294,3 +294,26 @@
 .product-image:hover {
     transform: scale(1.03);
 }
+.stock {
+    margin: 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.in-stock {
+    color: #16a34a;
+}
+
+.low-stock {
+    color: #f59e0b;
+}
+
+.out-stock {
+    color: #dc2626;
+}
+
+.cart-hover-btn:disabled,
+.modal-cart-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

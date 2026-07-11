@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
 import { Payment } from '../../services/payment';
 
 
-
+declare var Razorpay: any;
 
 import {
   FormBuilder,
@@ -113,28 +113,11 @@ export class Checkout implements OnInit {
 
     }
     this.isPlacingOrder = true;
-    this.paymentService.createOrder(this.grandTotal).subscribe({
 
-      next: (response) => {
-
-        console.log('Razorpay Order:', response);
-
-      },
-
-      error: (error) => {
-
-        console.error(error);
-
-      }
-
-    });
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)
     );
-
-
-
     const order: Order = {
 
       customerName: this.checkoutForm.value.name,
@@ -153,7 +136,7 @@ export class Checkout implements OnInit {
 
       paymentMethod: this.checkoutForm.value.paymentMethod,
 
-      paymentStatus: 'Pending',
+      paymentStatus: this.paymentMethod === 'COD' ? 'Pending' : 'Paid',
 
       orderStatus: 'Processing',
 
@@ -165,44 +148,63 @@ export class Checkout implements OnInit {
 
     };
 
-    this.orderService.addOrder(order).subscribe({
+    if (this.paymentMethod === 'COD') {
+
+      this.orderService.addOrder(order).subscribe({
+
+        next: (response) => {
+
+          this.generatedOrderId = response.order._id;
+
+          this.cartService.clearCart();
+
+          this.orderPlaced = true;
+
+          this.isPlacingOrder = false;
+
+          localStorage.removeItem('customerInfo');
+
+          this.checkoutForm.reset({
+
+            paymentMethod: 'COD'
+
+          });
+
+        },
+
+        error: (error) => {
+
+
+
+          this.isPlacingOrder = false;
+
+        }
+
+      });
+
+      return;
+
+    }
+    this.paymentService.createOrder(this.grandTotal).subscribe({
 
       next: (response) => {
 
-        console.log("Response:", response);
-
-        this.generatedOrderId = response.order._id;
-
-        this.cartService.clearCart();
-
-        this.orderPlaced = true;
-        this.isPlacingOrder = false;
-        localStorage.removeItem('customerInfo');
-        this.checkoutForm.reset({
-
-          paymentMethod: 'COD'
-
-        });
-        this.couponCode = '';
-
-        this.discount = 0;
-
-        this.discountAmount = 0;
-        localStorage.removeItem('customerInfo');
-        console.log("Popup State:", this.orderPlaced);
+        this.openRazorpay(response, order);
 
       },
 
       error: (error) => {
+
+
+
         this.isPlacingOrder = false;
-
-        console.error(error);
-
-        alert('Failed to place order.');
 
       }
 
     });
+
+
+
 
 
   }
@@ -272,8 +274,122 @@ export class Checkout implements OnInit {
     this.discountAmount = Math.round(
       (this.subtotal * this.discount) / 100
     );
+  }
+  openRazorpay(response: any, order: Order) {
+
+    const options = {
+
+      key: response.key,
+
+      amount: response.order.amount,
+
+      currency: response.order.currency,
+
+      name: "Triangle Sports",
+
+      description: "Order Payment",
+
+      order_id: response.order.id,
+      notes: {
+
+        customerName: this.checkoutForm.value.name
+
+      },
+
+
+      handler: (paymentResponse: any) => {
+
+
+
+        this.paymentService.verifyPayment(paymentResponse).subscribe({
+
+          next: (verifyRes) => {
+
+            order.paymentStatus = "Paid";
+            this.orderService.addOrder(order).subscribe({
+
+              next: (res) => {
+
+
+
+                this.generatedOrderId = res.order._id;
+
+                this.cartService.clearCart();
+
+                this.orderPlaced = true;
+
+                this.isPlacingOrder = false;
+
+                localStorage.removeItem("customerInfo");
+
+                this.checkoutForm.reset({
+                  paymentMethod: "COD"
+                });
+                this.couponCode = '';
+                this.discount = 0;
+                this.discountAmount = 0;
+
+              },
+
+              error: (err) => {
+
+                alert(err.error.message);
+                
+                this.isPlacingOrder = false;
+
+              }
+
+            });
+
+          },
+
+          error: (err) => {
+
+
+            alert("Payment verification failed.");
+            order.paymentStatus = "Failed";
+            this.isPlacingOrder = false;
+
+          }
+
+        });
+
+      },
+
+      prefill: {
+
+        name: this.checkoutForm.value.name,
+
+        email: this.checkoutForm.value.email,
+
+        contact: this.checkoutForm.value.phone
+
+      },
+      modal: {
+
+        ondismiss: () => {
+
+          this.isPlacingOrder = false;
+
+        }
+
+      },
+
+      theme: {
+
+        color: "#ff4d5a"
+
+      }
+
+    };
+
+    const razorpay = new Razorpay(options);
+
+    razorpay.open();
 
   }
+
+
   continueShopping() {
 
     this.orderPlaced = false;

@@ -135,7 +135,15 @@ export class ProductDetail implements OnInit {
 
   increaseQuantity() {
 
-    this.quantity++;
+    if (this.product && this.quantity < this.product.stock) {
+
+      this.quantity++;
+
+    } else {
+
+      alert(`Only ${this.product?.stock} items available`);
+
+    }
 
   }
 
@@ -151,22 +159,60 @@ export class ProductDetail implements OnInit {
 
   addToCart() {
 
-    if (this.product) {
+    if (!this.product) return;
 
-      this.cartService.addToCart({
-        ...this.product,
-        quantity: this.quantity,
-        selectedSize: this.selectedSize
-      });
+    if (this.quantity > this.product.stock) {
 
-      this.notificationService.show(
-        this.product.name + ' added to cart'
-      );
+      alert(`Only ${this.product.stock} items available`);
+
+      return;
 
     }
 
+    if (this.product.stock === 0) {
+
+      alert("This product is Out of Stock");
+
+      return;
+
+    }
+
+    this.cartService.addToCart({
+
+      ...this.product,
+
+      quantity: this.quantity,
+
+      selectedSize: this.selectedSize
+
+    });
+
+    this.notificationService.show(
+
+      this.product.name + " added to cart"
+
+    );
+
   }
   buyNow() {
+
+    if (!this.product) return;
+
+    if (this.quantity > this.product.stock) {
+
+      alert(`Only ${this.product.stock} items available`);
+
+      return;
+
+    }
+
+    if (this.product.stock === 0) {
+
+      alert("This product is Out of Stock");
+
+      return;
+
+    }
 
     this.addToCart();
 

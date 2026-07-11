@@ -11,7 +11,7 @@ export class Payment {
 
   constructor(
     private http: HttpClient
-  ) {}
+  ) { }
 
   createOrder(amount: number): Observable<any> {
 
@@ -24,6 +24,17 @@ export class Payment {
         amount
 
       }
+
+    );
+
+  }
+  verifyPayment(data: any): Observable<any> {
+
+    return this.http.post(
+
+      `${this.apiUrl}/verify`,
+
+      data
 
     );
 

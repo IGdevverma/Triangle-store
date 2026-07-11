@@ -80,56 +80,31 @@
 
             </small>
 
+            <label class="payment-label">
+                Payment Method
+            </label>
+
             <select formControlName="paymentMethod">
 
                 <option value="COD">
-                    Cash on Delivery
+                    Cash on Delivery (COD)
                 </option>
 
-                <option value="UPI">
-                    UPI
-                </option>
-
-                <option value="Card">
-                    Credit / Debit Card
+                <option value="ONLINE">
+                    Pay Online (Razorpay)
                 </option>
 
             </select>
 
-            <!-- UPI Options -->
+            <small class="payment-note" *ngIf="paymentMethod === 'ONLINE'">
 
-            <div *ngIf="paymentMethod === 'UPI'">
+                You can pay securely using UPI, Credit Card, Debit Card,
+                Net Banking or Wallet after clicking <strong>Place Order</strong>.
 
-                <h3>Select UPI App</h3>
+            </small>
 
-                <label>
-                    <input type="radio" name="upi">
-                    Google Pay
-                </label>
 
-                <label>
-                    <input type="radio" name="upi">
-                    PhonePe
-                </label>
 
-                <label>
-                    <input type="radio" name="upi">
-                    Paytm
-                </label>
-
-            </div>
-
-            <!-- Card Fields -->
-
-            <div *ngIf="paymentMethod === 'Card'">
-
-                <input type="text" placeholder="Card Number">
-
-                <input type="text" placeholder="Expiry Date">
-
-                <input type="password" placeholder="CVV">
-
-            </div>
 
             <button type="submit" [disabled]="isPlacingOrder">
 

@@ -21,7 +21,7 @@ export interface Order {
 
   paymentMethod: string;
 
-  paymentStatus: 'Pending' | 'Paid';
+  paymentStatus: 'Pending' | 'Paid' | 'Failed';
 
   orderStatus: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
 
