@@ -306,6 +306,10 @@ export class Checkout implements OnInit {
           next: (verifyRes) => {
 
             order.paymentStatus = "Paid";
+            order.razorpayOrderId = paymentResponse.razorpay_order_id;
+            order.razorpayPaymentId = paymentResponse.razorpay_payment_id;
+            order.paymentVerifiedAt = new Date().toISOString();
+
             this.orderService.addOrder(order).subscribe({
 
               next: (res) => {

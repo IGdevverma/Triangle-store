@@ -9,14 +9,20 @@
         </div>
 
         <ul class="menu">
-            <li class="active">
+            <li [class.active]="activeMenu==='dashboard'" (click)="activeMenu='dashboard'">
+
                 <i class="fa-solid fa-chart-line"></i>
+
                 Dashboard
+
             </li>
 
-            <li>
+            <li [class.active]="activeMenu==='products'" (click)="activeMenu='products'">
+
                 <i class="fa-solid fa-box"></i>
+
                 Products
+
             </li>
 
             <li>
@@ -29,19 +35,28 @@
                 Brands
             </li>
 
-            <li>
+            <li [class.active]="activeMenu==='orders'" (click)="activeMenu='orders'">
+
                 <i class="fa-solid fa-cart-shopping"></i>
+
                 Orders
+
             </li>
 
-            <li>
+            <li [class.active]="activeMenu==='customers'" (click)="activeMenu='customers'">
+
                 <i class="fa-solid fa-users"></i>
+
                 Customers
+
             </li>
 
-            <li>
+            <li [class.active]="activeMenu==='settings'" (click)="activeMenu='settings'">
+
                 <i class="fa-solid fa-gear"></i>
+
                 Settings
+
             </li>
         </ul>
 
@@ -50,196 +65,542 @@
     <!-- Main -->
 
     <main class="main-content">
+        <div *ngIf="activeMenu === 'dashboard'">
 
-        <!-- Top Bar -->
+            <!-- Top Bar -->
 
-        <header class="topbar">
+            <header class="topbar">
 
-            <div class="search">
+                <div class="search">
 
-                <i class="fa-solid fa-magnifying-glass"></i>
+                    <i class="fa-solid fa-magnifying-glass"></i>
 
-                <input type="text" placeholder="Search Products..." [(ngModel)]="searchTerm">
-
-            </div>
-
-            <div class="filters">
-
-                <select [(ngModel)]="selectedStock">
-
-                    <option>All</option>
-
-                    <option>In Stock</option>
-
-                    <option>Out of Stock</option>
-
-                    <option>Low Stock</option>
-
-                </select>
-
-                <select [(ngModel)]="selectedSort">
-
-                    <option>Newest</option>
-
-                    <option>Price Low → High</option>
-
-                    <option>Price High → Low</option>
-
-                    <option>Name A → Z</option>
-
-                    <option>Stock Highest</option>
-
-                </select>
-
-            </div>
-
-            <button class="add-btn" (click)="openAddModal()">
-
-                + Add Product
-
-            </button>
-
-        </header>
-
-        <!-- Cards -->
-
-        <div class="stats">
-
-            <div class="card">
-
-                <div>
-
-                    <h3>{{totalProducts}}</h3>
-
-                    <p>Total Products</p>
+                    <input type="text" placeholder="Search Products..." [(ngModel)]="searchTerm">
 
                 </div>
 
-                📦
+                <div class="filters">
 
-            </div>
+                    <select [(ngModel)]="selectedStock">
 
-            <div class="card">
+                        <option>All</option>
 
-                <div>
+                        <option>In Stock</option>
 
-                    <h3>₹{{inventoryValue}}</h3>
+                        <option>Out of Stock</option>
 
-                    <p>Inventory Value</p>
+                        <option>Low Stock</option>
 
-                </div>
+                    </select>
 
-                💰
+                    <select [(ngModel)]="selectedSort">
 
-            </div>
+                        <option>Newest</option>
 
-            <div class="card">
+                        <option>Price Low → High</option>
 
-                <div>
+                        <option>Price High → Low</option>
 
-                    <h3>{{totalCategories}}</h3>
+                        <option>Name A → Z</option>
 
-                    <p>Categories</p>
+                        <option>Stock Highest</option>
 
-                </div>
-
-                📂
-
-            </div>
-
-            <div class="card">
-
-                <div>
-
-                    <h3>{{mostExpensiveProduct}}</h3>
-
-                    <p>Premium Product</p>
+                    </select>
 
                 </div>
 
-                ⭐
+                <button class="add-btn" (click)="openAddModal()">
 
-            </div>
+                    + Add Product
 
-            <div class="card">
+                </button>
 
-                <div>
+            </header>
 
-                    <h3>{{ totalStock }}</h3>
+            <!-- Cards -->
 
-                    <p>Total Stock</p>
+            <div class="stats">
 
-                </div>
-
-                📦
-
-            </div>
-
-        </div>
-
-        <div class="chart-card">
-
-            <div class="chart-header">
-
-                <h2>Sales Overview</h2>
-
-                <span>Last 6 Months</span>
-
-            </div>
-
-            <div class="chart-container">
-
-                <canvas #salesCanvas></canvas>
-
-            </div>
-
-        </div>
-
-        <div class="dashboard-grid">
-
-            <!-- Low Stock -->
-
-            <div class="low-stock-card">
-
-                <div class="section-title">
-
-                    <h3>⚠ Low Stock Products</h3>
-
-                    <span>{{ lowStockProducts.length }}</span>
-
-                </div>
-
-                <div class="low-stock-item" *ngFor="let product of lowStockProducts">
+                <div class="card">
 
                     <div>
 
-                        <h4>{{ product.name }}</h4>
+                        <h3>{{ dashboardData.totalProducts }}</h3>
 
-                        <small>{{ product.category }}</small>
+                        <p>Total Products</p>
 
                     </div>
 
-                    <span class="danger-badge">
-
-                        {{ product.stock }} Left
-
-                    </span>
+                    📦
 
                 </div>
 
-                <p *ngIf="lowStockProducts.length===0" class="empty">
+                <div class="card">
 
-                    🎉 All products have sufficient stock
+                    <div>
 
-                </p>
+                        <h3>₹{{ dashboardData.inventoryValue }}</h3>
+
+                        <p>Inventory Value</p>
+
+                    </div>
+
+                    💰
+
+                </div>
+
+                <div class="card">
+
+                    <div>
+
+                        <h3>{{ dashboardData.totalCategories }}</h3>
+
+                        <p>Categories</p>
+
+                    </div>
+
+                    📂
+
+                </div>
+
+                <div class="card">
+
+                    <div>
+
+                        <h3>{{ dashboardData.totalOrders }}</h3>
+
+                        <p>Total Orders</p>
+
+                    </div>
+
+                    🛒
+
+                </div>
+
+                <div class="card">
+
+                    <div>
+
+                        <h3>{{ dashboardData.totalStock }}</h3>
+
+                        <p>Total Stock</p>
+
+                    </div>
+
+                    📦
+
+                </div>
 
             </div>
 
+            <div class="chart-card">
+
+                <div class="chart-header">
+
+                    <h2>Sales Overview</h2>
+
+                    <span>Last 6 Months</span>
+
+                </div>
+
+                <div class="chart-container">
+
+                    <canvas #salesCanvas></canvas>
+
+                </div>
+
+            </div>
+
+            <div class="dashboard-grid">
+
+                <!-- Low Stock -->
+
+                <div class="low-stock-card">
+
+                    <div class="section-title">
+
+                        <h3>⚠ Low Stock Products</h3>
+
+                        <span>{{ lowStockProducts.length }}</span>
+
+                    </div>
+
+                    <div class="low-stock-item" *ngFor="let product of lowStockProducts">
+
+                        <div>
+
+                            <h4>{{ product.name }}</h4>
+
+                            <small>{{ product.category }}</small>
+
+                        </div>
+
+                        <span class="danger-badge">
+
+                            {{ product.stock }} Left
+
+                        </span>
+
+                    </div>
+
+                    <p *ngIf="lowStockProducts.length===0" class="empty">
+
+                        🎉 All products have sufficient stock
+
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- Product Table -->
+
+            <div class="table-card">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Stock</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngFor="let product of filteredProducts">
+
+                            <td>
+
+                                <div class="product-info">
+
+                                    <img [src]="product.image" [alt]="product.name">
+
+                                    <div>
+
+                                        <h4>{{ product.name }}</h4>
+
+                                        <small>{{ product.sku || 'TS-101' }}</small>
+
+                                    </div>
+
+                                </div>
+
+                            </td>
+
+                            <td>{{product.category}}</td>
+
+                            <td>₹{{product.price}}</td>
+
+                            <td>{{product.stock}}</td>
+
+                            <td>
+
+                                <span class="status" [class.inactive]="product.stock==0">
+
+                                    {{ (product.stock ?? 0) > 0 ? 'Active' : 'Out of Stock' }}
+
+                                </span>
+
+                            </td>
+
+
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="edit" (click)="editProduct(product)">
+
+                                        <i class="fa-solid fa-pen"></i>
+
+                                    </button>
+
+                                    <button class="delete" (click)="deleteProduct(product._id!)">
+
+                                        <i class="fa-solid fa-trash"></i>
+
+                                    </button>
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+            <!-- Add / Edit Product Modal -->
+
+            <div class="modal-overlay" *ngIf="showModal">
+
+                <div class="modal">
+
+                    <div class="modal-header">
+
+                        <div>
+
+                            <h2>{{ editing ? 'Edit Product' : 'Add Product' }}</h2>
+
+                            <p>Add a new product to your store</p>
+
+                        </div>
+
+                        <button class="close-btn" (click)="closeModal()">
+                            ✕
+                        </button>
+
+                    </div>
+
+                    <div class="product-form">
+
+                        <!-- LEFT -->
+
+                        <div class="left-section">
+
+                            <label>Product Image</label>
+
+
+
+
+
+                            <div class="upload-box">
+
+                                <input #fileInput type="file" hidden accept="image/*" (change)="onFileSelected($event)">
+
+                                <div class="upload-area" (click)="fileInput.click()">
+
+                                    <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+
+                                    <h3>Upload Product Image</h3>
+
+                                    <p>Drag & Drop or Click to Browse</p>
+
+                                    <small>PNG • JPG • WEBP (Max 5MB)</small>
+
+                                </div>
+
+                            </div>
+
+
+
+                            <div class="preview-card" *ngIf="imagePreview">
+
+                                <img [src]="imagePreview">
+
+                                <button class="remove-image" (click)="imagePreview=''; selectedFile = null!">
+
+                                    ✕
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        <!-- RIGHT -->
+
+                        <div class="right-section">
+
+                            <div class="row">
+
+                                <div>
+
+                                    <label>Product Name</label>
+
+                                    <input type="text" [(ngModel)]="newProduct.name">
+
+                                </div>
+
+                                <div>
+
+                                    <label>Price</label>
+
+                                    <input type="number" [(ngModel)]="newProduct.price">
+
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div>
+
+                                    <label>Category</label>
+
+                                    <select [(ngModel)]="newProduct.category">
+
+                                        <option value="">Select Category</option>
+
+                                        <option>T-Shirts</option>
+
+                                        <option>Hoodies</option>
+
+                                        <option>Jackets</option>
+
+                                        <option>Shorts</option>
+
+                                        <option>Tracksuits</option>
+
+                                        <option>Shoes</option>
+
+                                        <option>Accessories</option>
+
+                                    </select>
+                                </div>
+
+                                <div>
+
+                                    <label>Stock</label>
+
+                                    <input type="number" [(ngModel)]="newProduct.stock">
+
+                                </div>
+
+                            </div>
+
+                            <label>Description</label>
+
+                            <textarea rows="5" [(ngModel)]="newProduct.description">
+                </textarea>
+
+                            <div class="row">
+
+                                <div>
+
+                                    <label>Discount (%)</label>
+
+                                    <input type="number" placeholder="10">
+
+                                </div>
+
+                                <div>
+
+                                    <label>SKU</label>
+
+                                    <input type="text" value="Auto Generated" readonly>
+
+                                </div>
+
+                                <div>
+
+                                    <label>Fabric</label>
+
+                                    <input type="text" [(ngModel)]="newProduct.fabric">
+
+                                </div>
+
+                                <div>
+
+                                    <label>Type</label>
+
+                                    <input type="text" [(ngModel)]="newProduct.type">
+
+                                </div>
+
+                            </div>
+                            <div class="row">
+
+                                <div class="full-width">
+
+                                    <label>Available Colors</label>
+                                    <input type="text" placeholder="Black, White, Grey"
+                                        [(ngModel)]="newProduct.availableColors">
+
+                                    <div class="color-list">
+
+                                        <!-- chips -->
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+
+                                <div class="switch-row">
+
+                                    <label>Show on Home Page</label>
+
+                                    <label class="switch">
+
+                                        <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
+
+                                        <span class="slider"></span>
+
+                                    </label>
+
+                                </div>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button class="cancel-btn" (click)="closeModal()">
+
+                            Cancel
+
+                        </button>
+
+                        <button *ngIf="!editing" class="save-btn" (click)="addProduct()">
+
+                            + Add Product
+
+                        </button>
+
+                        <button *ngIf="editing" class="save-btn" (click)="updateProduct()">
+
+                            Update Product
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="pagination">
+
+                <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+
+                    <i class="fa-solid fa-chevron-left"></i>
+
+                </button>
+
+                <button *ngFor="let page of pages" class="page-number" [class.active]="page === currentPage"
+                    (click)="goToPage(page)">
+
+                    {{ page }}
+
+                </button>
+
+                <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </button>
+
+            </div>
         </div>
+        <div *ngIf="activeMenu === 'orders'" class="table-card">
 
-        <!-- Product Table -->
-
-        <div class="table-card">
+            <h2>Orders</h2>
 
             <table>
 
@@ -247,12 +608,16 @@
 
                     <tr>
 
-                        <th>Product</th>
-                        <th>Category</th>
-                        <th>Price</th>
-                        <th>Stock</th>
+                        <th>Order ID</th>
+
+                        <th>Customer</th>
+
+                        <th>Total</th>
+
+                        <th>Payment</th>
+
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th>Invoice</th>
 
                     </tr>
 
@@ -260,57 +625,52 @@
 
                 <tbody>
 
-                    <tr *ngFor="let product of filteredProducts">
+                    <tr *ngFor="let order of orders">
 
-                        <td>
+                        <td>{{ order._id | slice:0:10 }}...</td>
 
-                            <div class="product-info">
-
-                                <img [src]="product.image" [alt]="product.name">
-
-                                <div>
-
-                                    <h4>{{ product.name }}</h4>
-
-                                    <small>{{ product.sku || 'TS-101' }}</small>
-
-                                </div>
-
-                            </div>
-
+                        <td class="customer-name">
+                            {{ order.customerName }}
                         </td>
 
-                        <td>{{product.category}}</td>
-
-                        <td>₹{{product.price}}</td>
-
-                        <td>{{product.stock}}</td>
+                        <td>₹{{ order.total }}</td>
 
                         <td>
+                            <span class="payment-badge" [class.paid]="order.paymentStatus==='Paid'"
+                                [class.pending]="order.paymentStatus==='Pending'">
 
-                            <span class="status" [class.inactive]="product.stock==0">
-
-                                {{ (product.stock ?? 0) > 0 ? 'Active' : 'Out of Stock' }}
+                                {{ order.paymentStatus }}
 
                             </span>
-
                         </td>
 
-
                         <td>
-                            <div class="action-buttons">
-                                <button class="edit" (click)="editProduct(product)">
 
-                                    <i class="fa-solid fa-pen"></i>
+                            <select class="status-select" [ngModel]="order.orderStatus"
+                                (ngModelChange)="changeOrderStatus(order, $event)">
 
-                                </button>
+                                <option value="Processing">Processing</option>
 
-                                <button class="delete" (click)="deleteProduct(product._id!)">
+                                <option value="Packed">Packed</option>
 
-                                    <i class="fa-solid fa-trash"></i>
+                                <option value="Shipped">Shipped</option>
 
-                                </button>
-                            </div>
+                                <option value="Delivered">Delivered</option>
+
+                                <option value="Cancelled">Cancelled</option>
+
+                            </select>
+
+                        </td>
+                        <td>
+
+                            <button class="invoice-btn" (click)="downloadInvoice(order)">
+
+                                <i class="fa-solid fa-file-pdf"></i>
+
+                                Invoice
+
+                            </button>
 
                         </td>
 
@@ -319,265 +679,6 @@
                 </tbody>
 
             </table>
-
-        </div>
-        <!-- Add / Edit Product Modal -->
-
-        <div class="modal-overlay" *ngIf="showModal">
-
-            <div class="modal">
-
-                <div class="modal-header">
-
-                    <div>
-
-                        <h2>{{ editing ? 'Edit Product' : 'Add Product' }}</h2>
-
-                        <p>Add a new product to your store</p>
-
-                    </div>
-
-                    <button class="close-btn" (click)="closeModal()">
-                        ✕
-                    </button>
-
-                </div>
-
-                <div class="product-form">
-
-                    <!-- LEFT -->
-
-                    <div class="left-section">
-
-                        <label>Product Image</label>
-
-
-
-
-
-                        <div class="upload-box">
-
-                            <input #fileInput type="file" hidden accept="image/*" (change)="onFileSelected($event)">
-
-                            <div class="upload-area" (click)="fileInput.click()">
-
-                                <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
-
-                                <h3>Upload Product Image</h3>
-
-                                <p>Drag & Drop or Click to Browse</p>
-
-                                <small>PNG • JPG • WEBP (Max 5MB)</small>
-
-                            </div>
-
-                        </div>
-
-
-
-                        <div class="preview-card" *ngIf="imagePreview">
-
-                            <img [src]="imagePreview">
-
-                            <button class="remove-image" (click)="imagePreview=''; selectedFile = null!">
-
-                                ✕
-
-                            </button>
-
-                        </div>
-
-                    </div>
-
-                    <!-- RIGHT -->
-
-                    <div class="right-section">
-
-                        <div class="row">
-
-                            <div>
-
-                                <label>Product Name</label>
-
-                                <input type="text" [(ngModel)]="newProduct.name">
-
-                            </div>
-
-                            <div>
-
-                                <label>Price</label>
-
-                                <input type="number" [(ngModel)]="newProduct.price">
-
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-
-                            <div>
-
-                                <label>Category</label>
-
-                                <select [(ngModel)]="newProduct.category">
-
-                                    <option value="">Select Category</option>
-
-                                    <option>T-Shirts</option>
-
-                                    <option>Hoodies</option>
-
-                                    <option>Jackets</option>
-
-                                    <option>Shorts</option>
-
-                                    <option>Tracksuits</option>
-
-                                    <option>Shoes</option>
-
-                                    <option>Accessories</option>
-
-                                </select>
-                            </div>
-
-                            <div>
-
-                                <label>Stock</label>
-
-                                <input type="number" [(ngModel)]="newProduct.stock">
-
-                            </div>
-
-                        </div>
-
-                        <label>Description</label>
-
-                        <textarea rows="5" [(ngModel)]="newProduct.description">
-                </textarea>
-
-                        <div class="row">
-
-                            <div>
-
-                                <label>Discount (%)</label>
-
-                                <input type="number" placeholder="10">
-
-                            </div>
-
-                            <div>
-
-                                <label>SKU</label>
-
-                                <input type="text" value="Auto Generated" readonly>
-
-                            </div>
-
-                            <div>
-
-                                <label>Fabric</label>
-
-                                <input type="text" [(ngModel)]="newProduct.fabric">
-
-                            </div>
-
-                            <div>
-
-                                <label>Type</label>
-
-                                <input type="text" [(ngModel)]="newProduct.type">
-
-                            </div>
-
-                        </div>
-                        <div class="row">
-
-                            <div class="full-width">
-
-                                <label>Available Colors</label>
-                                <input type="text" placeholder="Black, White, Grey"
-                                    [(ngModel)]="newProduct.availableColors">
-
-                                <div class="color-list">
-
-                                    <!-- chips -->
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <div class="row">
-
-                            <div class="switch-row">
-
-                                <label>Show on Home Page</label>
-
-                                <label class="switch">
-
-                                    <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
-
-                                    <span class="slider"></span>
-
-                                </label>
-
-                            </div>
-
-                        </div>
-
-
-
-                    </div>
-
-                </div>
-
-                <div class="modal-footer">
-
-                    <button class="cancel-btn" (click)="closeModal()">
-
-                        Cancel
-
-                    </button>
-
-                    <button *ngIf="!editing" class="save-btn" (click)="addProduct()">
-
-                        + Add Product
-
-                    </button>
-
-                    <button *ngIf="editing" class="save-btn" (click)="updateProduct()">
-
-                        Update Product
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <div class="pagination">
-
-            <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
-
-                <i class="fa-solid fa-chevron-left"></i>
-
-            </button>
-
-            <button *ngFor="let page of pages" class="page-number" [class.active]="page === currentPage"
-                (click)="goToPage(page)">
-
-                {{ page }}
-
-            </button>
-
-            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
-
-                <i class="fa-solid fa-chevron-right"></i>
-
-            </button>
 
         </div>
 

@@ -1,0 +1,46 @@
+<div class="tracking-container" *ngIf="order">
+
+    <h1>Track Your Order</h1>
+
+    <div class="order-card">
+
+        <h3>Order ID</h3>
+
+        <p>{{ order._id }}</p>
+
+        <h3>Customer</h3>
+
+        <p>{{ order.customerName }}</p>
+
+        <h3>Total</h3>
+
+        <p>₹{{ order.total }}</p>
+
+    </div>
+
+    <div class="tracking-timeline">
+
+        <div class="timeline-step" *ngFor="let step of steps" [class.completed]="isCompleted(step)"
+            [class.current]="isCurrent(step)">
+
+            <div class="circle">
+
+                <span *ngIf="isCompleted(step)">✓</span>
+
+            </div>
+
+            <div class="content">
+
+                <h3>{{ step }}</h3>
+
+                <small *ngIf="isCurrent(step)">
+                    Current Status
+                </small>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

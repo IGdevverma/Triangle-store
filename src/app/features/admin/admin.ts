@@ -5,6 +5,11 @@ import { Chart } from 'chart.js/auto';
 import { ProductService } from '../../services/product';
 import { Product } from '../../models/product';
 import { ViewChild, ElementRef } from '@angular/core';
+import { OrderService } from '../../services/order';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { AdminService } from '../../services/admin';
+
 
 @Component({
   selector: 'app-admin',
@@ -19,10 +24,11 @@ export class Admin implements OnInit, AfterViewInit {
 
   @ViewChild('salesCanvas')
   salesCanvas!: ElementRef<HTMLCanvasElement>;
-
+  dashboardData: any = {};
   searchTerm = '';
   currentPage = 1;
   showModal = false;
+  activeMenu = 'dashboard';
   itemsPerPage = 5;
   selectedStock = 'All';
   selectedSort = 'Newest';
@@ -34,6 +40,7 @@ export class Admin implements OnInit, AfterViewInit {
   selectedFile!: File;
   imagePreview = '';
   lowStockProducts: Product[] = [];
+  orders: any[] = [];
   availableColors = [
     'Black',
     'White',
@@ -91,11 +98,17 @@ export class Admin implements OnInit, AfterViewInit {
   }
 
   constructor(
-    private productService: ProductService
+
+    private productService: ProductService,
+    private orderService: OrderService,
+    private adminService: AdminService
+
   ) { }
   ngOnInit(): void {
 
     this.loadProducts();
+    this.loadOrders();
+    this.loadDashboard();
 
   }
 
@@ -144,6 +157,79 @@ export class Admin implements OnInit, AfterViewInit {
 
       error: (err) => {
         console.error(err);
+      }
+
+    });
+
+  }
+  loadOrders() {
+
+    this.orderService.getOrders().subscribe({
+
+      next: (response: any) => {
+
+        this.orders = response.orders;
+
+        console.log("Orders:", this.orders);
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+      }
+
+    });
+
+  }
+
+  loadDashboard() {
+
+    this.adminService.getDashboard().subscribe({
+
+      next: (response: any) => {
+
+        this.dashboardData = response.dashboard;
+
+        console.log(this.dashboardData);
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+      }
+
+    });
+
+  }
+
+  changeOrderStatus(order: any, status: string) {
+
+    this.orderService.updateOrderStatus(
+
+      order._id,
+
+      status
+
+    ).subscribe({
+
+      next: () => {
+
+        order.orderStatus = status;
+
+        alert('Order status updated successfully.');
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+        alert('Failed to update order status.');
+
       }
 
     });
@@ -549,6 +635,232 @@ export class Admin implements OnInit, AfterViewInit {
       }
 
     });
+
+
+
+  }
+  downloadInvoice(order: any) {
+
+    const img = new Image();
+
+    img.src = 'assets/images/trianglepng.png';
+
+    img.onload = () => {
+
+      const doc = new jsPDF();
+      doc.addImage(img, 'PNG', 15, 12, 20, 20);
+      // Company
+      doc.setFontSize(22);
+      doc.setFont("helvetica", "bold");
+      doc.text("Triangle Sports", 45, 20);
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+
+      doc.text("Triangle Sports Pvt. Ltd.", 45, 28);
+      doc.text("New Delhi, India", 45, 34);
+      doc.text("support@trianglesports.com", 45, 40);
+      doc.text("+91 9990180409", 45, 46);
+
+      // Invoice Heading
+
+      doc.setFontSize(24);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("TAX INVOICE", 145, 18);
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "normal");
+
+      doc.setFontSize(10);
+
+      doc.text(`Invoice # : ${order._id.slice(-6)}`, 145, 28);
+
+      doc.text(
+        `Date : ${new Date(order.createdAt).toLocaleDateString()}`,
+        145,
+        34
+      );
+
+      doc.text(
+        `Payment : ${order.paymentStatus}`,
+        145,
+        40
+      );
+
+      doc.setDrawColor(180);
+
+      doc.line(
+        15,
+        55,
+        195,
+        55
+      );
+
+      // Bill To Box
+
+      doc.setDrawColor(200);
+      doc.rect(14, 60, 85, 55);
+
+      doc.setFontSize(12);
+      doc.setFont("helvetica", "bold");
+      doc.text("BILL TO", 18, 68);
+
+      doc.setFontSize(10);
+      doc.setFont("helvetica", "normal");
+
+      doc.text(order.customerName, 18, 76);
+      doc.text(order.email, 18, 83);
+      doc.text(order.phone, 18, 90);
+
+
+      doc.rect(111, 60, 84, 55);
+
+      doc.setFont("helvetica", "bold");
+      doc.text("SHIPPING ADDRESS", 115, 68);
+
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+
+      const address = doc.splitTextToSize(
+        order.address,
+        70
+      );
+
+      doc.text(address, 115, 76);
+
+      doc.text(
+        `${order.city}, ${order.state}`,
+        115,
+        83
+      );
+
+      doc.text(
+        order.pincode,
+        115,
+        90
+      );
+
+
+      // Order Information Box
+
+      doc.setDrawColor(200);
+      doc.rect(14, 122, 181, 24);
+
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "bold");
+
+      doc.text("ORDER INFORMATION", 18, 130);
+
+      doc.setFont("helvetica", "normal");
+
+      doc.text(`Order ID : ${order._id.slice(-8)}`, 18, 138);
+      doc.text(`Payment : ${order.paymentStatus}`, 85, 138);
+      doc.text(`Status : ${order.orderStatus}`, 145, 138);
+
+
+
+      // Products Table
+      autoTable(doc, {
+
+        startY: 155,
+
+        head: [[
+          "Product",
+          "Qty",
+          "Price",
+          "Total"
+        ]],
+
+        body: order.items.map((item: any) => [
+
+          item.name,
+
+          item.quantity,
+
+          `Rs. ${item.price}`,
+
+          `Rs. ${item.price * item.quantity}`
+
+        ]),
+
+        headStyles: {
+
+          fillColor: [109, 40, 217]
+
+        },
+
+
+        theme: "grid",
+
+        styles: {
+          fontSize: 10,
+          cellPadding: 4
+        },
+
+        columnStyles: {
+          1: { halign: "center" },
+          2: { halign: "right" },
+          3: { halign: "right" }
+        },
+
+        foot: [[
+          "",
+          "",
+          "Grand Total",
+          `Rs. ${order.total}`
+        ]],
+
+        footStyles: {
+          fillColor: [235, 235, 235],
+          textColor: 0,
+          fontStyle: "bold"
+        }
+
+      });
+      const finalY = (doc as any).lastAutoTable.finalY;
+      // Signature
+
+      doc.line(145, finalY + 24, 190, finalY + 24);
+
+      doc.setFontSize(10);
+
+      doc.text(
+        "Authorized Signature",
+        145,
+        finalY + 31
+      );
+
+
+      // Footer
+
+      doc.setDrawColor(180);
+      doc.line(14, finalY + 15, 195, finalY + 15);
+
+      doc.setFontSize(9);
+
+      doc.text(
+        "Thank you for shopping with Triangle Sports.",
+        14,
+        finalY + 25
+      );
+
+      doc.text(
+        "Goods once sold are subject to our return policy.",
+        14,
+        finalY + 31
+      );
+
+      doc.text(
+        "www.trianglesports.com",
+        14,
+        finalY + 37
+      );
+
+      doc.save(`invoice-${order._id.slice(-6)}.pdf`);
+
+    };
+
 
 
 

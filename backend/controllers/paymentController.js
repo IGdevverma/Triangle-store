@@ -1,5 +1,6 @@
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const Order = require("../models/Order");
 const razorpay = new Razorpay({
 
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -114,4 +115,61 @@ exports.verifyPayment = async (req, res) => {
 
     }
 
+};
+
+exports.handleWebhook = async (req, res) => {
+    const signature = req.headers["x-razorpay-signature"];
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+
+    if (!signature || !webhookSecret) {
+        return res.status(400).json({ success: false, message: "Webhook is not configured" });
+    }
+
+    const expectedSignature = crypto
+        .createHmac("sha256", webhookSecret)
+        .update(req.body)
+        .digest("hex");
+
+    const signatureBuffer = Buffer.from(signature, "utf8");
+    const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+
+    if (
+        signatureBuffer.length !== expectedBuffer.length ||
+        !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)
+    ) {
+        return res.status(400).json({ success: false, message: "Invalid webhook signature" });
+    }
+
+    try {
+        const event = JSON.parse(req.body.toString("utf8"));
+        const payment = event.payload?.payment?.entity;
+        const razorpayOrderId = payment?.order_id || event.payload?.order?.entity?.id;
+
+        if (!razorpayOrderId) {
+            return res.status(200).json({ success: true, message: "Webhook received" });
+        }
+
+        if (event.event === "payment.captured" || event.event === "order.paid") {
+            await Order.findOneAndUpdate(
+                { razorpayOrderId },
+                {
+                    paymentStatus: "Paid",
+                    razorpayPaymentId: payment?.id,
+                    paymentVerifiedAt: new Date()
+                }
+            );
+        }
+
+        if (event.event === "payment.failed") {
+            await Order.findOneAndUpdate(
+                { razorpayOrderId, paymentStatus: { $ne: "Paid" } },
+                { paymentStatus: "Failed" }
+            );
+        }
+
+        return res.status(200).json({ success: true, message: "Webhook processed" });
+    } catch (error) {
+        console.error("WEBHOOK ERROR:", error.message);
+        return res.status(500).json({ success: false, message: "Webhook processing failed" });
+    }
 };

@@ -1,4 +1,5 @@
 const upload = require("../middleware/upload");
+const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const express = require("express");
 
@@ -15,6 +16,10 @@ router.post(
 
     "/",
 
+    isAuthenticatedUser,
+
+    authorizeRoles("admin"),
+
     upload.single("image"),
 
     createProduct
@@ -26,12 +31,20 @@ router.put(
 
     "/:id",
 
+    isAuthenticatedUser,
+
+    authorizeRoles("admin"),
+
     updateProduct
 
 );
 router.delete(
 
     "/:id",
+
+    isAuthenticatedUser,
+
+    authorizeRoles("admin"),
 
     deleteProduct
 

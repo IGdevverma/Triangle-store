@@ -23,6 +23,12 @@ export interface Order {
 
   paymentStatus: 'Pending' | 'Paid' | 'Failed';
 
+  razorpayOrderId?: string;
+
+  razorpayPaymentId?: string;
+
+  paymentVerifiedAt?: string;
+
   orderStatus: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
 
   items: CartItem[];

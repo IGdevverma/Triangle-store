@@ -5,14 +5,17 @@ const router = express.Router();
 const {
     createOrder,
     getOrders,
+    getOrderById,
     updateOrderStatus
 } = require("../controllers/orderController");
+const { isAuthenticatedUser } = require("../middleware/auth");
 
 router.route("/")
-    .post(createOrder)
-    .get(getOrders);
+    .post(isAuthenticatedUser, createOrder)
+    .get(isAuthenticatedUser, getOrders);
 
 router.route("/:id")
-    .put(updateOrderStatus);
+    .get(isAuthenticatedUser, getOrderById)
+    .put(isAuthenticatedUser, updateOrderStatus);
 
 module.exports = router;

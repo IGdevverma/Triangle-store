@@ -194,10 +194,11 @@
 }
 
 table{
+
     width:100%;
+
     border-collapse:collapse;
 
-    table-layout:fixed;
 }
 
 th{
@@ -706,5 +707,182 @@ textarea{
     transform:translateY(-3px);
 
     box-shadow:0 12px 25px rgba(124,58,237,.35);
+
+}
+.customer-name{
+
+    font-weight:600;
+
+    max-width:220px;
+
+    white-space:normal;
+
+    word-break:break-word;
+
+    line-height:1.4;
+
+}
+.payment-badge{
+    padding:6px 14px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.paid{
+    background:#dcfce7;
+    color:#16a34a;
+}
+
+.pending{
+    background:#fef3c7;
+    color:#d97706;
+}
+.status-select{
+
+    width:150px;
+
+    padding:10px 14px;
+
+    border:1px solid #ddd;
+
+    border-radius:10px;
+
+    background:#fff;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.status-select:hover{
+
+    border-color:#6d28d9;
+
+}
+
+.status-select:focus{
+
+    border-color:#6d28d9;
+
+}
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th{
+
+    background:#f8fafc;
+
+    padding:18px;
+
+    text-align:left;
+
+    color:#374151;
+
+    font-size:14px;
+
+    font-weight:700;
+
+}
+
+td{
+
+    padding:18px;
+
+    border-bottom:1px solid #eee;
+
+}
+tbody tr{
+
+    transition:.25s;
+
+}
+
+tbody tr:hover{
+
+    background:#faf5ff;
+
+}
+.orders-card{
+
+    background:#fff;
+
+    border-radius:16px;
+
+    padding:25px;
+
+    box-shadow:0 8px 30px rgba(0,0,0,.08);
+
+}
+.order-total{
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+th:nth-child(1),
+td:nth-child(1){
+    width:18%;
+}
+
+th:nth-child(2),
+td:nth-child(2){
+    width:28%;
+}
+
+th:nth-child(3),
+td:nth-child(3){
+    width:12%;
+}
+
+th:nth-child(4),
+td:nth-child(4){
+    width:16%;
+}
+
+th:nth-child(5),
+td:nth-child(5){
+    width:18%;
+}
+.invoice-btn{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    padding:10px 16px;
+
+    border:none;
+
+    border-radius:8px;
+
+    background:#dc2626;
+
+    color:white;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.invoice-btn:hover{
+
+    background:#b91c1c;
 
 }

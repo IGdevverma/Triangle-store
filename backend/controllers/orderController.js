@@ -7,13 +7,13 @@ const createOrder = async (req, res) => {
 
     try {
 
-        console.log(req.body);
+        const items = [];
 
+        // Products and prices always come from the database, never from the browser.
+        for (const item of req.body.items || []) {
 
-        // Check Stock Before Creating Order
-        for (const item of req.body.items) {
-
-            const product = await Product.findById(item._id);
+            const productId = item.productId || item._id || item.id;
+            const product = await Product.findById(productId);
 
             if (!product) {
 
@@ -24,7 +24,18 @@ const createOrder = async (req, res) => {
 
             }
 
-            if (product.stock < item.quantity) {
+            const quantity = Number(item.quantity);
+
+            if (!Number.isInteger(quantity) || quantity < 1) {
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid item quantity"
+                });
+
+            }
+
+            if (product.stock < quantity) {
 
                 return res.status(400).json({
                     success: false,
@@ -33,18 +44,37 @@ const createOrder = async (req, res) => {
 
             }
 
+            items.push({
+                productId: product._id.toString(),
+                name: product.name,
+                image: product.image,
+                price: product.price,
+                quantity
+            });
+
         }
 
-        const order = await Order.create(req.body);
+        if (!items.length) {
+            return res.status(400).json({ success: false, message: "Cart is empty" });
+        }
+
+        const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        const shipping = subtotal >= 1999 ? 0 : 99;
+        const gst = Math.round(subtotal * 0.18);
+
+        const order = await Order.create({
+            ...req.body,
+            user: req.user._id,
+            items,
+            total: subtotal + shipping + gst,
+            trackingHistory: [{ status: "Processing", date: new Date() }]
+        });
 
         for (const item of order.items) {
 
-            console.log("Item ID:", item._id);
-            console.log("Quantity:", item.quantity);
+            await Product.findByIdAndUpdate(
 
-            const updatedProduct = await Product.findByIdAndUpdate(
-
-                item._id,
+                item.productId,
 
                 {
                     $inc: {
@@ -55,12 +85,7 @@ const createOrder = async (req, res) => {
                 { new: true }
 
             );
-
-            console.log("Updated Product:", updatedProduct);
-
         }
-
-        console.log("Customer Email:", order.email);
 
         res.status(201).json({
             success: true,
@@ -132,7 +157,8 @@ const getOrders = async (req, res) => {
 
     try {
 
-        const orders = await Order.find().sort({
+        const filter = req.user.role === "admin" ? {} : { user: req.user._id };
+        const orders = await Order.find(filter).sort({
 
             createdAt: -1
 
@@ -160,25 +186,59 @@ const getOrders = async (req, res) => {
 
 };
 
+const getOrderById = async (req, res) => {
+
+    try {
+
+        const order = await Order.findById(req.params.id);
+
+        if (!order) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message: "Order not found"
+
+            });
+
+        }
+
+        if (req.user.role !== "admin" && order.user?.toString() !== req.user._id.toString()) {
+            return res.status(403).json({ success: false, message: "Not allowed to view this order" });
+        }
+
+        res.status(200).json({
+
+            success: true,
+
+            order
+
+        });
+
+    }
+
+    catch (error) {
+
+        res.status(500).json({
+
+            success: false,
+
+            message: error.message
+
+        });
+
+    }
+
+};
+
 // Update Order Status
 
 const updateOrderStatus = async (req, res) => {
 
     try {
 
-        const order = await Order.findByIdAndUpdate(
-
-            req.params.id,
-
-            {
-                orderStatus: req.body.orderStatus
-            },
-
-            {
-                new: true
-            }
-
-        );
+        const order = await Order.findById(req.params.id);
 
         if (!order) {
 
@@ -190,6 +250,27 @@ const updateOrderStatus = async (req, res) => {
             });
 
         }
+
+        const isAdmin = req.user.role === "admin";
+        const isOwner = order.user?.toString() === req.user._id.toString();
+
+        if (!isAdmin && (!isOwner || req.body.orderStatus !== "Cancelled")) {
+            return res.status(403).json({ success: false, message: "Not allowed to update this order" });
+        }
+
+        // Update current status
+        order.orderStatus = req.body.orderStatus;
+
+        // Add tracking history
+        order.trackingHistory.push({
+
+            status: req.body.orderStatus,
+
+            date: new Date()
+
+        });
+
+        await order.save();
 
         res.status(200).json({
 
@@ -217,6 +298,7 @@ module.exports = {
 
     getOrders,
 
-    updateOrderStatus
+    updateOrderStatus,
+    getOrderById
 
 };

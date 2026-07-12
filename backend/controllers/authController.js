@@ -7,7 +7,7 @@ const registerUser = async (req, res) => {
 
     try {
 
-        const { name, email, password, role } = req.body;
+        const { name, email, password, phone } = req.body;
 
         const existingUser = await User.findOne({ email });
 
@@ -30,7 +30,9 @@ const registerUser = async (req, res) => {
             email,
 
             password,
-            role: role || "user"
+            phone,
+            // Public registration must never be able to create an admin account.
+            role: "user"
 
         });
 

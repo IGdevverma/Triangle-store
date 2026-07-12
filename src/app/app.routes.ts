@@ -19,6 +19,7 @@ import { Profile } from './features/profile/profile';
 import { Dashboard } from './features/dashboard/dashboard';
 import { EditProfile } from './features/edit-profile/edit-profile';
 import { adminGuard } from './guards/admin.guard';
+import { OrderTracking } from './features/order-tracking/order-tracking';
 
 export const routes: Routes = [
   {
@@ -42,12 +43,14 @@ export const routes: Routes = [
   },
   {
     path: 'checkout',
-    component: Checkout
+    component: Checkout,
+    canActivate: [authGuard]
   },
 
   {
     path: 'orders',
-    component: Orders
+    component: Orders,
+    canActivate: [authGuard]
   },
   {
 
@@ -130,6 +133,11 @@ export const routes: Routes = [
   {
     path: 'profile/edit',
     component: EditProfile,
+    canActivate: [authGuard]
+  },
+  {
+    path: 'track-order/:id',
+    component: OrderTracking,
     canActivate: [authGuard]
   },
 ];
