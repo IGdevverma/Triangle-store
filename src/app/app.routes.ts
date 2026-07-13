@@ -22,6 +22,7 @@ import { adminGuard } from './guards/admin.guard';
 import { OrderTracking } from './features/order-tracking/order-tracking';
 import { Customers } from './features/customers/customers';
 import { OrderSuccess } from './features/order-success/order-success';
+import { Contact } from './features/contact/contact';
 
 export const routes: Routes = [
   {
@@ -151,5 +152,36 @@ export const routes: Routes = [
     path: 'order-success',
     component: OrderSuccess,
     canActivate: [authGuard]
+  },
+  {
+    path: 'contact',
+    component: Contact
+  },
+  {
+    path: 'privacy-policy',
+    loadComponent: () =>
+      import('./features/privacy-policy/privacy-policy')
+        .then(m => m.PrivacyPolicy)
+  },
+
+  {
+    path: 'terms',
+    loadComponent: () =>
+      import('./features/terms/terms')
+        .then(m => m.Terms)
+  },
+
+  {
+    path: 'shipping-policy',
+    loadComponent: () =>
+      import('./features/shipping-policy/shipping-policy')
+        .then(m => m.ShippingPolicy)
+  },
+
+  {
+    path: 'refund-policy',
+    loadComponent: () =>
+      import('./features/refund-policy/refund-policy')
+        .then(m => m.RefundPolicy)
   },
 ];

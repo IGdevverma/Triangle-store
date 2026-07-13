@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
 import { Product } from '../../models/product';
 import { ProductService } from '../../services/product';
 import { CartService } from '../../services/cart';
@@ -31,7 +31,8 @@ export class Shop implements OnInit {
     private cartService: CartService,
     private wishlistService: WishlistService,
     private notificationService: NotificationService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -43,6 +44,13 @@ export class Shop implements OnInit {
       next: (response: any) => {
 
         this.products = response.products;
+        this.route.queryParams.subscribe(params => {
+
+          this.searchTerm = params['search'] || '';
+
+          this.filterProducts();
+
+        });
 
         this.filteredProducts = response.products;
 
@@ -69,10 +77,15 @@ export class Shop implements OnInit {
       const matchesCategory =
         this.selectedCategory === 'All' ||
         product.category === this.selectedCategory;
+      const keyword = this.searchTerm.toLowerCase();
+
       const matchesSearch =
-        product.name
-          .toLowerCase()
-          .includes(this.searchTerm.toLowerCase());
+
+        product.name.toLowerCase().includes(keyword) ||
+
+        product.category.toLowerCase().includes(keyword) ||
+
+        (product.description || '').toLowerCase().includes(keyword);
 
       let matchesPrice = true;
 
@@ -146,7 +159,7 @@ export class Shop implements OnInit {
 
     if (product.id && this.isWishlisted(product.id)) {
 
-       this.wishlistService.removeFromWishlist(product.id);
+      this.wishlistService.removeFromWishlist(product.id);
 
     }
 

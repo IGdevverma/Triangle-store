@@ -253,9 +253,42 @@
     </div>
 
     <!--Search-->
-    <div (click)="toggleSearch()">
+    <div class="search-container">
+      <i class="fa-solid fa-magnifying-glass" (click)="toggleSearch()"></i>
+      <div class="search-dropdown" *ngIf="isSearchOpen">
 
-      <i class="fa-solid fa-magnifying-glass"></i>
+        <div class="search-input">
+
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterSearch()"
+            (keyup.enter)="searchProducts()">
+
+          <div class="search-results" *ngIf="searchResults.length > 0">
+
+            <div class="search-item" *ngFor="let product of searchResults" [routerLink]="['/product', product._id]"
+              (click)="isSearchOpen = false">
+
+              <img [src]="product.image" [alt]="product.name">
+
+              <div>
+
+                <strong>{{ product.name }}</strong>
+
+                <p>₹{{ product.price }}</p>
+
+              </div>
+
+            </div>
+
+          </div>
+
+          <span (click)="toggleSearch(); $event.stopPropagation()">
+            ✕
+          </span>
+
+        </div>
+
+      </div>
 
     </div>
     <!-- Wishlist -->
@@ -296,31 +329,6 @@
 
 </nav>
 
-<div class="search-drawer" [class.open]="isSearchOpen">
-
-  <div class="search-box">
-
-
-
-    <button (click)="searchProducts()">
-      <div class="search-wrapper">
-
-        <input *ngIf="isSearchOpen" type="text" placeholder="Search products..." [(ngModel)]="searchTerm"
-          (keyup.enter)="searchProducts()">
-
-        <i class="fa-solid fa-magnifying-glass" (click)="toggleSearch()">
-        </i>
-
-      </div>
-    </button>
-
-    <span class="close-search" (click)="toggleSearch()">
-      ✕
-    </span>
-
-  </div>
-
-</div>
 
 
 <!-- ================= CART DRAWER ================= -->

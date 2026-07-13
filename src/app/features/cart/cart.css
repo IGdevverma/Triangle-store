@@ -127,10 +127,10 @@
   background: #e63939;
 }
 .cart-summary {
-  width: 300px;
+  width: 100%;
   margin-left: auto;
   padding: 25px;
-
+  max-width:300px;
   background: white;
 
   border-radius: 12px;

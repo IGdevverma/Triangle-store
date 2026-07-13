@@ -6,6 +6,8 @@ import { CartService, CartItem } from '../../services/cart';
 import { AuthService } from '../../services/auth';
 import { WishlistService } from '../../services/wishlist';
 import { FormsModule } from '@angular/forms';
+import { Product } from '../../models/product';
+import { ProductService } from '../../services/product';
 
 
 @Component({
@@ -24,6 +26,8 @@ export class Header implements OnInit {
   cartCount = 0;
   wishlistCount = 0;
   searchTerm = '';
+  searchResults: Product[] = [];
+  allProducts: Product[] = [];
 
   user: { name: string; role: string } | null = null;
   isUserMenuOpen = false;
@@ -44,13 +48,14 @@ export class Header implements OnInit {
   }
 
   constructor(
+    private productService: ProductService,
     private cartService: CartService,
     private authService: AuthService,
     private wishlistService: WishlistService,
     private router: Router,
     private themeService: ThemeService,
     private route: ActivatedRoute,
-    private elementRef: ElementRef,
+    private elementRef: ElementRef
 
 
   ) { }
@@ -96,7 +101,19 @@ export class Header implements OnInit {
 
     });
 
+    this.productService.getProducts().subscribe({
+
+      next: (response: any) => {
+
+        this.allProducts = response.products;
+
+      }
+
+    });
+
   }
+
+
 
   isLoggedIn(): boolean {
     return this.authService.isLoggedIn();
@@ -183,7 +200,29 @@ export class Header implements OnInit {
   toggleSearch() {
     this.isSearchOpen = !this.isSearchOpen;
   }
+  filterSearch() {
 
+    const keyword = this.searchTerm.trim().toLowerCase();
+
+    if (!keyword) {
+
+      this.searchResults = [];
+
+      return;
+
+    }
+
+    this.searchResults = this.allProducts
+      .filter(product =>
+
+        product.name.toLowerCase().includes(keyword) ||
+
+        product.category.toLowerCase().includes(keyword)
+
+      )
+      .slice(0, 5);
+
+  }
   searchProducts() {
 
     if (this.searchTerm.trim()) {

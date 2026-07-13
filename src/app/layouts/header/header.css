@@ -176,47 +176,50 @@ body {
 
 
 
-.cart-badge{
+.cart-badge {
 
-    position: absolute;
+  position: absolute;
 
-    top: -8px;
+  top: -8px;
 
-    right: -8px;
+  right: -8px;
 
-    width: 18px;
+  width: 18px;
 
-    height: 18px;
+  height: 18px;
 
-    border-radius: 50%;
+  border-radius: 50%;
 
-    background: #ef4444;
+  background: #ef4444;
 
-    color: #fff;
+  color: #fff;
 
-    display: flex;
+  display: flex;
 
-    align-items: center;
+  align-items: center;
 
-    justify-content: center;
+  justify-content: center;
 
-    font-size: 10px;
+  font-size: 10px;
 
-    font-weight: 700;
+  font-weight: 700;
 }
-.cart-wrapper{
-    position: relative;
+
+.cart-wrapper {
+  position: relative;
 }
-.cart-icon{
 
-    display: flex;
+.cart-icon {
 
-    align-items: center;
+  display: flex;
 
-    gap: 8px;
+  align-items: center;
 
-    cursor: pointer;
+  gap: 8px;
+
+  cursor: pointer;
 }
+
 .cart-count,
 .wishlist-count {
   position: absolute;
@@ -538,7 +541,8 @@ body {
 
     left: -320px;
 
-    width: 300px;
+    width: 100%;
+    max-width: 320px;
 
     height: 100vh;
 
@@ -702,77 +706,119 @@ body {
 }
 
 .search-drawer {
+
   position: fixed;
-  top: -120px;
+
+  top: 85px;
+
   left: 0;
 
   width: 100%;
-  background: white;
 
-  padding: 25px 0;
+  display: none;
 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
-
-  transition: .3s ease;
+  justify-content: center;
 
   z-index: 999;
+
+  padding: 20px;
+
 }
 
 .search-drawer.open {
-  top: 84px;
+
+  display: flex;
+
 }
 
 .search-box {
-  max-width: 900px;
-  margin: auto;
+
+  width: 700px;
+
+  background: #fff;
+
+  border-radius: 12px;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, .12);
+
+  padding: 18px;
 
   display: flex;
+
   align-items: center;
 
   gap: 15px;
 
-  padding: 0 20px;
 }
 
 .search-box input {
+
   flex: 1;
 
-  height: 55px;
+  height: 52px;
 
   border: 1px solid #ddd;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
-  padding: 0 20px;
+  padding: 0 18px;
 
   font-size: 16px;
 
   outline: none;
+
+}
+
+.search-box input:focus {
+
+  border-color: #7c3aed;
+
 }
 
 .search-box button {
-  width: 55px;
-  height: 55px;
-  transition: .25s;
+
+  padding: 0 22px;
+
+  height: 52px;
+
   border: none;
 
-  border-radius: 8px;
+  border-radius: 10px;
 
-  background: #e11d48;
+  background: #7c3aed;
 
   color: white;
 
   cursor: pointer;
+
+  font-weight: 600;
+
+  transition: .25s;
+
 }
 
 .search-box button:hover {
 
-  background: #c9184a;
+  background: #6425d0;
+
 }
 
 .close-search {
-  font-size: 24px;
+
   cursor: pointer;
+
+  font-size: 22px;
+
+  color: #666;
+
+  transition: .2s;
+
+}
+
+.close-search:hover {
+
+  color: #000;
+
 }
 
 @media (max-width:768px) {
@@ -896,9 +942,9 @@ body {
 
 .user-dropdown a:hover {
 
-   background:#f8f8f8;
+  background: #f8f8f8;
 
-    color:#e11d48;
+  color: #e11d48;
 }
 
 .user-dropdown hr {
@@ -908,4 +954,126 @@ body {
   border: none;
 
   border-top: 1px solid #eee;
+}
+
+.search-dropdown {
+
+  position: absolute;
+
+  top: 70px;
+
+  right: 0;
+
+  width: 420px;
+
+  background: #fff;
+
+  border-radius: 14px;
+
+  box-shadow: 0 15px 40px rgba(0, 0, 0, .15);
+
+  padding: 20px;
+
+  z-index: 999;
+}
+
+.search-input {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  border: 1px solid #ddd;
+
+  border-radius: 10px;
+
+  padding: 12px 15px;
+}
+
+.search-input input {
+
+  flex: 1;
+
+  border: none;
+
+  outline: none;
+
+  font-size: 16px;
+
+  background: transparent;
+}
+
+.search-input span {
+
+  cursor: pointer;
+
+  font-size: 22px;
+
+  color: #777;
+}
+
+.search-results {
+
+  margin-top: 15px;
+
+  border-top: 1px solid #eee;
+
+  max-height: 320px;
+
+  overflow-y: auto;
+
+}
+
+.search-item {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 15px;
+
+  padding: 12px;
+
+  cursor: pointer;
+
+  transition: .2s;
+
+}
+
+.search-item:hover {
+
+  background: #f7f7f7;
+
+}
+
+.search-item img {
+
+  width: 55px;
+
+  height: 55px;
+
+  object-fit: cover;
+
+  border-radius: 8px;
+
+}
+
+.search-item strong {
+
+  display: block;
+
+  font-size: 15px;
+
+}
+
+.search-item p {
+
+  margin: 3px 0 0;
+
+  color: #6D28D9;
+
+  font-weight: 600;
+
 }

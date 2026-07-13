@@ -168,6 +168,17 @@
 
     animation: popup 0.3s ease;
 }
+@media(max-width:768px){
+
+.quick-view-modal{
+
+    width:95%;
+
+    padding:20px;
+
+}
+
+}
 
 .quick-view-modal img {
 

@@ -112,6 +112,8 @@ export class Home implements OnInit {
 
   }
 
+  
+
   /* ================= HERO SLIDER ================= */
 
   nextSlide() {
