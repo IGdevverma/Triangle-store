@@ -6,6 +6,8 @@ exports.isAuthenticatedUser = asyncHandler(async (req, res, next) => {
 
     const authHeader = req.headers.authorization;
 
+    console.log("Authorization:", authHeader);
+
     if (!authHeader) {
         return res.status(401).json({
             success: false,
@@ -24,7 +26,14 @@ exports.isAuthenticatedUser = asyncHandler(async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = await User.findById(decoded.id);
+    console.log("Decoded Token:", decoded);
+    console.log("Decoded ID:", decoded.id);
+
+    const user = await User.findById(decoded.id);
+
+    console.log("User Found:", user);
+
+    req.user = user;
 
     if (!req.user) {
         return res.status(401).json({
@@ -34,7 +43,6 @@ exports.isAuthenticatedUser = asyncHandler(async (req, res, next) => {
     }
 
     next();
-
 });
 
 exports.authorizeRoles = (...roles) => {
@@ -56,5 +64,6 @@ exports.authorizeRoles = (...roles) => {
         next();
 
     };
+    
 
 };

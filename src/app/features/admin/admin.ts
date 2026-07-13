@@ -409,6 +409,9 @@ export class Admin implements OnInit, AfterViewInit {
   editing = false;
 
   addProduct() {
+    alert("addProduct called");
+    
+    console.log("addProduct called");
 
     if (!this.isFormValid()) {
 
@@ -460,38 +463,24 @@ export class Admin implements OnInit, AfterViewInit {
     console.log("Description:", formData.get('description'));
 
     console.log("Image:", formData.get('image'));
+    console.log("Before API Call");
 
-    this.productService.addProduct(formData).subscribe(() => {
+    this.productService.addProduct(formData).subscribe({
+      
 
-      this.loadProducts();
+      next: (res) => {
+        console.log("SUCCESS", res);
+        alert("Product Added");
+      },
 
-      this.closeModal();
-
-      this.newProduct = {
-
-        name: '',
-
-        price: 0,
-
-        image: '',
-
-        category: '',
-
-        description: '',
-
-        fabric: '',
-
-        type: '',
-        availableColors: '',
-        stock: 0,
-
-        showOnHome: true
-
-      };
-
-      this.imagePreview = '';
+      error: (err) => {
+        console.error("FULL ERROR:", err);
+        alert("Error: " + JSON.stringify(err.error));
+      }
 
     });
+    console.log("API Called");
+
 
   }
 
@@ -609,6 +598,7 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
   openAddModal() {
+    console.log("Button clicked");
 
     this.editing = false;
 
