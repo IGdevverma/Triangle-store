@@ -9,6 +9,7 @@ import { OrderService } from '../../services/order';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AdminService } from '../../services/admin';
+import { UserService } from '../../services/user';
 
 
 @Component({
@@ -21,14 +22,58 @@ import { AdminService } from '../../services/admin';
 
 
 export class Admin implements OnInit, AfterViewInit {
+  changeRole(user: any, role: string) {
+
+    this.userService.updateRole(user._id, role).subscribe({
+
+      next: (response: any) => {
+
+        alert(response.message);
+
+        user.role = role;
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+        alert(err.error?.message || "Failed to update role");
+
+      }
+
+    });
+
+  }
 
   @ViewChild('salesCanvas')
   salesCanvas!: ElementRef<HTMLCanvasElement>;
-  dashboardData: any = {};
+  dashboardData = {
+    totalProducts: 0,
+    totalOrders: 0,
+    totalUsers: 0,
+    totalRevenue: 0,
+    totalCategories: 0,
+    totalStock: 0,
+    inventoryValue: 0,
+    lowStockProducts: 0,
+    processingOrders: 0,
+    packedOrders: 0,
+    shippedOrders: 0,
+    deliveredOrders: 0,
+    cancelledOrders: 0,
+    monthlySales: [] as any[]
+  };
+  customers: any[] = [];
+  today = new Date();
+  filteredCustomers: any[] = [];
+
+  customerSearch = '';
+  salesChart: any;
   searchTerm = '';
   currentPage = 1;
   showModal = false;
-  activeMenu = 'dashboard';
+  activeMenu: string = 'dashboard';
   itemsPerPage = 5;
   selectedStock = 'All';
   selectedSort = 'Newest';
@@ -101,7 +146,8 @@ export class Admin implements OnInit, AfterViewInit {
 
     private productService: ProductService,
     private orderService: OrderService,
-    private adminService: AdminService
+    private adminService: AdminService,
+    private userService: UserService
 
   ) { }
   ngOnInit(): void {
@@ -109,6 +155,7 @@ export class Admin implements OnInit, AfterViewInit {
     this.loadProducts();
     this.loadOrders();
     this.loadDashboard();
+    this.loadCustomers();
 
   }
 
@@ -193,6 +240,7 @@ export class Admin implements OnInit, AfterViewInit {
         this.dashboardData = response.dashboard;
 
         console.log(this.dashboardData);
+        this.createSalesChart();
 
       },
 
@@ -205,6 +253,74 @@ export class Admin implements OnInit, AfterViewInit {
     });
 
   }
+  loadCustomers() {
+
+    this.userService.getUsers().subscribe({
+
+      next: (response: any) => {
+
+        this.customers = response.users;
+
+        this.filteredCustomers = response.users;
+
+        console.log("Customers:", this.customers);
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+      }
+
+    });
+
+  }
+
+  filterCustomers() {
+
+    const search = this.customerSearch.toLowerCase();
+
+    this.filteredCustomers = this.customers.filter((user: any) =>
+
+      user.name.toLowerCase().includes(search) ||
+
+      user.email.toLowerCase().includes(search) ||
+
+      (user.phone || '').toLowerCase().includes(search)
+
+    );
+
+  }
+
+  deleteCustomer(id: string) {
+
+    if (!confirm('Are you sure you want to delete this customer?')) {
+      return;
+    }
+
+    this.userService.deleteUser(id).subscribe({
+
+      next: (response: any) => {
+
+        alert(response.message);
+
+        this.loadCustomers();
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+        alert(err.error?.message || 'Failed to delete customer');
+
+      }
+
+    });
+
+  }
+
 
   changeOrderStatus(order: any, status: string) {
 
@@ -568,49 +684,39 @@ export class Admin implements OnInit, AfterViewInit {
 
   createSalesChart() {
 
-    new Chart(this.salesCanvas.nativeElement, {
+    // Purana chart destroy karo
+    if (this.salesChart) {
+      this.salesChart.destroy();
+    }
+
+    const labels = this.dashboardData.monthlySales.map((item: any) => {
+
+      const months = [
+        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      ];
+
+      return months[item._id.month - 1];
+
+    });
+
+    const revenue = this.dashboardData.monthlySales.map((item: any) => item.revenue);
+
+    this.salesChart = new Chart(this.salesCanvas.nativeElement, {
 
       type: 'line',
 
       data: {
 
-        labels: [
-
-          'Jan',
-
-          'Feb',
-
-          'Mar',
-
-          'Apr',
-
-          'May',
-
-          'Jun'
-
-        ],
+        labels,
 
         datasets: [
 
           {
 
-            label: 'Sales',
+            label: 'Monthly Revenue',
 
-            data: [
-
-              12000,
-
-              19000,
-
-              15000,
-
-              25000,
-
-              21000,
-
-              30000
-
-            ],
+            data: revenue,
 
             borderColor: '#7C3AED',
 
@@ -635,8 +741,6 @@ export class Admin implements OnInit, AfterViewInit {
       }
 
     });
-
-
 
   }
   downloadInvoice(order: any) {

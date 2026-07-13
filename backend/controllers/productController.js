@@ -17,6 +17,21 @@ const createProduct = asyncHandler(async (req, res) => {
         }
 
         console.log("BODY:", req.body);
+        const existingProduct = await Product.findOne({
+            name: req.body.name
+        });
+
+        if (existingProduct) {
+
+            return res.status(400).json({
+
+                success: false,
+
+                message: "Product with this name already exists"
+
+            });
+
+        }
         const sku = "TS-" + Date.now();
 
         req.body.sku = sku;

@@ -33,6 +33,27 @@ exports.getDashboard = async (req, res) => {
             }
         ]);
 
+
+        const monthlySales = await Order.aggregate([
+            {
+                $group: {
+                    _id: {
+                        month: {
+                            $month: "$createdAt"
+                        }
+                    },
+                    revenue: {
+                        $sum: "$total"
+                    }
+                }
+            },
+            {
+                $sort: {
+                    "_id.month": 1
+                }
+            }
+        ]);
+
         const [
             processingOrders,
             packedOrders,
@@ -125,7 +146,9 @@ exports.getDashboard = async (req, res) => {
 
                 totalStock: stock[0]?.totalStock || 0,
 
-                inventoryValue: inventory[0]?.inventoryValue || 0
+                inventoryValue: inventory[0]?.inventoryValue || 0,
+                monthlySales
+                
 
 
 

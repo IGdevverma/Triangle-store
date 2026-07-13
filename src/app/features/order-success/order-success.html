@@ -1,0 +1,67 @@
+<div class="success-container">
+
+    <div class="success-card">
+
+        <div class="success-icon">
+
+            <i class="fa-solid fa-circle-check"></i>
+
+        </div>
+
+        <h1>Order Placed Successfully 🎉</h1>
+
+        <p>
+
+            Thank you for shopping with <strong>Triangle Sports</strong>
+
+        </p>
+
+        <div class="order-box">
+
+            <h3>Order ID</h3>
+
+            <p>{{ orderId }}</p>
+
+        </div>
+        <button class="secondary-btn" (click)="copyOrderId()">
+
+            {{ copied ? '✅ Copied' : '📋 Copy Order ID' }}
+
+        </button>
+        <div class="delivery-box">
+
+            <i class="fa-solid fa-truck-fast"></i>
+
+            Estimated Delivery
+
+            <strong>
+
+                {{ deliveryDate }}
+
+            </strong>
+
+        </div>
+        <p class="success-note">
+
+            You'll receive your invoice and order updates on your registered email.
+
+        </p>
+        <div class="success-buttons">
+
+            <button class="primary-btn" routerLink="/orders">
+
+                My Orders
+
+            </button>
+
+            <button class="secondary-btn" routerLink="/shop">
+
+                Continue Shopping
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>

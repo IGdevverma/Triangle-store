@@ -8,6 +8,7 @@ import { Router } from '@angular/router';
 import { Payment } from '../../services/payment';
 
 
+
 declare var Razorpay: any;
 
 import {
@@ -51,7 +52,8 @@ export class Checkout implements OnInit {
     private cartService: CartService,
     private router: Router,
     private orderService: OrderService,
-    private paymentService: Payment
+    private paymentService: Payment,
+
   ) {
     this.checkoutForm = this.fb.group({
 
@@ -161,6 +163,11 @@ export class Checkout implements OnInit {
           this.orderPlaced = true;
 
           this.isPlacingOrder = false;
+          this.router.navigate(['/order-success'], {
+            state: {
+              orderId: response.order._id
+            }
+          });
 
           localStorage.removeItem('customerInfo');
 
@@ -200,6 +207,7 @@ export class Checkout implements OnInit {
         this.isPlacingOrder = false;
 
       }
+
 
     });
 
@@ -338,7 +346,7 @@ export class Checkout implements OnInit {
               error: (err) => {
 
                 alert(err.error.message);
-                
+
                 this.isPlacingOrder = false;
 
               }

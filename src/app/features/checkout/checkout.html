@@ -105,10 +105,11 @@
 
 
 
+            <button type="submit" class="place-order-btn" [disabled]="isPlacingOrder">
 
-            <button type="submit" [disabled]="isPlacingOrder">
+                <i class="fa-solid fa-lock"></i>
 
-                {{ isPlacingOrder ? 'Placing Order...' : 'Place Order' }}
+                {{ isPlacingOrder ? 'Placing Order...' : 'Place Order Securely' }}
 
             </button>
 
@@ -184,14 +185,27 @@
 
                 <div class="summary-item" *ngFor="let item of cartItems">
 
-                    <span>
-                        {{ item.name }}
-                        × {{ item.quantity }}
-                    </span>
+                    <img [src]="item.image" [alt]="item.name" class="summary-image">
 
-                    <span>
+                    <div class="summary-details">
+
+                        <h4>{{ item.name }}</h4>
+
+                        <small>
+                            Qty : {{ item.quantity }}
+                        </small>
+
+                        <p>
+                            ₹{{ item.price }} × {{ item.quantity }}
+                        </p>
+
+                    </div>
+
+                    <strong>
+
                         ₹{{ item.price * item.quantity }}
-                    </span>
+
+                    </strong>
 
                 </div>
 
@@ -204,6 +218,7 @@
                 <span>₹{{ grandTotal }}</span>
 
             </div>
+            
 
         </div>
 

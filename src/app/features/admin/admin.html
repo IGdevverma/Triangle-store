@@ -25,15 +25,15 @@
 
             </li>
 
-            <li>
+            <li [class.active]="activeMenu==='categories'" (click)="activeMenu='categories'">
+
                 <i class="fa-solid fa-layer-group"></i>
+
                 Categories
+
             </li>
 
-            <li>
-                <i class="fa-solid fa-tags"></i>
-                Brands
-            </li>
+
 
             <li [class.active]="activeMenu==='orders'" (click)="activeMenu='orders'">
 
@@ -50,6 +50,8 @@
                 Customers
 
             </li>
+
+
 
             <li [class.active]="activeMenu==='settings'" (click)="activeMenu='settings'">
 
@@ -117,104 +119,230 @@
 
             </header>
 
+
+            <div class="dashboard-header">
+
+                <div>
+
+                    <h1>👋 Welcome Back, Admin</h1>
+
+                    <p>Here's what's happening in your store today.</p>
+
+                </div>
+
+                <div class="today-date">
+
+                    {{ today | date:'EEEE, dd MMM yyyy' }}
+
+                </div>
+
+            </div>
+
             <!-- Cards -->
 
             <div class="stats">
 
-                <div class="card">
+                <div class="card purple">
 
-                    <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-box"></i>
+                    </div>
+
+                    <div class="card-info">
 
                         <h3>{{ dashboardData.totalProducts }}</h3>
 
                         <p>Total Products</p>
 
-                    </div>
-
-                    📦
-
-                </div>
-
-                <div class="card">
-
-                    <div>
-
-                        <h3>₹{{ dashboardData.inventoryValue }}</h3>
-
-                        <p>Inventory Value</p>
+                        <small>Available in store</small>
 
                     </div>
 
-                    💰
-
                 </div>
 
-                <div class="card">
+                <div class="card green">
 
-                    <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-indian-rupee-sign"></i>
+                    </div>
 
-                        <h3>{{ dashboardData.totalCategories }}</h3>
+                    <div class="card-info">
 
-                        <p>Categories</p>
+                        <h3>₹{{ dashboardData.totalRevenue | number }}</h3>
+
+                        <p>Total Revenue</p>
+
+                        <small>Lifetime earnings</small>
 
                     </div>
 
-                    📂
+                </div>
+
+                <div class="card blue">
+
+                    <div class="card-icon">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+
+                    <div class="card-info">
+
+                        <h3>{{ dashboardData.totalUsers }}</h3>
+
+                        <p>Total Customers</p>
+
+                        <small>Registered users</small>
+
+                    </div>
 
                 </div>
 
-                <div class="card">
+                <div class="card orange">
 
-                    <div>
+                    <div class="card-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+
+                    <div class="card-info">
 
                         <h3>{{ dashboardData.totalOrders }}</h3>
 
                         <p>Total Orders</p>
 
-                    </div>
+                        <small>Orders received</small>
 
-                    🛒
+                    </div>
 
                 </div>
 
-                <div class="card">
+                <div class="card red">
 
-                    <div>
-
-                        <h3>{{ dashboardData.totalStock }}</h3>
-
-                        <p>Total Stock</p>
-
+                    <div class="card-icon">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
 
-                    📦
+                    <div class="card-info">
+
+                        <h3>{{ dashboardData.lowStockProducts }}</h3>
+
+                        <p>Low Stock</p>
+
+                        <small>Need attention</small>
+
+                    </div>
 
                 </div>
 
             </div>
+            <div class="chart-section">
+                <div class="chart-card">
 
-            <div class="chart-card">
+                    <div class="chart-header">
 
-                <div class="chart-header">
+                        <h2>Sales Overview</h2>
 
-                    <h2>Sales Overview</h2>
+                        <span>Last 6 Months</span>
 
-                    <span>Last 6 Months</span>
+                    </div>
+
+                    <div class="chart-container">
+
+                        <canvas #salesCanvas></canvas>
+
+                    </div>
 
                 </div>
+                <div class="top-products-card">
 
-                <div class="chart-container">
+                    <div class="card-header">
 
-                    <canvas #salesCanvas></canvas>
+                        <h3>🔥 Top Selling Products</h3>
+
+                    </div>
+
+                    <div class="top-product">
+
+                        <div>
+
+                            <strong>Triangle T-Shirt</strong>
+
+                            <p>254 Sales</p>
+
+                        </div>
+
+                        <span>🥇</span>
+
+                    </div>
+
+                    <div class="top-product">
+
+                        <div>
+
+                            <strong>Sports Shorts</strong>
+
+                            <p>183 Sales</p>
+
+                        </div>
+
+                        <span>🥈</span>
+
+                    </div>
+
+                    <div class="top-product">
+
+                        <div>
+
+                            <strong>Cricket Jersey</strong>
+
+                            <p>151 Sales</p>
+
+                        </div>
+
+                        <span>🥉</span>
+
+                    </div>
 
                 </div>
-
             </div>
+
 
             <div class="dashboard-grid">
 
                 <!-- Low Stock -->
+                <div class="recent-orders-card">
 
+                    <div class="section-title">
+
+                        <h3>🕒 Recent Orders</h3>
+
+                        <span>{{ orders.length }}</span>
+
+                    </div>
+
+                    <div class="recent-order" *ngFor="let order of orders.slice(0,5)">
+
+                        <div>
+
+                            <h4>{{ order.customerName }}</h4>
+
+                            <small>{{ order.createdAt | date:'dd MMM yyyy' }}</small>
+
+                        </div>
+
+                        <div class="order-right">
+
+                            <strong>₹{{ order.total }}</strong>
+
+                            <span class="status">
+
+                                {{ order.orderStatus }}
+
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
                 <div class="low-stock-card">
 
                     <div class="section-title">
@@ -229,7 +357,11 @@
 
                         <div>
 
-                            <h4>{{ product.name }}</h4>
+                            <h4 class="product-title">
+
+                                {{ product.name }}
+
+                            </h4>
 
                             <small>{{ product.category }}</small>
 
@@ -252,9 +384,26 @@
                 </div>
 
             </div>
+        </div>
+        <!-- Product Table -->
+        <div *ngIf="activeMenu === 'products'">
+            <div class="products-header">
 
-            <!-- Product Table -->
+                <div>
 
+                    <h2>Products Management</h2>
+
+                    <p>Manage your inventory and products</p>
+
+                </div>
+
+                <div class="products-count">
+
+                    {{ products.length }} Products
+
+                </div>
+
+            </div>
             <div class="table-card">
 
                 <table>
@@ -282,8 +431,7 @@
                             <td>
 
                                 <div class="product-info">
-
-                                    <img [src]="product.image" [alt]="product.name">
+                                    <img class="product-image" [src]="product.image" [alt]="product.name">
 
                                     <div>
 
@@ -301,13 +449,24 @@
 
                             <td>₹{{product.price}}</td>
 
-                            <td>{{product.stock}}</td>
+                            <td>
+
+                                <span class="stock-badge" [class.in-stock]="product.stock > 10"
+                                    [class.low-stock]="product.stock > 0 && product.stock <= 10"
+                                    [class.out-stock]="product.stock == 0">
+
+                                    {{ product.stock }}
+
+                                </span>
+
+                            </td>
 
                             <td>
 
-                                <span class="status" [class.inactive]="product.stock==0">
+                                <span class="status-badge" [class.active-status]="product.stock > 0"
+                                    [class.inactive-status]="product.stock == 0">
 
-                                    {{ (product.stock ?? 0) > 0 ? 'Active' : 'Out of Stock' }}
+                                    {{ product.stock > 0 ? 'Active' : 'Out of Stock' }}
 
                                 </span>
 
@@ -338,8 +497,6 @@
                 </table>
 
             </div>
-            <!-- Add / Edit Product Modal -->
-
             <div class="modal-overlay" *ngIf="showModal">
 
                 <div class="modal">
@@ -574,30 +731,54 @@
                 </div>
 
             </div>
+        </div>
+        <!-- Add / Edit Product Modal -->
 
-            <div class="pagination">
 
-                <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
 
-                    <i class="fa-solid fa-chevron-left"></i>
+        <div class="pagination">
 
-                </button>
+            <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
 
-                <button *ngFor="let page of pages" class="page-number" [class.active]="page === currentPage"
-                    (click)="goToPage(page)">
+                <i class="fa-solid fa-chevron-left"></i>
 
-                    {{ page }}
+            </button>
 
-                </button>
+            <button *ngFor="let page of pages" class="page-number" [class.active]="page === currentPage"
+                (click)="goToPage(page)">
 
-                <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                {{ page }}
 
-                    <i class="fa-solid fa-chevron-right"></i>
+            </button>
 
-                </button>
+            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+
+                <i class="fa-solid fa-chevron-right"></i>
+
+            </button>
+
+        </div>
+
+
+        <div *ngIf="activeMenu === 'categories'">
+
+            <div class="products-header">
+
+                <div>
+                    <h2>Categories</h2>
+                    <p>Manage product categories</p>
+                </div>
 
             </div>
+
+            <div class="table-card">
+
+                <h3>Coming Soon...</h3>
+
+            </div>
+
         </div>
+
         <div *ngIf="activeMenu === 'orders'" class="table-card">
 
             <h2>Orders</h2>
@@ -679,6 +860,158 @@
                 </tbody>
 
             </table>
+
+        </div>
+
+        <div *ngIf="activeMenu === 'customers'">
+
+
+            <div class="content">
+
+                <div class="page-header">
+                    <h2>Customers</h2>
+                </div>
+
+                <div class="search-bar">
+
+                    <input type="text" placeholder="Search customer..." [(ngModel)]="customerSearch"
+                        (input)="filterCustomers()">
+
+                </div>
+
+                <table class="customer-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Change Role</th>
+                            <th>Delete</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngFor="let user of filteredCustomers">
+
+                            <td>{{ user.name }}</td>
+
+                            <td>{{ user.email }}</td>
+
+                            <td>{{ user.phone || '-' }}</td>
+
+
+                            <td>
+
+                                <span class="role-badge" [class.admin]="user.role==='admin'"
+                                    [class.user]="user.role==='user'">
+
+                                    {{ user.role }}
+
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                {{ user.createdAt | date:'dd MMM yyyy' }}
+
+                            </td>
+                            <td>
+
+                                <select [ngModel]="user.role" (ngModelChange)="changeRole(user,$event)">
+
+                                    <option value="user">
+
+                                        User
+
+                                    </option>
+
+                                    <option value="admin">
+
+                                        Admin
+
+                                    </option>
+
+                                </select>
+                            </td>
+
+                            <td>
+
+
+                                <button class="delete-btn" (click)="deleteCustomer(user._id)">
+
+                                    <i class="fa-solid fa-trash"></i>
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+        <div *ngIf="activeMenu === 'settings'">
+
+            <div class="products-header">
+
+                <div>
+
+                    <h2>Settings</h2>
+
+                    <p>Manage your store settings</p>
+
+                </div>
+
+            </div>
+
+            <div class="table-card">
+
+                <div style="padding:30px;">
+
+                    <h3>General Settings</h3>
+
+                    <br>
+
+                    <label>Store Name</label>
+
+                    <input type="text" value="Triangle Sports" class="form-control">
+
+                    <br><br>
+
+                    <label>Support Email</label>
+
+                    <input type="email" value="support@trianglesports.com" class="form-control">
+
+                    <br><br>
+
+                    <label>Phone Number</label>
+
+                    <input type="text" value="+91 9990180409" class="form-control">
+
+                    <br><br>
+
+                    <button class="save-btn">
+
+                        Save Settings
+
+                    </button>
+
+                </div>
+
+            </div>
 
         </div>
 
