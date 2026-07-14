@@ -35,7 +35,7 @@ const registerUser = async (req, res) => {
             role: "user"
 
         });
-
+        console.log("LOGIN USER ID:", user._id);
         const token = user.getJWTToken();
 
         res.status(201).json({
@@ -92,6 +92,7 @@ const loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({ email }).select("+password");
+        console.log("LOGIN USER:", user);
         console.log("User:", user);
         if (!user) {
 
