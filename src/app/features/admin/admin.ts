@@ -82,7 +82,7 @@ export class Admin implements OnInit, AfterViewInit {
   totalStock = 0;
   totalCategories = 0;
   mostExpensiveProduct = '';
-  selectedFile!: File;
+  selectedFile: File | null = null;
   imagePreview = '';
   lowStockProducts: Product[] = [];
   orders: any[] = [];
@@ -169,11 +169,15 @@ export class Admin implements OnInit, AfterViewInit {
   loadProducts() {
     this.productService.getProducts().subscribe({
 
+
       next: (response: any) => {
+        console.log("API Response", response);
 
         const data: Product[] = response.products;
+        console.log("Products", data);
 
         this.products = data;
+
 
         this.totalProducts = data.length;
         this.totalStock = data.reduce(
@@ -410,7 +414,7 @@ export class Admin implements OnInit, AfterViewInit {
 
   addProduct() {
     alert("addProduct called");
-    
+
     console.log("addProduct called");
 
     if (!this.isFormValid()) {
@@ -451,7 +455,7 @@ export class Admin implements OnInit, AfterViewInit {
 
     formData.append('showOnHome', String(this.newProduct.showOnHome));
 
-    formData.append('image', this.selectedFile);
+    formData.append('image', this.selectedFile!);
 
 
     console.log("Name:", formData.get('name'));
@@ -466,11 +470,19 @@ export class Admin implements OnInit, AfterViewInit {
     console.log("Before API Call");
 
     this.productService.addProduct(formData).subscribe({
-      
+
 
       next: (res) => {
+
         console.log("SUCCESS", res);
+
         alert("Product Added");
+        this.currentPage = 1;
+
+        this.closeModal();
+
+        this.loadProducts();
+
       },
 
       error: (err) => {
@@ -630,6 +642,24 @@ export class Admin implements OnInit, AfterViewInit {
 
     this.showModal = false;
 
+    this.selectedFile = null;
+
+    this.imagePreview = '';
+
+    this.newProduct = {
+      name: '',
+      price: 0,
+      image: '',
+      category: '',
+      description: '',
+      fabric: '',
+      type: '',
+      availableColors: '',
+      colors: [],
+      stock: 0,
+      showOnHome: true
+    };
+
   }
 
   toggleColor(color: string) {
@@ -666,7 +696,9 @@ export class Admin implements OnInit, AfterViewInit {
 
       };
 
-      reader.readAsDataURL(this.selectedFile);
+      if (this.selectedFile) {
+        reader.readAsDataURL(this.selectedFile);
+      }
 
     }
 
@@ -958,6 +990,18 @@ export class Admin implements OnInit, AfterViewInit {
 
 
 
+  }
+  getImageUrl(image: string) {
+
+    if (!image) {
+      return 'assets/no-image.png';
+    }
+
+    if (image.startsWith('http')) {
+      return image;
+    }
+
+    return 'assets/uploads/' + image;
   }
 
 }

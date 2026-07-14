@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class AdminService {
 
-  private apiUrl = 'http://localhost:8000/api/admin';
+  private apiUrl =
+    'https://triangle-store-api.onrender.com/api/admin';
 
   constructor(private http: HttpClient) { }
 

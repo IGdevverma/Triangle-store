@@ -8,7 +8,8 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
 
-  private apiUrl = 'http://localhost:8000/api/users';
+  private apiUrl =
+    'https://triangle-store-api.onrender.com/api/users';
 
   constructor(private http: HttpClient) { }
 

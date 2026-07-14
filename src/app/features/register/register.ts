@@ -30,7 +30,7 @@ export class Register {
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   register() {
 
@@ -67,8 +67,12 @@ export class Register {
 
       error: (err) => {
 
+        console.log("REGISTER ERROR:", err);
+
+        alert(JSON.stringify(err));
+
         this.errorMessage =
-          err.error.message || 'Registration failed';
+          err.error?.message || 'Registration failed';
 
       }
 

@@ -7,7 +7,8 @@ import { Observable } from 'rxjs';
 })
 export class Payment {
 
-  private apiUrl = 'http://localhost:8000/api/payment';
+  private apiUrl =
+    'https://triangle-store-api.onrender.com/api/payment';
 
   constructor(
     private http: HttpClient

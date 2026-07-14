@@ -7,8 +7,8 @@ import { HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class AuthService {
-
-  private apiUrl = 'http://localhost:8000/api/auth';
+  private apiUrl =
+    'https://triangle-store-api.onrender.com/api/auth';
   private currentUserSubject = new BehaviorSubject<any>(this.getUser());
 
   currentUser$ = this.currentUserSubject.asObservable();
