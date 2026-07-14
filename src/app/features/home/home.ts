@@ -82,7 +82,9 @@ export class Home implements OnInit {
     /* Load Products */
     this.productService.getProducts().subscribe({
 
+
       next: (response: any) => {
+        console.log(response.products);
 
        this.products = response.products;
 

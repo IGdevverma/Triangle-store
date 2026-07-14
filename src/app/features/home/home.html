@@ -165,7 +165,7 @@
 
                 <div class="product-image">
 
-                    <img [src]="product.image" [alt]="product.name">
+                    <img [src]="getImageUrl(product.image)" [alt]="product.name">
 
                     <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
 
@@ -234,7 +234,7 @@
 
         <div class="best-card" *ngFor="let product of filteredProducts | slice:0:3">
 
-            <img [src]="product.image" [alt]="product.name">
+            <img [src]="getImageUrl(product.image)" [alt]="product.name" [alt]="product.name">
 
             <h3>{{ product.name }}</h3>
 
