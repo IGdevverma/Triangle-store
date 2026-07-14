@@ -1,15 +1,19 @@
 
 const User = require("../models/User");
+const mongoose = require("mongoose");
 
 // Register User
 
 const registerUser = async (req, res) => {
-
+    
+    console.log("Database:", mongoose.connection.name);
+    console.log("Host:", mongoose.connection.host);
     try {
 
         const { name, email, password, phone } = req.body;
 
         const existingUser = await User.findOne({ email });
+        console.log("Existing User:", existingUser);
 
         if (existingUser) {
 
