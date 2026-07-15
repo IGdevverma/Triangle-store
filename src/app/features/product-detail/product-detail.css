@@ -40,7 +40,7 @@
 
 .breadcrumb span{
 
-    color:#111;
+    color:var(--text);
 
     font-weight:600;
 
@@ -170,7 +170,7 @@
 
     font-weight:700;
 
-    color:#111;
+    color:var(--text);
 
     margin-bottom:15px;
 
@@ -226,7 +226,7 @@
 
     font-weight:700;
 
-    color:#111;
+    color:var(--text)
 
 }
 
@@ -382,11 +382,11 @@
 
 .sizes button.active{
 
-    background:#111;
+    background:var(--text);
 
     color:white;
 
-    border-color:#111;
+    border-color:var(--text)
 
 }
 
@@ -494,7 +494,7 @@
 
 .cart-btn{
 
-    background:#111;
+    background:var(--text);
 
     color:white;
 
@@ -585,7 +585,7 @@
 
 .delivery-box input:focus{
 
-    border-color:#111;
+    border-color:var(--text)
 
 }
 
@@ -595,7 +595,7 @@
 
     border:none;
 
-    background:#111;
+    background:var(--text);
 
     color:white;
 
@@ -701,7 +701,7 @@
 
 .product-specs strong{
 
-    color:#111;
+    color:var(--text)
 
 }
 
@@ -729,7 +729,7 @@
 
 .meta strong{
 
-    color:#111;
+    color:var(--text)
 
 }
 
@@ -781,13 +781,13 @@
 
 .tab-header button:hover{
 
-    color:#111;
+    color:var(--text)
 
 }
 
 .tab-header button.active{
 
-    color:#111;
+    color:var(--text);
 
     font-weight:700;
 
@@ -807,7 +807,7 @@
 
     height:3px;
 
-    background:#111;
+    background:var(--text)
 
 }
 
@@ -859,8 +859,7 @@
 
     font-size:22px;
 
-    color:#111;
-
+    color:var(--text)
 }
 
 .product-details{
@@ -941,7 +940,7 @@
 
     border:none;
 
-    background:#111;
+    background:var(--text);
 
     color:white;
 
@@ -1101,7 +1100,7 @@ font-size:18px;
 
     margin-bottom:35px;
 
-    color:#111;
+    color:var(--text)
 
 }
 
@@ -1167,7 +1166,7 @@ font-size:18px;
 
     font-weight:600;
 
-    color:#111;
+    color:var(--text)
 
 }
 
@@ -1179,7 +1178,7 @@ font-size:18px;
 
     font-weight:700;
 
-    color:#111;
+    color:var(--text)
 
 }
 @media(max-width:1100px){

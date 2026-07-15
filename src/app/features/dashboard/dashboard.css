@@ -138,7 +138,7 @@
 
     text-decoration:none;
 
-    color:#e11d48;
+   background: (--primary);
 
     font-weight:600;
 }

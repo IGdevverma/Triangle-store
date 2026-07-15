@@ -48,7 +48,7 @@
 
     border-radius:50%;
 
-    background:#e11d48;
+    background:var(--primary);
 
     color:#fff;
 
@@ -133,7 +133,7 @@
 
     background:#fafafa;
 
-    color:#e11d48;
+    color:var(--primary);
 
     padding-left:35px;
 }

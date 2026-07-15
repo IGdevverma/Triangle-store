@@ -29,7 +29,13 @@ export interface Order {
 
   paymentVerifiedAt?: string;
 
-  orderStatus: 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
+  orderStatus?:
+  | 'Placed'
+  | 'Processing'
+  | 'Packed'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Cancelled';
 
   items: CartItem[];
 

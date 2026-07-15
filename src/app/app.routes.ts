@@ -13,7 +13,7 @@ import { DealerRegistration } from './features/dealer-registration/dealer-regist
 import { TeamKitDesigner } from './features/team-kit-designer/team-kit-designer';
 import { KitCategory } from './features/kit-category/kit-category';
 import { TeamKitCustomize } from './features/team-kit-customize/team-kit-customize';
-import { AdminOrders } from './features/admin-orders/admin-orders';
+
 import { Register } from './features/register/register';
 import { Profile } from './features/profile/profile';
 import { Dashboard } from './features/dashboard/dashboard';
@@ -120,11 +120,8 @@ export const routes: Routes = [
     path: 'team-kit-customize/:slug',
     component: TeamKitCustomize
   },
-  {
-    path: 'admin-orders',
-    component: AdminOrders,
-    canActivate: [authGuard]
-  },
+  
+ 
   {
     path: 'register',
     component: Register

@@ -114,3 +114,35 @@
 .timeline-step.current h3{
     color:#16a34a;
 }
+.tracking-container {
+    margin-top: 25px;
+}
+
+.timeline-step .content h3 {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.timeline-step .content small {
+    font-size: 13px;
+}
+
+.timeline-step.current .circle {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0% {
+        box-shadow: 0 0 0 0 rgba(22,163,74,.5);
+    }
+
+    70% {
+        box-shadow: 0 0 0 12px rgba(22,163,74,0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(22,163,74,0);
+    }
+
+}

@@ -27,6 +27,7 @@ export class Orders implements OnInit {
       next: (response) => {
 
         this.orders = response.orders;
+        this.isLoading = false;
 
 
       },
@@ -34,6 +35,7 @@ export class Orders implements OnInit {
       error: (error) => {
 
         console.error(error);
+         this.isLoading = false;
 
       }
 
@@ -96,7 +98,7 @@ export class Orders implements OnInit {
 
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status?: string): string {
 
     switch (status) {
 
@@ -105,6 +107,12 @@ export class Orders implements OnInit {
 
       case 'Processing':
         return 'processing';
+
+      case 'Packed':
+        return 'packed';
+
+      case 'Shipped':
+        return 'shipped';
 
       case 'Cancelled':
         return 'cancelled';
@@ -126,6 +134,30 @@ export class Orders implements OnInit {
       year: 'numeric'
 
     });
+
+  }
+
+
+  isCompleted(order: any, status: string): boolean {
+
+    const steps = [
+      'Placed',
+      'Processing',
+      'Packed',
+      'Shipped',
+      'Delivered'
+    ];
+
+    return (
+      steps.indexOf(order.orderStatus) >=
+      steps.indexOf(status)
+    );
+
+  }
+
+  isCurrent(order: any, status: string): boolean {
+
+    return order.orderStatus === status;
 
   }
 }

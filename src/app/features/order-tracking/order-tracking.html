@@ -18,25 +18,64 @@
 
     </div>
 
-    <div class="tracking-timeline">
+    <div class="tracking-container">
 
-        <div class="timeline-step" *ngFor="let step of steps" [class.completed]="isCompleted(step)"
-            [class.current]="isCurrent(step)">
+        <div class="timeline-step" [class.completed]="true">
 
-            <div class="circle">
-
-                <span *ngIf="isCompleted(step)">✓</span>
-
-            </div>
+            <div class="circle">✓</div>
 
             <div class="content">
+                <h3>Order Placed</h3>
+                <small>{{ formatDate(order.createdAt!) }}</small>
+            </div>
 
-                <h3>{{ step }}</h3>
+        </div>
 
-                <small *ngIf="isCurrent(step)">
-                    Current Status
-                </small>
+        <div class="timeline-step" [class.completed]="order.orderStatus !== 'Cancelled'"
+            [class.current]="order.orderStatus === 'Processing'">
 
+            <div class="circle">✓</div>
+
+            <div class="content">
+                <h3>Processing</h3>
+                <small>Your order is being prepared.</small>
+            </div>
+
+        </div>
+
+        <div class="timeline-step" [class.completed]="order.orderStatus === 'Packed' ||
+                       order.orderStatus === 'Shipped' ||
+                       order.orderStatus === 'Delivered'" [class.current]="order.orderStatus === 'Packed'">
+
+            <div class="circle">📦</div>
+
+            <div class="content">
+                <h3>Packed</h3>
+                <small>Ready for shipment.</small>
+            </div>
+
+        </div>
+
+        <div class="timeline-step" [class.completed]="order.orderStatus === 'Shipped' ||
+                       order.orderStatus === 'Delivered'" [class.current]="order.orderStatus === 'Shipped'">
+
+            <div class="circle">🚚</div>
+
+            <div class="content">
+                <h3>Shipped</h3>
+                <small>Your package is on the way.</small>
+            </div>
+
+        </div>
+
+        <div class="timeline-step" [class.completed]="order.orderStatus === 'Delivered'"
+            [class.current]="order.orderStatus === 'Delivered'">
+
+            <div class="circle">🏠</div>
+
+            <div class="content">
+                <h3>Delivered</h3>
+                <small>Package delivered successfully.</small>
             </div>
 
         </div>

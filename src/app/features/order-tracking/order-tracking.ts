@@ -14,6 +14,9 @@ import { OrderService } from '../../services/order';
 })
 
 export class OrderTracking implements OnInit {
+formatDate(arg0: any) {
+throw new Error('Method not implemented.');
+}
 
   steps = [
     'Processing',

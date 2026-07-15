@@ -5,35 +5,74 @@
 
     <div class="overlay">
 
-        <p class="subtitle">
-            TRIANGLE SPORTS
-        </p>
+        <div class="hero-content">
 
-        <h1>
-            Performance<br>
-            Meets Style
-        </h1>
+            <span class="hero-tag">
 
-        <p class="description">
-            Premium sportswear for athletes and complete manufacturing solutions.
-        </p>
+                PERFORMANCE SPORTSWEAR
 
-        <div class="hero-buttons">
+            </span>
 
-            <a routerLink="/shop" class="hero-btn">
+            <h1>
 
-                Shop Now
-            </a>
+                Performance
+                <br>
 
-            <a routerLink="/request-quote" class="hero-btn secondary">
+                Starts Here
 
-                Manufacturing
-            </a>
+            </h1>
+
+            <p class="description">
+
+                Premium sportswear and complete manufacturing
+                solutions designed for athletes, teams,
+                academies and brands.
+
+            </p>
+
+            <div class="hero-buttons">
+
+                <a routerLink="/shop" class="btn btn-primary">
+
+                    Shop Collection
+
+                </a>
+
+                <a routerLink="/request-quote" class="btn btn-outline hero-outline">
+
+                    Manufacturing
+
+                </a>
+
+            </div>
+
+            <div class="hero-trust">
+
+                <div class="stars">
+
+                    ★★★★★
+
+                </div>
+
+                <div>
+
+                    Trusted by
+
+                    <strong>
+
+                        500+
+
+                    </strong>
+
+                    Teams Across India
+
+                </div>
+
+            </div>
 
         </div>
 
     </div>
-
     <button class="nav prev" (click)="prevSlide()">
 
         ❮
@@ -56,75 +95,59 @@
     </div>
 
 </section>
+<section class="brand-trust">
 
+    <div class="trust-item">
 
-<!-- Business Categories -->
+        <i class="fa-solid fa-star"></i>
 
-<section class="hero-categories">
+        <div>
 
-    <!-- Left Big Card -->
+            <h3>4.9/5</h3>
 
-    <div class="hero-card large" routerLink="/shop">
-
-        <img src="assets/images/Swim.jpg" alt="Triangle Sports">
-
-        <div class="overlay">
-
-            <h2>Triangle Sports Collection</h2>
-
-            <p>Shop T-Shirts, Lowers & Activewear</p>
-
-            <a routerLink="/shop" class="shop-btn">
-                Shop Now →
-            </a>
+            <span>Customer Rating</span>
 
         </div>
 
     </div>
 
-    <!-- Right Side -->
+    <div class="trust-item">
 
-    <div class="hero-right">
+        <i class="fa-solid fa-users"></i>
 
-        <div class="hero-card small" routerLink="/shop">
+        <div>
 
-            <img src="assets/images/compression.jpg" alt="Compression">
+            <h3>500+</h3>
 
-            <div class="overlay">
-
-                <h3>Compression</h3>
-
-                <p>Premium Performance Sleeves</p>
-
-            </div>
+            <span>Teams Served</span>
 
         </div>
 
-        <div class="hero-card small" routerLink="/shop">
+    </div>
 
-            <img src="assets/images/teamwear.jpg" alt="Teamwear">
+    <div class="trust-item">
 
-            <div class="overlay">
+        <i class="fa-solid fa-shirt"></i>
 
-                <h3>Teamwear</h3>
+        <div>
 
-                <p>Sports Kits & Team Apparel</p>
+            <h3>10,000+</h3>
 
-            </div>
+            <span>Products Delivered</span>
 
         </div>
 
-        <div class="hero-card wide" routerLink="/request-quote">
+    </div>
 
-            <img src="assets/images/manufacturing.jpg" alt="Manufacturing">
+    <div class="trust-item">
 
-            <div class="overlay">
+        <i class="fa-solid fa-industry"></i>
 
-                <h3>Manufacturing Services</h3>
+        <div>
 
-                <p>Private Label & Bulk Orders</p>
+            <h3>Own Factory</h3>
 
-            </div>
+            <span>Manufacturer</span>
 
         </div>
 
@@ -132,7 +155,10 @@
 
 </section>
 
-<!-- Filters -->
+
+
+
+
 
 
 
@@ -163,37 +189,109 @@
             <div class="product-card" *ngFor="let product of displayedProducts"
                 [routerLink]="['/product', product._id]">
 
+                <!-- Badge -->
+
+                <span class="discount-badge">
+
+                    -20%
+
+                </span>
+
+                <!-- Wishlist -->
+
+                <button class="wishlist-btn">
+
+                    <i class="fa-regular fa-heart"></i>
+
+                </button>
+
+                <!-- Quick View -->
+
+                <button class="quick-btn">
+
+                    <i class="fa-regular fa-eye"></i>
+
+                </button>
+
+                <!-- Image -->
+
                 <div class="product-image">
 
                     <img [src]="getImageUrl(product.image)" [alt]="product.name">
 
-                    <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
-
-                        SAVE {{ product.discount }}%
-
-                    </span>
-
                 </div>
+
+                <!-- Info -->
 
                 <div class="product-info">
 
-                    <h3>{{ product.name }}</h3>
+                    <span class="brand">
 
-                    <div class="price-box">
+                        TRIANGLE SPORTS
 
-                        <span class="current-price">
+                    </span>
 
-                            ₹{{ product.price }}
+                    <h3>
+
+                        {{product.name}}
+
+                    </h3>
+
+                    <div class="rating">
+
+                        ★★★★★
+
+                        <span>(24 Reviews)</span>
+
+                    </div>
+
+                    <div class="price-row">
+
+                        <span class="price">
+
+                            ₹{{product.price}}
 
                         </span>
 
-                        <span class="old-price" *ngIf="product.discount">
+                        <span class="old-price">
 
-                            ₹{{ (product.price/(1-product.discount/100)) | number:'1.0-0' }}
+                            ₹1299
 
                         </span>
 
                     </div>
+
+                    <!-- Colors -->
+
+                    <div class="colors">
+
+                        <span class="black"></span>
+
+                        <span class="purple"></span>
+
+                        <span class="gray"></span>
+
+                    </div>
+
+                    <!-- Sizes -->
+
+                    <div class="sizes">
+
+                        <span>S</span>
+
+                        <span>M</span>
+
+                        <span>L</span>
+
+                        <span>XL</span>
+
+                    </div>
+
+                    <button class="btn btn-primary add-btn">
+
+                        Add To Cart
+
+                    </button>
 
                 </div>
 
@@ -218,43 +316,89 @@
     </div>
 
 </section>
-
 <section class="best-sellers">
 
-    <div class="best-header">
-        <h2>Best Seller Products</h2>
+    <div class="section-title">
+
+        <span>BEST SELLERS</span>
+
+        <h2>
+
+            Most Loved Products
+
+        </h2>
 
         <p>
-            Gear up with the champions' choice. Our best sellers bring
-            the winning spirit to you.
+
+            Discover our most popular sportswear chosen by athletes,
+            teams and fitness enthusiasts.
+
         </p>
+
     </div>
 
-    <div class="best-grid">
+    <div class="best-layout">
 
-        <div class="best-card" *ngFor="let product of filteredProducts | slice:0:3">
+        <!-- Large Card -->
 
-            <img [src]="getImageUrl(product.image)" [alt]="product.name" [alt]="product.name">
-
-            <h3>{{ product.name }}</h3>
-
-            <p>₹{{ product.price }}</p>
-
-        </div>
-
-        <div class="best-card" routerLink="/product/6">
+        <div class="featured-product">
 
             <img src="assets/products/football jersey.jpg" alt="Football Jersey">
 
-            <h3>Football Jersey</h3>
+            <div class="featured-overlay">
 
-            <p>₹899</p>
+                <span>Editor's Choice</span>
+
+                <h3>
+
+                    Football Jersey
+
+                </h3>
+
+                <p>
+
+                    Premium breathable fabric built for
+                    match performance.
+
+                </p>
+
+                <a routerLink="/shop" class="btn btn-primary">
+
+                    Shop Now
+
+                </a>
+
+            </div>
 
         </div>
 
+        <!-- Right Grid -->
 
+        <div class="mini-products">
 
+            <div class="mini-card" *ngFor="let product of filteredProducts | slice:0:4">
 
+                <img [src]="getImageUrl(product.image)" [alt]="product.name">
+
+                <div>
+
+                    <h4>
+
+                        {{product.name}}
+
+                    </h4>
+
+                    <p>
+
+                        ₹{{product.price}}
+
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
 
     </div>
 
@@ -300,59 +444,44 @@
 
 </section>
 
-<!-- Performance Video -->
 
-<section class="performance-video">
-
-    <video controls autoplay muted loop playsinline>
-        <source src="/videos/hero.mp4" type="video/mp4">
-    </video>
-
-    <div class="video-overlay">
-
-        <p class="subtitle">
-            TRIANGLE SPORTS
-        </p>
-
-        <h2>
-            Built For<br>
-            Performance
-        </h2>
-
-        <p>
-            From premium sportswear to complete manufacturing solutions,
-            we help athletes and brands perform at their best.
-        </p>
-
-        <a routerLink="/request-quote" class="hero-btn">
-            Start Manufacturing
-        </a>
-
-    </div>
-
-</section>
 
 <!-- Testimonials -->
 
 <section class="testimonials">
 
-    <div class="section-header">
+    <div class="section-title">
+
+        <span>TESTIMONIALS</span>
 
         <h2>
+
             What Our Clients Say
+
         </h2>
 
         <p>
-            Trusted by institutions and brands across India.
+
+            Trusted by schools, colleges, sports academies,
+            corporate teams and athletes across India.
+
         </p>
 
     </div>
 
     <div class="testimonial-grid">
 
-        <div class="testimonial-card" *ngFor="let item of testimonials">
+        <div
+        class="testimonial-card"
+        *ngFor="let item of testimonials">
 
-            <div class="quote">
+            <div class="quote-icon">
+
+                <i class="fa-solid fa-quote-left"></i>
+
+            </div>
+
+            <div class="stars">
 
                 ★★★★★
 
@@ -360,21 +489,265 @@
 
             <p class="review">
 
-                "{{ item.review }}"
+                "{{item.review}}"
 
             </p>
 
-            <h3>
+            <div class="client">
 
-                {{ item.company }}
+                <div class="avatar">
 
-            </h3>
+                    {{item.author.charAt(0)}}
 
-            <span>
+                </div>
 
-                {{ item.author }}
+                <div>
 
-            </span>
+                    <h4>
+
+                        {{item.author}}
+
+                    </h4>
+
+                    <span>
+
+                        {{item.company}}
+
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+<section class="why-us">
+
+    <div class="section-title">
+
+        <span>WHY CHOOSE US</span>
+
+        <h2>Built For Champions</h2>
+
+        <p>
+
+            We don't just sell sportswear.
+            We manufacture premium performance apparel trusted
+            by teams, academies and athletes across India.
+
+        </p>
+
+    </div>
+
+    <div class="why-grid">
+
+        <div class="why-card">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-medal"></i>
+
+            </div>
+
+            <h3>Premium Quality</h3>
+
+            <p>
+
+                High performance fabrics designed for comfort,
+                durability and long training sessions.
+
+            </p>
+
+        </div>
+
+        <div class="why-card">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-industry"></i>
+
+            </div>
+
+            <h3>Own Manufacturing</h3>
+
+            <p>
+
+                Complete in-house production with strict quality
+                control from fabric to final stitching.
+
+            </p>
+
+        </div>
+
+        <div class="why-card">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-shirt"></i>
+
+            </div>
+
+            <h3>Custom Team Kits</h3>
+
+            <p>
+
+                Jerseys, tracksuits and uniforms customised
+                with your logo, colours and player names.
+
+            </p>
+
+        </div>
+
+        <div class="why-card">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-truck-fast"></i>
+
+            </div>
+
+            <h3>Fast Delivery</h3>
+
+            <p>
+
+                Reliable shipping across India with secure
+                packaging and live order tracking.
+
+            </p>
+
+        </div>
+
+        <div class="why-card">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-headset"></i>
+
+            </div>
+
+            <h3>Dedicated Support</h3>
+
+            <p>
+
+                Our team assists you from enquiry
+                until successful delivery.
+
+            </p>
+
+        </div>
+
+        <div class="why-card">
+
+            <div class="icon">
+
+                <i class="fa-solid fa-people-group"></i>
+
+            </div>
+
+            <h3>Bulk Orders</h3>
+
+            <p>
+
+                Best pricing and dedicated manufacturing
+                support for schools, colleges and companies.
+
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+<section class="manufacturing">
+
+    <div class="manufacturing-image">
+
+        <img src="assets/images/manufacturing.jpg" alt="Triangle Manufacturing">
+
+    </div>
+
+    <div class="manufacturing-content">
+
+        <span class="section-tag">
+
+            MANUFACTURING
+
+        </span>
+
+        <h2>
+
+            Your Manufacturing Partner
+
+        </h2>
+
+        <p>
+
+            Triangle Sports manufactures premium sportswear
+            for brands, schools, colleges, academies,
+            gyms and corporate teams.
+
+        </p>
+
+        <div class="manufacturing-points">
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Own Manufacturing Unit
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                MOQ Starting From 50 Pieces
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Custom Logo Printing
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Fast Production
+
+            </div>
+
+            <div>
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                Pan India Delivery
+
+            </div>
+
+        </div>
+
+        <div class="manufacturing-buttons">
+
+            <a routerLink="/request-quote" class="btn btn-primary">
+
+                Request Quote
+
+            </a>
+
+            <a routerLink="/team-kit-designer" class="btn btn-outline">
+
+                Design Team Kit
+
+            </a>
 
         </div>
 

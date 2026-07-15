@@ -74,7 +74,7 @@
 
     margin-bottom: 15px;
 
-    color: #111;
+    color: var(--text)
 
 }
 

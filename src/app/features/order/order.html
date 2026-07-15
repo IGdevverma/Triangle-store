@@ -1,147 +1,344 @@
 <div class="orders-container">
 
-    <h1>Order History</h1>
-    <div *ngIf="isLoading" class="loading">
+  <h1>My Orders</h1>
 
-        Loading Orders...
+ 
 
-    </div>
+  <div *ngIf="!isLoading && !hasOrders()" class="empty-orders">
+    <h2>No Orders Found</h2>
+    <p>You haven't placed any orders yet.</p>
+  </div>
 
-    <div *ngIf="!isLoading && !hasOrders()" class="empty-orders">
+  <div class="order-card" *ngFor="let order of orders">
 
-        <h2>No Orders Found</h2>
+    <!-- ================= HEADER ================= -->
 
-        <p>You haven't placed any orders yet.</p>
+    <div class="order-top">
 
-    </div>
+      <div class="product-preview">
 
-    <div class="order-card" *ngFor="let order of orders">
+        <img
+          [src]="order.items[0].image"
+          [alt]="order.items[0].name">
 
-        <div class="order-header">
+      </div>
 
-            <div>
+      <div class="order-summary">
 
-                <span>Order ID</span>
+        <h2>{{ order.items[0].name }}</h2>
 
-                <h3>#{{ order._id }}</h3>
+        <p class="delivery-date">
 
-            </div>
+          Arriving by
 
-            <div>
+          <strong>
+            {{ formatDate(order.createdAt!) }}
+          </strong>
 
-                <span>Order Date</span>
+        </p>
 
-                {{ formatDate(order.createdAt!) }}
+        <div class="summary-grid">
 
-            </div>
+          <div>
 
-            <div>
+            <span>Order ID</span>
 
-                <span>Total Amount</span>
+            <h4>#{{ order._id }}</h4>
 
-                <h3>₹{{ order.total }}</h3>
+          </div>
 
-            </div>
+          <div>
 
-            <div>
+            <span>Total</span>
 
-                <span>Status</span>
+            <h4>₹{{ order.total }}</h4>
 
-                <h3 class="status" [ngClass]="getStatusClass(order.orderStatus)">
+          </div>
 
-                    {{ order.orderStatus }}
+          <div>
 
-                </h3>
+            <span>Payment</span>
 
-                <div class="tracking-line">
+            <h4>{{ order.paymentMethod }}</h4>
 
-                    <div class="track-step" [class.active]="true">
+          </div>
 
-                        <div class="circle">✓</div>
-                        <span>Placed</span>
+          <div>
 
-                    </div>
+            <span>Status</span>
 
-                    <div class="track-step" [class.active]="order.orderStatus !== 'Cancelled'">
+            <h4
+              class="status"
+              [ngClass]="getStatusClass(order.orderStatus)">
 
-                        <div class="circle">✓</div>
-                        <span>Processing</span>
+              {{ order.orderStatus }}
 
-                    </div>
+            </h4>
 
-                    <div class="track-step" [class.active]="order.orderStatus === 'Shipped' ||
-                          order.orderStatus === 'Delivered'">
-
-                        <div class="circle">✓</div>
-                        <span>Shipped</span>
-
-                    </div>
-
-                    <div class="track-step" [class.active]="order.orderStatus === 'Delivered'">
-
-                        <div class="circle">✓</div>
-                        <span>Delivered</span>
-
-                    </div>
-
-                </div>
-
-            </div>
+          </div>
 
         </div>
 
-        <!-- Products -->
-
-        <div class="products-section">
-
-            <h4>Products Ordered</h4>
-
-            <div class="product-item" *ngFor="let item of order.items">
-
-                <img [src]="item.image" [alt]="item.name">
-
-                <div class="product-info">
-
-                    <p>{{ item.name }}</p>
-
-                    <small>
-
-                        Quantity:
-                        {{ item.quantity }}
-
-                    </small>
-
-                </div>
-
-                <div class="product-price">
-
-                    ₹{{ item.price }}
-
-                </div>
-
-            </div>
-
-        </div>
-        <div class="order-actions">
-
-            <button class="buy-btn" (click)="buyAgain(order)">
-
-                Buy Again
-
-            </button>
-            <button class="cancel-btn" *ngIf="order.orderStatus !== 'Delivered' &&
-
-               order.orderStatus !== 'Cancelled'" (click)="cancelOrder(order._id!)">
-
-                Cancel Order
-
-            </button>
-
-        </div>
+      </div>
 
     </div>
 
+    <!-- ================= TRACKING ================= -->
 
+    <div class="tracking-card">
 
+      <h3>Order Tracking</h3>
+
+      <div class="tracking-timeline">
+
+        <!-- Ordered -->
+
+        <div
+          class="timeline-step completed">
+
+          <div class="circle">
+
+            ✓
+
+          </div>
+
+          <div class="content">
+
+            <h4>Order Placed</h4>
+
+            <small>
+
+              {{ formatDate(order.createdAt!) }}
+
+            </small>
+
+          </div>
+
+        </div>
+
+        <!-- Processing -->
+
+        <div
+          class="timeline-step"
+          [class.completed]="
+            order.orderStatus === 'Processing' ||
+            order.orderStatus === 'Packed' ||
+            order.orderStatus === 'Shipped' ||
+            order.orderStatus === 'Delivered'
+          "
+          [class.current]="
+            order.orderStatus === 'Processing'
+          ">
+
+          <div class="circle">
+
+            ⚙
+
+          </div>
+
+          <div class="content">
+
+            <h4>Processing</h4>
+
+            <p>Your order is being prepared.</p>
+
+          </div>
+
+        </div>
+
+        <!-- Packed -->
+
+        <div
+          class="timeline-step"
+          [class.completed]="
+            order.orderStatus === 'Packed' ||
+            order.orderStatus === 'Shipped' ||
+            order.orderStatus === 'Delivered'
+          "
+          [class.current]="
+            order.orderStatus === 'Packed'
+          ">
+
+          <div class="circle">
+
+            📦
+
+          </div>
+
+          <div class="content">
+
+            <h4>Packed</h4>
+
+            <p>Your parcel has been packed.</p>
+
+          </div>
+
+        </div>
+
+        <!-- Shipped -->
+
+        <div
+          class="timeline-step"
+          [class.completed]="
+            order.orderStatus === 'Shipped' ||
+            order.orderStatus === 'Delivered'
+          "
+          [class.current]="
+            order.orderStatus === 'Shipped'
+          ">
+
+          <div class="circle">
+
+            🚚
+
+          </div>
+
+          <div class="content">
+
+            <h4>Shipped</h4>
+
+            <p>Your order is on the way.</p>
+
+          </div>
+
+        </div>
+
+        <!-- Delivered -->
+
+        <div
+          class="timeline-step"
+          [class.completed]="
+            order.orderStatus === 'Delivered'
+          "
+          [class.current]="
+            order.orderStatus === 'Delivered'
+          ">
+
+          <div class="circle">
+
+            🏠
+
+          </div>
+
+          <div class="content">
+
+            <h4>Delivered</h4>
+
+            <p>Package delivered successfully.</p>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================= PRODUCTS ================= -->
+
+    <div class="products-section">
+
+      <h3>Products Ordered</h3>
+
+      <div
+        class="product-item"
+        *ngFor="let item of order.items">
+
+        <img
+          [src]="item.image"
+          [alt]="item.name">
+
+        <div class="product-info">
+
+          <h4>{{ item.name }}</h4>
+
+          <p>
+
+            Quantity :
+            {{ item.quantity }}
+
+          </p>
+
+        </div>
+
+        <div class="product-price">
+
+          ₹{{ item.price }}
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ================= SHIPPING ================= -->
+
+    <div class="shipping-card">
+
+      <h3>Shipping Address</h3>
+
+      <p>
+
+        {{ order.customerName }}
+
+      </p>
+
+      <p>
+
+        {{ order.address }}
+
+      </p>
+
+      <p>
+
+        {{ order.city }},
+        {{ order.state }}
+
+        -
+
+        {{ order.pincode }}
+
+      </p>
+
+      <p>
+
+        {{ order.phone }}
+
+      </p>
+
+    </div>
+
+    <!-- ================= ACTIONS ================= -->
+
+    <div class="order-actions">
+
+      <button
+        class="invoice-btn">
+
+        Download Invoice
+
+      </button>
+
+      <button
+        class="buy-btn"
+        (click)="buyAgain(order)">
+
+        Buy Again
+
+      </button>
+
+      <button
+        class="cancel-btn"
+        *ngIf="order.orderStatus !== 'Delivered' &&
+               order.orderStatus !== 'Cancelled'"
+        (click)="cancelOrder(order._id!)">
+
+        Cancel Order
+
+      </button>
+
+    </div>
+
+  </div>
 
 </div>
