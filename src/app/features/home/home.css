@@ -15,6 +15,7 @@
     background:#000;
 }
 
+
 .slider-image{
 
     width:100%;
@@ -591,6 +592,9 @@ font-size:26px;
 
     line-height:1.8;
 
+}
+.slider-arrow{
+    display:none;
 }
 
 /*================ GRID ================*/
