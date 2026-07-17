@@ -16,6 +16,7 @@ const { handleWebhook } = require("./controllers/paymentController");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const quoteRoutes = require("./routes/quoteRoutes");
 
 
 // MongoDB Connection
@@ -36,6 +37,7 @@ app.use("/api/payment", paymentRoutes);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/admin", adminRoutes);
+app.use("/api/quotes", quoteRoutes);
 // Test Route
 app.get("/", (req, res) => {
   res.send("🚀 Triangle Sports Backend Running");

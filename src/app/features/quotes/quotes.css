@@ -1,0 +1,170 @@
+.quotes-page{
+
+    padding:30px;
+
+}
+
+.page-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:25px;
+
+}
+
+.page-header h2{
+
+    font-size:28px;
+
+    font-weight:700;
+
+    margin:0;
+
+    color:#111827;
+
+}
+
+.page-header p{
+
+    margin-top:6px;
+
+    color:#6b7280;
+
+}
+
+.loading,
+.empty{
+
+    text-align:center;
+
+    padding:70px;
+
+    font-size:18px;
+
+    color:#6b7280;
+
+}
+
+.table-wrapper{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    box-shadow:
+
+    0 10px 35px rgba(0,0,0,.08);
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+thead{
+
+    background:#7c3aed;
+
+    color:#fff;
+
+}
+
+thead th{
+
+    padding:18px;
+
+    text-align:left;
+
+    font-size:14px;
+
+    font-weight:600;
+
+}
+
+tbody td{
+
+    padding:18px;
+
+    border-bottom:1px solid #eee;
+
+    font-size:14px;
+
+}
+
+tbody tr:hover{
+
+    background:#faf7ff;
+
+}
+
+.badge{
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+}
+
+.pending{
+
+    background:#FEF3C7;
+
+    color:#B45309;
+
+}
+
+.approved{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.rejected{
+
+    background:#FEE2E2;
+
+    color:#B91C1C;
+
+}
+
+.btn-view{
+
+    background:#7c3aed;
+
+    color:#fff;
+
+    border:none;
+
+    padding:8px 18px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.btn-view:hover{
+
+    background:#6d28d9;
+
+}

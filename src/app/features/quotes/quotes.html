@@ -1,0 +1,153 @@
+<div class="quotes-page">
+
+    <div class="page-header">
+
+        <div>
+
+            <h2>Manufacturing Quotes</h2>
+
+            <p>Manage all customer enquiries</p>
+
+        </div>
+
+    </div>
+
+    <!-- Loading -->
+
+    <div class="loading" *ngIf="loading">
+
+        Loading Quotes...
+
+    </div>
+
+    <!-- Empty -->
+
+    <div
+        class="empty"
+        *ngIf="!loading && quotes.length===0">
+
+        No Quotes Found
+
+    </div>
+
+    <!-- Table -->
+
+    <div
+        class="table-wrapper"
+        *ngIf="!loading && quotes.length">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Name</th>
+
+                    <th>Company</th>
+
+                    <th>Product</th>
+
+                    <th>Qty</th>
+
+                    <th>Email</th>
+
+                    <th>Phone</th>
+
+                    <th>Status</th>
+
+                    <th>Date</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr *ngFor="let quote of quotes">
+
+                    <td>
+
+                        <strong>{{quote.name}}</strong>
+
+                    </td>
+
+                    <td>
+
+                        {{quote.company}}
+
+                    </td>
+
+                    <td>
+
+                        {{quote.product}}
+
+                    </td>
+
+                    <td>
+
+                        {{quote.quantity}}
+
+                    </td>
+
+                    <td>
+
+                        {{quote.email}}
+
+                    </td>
+
+                    <td>
+
+                        {{quote.phone}}
+
+                    </td>
+
+                    <td>
+
+                        <span
+                            class="badge"
+
+                            [ngClass]="{
+
+                            pending:quote.status==='Pending',
+
+                            approved:quote.status==='Approved',
+
+                            rejected:quote.status==='Rejected'
+
+                            }">
+
+                            {{quote.status}}
+
+                        </span>
+
+                    </td>
+
+                    <td>
+
+                        {{quote.createdAt | date:'dd MMM yyyy'}}
+
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="btn-view">
+
+                            View
+
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>

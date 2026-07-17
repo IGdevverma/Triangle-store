@@ -23,7 +23,7 @@ import { OrderTracking } from './features/order-tracking/order-tracking';
 import { Customers } from './features/customers/customers';
 import { OrderSuccess } from './features/order-success/order-success';
 import { Contact } from './features/contact/contact';
-
+import { Quotes } from './features/quotes/quotes';
 export const routes: Routes = [
   {
     path: '',
@@ -120,8 +120,8 @@ export const routes: Routes = [
     path: 'team-kit-customize/:slug',
     component: TeamKitCustomize
   },
-  
- 
+
+
   {
     path: 'register',
     component: Register
@@ -180,5 +180,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/refund-policy/refund-policy')
         .then(m => m.RefundPolicy)
+  },
+  {
+    path: 'quotes',
+    component: Quotes,
+    canActivate: [adminGuard]
   },
 ];

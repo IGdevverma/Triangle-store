@@ -5,15 +5,14 @@ const mongoose = require("mongoose");
 // Register User
 
 const registerUser = async (req, res) => {
-    
-    console.log("Database:", mongoose.connection.name);
-    console.log("Host:", mongoose.connection.host);
+
+
     try {
 
         const { name, email, password, phone } = req.body;
 
         const existingUser = await User.findOne({ email });
-        console.log("Existing User:", existingUser);
+
 
         if (existingUser) {
 
@@ -39,9 +38,9 @@ const registerUser = async (req, res) => {
             role: "user"
 
         });
-        console.log("LOGIN USER ID:", user._id);
-        const token = user.getJWTToken();
 
+        const token = user.getJWTToken();
+        
         res.status(201).json({
 
             success: true,
@@ -81,7 +80,7 @@ const registerUser = async (req, res) => {
 // Login User
 
 const loginUser = async (req, res) => {
-    console.log("Request Body:", req.body);
+console.log("GENERATED TOKEN:", token);
     try {
 
         const { email, password } = req.body;
@@ -96,8 +95,9 @@ const loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({ email }).select("+password");
-        console.log("LOGIN USER:", user);
-        console.log("User:", user);
+        console.log("LOGIN EMAIL:", email);
+        console.log("LOGIN USER ID:", user?._id);
+
         if (!user) {
 
             return res.status(401).json({
@@ -108,7 +108,7 @@ const loginUser = async (req, res) => {
         }
 
         const isMatched = await user.comparePassword(password);
-        console.log("Password Matched:", isMatched);
+
         if (!isMatched) {
 
             return res.status(401).json({
@@ -205,6 +205,6 @@ module.exports = {
 
     loginUser,
     updateProfile,
-    
+
 
 };

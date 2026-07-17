@@ -26,6 +26,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
 
     const { email, password } = req.body;
+     console.log("LOGIN EMAIL:", email);
 
     if (!email || !password) {
         return res.status(400).json({
@@ -35,7 +36,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const user = await User.findOne({ email }).select("+password");
-
+    console.log("LOGIN USER:", user);
     if (!user) {
         return res.status(401).json({
             success: false,
@@ -44,6 +45,8 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const isPasswordMatched = await user.comparePassword(password);
+     console.log("PASSWORD MATCH:", isPasswordMatched);
+
 
     if (!isPasswordMatched) {
         return res.status(401).json({
@@ -53,6 +56,7 @@ const loginUser = asyncHandler(async (req, res) => {
     }
 
     const token = user.getJWTToken();
+    console.log("GENERATED TOKEN:", token);
 
     res.status(200).json({
         success: true,
@@ -149,7 +153,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 
 const updateUserRole = asyncHandler(async (req, res) => {
-    
+
 
     const { role } = req.body;
 

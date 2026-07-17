@@ -10,12 +10,14 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AdminService } from '../../services/admin';
 import { UserService } from '../../services/user';
+import { QuoteService } from '../../services/quote';
+import { Quotes } from '../quotes/quotes';
 
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,Quotes],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
@@ -86,6 +88,11 @@ export class Admin implements OnInit, AfterViewInit {
   imagePreview = '';
   lowStockProducts: Product[] = [];
   orders: any[] = [];
+  quotes: any[] = [];
+
+  filteredQuotes: any[] = [];
+
+  quoteSearch = '';
   availableColors = [
     'Black',
     'White',
@@ -147,7 +154,8 @@ export class Admin implements OnInit, AfterViewInit {
     private productService: ProductService,
     private orderService: OrderService,
     private adminService: AdminService,
-    private userService: UserService
+    private userService: UserService,
+    private quoteService: QuoteService
 
   ) { }
   ngOnInit(): void {
@@ -156,6 +164,7 @@ export class Admin implements OnInit, AfterViewInit {
     this.loadOrders();
     this.loadDashboard();
     this.loadCustomers();
+    this.loadQuotes();
 
   }
 
@@ -171,10 +180,10 @@ export class Admin implements OnInit, AfterViewInit {
 
 
       next: (response: any) => {
-        console.log("API Response", response);
+        
 
         const data: Product[] = response.products;
-        console.log("Products", data);
+        
 
         this.products = data;
 
@@ -221,7 +230,7 @@ export class Admin implements OnInit, AfterViewInit {
 
         this.orders = response.orders;
 
-        console.log("Orders:", this.orders);
+        
 
       },
 
@@ -267,7 +276,30 @@ export class Admin implements OnInit, AfterViewInit {
 
         this.filteredCustomers = response.users;
 
-        console.log("Customers:", this.customers);
+       
+
+      },
+
+      error: (err) => {
+
+        console.error(err);
+
+      }
+
+    });
+
+  }
+
+
+  loadQuotes() {
+
+    this.quoteService.getQuotes().subscribe({
+
+      next: (response: any) => {
+
+        this.quotes = response.quotes;
+
+        this.filteredQuotes = response.quotes;
 
       },
 
@@ -415,7 +447,7 @@ export class Admin implements OnInit, AfterViewInit {
   addProduct() {
     alert("addProduct called");
 
-    console.log("addProduct called");
+   
 
     if (!this.isFormValid()) {
 
@@ -424,9 +456,9 @@ export class Admin implements OnInit, AfterViewInit {
       return;
 
     }
-    console.log('Stock:', this.newProduct.stock);
+    
 
-    console.log('Type:', typeof this.newProduct.stock);
+    
     const formData = new FormData();
 
     formData.append('name', this.newProduct.name);
@@ -448,8 +480,7 @@ export class Admin implements OnInit, AfterViewInit {
       'colors',
       JSON.stringify(this.newProduct.colors)
     );
-    console.log('Stock:', this.newProduct.stock);
-    console.log('Type:', typeof this.newProduct.stock);
+    
 
     formData.append('stock', String(this.newProduct.stock));
 
@@ -458,23 +489,14 @@ export class Admin implements OnInit, AfterViewInit {
     formData.append('image', this.selectedFile!);
 
 
-    console.log("Name:", formData.get('name'));
-
-    console.log("Price:", formData.get('price'));
-
-    console.log("Category:", formData.get('category'));
-
-    console.log("Description:", formData.get('description'));
-
-    console.log("Image:", formData.get('image'));
-    console.log("Before API Call");
+   
 
     this.productService.addProduct(formData).subscribe({
 
 
       next: (res) => {
 
-        console.log("SUCCESS", res);
+       
 
         alert("Product Added");
         this.currentPage = 1;
@@ -486,12 +508,12 @@ export class Admin implements OnInit, AfterViewInit {
       },
 
       error: (err) => {
-        console.error("FULL ERROR:", err);
+        
         alert("Error: " + JSON.stringify(err.error));
       }
 
     });
-    console.log("API Called");
+    
 
 
   }
@@ -610,7 +632,7 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
   openAddModal() {
-    console.log("Button clicked");
+    
 
     this.editing = false;
 

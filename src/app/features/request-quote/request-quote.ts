@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
+import { QuoteService } from '../../services/quote';
 import {
   FormBuilder,
   FormGroup,
@@ -18,7 +20,7 @@ export class RequestQuote {
 
   // Manufacturing Quote Form
   quoteForm: FormGroup;
-
+  loading = false;
   submitted = false;
 
   // Dealer Form
@@ -26,7 +28,13 @@ export class RequestQuote {
 
   dealerSubmitted = false;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+
+    private fb: FormBuilder,
+
+    private quoteService: QuoteService
+
+  ) {
 
     // Quote Form
     this.quoteForm = this.fb.group({
@@ -82,53 +90,138 @@ export class RequestQuote {
   // Manufacturing Quote
   submitQuote() {
 
-    if (this.quoteForm.valid) {
+    if (this.quoteForm.invalid) {
 
-      const form = this.quoteForm.value;
+      this.quoteForm.markAllAsTouched();
 
-      const whatsappMessage = `Hello Triangle Sports,
+      return;
+
+    }
+
+    this.loading = true;
+
+    const form = this.quoteForm.value;
+
+    const payload = {
+
+      name: form.name,
+
+      company: form.company,
+
+      email: form.email,
+
+      phone: form.phone,
+
+      product: form.product,
+
+      quantity: form.quantity,
+
+      requirements: form.message
+
+    };
+
+    this.quoteService.submitQuote(payload).subscribe({
+
+      next: (res) => {
+
+        const whatsappMessage = `Hello Triangle Sports,
 
 Manufacturing Enquiry
 
 Name: ${form.name}
+
 Company: ${form.company}
+
 Email: ${form.email}
+
 Phone: ${form.phone}
+
 Product: ${form.product}
+
 Quantity: ${form.quantity}
 
 Requirements:
+
 ${form.message}`;
 
-      const url =
-        `https://wa.me/916398235747?text=${encodeURIComponent(whatsappMessage)}`;
+        window.open(
 
-      window.open(url, '_blank');
+          `https://wa.me/919990180409?text=${encodeURIComponent(whatsappMessage)}`,
 
-      this.submitted = true;
+          '_blank'
 
-      this.quoteForm.reset();
+        );
+
+        Swal.fire({
+
+          icon: 'success',
+
+          title: 'Quote Submitted',
+
+          text: 'Our sales team will contact you shortly.',
+
+          confirmButtonColor: '#7c3aed'
+
+        });
+
+        this.quoteForm.reset();
+
+        this.submitted = true;
+
+        this.loading = false;
+
+      },
+
+      error: () => {
+
+        this.loading = false;
+
+        Swal.fire({
+
+          icon: 'error',
+
+          title: 'Submission Failed',
+
+          text: 'Please try again later.'
+
+        });
+
+      }
+
+    });
+    
+
+  }
+    // ======================================
+  // Dealer Registration
+  // ======================================
+
+  submitDealer() {
+
+    if (this.dealerForm.invalid) {
+
+      this.dealerForm.markAllAsTouched();
+
+      return;
 
     }
 
-  }
+    const form = this.dealerForm.value;
 
-  // Dealer Registration
-  submitDealer() {
-
-    if (this.dealerForm.valid) {
-
-      const form = this.dealerForm.value;
-
-      const whatsappMessage = `Hello Triangle Sports,
+    const whatsappMessage = `Hello Triangle Sports,
 
 Dealer Registration Request
 
 Name: ${form.fullName}
+
 Business: ${form.businessName}
+
 Email: ${form.email}
+
 Phone: ${form.phone}
+
 City: ${form.city}
+
 State: ${form.state}
 
 Experience:
@@ -137,19 +230,47 @@ ${form.experience}
 Message:
 ${form.message}`;
 
-      const url =
-        `https://wa.me/916398235747?text=${encodeURIComponent(whatsappMessage)}`;
+    window.open(
+      `https://wa.me/916398235747?text=${encodeURIComponent(whatsappMessage)}`,
+      '_blank'
+    );
 
-      window.open(url, '_blank');
+    Swal.fire({
 
-      this.dealerSubmitted = true;
+      icon: 'success',
 
-      this.dealerForm.reset();
+      title: 'Dealer Request Submitted',
 
-    }
+      text: 'Our team will contact you shortly.',
+
+      confirmButtonColor: '#7c3aed'
+
+    });
+
+    this.dealerSubmitted = true;
+
+    this.dealerForm.reset();
 
   }
+
+
+  // ======================================
+  // FAQ
+  // ======================================
+
   activeFaq: number | null = null;
+
+  toggleFaq(index: number) {
+
+    this.activeFaq = this.activeFaq === index ? null : index;
+
+  }
+
+
+  // ======================================
+  // Trusted Brands
+  // ======================================
+
   brands = [
 
     {
@@ -173,19 +294,4 @@ ${form.message}`;
     }
 
   ];
-
-  toggleFaq(index: number) {
-
-    if (this.activeFaq === index) {
-
-      this.activeFaq = null;
-
-    } else {
-
-      this.activeFaq = index;
-
-    }
-
-  }
-
 }

@@ -51,6 +51,14 @@
 
             </li>
 
+            <li [class.active]="activeMenu==='quotes'" (click)="activeMenu='quotes'">
+
+                <i class="fa-solid fa-file-signature"></i>
+
+                Quotes
+
+            </li>
+
 
 
             <li [class.active]="activeMenu==='settings'" (click)="activeMenu='settings'">
@@ -729,6 +737,9 @@
 
             </div>
 
+        </div>
+        <div *ngIf="activeMenu==='quotes'">
+            <app-quotes></app-quotes>
         </div>
         <div *ngIf="activeMenu === 'settings'">
 

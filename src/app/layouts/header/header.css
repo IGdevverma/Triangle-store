@@ -19,7 +19,8 @@
     grid-template-columns:260px 1fr 360px;
     justify-content:space-between;
     align-items:center;
-
+    
+    overflow: visible; 
     padding:0 30px;
 
     border-bottom:1px solid rgba(0,0,0,.05);
@@ -258,6 +259,7 @@ body{
 
 }
 
+
 .dropdown:hover .arrow{
 
     transform:rotate(180deg);
@@ -272,7 +274,15 @@ body{
 
 .dropdown{
 
-    position:relative;
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    height: 92px;
+
+    cursor: pointer;
 
 }
 
@@ -282,62 +292,53 @@ body{
 
 .mega-menu{
 
-    position:absolute;
+    position: absolute;
 
-    top:72px;
+    top: 100%;
 
-    left:50%;
+    left: 50%;
 
-    transform:
-    translateX(-50%)
-    translateY(20px);
+    transform: translateX(-50%) translateY(20px);
 
-    min-width:760px;
+    width: 900px;
 
-    background:white;
+    background: #fff;
 
-    border-radius:20px;
+    border-radius: 20px;
 
-    padding:38px;
+    padding: 35px;
 
-    display:grid;
+    display: grid;
 
-    grid-template-columns:
-    repeat(auto-fit,minmax(170px,1fr));
+    grid-template-columns: repeat(4,1fr);
 
-    gap:35px;
+    gap: 35px;
 
-    opacity:0;
+    opacity: 0;
 
-    visibility:hidden;
+    visibility: hidden;
 
-    pointer-events:none;
+    pointer-events: none;
 
-    transition:.35s ease;
+    transition: all .3s ease;
 
-    box-shadow:
+    box-shadow: 0 20px 60px rgba(0,0,0,.12);
 
-    0 30px 60px rgba(0,0,0,.10);
-
-    border:1px solid rgba(0,0,0,.05);
-
-    z-index:999;
+    z-index: 9999;
 
 }
 
 /* Open */
 
-.dropdown:hover .mega-menu{
+.dropdown:hover > .mega-menu{
 
-    opacity:1;
+    opacity: 1;
 
-    visibility:visible;
+    visibility: visible;
 
-    pointer-events:auto;
+    pointer-events: auto;
 
-    transform:
-    translateX(-50%)
-    translateY(0);
+    transform: translateX(-50%) translateY(0);
 
 }
 
@@ -1556,5 +1557,46 @@ width:95vw;
 right:-12px;
 
 }
+
+}
+/* MEN & WOMEN */
+
+.mega-small .mega-menu{
+
+    left:180px;
+
+    transform:none;
+
+    width:760px;
+
+}
+
+/* ACCESSORIES */
+
+.mega-large .mega-menu{
+
+    left:50%;
+
+    transform:translateX(-50%);
+
+    width:1000px;
+
+}
+
+/* Arrow */
+
+.menu-title{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+.arrow{
+
+    font-size:12px;
 
 }

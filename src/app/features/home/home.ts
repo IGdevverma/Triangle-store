@@ -84,7 +84,7 @@ export class Home implements OnInit {
 
 
       next: (response: any) => {
-        console.log(response.products);
+        
 
        this.products = response.products;
 
