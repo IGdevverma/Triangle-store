@@ -80,7 +80,7 @@ const registerUser = async (req, res) => {
 // Login User
 
 const loginUser = async (req, res) => {
-console.log("GENERATED TOKEN:", token);
+
     try {
 
         const { email, password } = req.body;
@@ -95,8 +95,7 @@ console.log("GENERATED TOKEN:", token);
         }
 
         const user = await User.findOne({ email }).select("+password");
-        console.log("LOGIN EMAIL:", email);
-        console.log("LOGIN USER ID:", user?._id);
+       
 
         if (!user) {
 
