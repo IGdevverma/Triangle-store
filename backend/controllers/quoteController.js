@@ -5,8 +5,9 @@ const adminQuoteReceived = require("../templates/adminQuoteReceived");
 // =========================
 // Create Quote
 // =========================
-console.log("🔥 createQuote API called");
+
 const createQuote = async (req, res) => {
+    console.log("🔥 createQuote API called");
 
     try {
 

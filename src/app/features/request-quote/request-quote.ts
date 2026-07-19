@@ -172,27 +172,26 @@ ${form.message}`;
 
       },
 
-      error: () => {
+      error: (err) => {
+
+        console.log("QUOTE ERROR:", err);
+        console.log("RESPONSE:", err.error);
 
         this.loading = false;
 
         Swal.fire({
-
           icon: 'error',
-
           title: 'Submission Failed',
-
-          text: 'Please try again later.'
-
+          text: err.error?.message || 'Please try again later.'
         });
 
       }
 
     });
-    
+
 
   }
-    // ======================================
+  // ======================================
   // Dealer Registration
   // ======================================
 
