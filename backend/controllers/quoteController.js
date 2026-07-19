@@ -5,7 +5,7 @@ const adminQuoteReceived = require("../templates/adminQuoteReceived");
 // =========================
 // Create Quote
 // =========================
-
+console.log("🔥 createQuote API called");
 const createQuote = async (req, res) => {
 
     try {
@@ -31,6 +31,11 @@ const createQuote = async (req, res) => {
         } catch (mailError) {
 
             console.error("❌ Admin Mail Error:", mailError);
+            return res.status(500).json({
+                success: false,
+                message: mailError.message
+            });
+
 
         }
 
@@ -52,7 +57,10 @@ const createQuote = async (req, res) => {
 
             success: false,
 
-            message: error.message
+            message: error.message,
+            stack: process.env.NODE_ENV === "development"
+                ? error.stack
+                : undefined
 
         });
 
