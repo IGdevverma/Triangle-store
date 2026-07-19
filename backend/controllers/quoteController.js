@@ -1,6 +1,8 @@
 const Quote = require("../models/Quote");
 const sendEmail = require("../utils/sendEmail");
 const adminQuoteReceived = require("../templates/adminQuoteReceived");
+const quoteApproved = require("../templates/quoteApproved");
+const quoteRejected = require("../templates/quoteRejected");
 
 // =========================
 // Create Quote
@@ -10,9 +12,11 @@ const createQuote = async (req, res) => {
     console.log("🔥 createQuote API called");
 
     try {
+        console.log("Request Body:", req.body);
 
         // Save quote
         const quote = await Quote.create(req.body);
+         console.log("✅ Quote saved");
 
         // Send admin email
         try {
@@ -23,11 +27,11 @@ const createQuote = async (req, res) => {
 
                 subject: `📩 New Manufacturing Quote - ${quote.name}`,
 
-                html: adminQuoteReceived(quote)
+                html: adminQuoteReceived(quote),
 
             });
 
-            console.log("✅ Admin email sent.");
+           
 
         } catch (mailError) {
 
@@ -154,70 +158,93 @@ const getQuote = async (req, res) => {
 // =========================
 // Update Quote Status
 // =========================
-
 const updateQuoteStatus = async (req, res) => {
 
     try {
 
         const allowedStatus = [
-
             "Pending",
-
             "Contacted",
-
             "Quotation Sent",
-
             "Approved",
-
             "Production",
-
             "Completed",
-
             "Rejected"
-
         ];
 
         if (!allowedStatus.includes(req.body.status)) {
 
             return res.status(400).json({
-
                 success: false,
-
                 message: "Invalid status."
-
             });
 
         }
 
         const quote = await Quote.findByIdAndUpdate(
-
             req.params.id,
-
             {
-
                 status: req.body.status
-
             },
-
             {
-
                 new: true,
-
                 runValidators: true
-
             }
-
         );
 
         if (!quote) {
 
             return res.status(404).json({
-
                 success: false,
-
                 message: "Quote not found."
-
             });
+
+        }
+
+        // ===============================
+        // Send Email to Customer
+        // ===============================
+
+        try {
+
+            if (quote.status === "Approved") {
+
+                await sendEmail({
+
+                    to: quote.email,
+
+                    subject: "🎉 Your Manufacturing Quote has been Approved",
+
+                    html: quoteApproved(quote)
+
+                });
+
+                console.log("✅ Approval email sent.");
+
+            }
+
+            if (quote.status === "Rejected") {
+
+                await sendEmail({
+
+                    to: quote.email,
+
+                    subject: "Manufacturing Quote Update",
+
+                    html: quoteRejected(quote)
+
+                });
+
+                console.log("✅ Rejection email sent.");
+
+            }
+
+        } catch (mailError) {
+
+            console.error("❌ Customer Email Error:", mailError);
+
+            // Email fail hone par bhi status update rahega.
+            // Sirf log karenge, response fail nahi karenge.
 
         }
 

@@ -9,19 +9,18 @@ export class QuoteService {
 
   private http = inject(HttpClient);
 
-  private api =
-    'https://triangle-store-api.onrender.com/api/quotes';
-    private getHeaders() {
+  private api = 'https://triangle-store-api.onrender.com/api/quotes';
+  private getHeaders() {
 
-      const token = localStorage.getItem('token');
+    const token = localStorage.getItem('token');
 
-      return {
-        headers: new HttpHeaders({
-          Authorization: `Bearer ${token}`
-        })
-      };
+    return {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    };
 
-}
+  }
 
   // ==========================
   // Customer
