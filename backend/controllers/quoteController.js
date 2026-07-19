@@ -19,11 +19,17 @@ const createQuote = async (req, res) => {
 
     } catch (error) {
 
+        console.error("=================================");
+        console.error("UPDATE QUOTE ERROR");
         console.error(error);
+        console.error("=================================");
 
-        res.status(500).json({
+        return res.status(500).json({
             success: false,
-            message: "Failed to submit quote."
+            message: error.message,
+            stack: process.env.NODE_ENV === "development"
+                ? error.stack
+                : undefined
         });
 
     }
@@ -213,29 +219,29 @@ const updateQuoteStatus = async (req, res) => {
 // =========================
 
 const deleteQuote = async (req, res) => {
-  try {
-    const quote = await Quote.findByIdAndDelete(req.params.id);
+    try {
+        const quote = await Quote.findByIdAndDelete(req.params.id);
 
-    if (!quote) {
-      return res.status(404).json({
-        success: false,
-        message: "Quote not found."
-      });
+        if (!quote) {
+            return res.status(404).json({
+                success: false,
+                message: "Quote not found."
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Quote deleted successfully."
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Unable to delete quote."
+        });
     }
-
-    res.status(200).json({
-      success: true,
-      message: "Quote deleted successfully."
-    });
-
-  } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Unable to delete quote."
-    });
-  }
 };
 
 module.exports = {

@@ -17,7 +17,7 @@ import { Quotes } from '../quotes/quotes';
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule, FormsModule,Quotes],
+  imports: [CommonModule, FormsModule, Quotes],
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
@@ -69,6 +69,12 @@ export class Admin implements OnInit, AfterViewInit {
   customers: any[] = [];
   today = new Date();
   filteredCustomers: any[] = [];
+
+  selectedQuote: any = null;
+
+  showQuoteModal = false;
+
+  loadingQuote = false;
 
   customerSearch = '';
   salesChart: any;
@@ -180,10 +186,10 @@ export class Admin implements OnInit, AfterViewInit {
 
 
       next: (response: any) => {
-        
+
 
         const data: Product[] = response.products;
-        
+
 
         this.products = data;
 
@@ -230,7 +236,7 @@ export class Admin implements OnInit, AfterViewInit {
 
         this.orders = response.orders;
 
-        
+
 
       },
 
@@ -276,7 +282,7 @@ export class Admin implements OnInit, AfterViewInit {
 
         this.filteredCustomers = response.users;
 
-       
+
 
       },
 
@@ -447,7 +453,7 @@ export class Admin implements OnInit, AfterViewInit {
   addProduct() {
     alert("addProduct called");
 
-   
+
 
     if (!this.isFormValid()) {
 
@@ -456,9 +462,9 @@ export class Admin implements OnInit, AfterViewInit {
       return;
 
     }
-    
 
-    
+
+
     const formData = new FormData();
 
     formData.append('name', this.newProduct.name);
@@ -480,7 +486,7 @@ export class Admin implements OnInit, AfterViewInit {
       'colors',
       JSON.stringify(this.newProduct.colors)
     );
-    
+
 
     formData.append('stock', String(this.newProduct.stock));
 
@@ -489,14 +495,14 @@ export class Admin implements OnInit, AfterViewInit {
     formData.append('image', this.selectedFile!);
 
 
-   
+
 
     this.productService.addProduct(formData).subscribe({
 
 
       next: (res) => {
 
-       
+
 
         alert("Product Added");
         this.currentPage = 1;
@@ -508,12 +514,12 @@ export class Admin implements OnInit, AfterViewInit {
       },
 
       error: (err) => {
-        
+
         alert("Error: " + JSON.stringify(err.error));
       }
 
     });
-    
+
 
 
   }
@@ -632,7 +638,7 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
   openAddModal() {
-    
+
 
     this.editing = false;
 
@@ -1024,6 +1030,31 @@ export class Admin implements OnInit, AfterViewInit {
     }
 
     return 'assets/uploads/' + image;
+  }
+
+  viewQuote(id: string) {
+
+    this.loadingQuote = true;
+
+    this.quoteService.getQuote(id).subscribe({
+
+      next: (res) => {
+
+        this.selectedQuote = res.quote;
+
+        this.showQuoteModal = true;
+
+        this.loadingQuote = false;
+
+      },
+
+      error: (err) => {
+        this.loadingQuote = false;
+        console.error(err);
+      }
+
+    });
+
   }
 
 }

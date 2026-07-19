@@ -47,10 +47,10 @@ const quoteSchema = new mongoose.Schema(
         "Pending",
         "Contacted",
         "Quotation Sent",
-        "Confirmed",
+        "Approved",
         "Production",
         "Completed",
-        "Cancelled"
+        "Rejected"
       ],
       default: "Pending",
     },

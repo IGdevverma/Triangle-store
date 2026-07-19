@@ -1,4 +1,20 @@
+<div class="toolbar">
+
+    <input type="text" placeholder="Search by name, company, email..." [(ngModel)]="searchText"
+        (input)="applyFilters()">
+
+    <select [(ngModel)]="statusFilter" (change)="applyFilters()">
+
+        <option value="">All Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+
+    </select>
+
+</div>
 <div class="quotes-page">
+
 
     <div class="page-header">
 
@@ -22,9 +38,7 @@
 
     <!-- Empty -->
 
-    <div
-        class="empty"
-        *ngIf="!loading && quotes.length===0">
+    <div class="empty" *ngIf="!loading && quotes.length===0">
 
         No Quotes Found
 
@@ -32,9 +46,7 @@
 
     <!-- Table -->
 
-    <div
-        class="table-wrapper"
-        *ngIf="!loading && quotes.length">
+    <div class="table-wrapper" *ngIf="!loading && quotes.length">
 
         <table>
 
@@ -66,7 +78,7 @@
 
             <tbody>
 
-                <tr *ngFor="let quote of quotes">
+                <tr *ngFor="let quote of filteredQuotes">
 
                     <td>
 
@@ -106,10 +118,7 @@
 
                     <td>
 
-                        <span
-                            class="badge"
-
-                            [ngClass]="{
+                        <span class="badge" [ngClass]="{
 
                             pending:quote.status==='Pending',
 
@@ -133,11 +142,8 @@
 
                     <td>
 
-                        <button
-                            class="btn-view">
-
+                        <button class="btn-view" (click)="viewQuote(quote._id)">
                             View
-
                         </button>
 
                     </td>
@@ -147,6 +153,105 @@
             </tbody>
 
         </table>
+
+    </div>
+
+</div>
+<div class="modal-overlay" *ngIf="showQuoteModal">
+
+    <div class="quote-modal">
+
+        <div class="modal-header">
+
+            <h2>Manufacturing Quote</h2>
+
+            <button class="close-btn" (click)="showQuoteModal=false">
+                ✕
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <div class="info-grid">
+
+                <div class="info-card">
+                    <label>Customer Name</label>
+                    <span>{{selectedQuote?.name}}</span>
+                </div>
+
+                <div class="info-card">
+                    <label>Company</label>
+                    <span>{{selectedQuote?.company}}</span>
+                </div>
+
+                <div class="info-card">
+                    <label>Email</label>
+                    <span>{{selectedQuote?.email}}</span>
+                </div>
+
+                <div class="info-card">
+                    <label>Phone</label>
+                    <span>{{selectedQuote?.phone}}</span>
+                </div>
+
+                <div class="info-card">
+                    <label>Product</label>
+                    <span>{{selectedQuote?.product}}</span>
+                </div>
+
+                <div class="info-card">
+                    <label>Quantity</label>
+                    <span>{{selectedQuote?.quantity}}</span>
+                </div>
+
+                <div class="info-card full-width">
+                    <label>Requirements</label>
+                    <span>{{selectedQuote?.requirements || 'No requirements provided'}}</span>
+                </div>
+
+
+
+                <div class="info-card">
+                    <label>Status</label>
+
+                    <select [(ngModel)]="selectedQuote.status" class="status-select">
+
+                        <option value="Pending">Pending</option>
+                        <option value="Approved">Approved</option>
+                        <option value="Rejected">Rejected</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+
+            <button class="btn-danger" (click)="deleteQuote(selectedQuote._id)">
+
+                Delete
+
+            </button>
+
+            <div>
+
+                <button class="btn-secondary" (click)="showQuoteModal=false">
+
+                    Close
+
+                </button>
+
+                <button type="button" class="btn-primary" (click)="updateStatus()">
+                    Save Changes
+                </button>
+
+            </div>
+
+        </div>
 
     </div>
 
