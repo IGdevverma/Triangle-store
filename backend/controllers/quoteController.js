@@ -1,5 +1,6 @@
 const Quote = require("../models/Quote");
-
+const sendEmail = require("../utils/sendEmail");
+const adminQuoteReceived = require("../templates/adminQuoteReceived");
 
 // =========================
 // Create Quote
@@ -9,32 +10,57 @@ const createQuote = async (req, res) => {
 
     try {
 
+        // Save quote
         const quote = await Quote.create(req.body);
 
+        // Send admin email
+        try {
+
+            await sendEmail({
+
+                to: process.env.ADMIN_EMAIL,
+
+                subject: `📩 New Manufacturing Quote - ${quote.name}`,
+
+                html: adminQuoteReceived(quote)
+
+            });
+
+            console.log("✅ Admin email sent.");
+
+        } catch (mailError) {
+
+            console.error("❌ Admin Mail Error:", mailError);
+
+        }
+
         res.status(201).json({
+
             success: true,
+
             message: "Quote submitted successfully.",
+
             quote
+
         });
 
     } catch (error) {
 
-        console.error("=================================");
-        console.error("UPDATE QUOTE ERROR");
-        console.error(error);
-        console.error("=================================");
+        console.error("Create Quote Error:", error);
 
-        return res.status(500).json({
+        res.status(500).json({
+
             success: false,
-            message: error.message,
-            stack: process.env.NODE_ENV === "development"
-                ? error.stack
-                : undefined
+
+            message: error.message
+
         });
 
     }
 
 };
+
+
 
 
 // =========================
