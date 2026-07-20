@@ -1,6 +1,16 @@
 const sendEmail = require("../utils/sendEmail");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const orderPlaced = require("../templates/orderPlaced");
+
+
+
+const orderPacked = require("../templates/orderPacked");
+const orderShipped = require("../templates/orderShipped");
+const orderDelivered = require("../templates/orderDelivered");
+const orderCancelled = require("../templates/orderCancelled");
+
+console.log("Order Template Function:", orderPlaced);
 // Create Order
 // Create Order
 const createOrder = async (req, res) => {
@@ -87,68 +97,64 @@ const createOrder = async (req, res) => {
             );
         }
 
+
+
+
+
+
+
+
+
+
+        try {
+            console.log("STEP 1");
+            const html = orderPlaced(order);
+            console.log("STEP 2");
+
+            console.log(html.substring(0, 300));
+
+            console.log("STEP 3");
+
+            await sendEmail({
+
+                to: order.email,
+
+                subject: "🎉 Order Confirmed - Triangle Sports",
+
+                html
+
+            });
+
+
+            console.log("STEP 4");
+        } catch (mailError) {
+
+            console.error("❌ Order email failed:", mailError);
+
+        }
+
+        // =============================
+        // Response
+        // =============================
+
         res.status(201).json({
             success: true,
             message: "Order Placed Successfully",
             order
         });
 
-
-
-
-
-
-
-        sendEmail({
-            to: order.email,
-            subject: "🎉 Order Confirmed - Triangle Sports",
-            html: `
-        <h2>Thank you for shopping with Triangle Sports!</h2>
-
-        <p>Hello <b>${order.customerName}</b>,</p>
-
-        <p>Your order has been placed successfully.</p>
-
-        <hr>
-
-        <p><b>Order ID:</b> ${order._id}</p>
-
-        <p><b>Total:</b> ₹${order.total}</p>
-
-        <p><b>Payment:</b> ${order.paymentMethod}</p>
-
-        <p><b>Status:</b> ${order.orderStatus}</p>
-
-        <br>
-
-        <p>We'll notify you once your order is shipped.</p>
-
-        <h3>Triangle Sports ❤️</h3>
-    `
-        })
-            .then(() => {
-                console.log("✅ Order confirmation email sent to:", order.email);
-            })
-            .catch(err => {
-                console.error("❌ Email failed:", err.message);
-            });
-
     } catch (error) {
 
         console.error("ORDER ERROR:", error);
 
         res.status(500).json({
-
             success: false,
             message: error.message
-
         });
 
     }
 
 };
-
-
 
 
 // Get All Orders
@@ -271,6 +277,30 @@ const updateOrderStatus = async (req, res) => {
         });
 
         await order.save();
+        // Send email when order is packed
+        if (order.orderStatus === "Packed") {
+
+            try {
+
+                await sendEmail({
+
+                    to: order.email,
+
+                    subject: "📦 Your Order Has Been Packed",
+
+                    html: orderPacked(order)
+
+                });
+
+                console.log("✅ Packed email sent.");
+
+            } catch (mailError) {
+
+                console.error("❌ Packed email failed:", mailError);
+
+            }
+
+        }
 
         res.status(200).json({
 
@@ -301,4 +331,8 @@ module.exports = {
     updateOrderStatus,
     getOrderById
 
+
 };
+
+
+
