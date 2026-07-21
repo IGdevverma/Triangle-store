@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class Payment {
 
-  private apiUrl =
-    'https://triangle-store-api.onrender.com/api/payment';
+private apiUrl = `${environment.apiUrl}/payment`;
 
   constructor(
     private http: HttpClient
