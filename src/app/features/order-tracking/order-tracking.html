@@ -4,17 +4,68 @@
 
     <div class="order-card">
 
-        <h3>Order ID</h3>
+        <div class="order-info">
 
-        <p>{{ order._id }}</p>
+            <div class="info-item">
+                <span>Order ID</span>
+                <strong>{{ order._id }}</strong>
+            </div>
 
-        <h3>Customer</h3>
+            <div class="info-item">
+                <span>Customer</span>
+                <strong>{{ order.customerName }}</strong>
+            </div>
 
-        <p>{{ order.customerName }}</p>
+            <div class="info-item">
+                <span>Payment</span>
 
-        <h3>Total</h3>
+                <strong [class.paid]="order.paymentStatus === 'Paid'"
+                    [class.pending]="order.paymentStatus === 'Pending'">
 
-        <p>₹{{ order.total }}</p>
+                    {{ order.paymentStatus }}
+
+                </strong>
+
+            </div>
+
+            <div class="info-item">
+                <span>Status</span>
+
+                <strong [class.processing]="order.orderStatus === 'Processing'"
+                    [class.delivered]="order.orderStatus === 'Delivered'"
+                    [class.cancelled]="order.orderStatus === 'Cancelled'">
+
+                    {{ order.orderStatus }}
+
+                </strong>
+
+            </div>
+
+            <div class="info-item">
+                <span>Total</span>
+                <strong>₹{{ order.total }}</strong>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="delivery-card">
+
+        <h3>Estimated Delivery</h3>
+
+        <h2>{{ getEstimatedDelivery() }}</h2>
+
+        <p *ngIf="order.orderStatus !== 'Delivered'">
+
+            Your package is expected to arrive on or before this date.
+
+        </p>
+
+        <p *ngIf="order.orderStatus === 'Delivered'">
+
+            ✅ Your order has been delivered.
+
+        </p>
 
     </div>
 
@@ -31,55 +82,83 @@
 
         </div>
 
-        <div class="timeline-step" [class.completed]="order.orderStatus !== 'Cancelled'"
-            [class.current]="order.orderStatus === 'Processing'">
+        <div class="timeline-step" *ngFor="let step of steps" [class.completed]="isCompleted(step.status)"
+            [class.current]="isCurrent(step.status)">
 
-            <div class="circle">✓</div>
-
-            <div class="content">
-                <h3>Processing</h3>
-                <small>Your order is being prepared.</small>
+            <div class="circle">
+                {{ step.icon }}
             </div>
 
-        </div>
-
-        <div class="timeline-step" [class.completed]="order.orderStatus === 'Packed' ||
-                       order.orderStatus === 'Shipped' ||
-                       order.orderStatus === 'Delivered'" [class.current]="order.orderStatus === 'Packed'">
-
-            <div class="circle">📦</div>
-
             <div class="content">
-                <h3>Packed</h3>
-                <small>Ready for shipment.</small>
-            </div>
 
-        </div>
+                <h3>{{ step.status }}</h3>
 
-        <div class="timeline-step" [class.completed]="order.orderStatus === 'Shipped' ||
-                       order.orderStatus === 'Delivered'" [class.current]="order.orderStatus === 'Shipped'">
+                <small *ngIf="getTrackingDate(step.status); else pending">
 
-            <div class="circle">🚚</div>
+                    {{ getTrackingDate(step.status) }}
 
-            <div class="content">
-                <h3>Shipped</h3>
-                <small>Your package is on the way.</small>
-            </div>
+                </small>
 
-        </div>
+                <ng-template #pending>
 
-        <div class="timeline-step" [class.completed]="order.orderStatus === 'Delivered'"
-            [class.current]="order.orderStatus === 'Delivered'">
+                    <small>
 
-            <div class="circle">🏠</div>
+                        {{ step.description }}
 
-            <div class="content">
-                <h3>Delivered</h3>
-                <small>Package delivered successfully.</small>
+                    </small>
+
+                </ng-template>
+
             </div>
 
         </div>
 
     </div>
+    <div class="products-card">
 
-</div>
+        <h2>Ordered Items</h2>
+
+        <div class="product-row" *ngFor="let item of order.items">
+
+            <img [src]="item.image" [alt]="item.name" class="product-image">
+
+            <div class="product-details">
+
+                <h4>{{ item.name }}</h4>
+
+                <p>Qty : {{ item.quantity }}</p>
+
+                <p>₹{{ item.price }}</p>
+
+            </div>
+
+            <div class="subtotal">
+
+                ₹{{ item.price * item.quantity }}
+
+            </div>
+
+        </div>
+
+
+
+    </div>
+    <div class="address-card">
+
+        <h2>Delivery Address</h2>
+
+        <p>
+            <strong>{{ order.customerName }}</strong>
+        </p>
+
+        <p>{{ order.phone }}</p>
+
+        <p>
+            {{ order.address }},
+            {{ order.city }},
+            {{ order.state }}
+        </p>
+
+        <p>{{ order.pincode }}</p>
+
+    </div>

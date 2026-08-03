@@ -48,5 +48,9 @@ export interface Order {
   createdAt?: string;
 
   updatedAt?: string;
+  trackingHistory?: {
+    status: string;
+    date: string;
+  }[];
 
 }

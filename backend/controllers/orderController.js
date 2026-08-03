@@ -1,14 +1,11 @@
-const sendEmail = require("../utils/sendEmail");
+const EmailService = require("../services/emailService");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-const orderPlaced = require("../templates/orderPlaced");
+const orderPlaced = require("../emails/templates/orderPlaced");
 
 
 
-const orderPacked = require("../templates/orderPacked");
-const orderShipped = require("../templates/orderShipped");
-const orderDelivered = require("../templates/orderDelivered");
-const orderCancelled = require("../templates/orderCancelled");
+
 
 console.log("Order Template Function:", orderPlaced);
 // Create Order
@@ -104,34 +101,18 @@ const createOrder = async (req, res) => {
 
 
 
-
-
         try {
-            console.log("STEP 1");
-            const html = orderPlaced(order);
-            console.log("STEP 2");
 
-            console.log(html.substring(0, 300));
+            await EmailService.sendOrderPlaced(order);
 
-            console.log("STEP 3");
+            console.log("✅ Order confirmation email sent.");
 
-            await sendEmail({
-
-                to: order.email,
-
-                subject: "🎉 Order Confirmed - Triangle Sports",
-
-                html
-
-            });
-
-
-            console.log("STEP 4");
         } catch (mailError) {
 
-            console.error("❌ Order email failed:", mailError);
+            console.error("❌ Order confirmation email failed:", mailError);
 
         }
+
 
         // =============================
         // Response
@@ -282,15 +263,7 @@ const updateOrderStatus = async (req, res) => {
 
             try {
 
-                await sendEmail({
-
-                    to: order.email,
-
-                    subject: "📦 Your Order Has Been Packed",
-
-                    html: orderPacked(order)
-
-                });
+                await EmailService.sendOrderPacked(order);
 
                 console.log("✅ Packed email sent.");
 

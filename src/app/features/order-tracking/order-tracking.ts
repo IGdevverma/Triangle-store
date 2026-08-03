@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-
+import { Order } from '../../models/orders';
 import { OrderService } from '../../services/order';
 
 @Component({
@@ -14,18 +14,53 @@ import { OrderService } from '../../services/order';
 })
 
 export class OrderTracking implements OnInit {
-formatDate(arg0: any) {
-throw new Error('Method not implemented.');
-}
+  formatDate(date: string | Date): string {
 
-  steps = [
-    'Processing',
-    'Packed',
-    'Shipped',
-    'Delivered'
-  ];
+    return new Date(date).toLocaleString('en-IN', {
 
-  order: any;
+      day: '2-digit',
+
+      month: 'short',
+
+      year: 'numeric',
+
+      hour: '2-digit',
+
+      minute: '2-digit'
+
+    });
+
+  }
+
+  readonly steps = [
+
+    {
+      status: 'Processing',
+      icon: '⚙️',
+      description: 'Your order is being prepared.'
+    },
+
+    {
+      status: 'Packed',
+      icon: '📦',
+      description: 'Your package has been packed.'
+    },
+
+    {
+      status: 'Shipped',
+      icon: '🚚',
+      description: 'Your package is on the way.'
+    },
+
+    {
+      status: 'Delivered',
+      icon: '🏠',
+      description: 'Delivered successfully.'
+    }
+
+  ] as const;
+
+  order!: Order;
 
   constructor(
 
@@ -37,13 +72,15 @@ throw new Error('Method not implemented.');
 
   ngOnInit(): void {
 
-    const id = this.route.snapshot.paramMap.get('id');
+    this.route.paramMap.subscribe(params => {
 
-    if (id) {
+      const id = params.get('id');
+
+      if (!id) return;
 
       this.orderService.getOrderById(id).subscribe({
 
-        next: (response: any) => {
+        next: (response) => {
 
           this.order = response.order;
 
@@ -53,13 +90,13 @@ throw new Error('Method not implemented.');
 
         error: (err) => {
 
-          console.error(err);
+          console.error("Failed to load order", err);
 
         }
 
       });
 
-    }
+    });
 
   }
 
@@ -67,9 +104,18 @@ throw new Error('Method not implemented.');
 
     if (!this.order) return false;
 
-    const currentIndex = this.steps.indexOf(this.order.orderStatus);
 
-    const stepIndex = this.steps.indexOf(step);
+    const currentIndex = this.steps.findIndex(
+
+      s => s.status === this.order.orderStatus
+
+    );
+
+    const stepIndex = this.steps.findIndex(
+
+      s => s.status === step
+
+    );
 
     return stepIndex <= currentIndex;
 
@@ -83,4 +129,50 @@ throw new Error('Method not implemented.');
 
   }
 
+
+  getTrackingDate(status: string): string {
+
+    if (!this.order?.trackingHistory) {
+
+      return '';
+
+    }
+
+    const history = this.order.trackingHistory.find(
+
+      (item: any) => item.status === status
+
+    );
+
+    return history
+
+      ? this.formatDate(history.date)
+
+      : '';
+
+  }
+
+  getEstimatedDelivery(): string {
+
+    if (!this.order?.createdAt) {
+
+      return '';
+
+    }
+
+    const date = new Date(this.order.createdAt);
+
+    date.setDate(date.getDate() + 5);
+
+    return date.toLocaleDateString('en-IN', {
+
+      weekday: 'long',
+
+      day: 'numeric',
+
+      month: 'long'
+
+    });
+
+  }
 }

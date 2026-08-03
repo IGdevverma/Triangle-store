@@ -12,7 +12,10 @@ import { AdminService } from '../../services/admin';
 import { UserService } from '../../services/user';
 import { QuoteService } from '../../services/quote';
 import { Quotes } from '../quotes/quotes';
-
+import { InvoiceService } from '../../services/invoice.service';
+import { ToastrService } from 'ngx-toastr';
+import Swal from 'sweetalert2';
+import { NgxSpinnerService } from 'ngx-spinner';
 
 @Component({
   selector: 'app-admin',
@@ -30,7 +33,10 @@ export class Admin implements OnInit, AfterViewInit {
 
       next: (response: any) => {
 
-        alert(response.message);
+        this.toastr.success(
+          response.message,
+          'Success'
+        );
 
         user.role = role;
 
@@ -40,7 +46,12 @@ export class Admin implements OnInit, AfterViewInit {
 
         console.error(err);
 
-        alert(err.error?.message || "Failed to update role");
+
+        this.toastr.error(
+          err.error?.message || 'Failed to update role',
+          'Error'
+        );
+
 
       }
 
@@ -161,7 +172,10 @@ export class Admin implements OnInit, AfterViewInit {
     private orderService: OrderService,
     private adminService: AdminService,
     private userService: UserService,
-    private quoteService: QuoteService
+    private quoteService: QuoteService,
+    private invoiceService: InvoiceService,
+    private toastr: ToastrService,
+    private spinner: NgxSpinnerService
 
   ) { }
   ngOnInit(): void {
@@ -345,7 +359,10 @@ export class Admin implements OnInit, AfterViewInit {
 
       next: (response: any) => {
 
-        alert(response.message);
+        this.toastr.success(
+          'Product deleted successfully.',
+          'Deleted'
+        );
 
         this.loadCustomers();
 
@@ -355,7 +372,10 @@ export class Admin implements OnInit, AfterViewInit {
 
         console.error(err);
 
-        alert(err.error?.message || 'Failed to delete customer');
+        this.toastr.error(
+          err.error?.message || 'Failed to delete customer',
+          'Error'
+        );
 
       }
 
@@ -378,7 +398,10 @@ export class Admin implements OnInit, AfterViewInit {
 
         order.orderStatus = status;
 
-        alert('Order status updated successfully.');
+        this.toastr.success(
+          'Order status updated successfully.',
+          'Updated'
+        );
 
       },
 
@@ -386,7 +409,10 @@ export class Admin implements OnInit, AfterViewInit {
 
         console.error(err);
 
-        alert('Failed to update order status.');
+        this.toastr.error(
+          'Failed to update order status.',
+          'Error'
+        );
 
       }
 
@@ -451,7 +477,7 @@ export class Admin implements OnInit, AfterViewInit {
   editing = false;
 
   addProduct() {
-    alert("addProduct called");
+    console.log('addProduct called');
 
 
 
@@ -504,7 +530,10 @@ export class Admin implements OnInit, AfterViewInit {
 
 
 
-        alert("Product Added");
+        this.toastr.success(
+          'Product added successfully.',
+          'Success'
+        );
         this.currentPage = 1;
 
         this.closeModal();
@@ -515,7 +544,10 @@ export class Admin implements OnInit, AfterViewInit {
 
       error: (err) => {
 
-        alert("Error: " + JSON.stringify(err.error));
+        this.toastr.error(
+          err.error?.message || 'Something went wrong.',
+          'Error'
+        );
       }
 
     });
@@ -541,7 +573,10 @@ export class Admin implements OnInit, AfterViewInit {
 
     if (!this.isFormValid()) {
 
-      alert('Please fill all fields correctly.');
+      this.toastr.warning(
+        'Please fill all fields correctly.',
+        'Validation'
+      );
 
       return;
     }
@@ -573,16 +608,69 @@ export class Admin implements OnInit, AfterViewInit {
 
   deleteProduct(id: string) {
 
-    if (confirm('Delete this product?')) {
+    Swal.fire({
 
-      this.productService.deleteProduct(id)
-        .subscribe(() => {
+      title: 'Delete Product?',
 
-          this.loadProducts();
+      text: 'This action cannot be undone.',
+
+      icon: 'warning',
+
+      showCancelButton: true,
+
+      confirmButtonColor: '#DC2626',
+
+      cancelButtonColor: '#6B7280',
+
+      confirmButtonText: 'Delete',
+
+      cancelButtonText: 'Cancel'
+
+    }).then((result) => {
+
+      if (result.isConfirmed) {
+
+        this.spinner.show();
+
+        this.productService.deleteProduct(id).subscribe({
+
+          next: () => {
+
+            this.spinner.hide();
+
+            this.loadProducts();
+
+            this.toastr.success(
+
+              'Product deleted successfully.',
+
+              'Deleted'
+
+            );
+
+          },
+
+          error: () => {
+
+            this.spinner.hide();
+
+            this.toastr.error(
+
+              
+
+              'Failed to delete product.',
+
+              'Error'
+
+            );
+
+          }
 
         });
 
-    }
+      }
+
+    });
 
   }
 
@@ -793,268 +881,12 @@ export class Admin implements OnInit, AfterViewInit {
     });
 
   }
-  downloadInvoice(order: any) {
 
-    const img = new Image();
-
-    img.src = 'assets/images/trianglepng.png';
-
-    img.onload = () => {
-
-      const doc = new jsPDF();
-      doc.addImage(img, 'PNG', 15, 12, 20, 20);
-      // Company
-      doc.setFontSize(22);
-      doc.setFont("helvetica", "bold");
-      doc.text("Triangle Sports", 45, 20);
-
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-
-      doc.text("Triangle Sports Pvt. Ltd.", 45, 28);
-      doc.text("New Delhi, India", 45, 34);
-      doc.text("support@trianglesports.com", 45, 40);
-      doc.text("+91 9990180409", 45, 46);
-
-      // Invoice Heading
-
-      doc.setFontSize(24);
-      doc.setFont("helvetica", "bold");
-
-      doc.text("TAX INVOICE", 145, 18);
-
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "normal");
-
-      doc.setFontSize(10);
-
-      doc.text(`Invoice # : ${order._id.slice(-6)}`, 145, 28);
-
-      doc.text(
-        `Date : ${new Date(order.createdAt).toLocaleDateString()}`,
-        145,
-        34
-      );
-
-      doc.text(
-        `Payment : ${order.paymentStatus}`,
-        145,
-        40
-      );
-
-      doc.setDrawColor(180);
-
-      doc.line(
-        15,
-        55,
-        195,
-        55
-      );
-
-      // Bill To Box
-
-      doc.setDrawColor(200);
-      doc.rect(14, 60, 85, 55);
-
-      doc.setFontSize(12);
-      doc.setFont("helvetica", "bold");
-      doc.text("BILL TO", 18, 68);
-
-      doc.setFontSize(10);
-      doc.setFont("helvetica", "normal");
-
-      doc.text(order.customerName, 18, 76);
-      doc.text(order.email, 18, 83);
-      doc.text(order.phone, 18, 90);
-
-
-      doc.rect(111, 60, 84, 55);
-
-      doc.setFont("helvetica", "bold");
-      doc.text("SHIPPING ADDRESS", 115, 68);
-
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-
-      const address = doc.splitTextToSize(
-        order.address,
-        70
-      );
-
-      doc.text(address, 115, 76);
-
-      doc.text(
-        `${order.city}, ${order.state}`,
-        115,
-        83
-      );
-
-      doc.text(
-        order.pincode,
-        115,
-        90
-      );
-
-
-      // Order Information Box
-
-      doc.setDrawColor(200);
-      doc.rect(14, 122, 181, 24);
-
-      doc.setFontSize(11);
-      doc.setFont("helvetica", "bold");
-
-      doc.text("ORDER INFORMATION", 18, 130);
-
-      doc.setFont("helvetica", "normal");
-
-      doc.text(`Order ID : ${order._id.slice(-8)}`, 18, 138);
-      doc.text(`Payment : ${order.paymentStatus}`, 85, 138);
-      doc.text(`Status : ${order.orderStatus}`, 145, 138);
-
-
-
-      // Products Table
-      autoTable(doc, {
-
-        startY: 155,
-
-        head: [[
-          "Product",
-          "Qty",
-          "Price",
-          "Total"
-        ]],
-
-        body: order.items.map((item: any) => [
-
-          item.name,
-
-          item.quantity,
-
-          `Rs. ${item.price}`,
-
-          `Rs. ${item.price * item.quantity}`
-
-        ]),
-
-        headStyles: {
-
-          fillColor: [109, 40, 217]
-
-        },
-
-
-        theme: "grid",
-
-        styles: {
-          fontSize: 10,
-          cellPadding: 4
-        },
-
-        columnStyles: {
-          1: { halign: "center" },
-          2: { halign: "right" },
-          3: { halign: "right" }
-        },
-
-        foot: [[
-          "",
-          "",
-          "Grand Total",
-          `Rs. ${order.total}`
-        ]],
-
-        footStyles: {
-          fillColor: [235, 235, 235],
-          textColor: 0,
-          fontStyle: "bold"
-        }
-
-      });
-      const finalY = (doc as any).lastAutoTable.finalY;
-      // Signature
-
-      doc.line(145, finalY + 24, 190, finalY + 24);
-
-      doc.setFontSize(10);
-
-      doc.text(
-        "Authorized Signature",
-        145,
-        finalY + 31
-      );
-
-
-      // Footer
-
-      doc.setDrawColor(180);
-      doc.line(14, finalY + 15, 195, finalY + 15);
-
-      doc.setFontSize(9);
-
-      doc.text(
-        "Thank you for shopping with Triangle Sports.",
-        14,
-        finalY + 25
-      );
-
-      doc.text(
-        "Goods once sold are subject to our return policy.",
-        14,
-        finalY + 31
-      );
-
-      doc.text(
-        "www.trianglesports.com",
-        14,
-        finalY + 37
-      );
-
-      doc.save(`invoice-${order._id.slice(-6)}.pdf`);
-
-    };
-
-
-
-
-  }
-  getImageUrl(image: string) {
-
-    if (!image) {
-      return 'assets/no-image.png';
-    }
-
-    if (image.startsWith('http')) {
-      return image;
-    }
-
-    return 'assets/uploads/' + image;
+  downloadInvoice(order: any): void {
+    this.invoiceService.generateInvoice(order);
   }
 
-  viewQuote(id: string) {
 
-    this.loadingQuote = true;
 
-    this.quoteService.getQuote(id).subscribe({
-
-      next: (res) => {
-
-        this.selectedQuote = res.quote;
-
-        this.showQuoteModal = true;
-
-        this.loadingQuote = false;
-
-      },
-
-      error: (err) => {
-        this.loadingQuote = false;
-        console.error(err);
-      }
-
-    });
-
-  }
 
 }

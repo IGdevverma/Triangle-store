@@ -95,7 +95,7 @@ const loginUser = async (req, res) => {
         }
 
         const user = await User.findOne({ email }).select("+password");
-       
+       console.log("User Found:", !!user);
 
         if (!user) {
 
@@ -107,7 +107,7 @@ const loginUser = async (req, res) => {
         }
 
         const isMatched = await user.comparePassword(password);
-
+        console.log("Password Match:", isMatched);
         if (!isMatched) {
 
             return res.status(401).json({
