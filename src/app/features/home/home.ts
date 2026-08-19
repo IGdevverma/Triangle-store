@@ -98,32 +98,20 @@ export class Home implements OnInit {
 
       next: (response: any) => {
 
-        this.products = response.products;
+
+        this.products = response.products || [];
 
         this.filteredProducts = response.products.filter(
           (product: Product) => product.showOnHome !== false
         );
 
         /* ===============================
-           MOST LOVED PRODUCTS
-           =============================== */
+   MOST LOVED PRODUCTS
+   =============================== */
 
-        const bestSellerKeywords = [
-          'Premium Ultra-Soft Cotton Fitted Tank',
-          'TriCore Oversized Pant',
-          'ProFlex Arm Sleeves'
-        ];
-
-        this.bestSellerProducts = bestSellerKeywords
-          .map(keyword => {
-
-            return response.products.find(
-              (product: Product) =>
-                product.name?.trim().toLowerCase() === keyword.trim().toLowerCase()
-            );
-
-          })
-          .filter((product): product is Product => !!product);
+        this.bestSellerProducts = response.products
+          .filter((product: Product) => product.showOnHome !== false)
+          .slice(0, 3);
 
         console.log(
           'MOST LOVED PRODUCTS:',
