@@ -88,20 +88,45 @@ const getProductById = asyncHandler(async (req, res) => {
 });
 
 // Update Product
+// Update Product
 const updateProduct = asyncHandler(async (req, res) => {
 
-    const product = await Product.findByIdAndUpdate(
-        req.params.id,
-        req.body,
-        {
-            new: true,
-            runValidators: true
+    console.log("========== UPDATE PRODUCT ==========");
+    console.log("BODY:", req.body);
+    console.log("FILE:", req.file);
+
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+        return res.status(404).json({
+            success: false,
+            message: "Product not found"
+        });
+    }
+
+    // Update image only if a new image was selected
+    if (req.file) {
+        console.log("NEW IMAGE PATH:", req.file.path);
+
+        product.image = req.file.path;
+    }
+
+    // Update other product fields
+    Object.keys(req.body).forEach((key) => {
+
+        if (key !== "image") {
+            product[key] = req.body[key];
         }
-    );
+
+    });
+
+    const updatedProduct = await product.save();
+
+    console.log("UPDATED PRODUCT:", updatedProduct);
 
     res.status(200).json({
         success: true,
-        product
+        product: updatedProduct
     });
 
 });
