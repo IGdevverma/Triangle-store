@@ -28,15 +28,11 @@ router.post(
 router.get("/", getProducts);
 router.get("/:id", getProductById);
 router.put(
-
     "/:id",
-
     isAuthenticatedUser,
-
     authorizeRoles("admin"),
-
+    upload.single("image"),
     updateProduct
-
 );
 router.delete(
 

@@ -9,7 +9,7 @@ import { environment } from '../../environments/environment';
 })
 export class ProductService {
 
-private apiUrl = `${environment.apiUrl}/products`;
+  private apiUrl = `${environment.apiUrl}/products`;
 
   constructor(private http: HttpClient) { }
 
@@ -36,22 +36,11 @@ private apiUrl = `${environment.apiUrl}/products`;
 
   }
 
-  updateProduct(
-
-    id: string,
-
-    product: Product
-
-  ): Observable<Product> {
-
-    return this.http.put<Product>(
-
+  updateProduct(id: string, product: FormData) {
+    return this.http.put(
       `${this.apiUrl}/${id}`,
-
       product
-
     );
-
   }
 
   deleteProduct(id: string): Observable<void> {

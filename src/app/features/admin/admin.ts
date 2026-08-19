@@ -17,6 +17,7 @@ import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { NgxSpinnerService } from 'ngx-spinner';
 
+
 @Component({
   selector: 'app-admin',
   standalone: true,
@@ -570,7 +571,6 @@ export class Admin implements OnInit, AfterViewInit {
 
   updateProduct() {
 
-
     if (!this.isFormValid()) {
 
       this.toastr.warning(
@@ -581,25 +581,96 @@ export class Admin implements OnInit, AfterViewInit {
       return;
     }
 
+    const formData = new FormData();
 
-    this.showModal = false;
+    formData.append('name', this.newProduct.name || '');
+    formData.append('price', String(this.newProduct.price || 0));
+    formData.append('category', this.newProduct.category || '');
+    formData.append('stock', String(this.newProduct.stock || 0));
+    formData.append('description', this.newProduct.description || '');
+    formData.append('fabric', this.newProduct.fabric || '');
+    formData.append('type', this.newProduct.type || '');
+    formData.append(
+      'availableColors',
+      this.newProduct.availableColors || ''
+    );
+
+    formData.append(
+      'showOnHome',
+      String(this.newProduct.showOnHome ?? true)
+    );
+
+    formData.append(
+      'discount',
+      String(this.newProduct.discount || 0)
+    );
+
+    formData.append(
+      'sku',
+      this.newProduct.sku || ''
+    );
+
+    // IMPORTANT: only append image when user selected a new file
+    if (this.selectedFile) {
+
+      formData.append(
+        'image',
+        this.selectedFile
+      );
+
+    }
+
     this.productService.updateProduct(
       this.newProduct._id!,
-      this.newProduct
-    ).subscribe(() => {
+      formData
+    ).subscribe({
 
-      this.loadProducts();
+      next: () => {
 
-      this.editing = false;
+        this.showModal = false;
 
-      this.newProduct = {
-        _id: '',
-        name: '',
-        price: 0,
-        image: '',
-        category: '',
-        stock: 0,
-      };
+        this.loadProducts();
+
+        this.editing = false;
+
+        this.selectedFile = null;
+
+        this.imagePreview = '';
+
+        this.newProduct = {
+          _id: '',
+          name: '',
+          price: 0,
+          image: '',
+          category: '',
+          description: '',
+          fabric: '',
+          type: '',
+          availableColors: '',
+          stock: 0,
+          showOnHome: true
+        };
+
+        this.toastr.success(
+          'Product updated successfully.',
+          'Success'
+        );
+
+      },
+
+      error: (err) => {
+
+        console.error(
+          'Update product error:',
+          err
+        );
+
+        this.toastr.error(
+          'Failed to update product.',
+          'Error'
+        );
+
+      }
 
     });
 
@@ -656,7 +727,7 @@ export class Admin implements OnInit, AfterViewInit {
 
             this.toastr.error(
 
-              
+
 
               'Failed to delete product.',
 
