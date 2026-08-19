@@ -105,230 +105,69 @@
 
 
 <!-- Featured Products -->
-
 <section class="featured-products">
 
+    <!-- HEADER -->
     <div class="featured-header">
 
-        <h2>Featured Collection</h2>
-
-        <p>
-
-            Discover our best-selling performance apparel crafted for athletes,
-            gym enthusiasts, and everyday training.
-
-        </p>
-
-    </div>
-
-    <div class="featured-wrapper">
-
-        <button class="slider-arrow left" (click)="prevFeatured()">
-            ❮
-        </button>
-
-        <div class="products-grid">
-            <div class="product-card" *ngFor="let product of displayedProducts"
-                [routerLink]="['/product', product._id]">
-
-                <!-- Badge -->
-
-                <span class="discount-badge">
-
-                    -20%
-
-                </span>
-
-                <!-- Wishlist -->
-
-                <button class="wishlist-btn">
-
-                    <i class="fa-regular fa-heart"></i>
-
-                </button>
-
-                <!-- Quick View -->
-
-                <button class="quick-btn">
-
-                    <i class="fa-regular fa-eye"></i>
-
-                </button>
-
-                <!-- Image -->
-
-                <div class="product-image">
-
-                    <img [src]="getImageUrl(product.image)" [alt]="product.name">
-
-                </div>
-
-                <!-- Info -->
-
-                <div class="product-info">
-
-                    <span class="brand">
-
-                        TRIANGLE SPORTS
-
-                    </span>
-
-                    <h3>
-
-                        {{product.name}}
-
-                    </h3>
-
-                    <div class="rating">
-
-                        ★★★★★
-
-                        <span>(24 Reviews)</span>
-
-                    </div>
-
-                    <div class="price-row">
-
-                        <span class="price">
-
-                            ₹{{product.price}}
-
-                        </span>
-
-                        <span class="old-price">
-
-                            ₹1299
-
-                        </span>
-
-                    </div>
-
-                    <!-- Colors -->
-
-                    <div class="colors">
-
-                        <span class="black"></span>
-
-                        <span class="purple"></span>
-
-                        <span class="gray"></span>
-
-                    </div>
-
-                    <!-- Sizes -->
-
-                    <div class="sizes">
-
-                        <span>S</span>
-
-                        <span>M</span>
-
-                        <span>L</span>
-
-                        <span>XL</span>
-
-                    </div>
-
-                    <button class="btn btn-primary add-btn">
-
-                        Add To Cart
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        <button class="slider-arrow right" (click)="nextFeatured()">
-            ❯
-        </button>
-
-    </div>
-
-   
-
-</section>
-<section class="best-sellers">
-
-    <div class="section-title">
-
-        <span>BEST SELLERS</span>
+        <span class="section-label">
+            FEATURED COLLECTION
+        </span>
 
         <h2>
-
             Most Loved Products
-
         </h2>
 
         <p>
-
             Discover our most popular sportswear chosen by athletes,
             teams and fitness enthusiasts.
-
         </p>
 
     </div>
 
-    <div class="best-layout">
 
-        <!-- Large Card -->
+    <!-- PRODUCTS -->
+    <div class="products-grid">
 
-        <div class="featured-product">
+        <div
+            class="product-item"
+            *ngFor="let product of bestSellerProducts"
+            [routerLink]="['/product', product._id]"
+        >
 
-            <img src="assets/products/football jersey.jpg" alt="Football Jersey">
+            <!-- IMAGE -->
+            <div class="product-image-wrapper">
 
-            <div class="featured-overlay">
+                <!-- DISCOUNT -->
+                <span class="discount-badge">
+                    SAVE 9%
+                </span>
 
-                <span>Editor's Choice</span>
-
-                <h3>
-
-                    Football Jersey
-
-                </h3>
-
-                <p>
-
-                    Premium breathable fabric built for
-                    match performance.
-
-                </p>
-
-                <a routerLink="/shop" class="btn btn-primary">
-
-                    Shop Now
-
-                </a>
+                <img
+                    [src]="getImageUrl(product.image)"
+                    [alt]="product.name"
+                    class="product-image"
+                />
 
             </div>
 
-        </div>
 
-        <!-- Right Grid -->
+            <!-- PRODUCT NAME -->
+            <h3 class="product-name">
+                {{ product.name }}
+            </h3>
 
-        <div class="mini-products">
 
-            <div class="mini-card" *ngFor="let product of filteredProducts | slice:0:4">
+            <!-- PRICE -->
+            <div class="price-row">
 
-                <img [src]="getImageUrl(product.image)" [alt]="product.name">
+                <span class="current-price">
+                    ₹{{ product.price }}
+                </span>
 
-                <div>
-
-                    <h4>
-
-                        {{product.name}}
-
-                    </h4>
-
-                    <p>
-
-                        ₹{{product.price}}
-
-                    </p>
-
-                </div>
+                <span class="old-price">
+                    ₹1299
+                </span>
 
             </div>
 
@@ -336,7 +175,21 @@
 
     </div>
 
+
+    <!-- VIEW ALL -->
+    <div class="view-all-wrapper">
+
+        <a
+            routerLink="/shop"
+            class="view-all-btn"
+        >
+            View all
+        </a>
+
+    </div>
+
 </section>
+
 
 <section class="services-section">
 
@@ -575,9 +428,7 @@
 
     <div class="brand-image">
 
-        <img
-            src="assets/images/aboutus.png"
-            alt="Triangle Sports">
+        <img src="assets/images/aboutus.png" alt="Triangle Sports">
 
     </div>
 
@@ -613,9 +464,7 @@
 
         </p>
 
-        <a
-            routerLink="/about"
-            class="btn btn-primary">
+        <a routerLink="/about" class="btn btn-primary">
 
             Read Our Story
 

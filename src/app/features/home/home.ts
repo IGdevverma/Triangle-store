@@ -5,6 +5,7 @@ import { ProductService } from '../../services/product';
 import { CartService } from '../../services/cart';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { SeoService } from '../../services/seo';
 
 @Component({
   selector: 'app-home',
@@ -13,8 +14,10 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
-export class Home implements OnInit {
 
+
+export class Home implements OnInit {
+  bestSellerProducts: Product[] = [];
   products: Product[] = [];
   filteredProducts: Product[] = [];
 
@@ -74,26 +77,67 @@ export class Home implements OnInit {
 
   constructor(
     private productService: ProductService,
-    private cartService: CartService
+    private cartService: CartService,
+    private seoService: SeoService
   ) { }
 
   ngOnInit(): void {
 
+    /* Update SEO */
+    this.seoService.updateSeo(
+      'Triangle Sports | Premium Sportswear Manufacturer',
+
+      'Premium Sportswear Manufacturer offering gym wear, jerseys, vests, activewear and custom team kits.',
+
+      'Sportswear,Gym Wear,Triangle Sports,Team Jerseys,Vests'
+    );
+
+    /* Load Products */
     /* Load Products */
     this.productService.getProducts().subscribe({
 
-
       next: (response: any) => {
-        
 
-       this.products = response.products;
+        this.products = response.products;
 
         this.filteredProducts = response.products.filter(
           (product: Product) => product.showOnHome !== false
         );
 
+        /* ===============================
+           MOST LOVED PRODUCTS
+           =============================== */
+
+        const bestSellerKeywords = [
+          'Premium Ultra-Soft Cotton Fitted Tank',
+          'TriCore Oversized Pant',
+          'ProFlex Arm Sleeves'
+        ];
+
+        this.bestSellerProducts = bestSellerKeywords
+          .map(keyword => {
+
+            return response.products.find(
+              (product: Product) =>
+                product.name?.trim().toLowerCase() === keyword.trim().toLowerCase()
+            );
+
+          })
+          .filter((product): product is Product => !!product);
+
+        console.log(
+          'MOST LOVED PRODUCTS:',
+          this.bestSellerProducts
+        );
+
+        /* ===============================
+           FEATURED PRODUCTS
+           =============================== */
+
         this.updateFeaturedProducts();
+
       },
+
       error: (err) => {
 
         console.error(
@@ -114,7 +158,7 @@ export class Home implements OnInit {
 
   }
 
-  
+
 
   /* ================= HERO SLIDER ================= */
 

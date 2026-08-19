@@ -70,7 +70,9 @@
 
 .main-content {
     flex: 1;
-    padding: 30px;
+    min-width: 0;
+    padding: 105px 32px 40px;
+    min-height: 100vh;
 }
 
 .topbar {
@@ -1343,6 +1345,7 @@ td:nth-child(5) {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 24px;
     margin: 30px 0 18px;
 }
 
@@ -1350,6 +1353,9 @@ td:nth-child(5) {
     font-size: 30px;
     font-weight: 700;
     color: #111827;
+}
+.products-header > div:first-child {
+    min-width: 0;
 }
 
 .products-header p {

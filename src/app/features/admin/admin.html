@@ -395,19 +395,21 @@
         </div>
         <!-- Product Table -->
         <div *ngIf="activeMenu === 'products'">
+
             <div class="products-header">
 
                 <div>
-
                     <h2>Products Management</h2>
-
                     <p>Manage your inventory and products</p>
-
                 </div>
 
-                <div class="products-count">
+                <div class="products-header-actions">
 
-                    {{ products.length }} Products
+                    <div class="products-count">
+                        {{ products.length }} Products
+                    </div>
+
+                    
 
                 </div>
 
@@ -494,7 +496,7 @@
                                         <i class="fa-solid fa-trash"></i>
 
                                     </button>
-                                   
+
                                 </div>
 
 

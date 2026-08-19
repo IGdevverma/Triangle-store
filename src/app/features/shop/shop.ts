@@ -8,6 +8,7 @@ import { CartService } from '../../services/cart';
 import { WishlistService } from '../../services/wishlist';
 import { NotificationService } from '../../services/notification';
 import { LoadingService } from '../../services/loading';
+import { SeoService } from '../../services/seo';
 
 @Component({
   selector: 'app-shop',
@@ -32,10 +33,21 @@ export class Shop implements OnInit {
     private wishlistService: WishlistService,
     private notificationService: NotificationService,
     private loadingService: LoadingService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private seoService: SeoService
   ) { }
 
   ngOnInit(): void {
+
+    this.seoService.updateSeo(
+
+      'Shop Sportswear | Triangle Sports',
+
+      'Browse premium sportswear including vests, shorts, track pants, jerseys and compression wear.',
+
+      'Sportswear Shop,Gym Wear,Track Pants,Vests'
+
+    );
 
     this.loadingService.show();
 

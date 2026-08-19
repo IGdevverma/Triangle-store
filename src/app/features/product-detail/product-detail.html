@@ -1,432 +1,1050 @@
-<div class="breadcrumb" *ngIf="product">
+<!-- =========================================================
+     PRODUCT DETAIL PAGE
+========================================================= -->
 
-  HOME / {{ product.category }} / {{ product.name }}
+<div class="product-page" *ngIf="product as product">
 
-</div>
+  <!-- ================= BREADCRUMB ================= -->
 
-<div *ngIf="product as product" class="product-detail-wrapper">
+  <div class="product-container">
 
-  <!-- LEFT -->
+    <div class="breadcrumb">
+      <a routerLink="/">Home</a>
 
-  <div class="product-image-section">
+      <span>/</span>
 
-    <div class="image-zoom-container" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom()">
+      <a [routerLink]="['/shop']">
+        {{ product.category }}
+      </a>
 
-      <img class="main-image" [src]="selectedImage" [alt]="product?.name" [style.transform]="zoomTransform"
-        [style.transform-origin]="zoomOrigin">
+      <span>/</span>
 
+      <strong>{{ product.name }}</strong>
     </div>
 
-    <!-- Thumbnails -->
-    <div class="thumbnail-images">
 
-      <img *ngFor="let image of productImages" [src]="image" [alt]="product?.name"
-        [class.active-thumb]="selectedImage === image" (click)="selectedImage = image">
+    <!-- ================= MAIN PRODUCT ================= -->
+    <section class="product-layout">
 
-    </div>
+      <!-- ================================================= -->
+      <!-- LEFT : PRODUCT IMAGE GALLERY -->
+      <!-- ================================================= -->
 
-  </div>
+      <div class="product-gallery">
 
-  <!-- RIGHT -->
+        <!-- Main Product Image -->
+        <div class="main-image-wrapper" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom()">
 
-  <div class="product-info-section">
+          <!-- Discount Badge -->
+          <div class="image-discount" *ngIf="product.discount && product.discount > 0">
+            -{{ product.discount }}%
+          </div>
 
-    <h1>{{ product.name }}</h1>
-
-    <div class="rating">
-
-      <span *ngFor="let star of [1,2,3,4,5]">
-        {{ star <= roundedRating ? '★' : '☆' }} </span>
-
-          <span class="review-count">
-            ({{ reviews.length }} Reviews)
-          </span>
-
-    </div>
-
-    <div class="price-section">
-
-      <span class="current-price">
-        ₹{{ product.price }}
-      </span>
-
-      <span class="old-price" *ngIf="product.discount && product.discount > 0">
-
-        ₹{{ product.price + (product.price * product.discount / (100 - product.discount)) | number:'1.0-0' }}
-
-      </span>
-
-      <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
-
-        {{ product.discount }}% OFF
-
-      </span>
-
-    </div>
-
-    <p class="tax-text">
-      {{ product.taxText || 'Inclusive of all taxes' }}
-    </p>
-
-    <p class="description">
-      {{ product.description }}
-    </p>
-
-    <!-- Colors -->
-
-    <div class="color-section" *ngIf="product.colors?.length">
-
-      <h3>Available Colors</h3>
-
-      <div class="colors">
-
-        <div class="color-item" *ngFor="let color of product.colors">
-
-          <span class="color-dot" [style.background]="color">
-          </span>
-
-          <span class="color-name">
-            {{ color }}
-          </span>
+          <img class="main-product-image" [src]="selectedImage" [alt]="product.name" [style.transform]="zoomTransform"
+            [style.transform-origin]="zoomOrigin" />
 
         </div>
 
-      </div>
 
-    </div>
+        <!-- Product Thumbnails -->
+        <div class="thumbnail-wrapper" *ngIf="productImages.length > 1">
 
-    <!-- Sizes -->
+          <button type="button" class="thumbnail" *ngFor="let image of productImages"
+            [class.active]="selectedImage === image" (click)="selectedImage = image">
 
-    <div class="size-section">
-
-      <h3>Size: {{ selectedSize }}</h3>
-
-      <div class="sizes">
-
-        <button *ngFor="let size of ['XS','S','M','L','XL','XXL','XXXL']" [class.active]="selectedSize === size"
-          (click)="selectedSize = size">
-
-          {{ size }}
-
-        </button>
-
-      </div>
-
-    </div>
-
-    <!-- Quantity -->
-
-    <div class="cart-row">
-
-      <span class="qty-label">Qty:</span>
-
-      <button (click)="decreaseQuantity()">−</button>
-
-      <span>{{ quantity }}</span>
-
-      <button (click)="increaseQuantity()">+</button>
-
-      <span class="stock" [class.in-stock]="product.stock">
-
-        <span *ngIf="product?.stock! > 10" class="in-stock">
-          🟢 In Stock
-        </span>
-
-        <span *ngIf="product?.stock! > 0 && product?.stock! <= 10" class="low-stock">
-          🟡 Only {{ product?.stock }} left
-        </span>
-
-        <span *ngIf="product?.stock === 0" class="out-stock">
-          🔴 Out of Stock
-        </span>
-
-      </span>
-
-    </div>
-
-    <!-- Buttons -->
-
-    <button class="cart-btn" (click)="addToCart()" [disabled]="product?.stock === 0">
-      {{ product?.stock === 0 ? 'OUT OF STOCK' : 'ADD TO CART' }}
-    </button>
-
-    <button class="buy-btn" (click)="buyNow()" [disabled]="product?.stock === 0">
-      BUY NOW
-    </button>
-
-    <div class="delivery-section">
-
-      <h4>Delivery</h4>
-
-      <!-- Amazon Style -->
-      <div *ngIf="isPincodeSaved; else enterPincode">
-
-        <p>
-
-          Deliver to
-          <strong>{{ pincode }}</strong>
-
-        </p>
-
-        <p>{{ deliveryMessage }}</p>
-
-        <p *ngIf="deliveryCharge === 0" class="free">
-
-          Free Delivery
-
-        </p>
-
-        <p *ngIf="deliveryCharge > 0">
-
-          Delivery Charges:
-          ₹{{ deliveryCharge }}
-
-        </p>
-
-        <button class="change-btn" (click)="changePincode()">
-
-          Change
-
-        </button>
-
-      </div>
-
-      <!-- First Time -->
-      <ng-template #enterPincode>
-
-        <div class="delivery-box">
-
-          <input type="text" maxlength="6" placeholder="Enter Pincode" [(ngModel)]="pincode">
-
-          <button (click)="checkDelivery()">
-
-            Check
+            <img [src]="image" [alt]="product.name" />
 
           </button>
 
         </div>
 
-      </ng-template>
+      </div>
 
-    </div>
 
-    <div class="delivery-estimate">
 
-      <h4>Estimated Delivery</h4>
+      <!-- ================================================= -->
+      <!-- RIGHT : PRODUCT INFORMATION -->
+      <!-- ================================================= -->
 
-      <p>
-        🚚 Delivery between
-        <strong>12 Jul - 15 Jul</strong>
-      </p>
+      <div class="product-information">
 
-    </div>
+        <!-- Brand -->
+        <div class="brand-label">
+          TRIANGLE SPORTS
+        </div>
 
-    <div class="product-specs">
 
-      <p>
-        <strong>SKU:</strong>
-        {{ product.sku }}
-      </p>
+        <!-- Product Name -->
+        <h1 class="product-title">
+          {{ product.name }}
+        </h1>
 
-      <p>
-        <strong>Fabric:</strong>
-        {{ product.fabric }}
-      </p>
 
-      <p>
-        <strong>Type:</strong>
-        {{ product.type }}
-      </p>
+        <!-- Rating -->
+        <div class="rating-row">
 
-    </div>
-    <!-- Meta -->
+          <div class="stars">
 
-    <div class="meta">
+            <span *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= roundedRating">
+              ★
+            </span>
 
-      <p>
-        SKU:
-        <strong>{{ product.sku }}</strong>
-      </p>
+          </div>
 
-      <p>
-        Categories:
-        <strong>{{ product.category }}</strong>
-      </p>
+          <span class="review-count">
+            {{ reviews.length }} Reviews
+          </span>
 
-      <p *ngIf="product.tags?.length">
-        Tags:
-        <strong>
-          {{ product.tags ? product.tags.join(', ') : '' }}
-        </strong>
-      </p>
+        </div>
 
-    </div>
+
+        <!-- Price -->
+        <div class="price-row">
+
+          <span class="current-price">
+            ₹{{ product.price | number:'1.0-0' }}
+          </span>
+
+          <span class="old-price" *ngIf="product.discount && product.discount > 0">
+            ₹{{
+            product.price +
+            (
+            product.price *
+            product.discount /
+            (100 - product.discount)
+            )
+            | number:'1.0-0'
+            }}
+          </span>
+
+          <span class="discount-text" *ngIf="product.discount && product.discount > 0">
+            {{ product.discount }}% OFF
+          </span>
+
+        </div>
+
+
+        <!-- Tax -->
+        <p class="tax-text">
+          {{ product.taxText || 'Inclusive of all taxes' }}
+        </p>
+
+
+        
+       
+
+
+
+        <!-- ================================================= -->
+        <!-- SIZE -->
+        <!-- ================================================= -->
+
+        <div class="option-block">
+
+          <div class="option-heading">
+
+            <span>
+              Select Size
+            </span>
+
+            <strong>
+              {{ selectedSize }}
+            </strong>
+
+          </div>
+
+
+          <div class="size-options">
+
+            <button type="button" *ngFor="let size of ['S','M','L','XL']" [class.selected]="selectedSize === size"
+              (click)="selectedSize = size">
+              {{ size }}
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- COLOR -->
+        <!-- ================================================= -->
+
+        <div class="option-block" *ngIf="product.colors?.length">
+
+          <div class="option-heading">
+
+            <span>
+              Color
+            </span>
+
+            <strong>
+              {{ product.colors?.[0] }}
+            </strong>
+
+          </div>
+
+
+          <div class="color-options">
+
+            <button type="button" class="color-option" *ngFor="let color of product.colors" [title]="color">
+
+              <span class="color-circle" [style.background-color]="color">
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- STOCK -->
+        <!-- ================================================= -->
+
+        <div class="stock-status">
+
+          <ng-container *ngIf="product.stock! > 10">
+
+            <span class="stock-dot green"></span>
+
+            <span>
+              In Stock
+            </span>
+
+          </ng-container>
+
+
+          <ng-container *ngIf="product.stock! > 0 && product.stock! <= 10">
+
+            <span class="stock-dot yellow"></span>
+
+            <span>
+              Only {{ product.stock }} left
+            </span>
+
+          </ng-container>
+
+
+          <ng-container *ngIf="product.stock === 0">
+
+            <span class="stock-dot red"></span>
+
+            <span>
+              Out of Stock
+            </span>
+
+          </ng-container>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- QUANTITY + ADD TO CART -->
+        <!-- ================================================= -->
+
+        <div class="purchase-row">
+
+          <!-- Quantity -->
+          <div class="quantity-control">
+
+            <button type="button" (click)="decreaseQuantity()">
+              −
+            </button>
+
+            <span>
+              {{ quantity }}
+            </span>
+
+            <button type="button" (click)="increaseQuantity()">
+              +
+            </button>
+
+          </div>
+
+
+          <!-- Add To Cart -->
+          <button type="button" class="add-cart-button" (click)="addToCart()" [disabled]="product.stock === 0">
+
+            {{
+            product.stock === 0
+            ? 'OUT OF STOCK'
+            : 'ADD TO CART'
+            }}
+
+          </button>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- BUY NOW -->
+        <!-- ================================================= -->
+
+        <button type="button" class="buy-now-button" (click)="buyNow()" [disabled]="product.stock === 0">
+          BUY NOW
+        </button>
+
+
+
+        <!-- ================================================= -->
+        <!-- DELIVERY -->
+        <!-- ================================================= -->
+
+        <div class="delivery-card">
+
+          <div class="delivery-header">
+
+            <span class="delivery-icon">
+              🚚
+            </span>
+
+            <div>
+
+              <strong>
+                Check delivery
+              </strong>
+
+              <p>
+                Enter your pincode for delivery information
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- Saved Pincode -->
+
+          <div *ngIf="isPincodeSaved; else enterPincode" class="saved-delivery">
+
+            <p>
+              Deliver to
+              <strong>
+                {{ pincode }}
+              </strong>
+            </p>
+
+            <p class="delivery-message">
+              {{ deliveryMessage }}
+            </p>
+
+            <p class="free-delivery" *ngIf="deliveryCharge === 0">
+              Free Delivery
+            </p>
+
+            <p *ngIf="deliveryCharge > 0">
+
+              Delivery Charges:
+              <strong>
+                ₹{{ deliveryCharge }}
+              </strong>
+
+            </p>
+
+            <button type="button" class="change-pincode" (click)="changePincode()">
+              Change
+            </button>
+
+          </div>
+
+
+          <!-- Enter Pincode -->
+
+          <ng-template #enterPincode>
+
+            <div class="pincode-box">
+
+              <input type="text" maxlength="6" inputmode="numeric" placeholder="Enter Pincode" [(ngModel)]="pincode" />
+
+              <button type="button" (click)="checkDelivery()">
+                Check
+              </button>
+
+            </div>
+
+          </ng-template>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- BENEFITS -->
+        <!-- ================================================= -->
+
+        <div class="benefits-grid">
+
+          <div class="benefit">
+
+            <span class="benefit-icon">
+              ↻
+            </span>
+
+            <div>
+
+              <strong>
+                Easy Returns
+              </strong>
+
+              <small>
+                Hassle-free returns
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <div class="benefit">
+
+            <span class="benefit-icon">
+              ✓
+            </span>
+
+            <div>
+
+              <strong>
+                Quality Assured
+              </strong>
+
+              <small>
+                Premium quality
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <div class="benefit">
+
+            <span class="benefit-icon">
+              🔒
+            </span>
+
+            <div>
+
+              <strong>
+                Secure Payment
+              </strong>
+
+              <small>
+                100% secure checkout
+              </small>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- ================================================= -->
+        <!-- PRODUCT INFORMATION -->
+        <!-- ================================================= -->
+
+        <div class="product-meta">
+
+          <div *ngIf="product.sku">
+
+            <span>
+              SKU
+            </span>
+
+            <strong>
+              {{ product.sku }}
+            </strong>
+
+          </div>
+
+
+          <div *ngIf="product.category">
+
+            <span>
+              Category
+            </span>
+
+            <strong>
+              {{ product.category }}
+            </strong>
+
+          </div>
+
+
+          <div *ngIf="product.type">
+
+            <span>
+              Type
+            </span>
+
+            <strong>
+              {{ product.type }}
+            </strong>
+
+          </div>
+
+
+          <div *ngIf="product.fabric">
+
+            <span>
+              Fabric
+            </span>
+
+            <strong>
+              {{ product.fabric }}
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =====================================================
+         PRODUCT INFORMATION TABS
+    ====================================================== -->
+
+    <section class="product-details-section">
+
+
+      <div class="tabs-header">
+
+        <button type="button" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+          Description
+        </button>
+
+
+        <button type="button" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
+          Reviews ({{ reviews.length }})
+        </button>
+
+      </div>
+
+
+
+      <!-- DESCRIPTION -->
+
+      <div class="tab-content" *ngIf="activeTab === 'description'">
+
+        <div class="description-grid">
+
+          <div class="description-main">
+
+            <h2>
+              Product Details
+            </h2>
+
+            <p>
+              {{ product.description }}
+            </p>
+
+            <ul>
+
+              <li>
+                Premium quality sportswear designed for comfort.
+              </li>
+
+              <li>
+                Four-way stretch for improved mobility.
+              </li>
+
+              <li>
+                Lightweight and breathable fabric.
+              </li>
+
+              <li>
+                Designed for training, gym and everyday performance.
+              </li>
+
+              <li>
+                Triangle Sports signature branding.
+              </li>
+
+            </ul>
+
+          </div>
+
+
+          <div class="specification-card">
+
+            <h3>
+              Product Specifications
+            </h3>
+
+
+            <div class="spec-row" *ngIf="product.type">
+              <span>Type</span>
+              <strong>{{ product.type }}</strong>
+            </div>
+
+
+            <div class="spec-row" *ngIf="product.fabric">
+              <span>Fabric</span>
+              <strong>{{ product.fabric }}</strong>
+            </div>
+
+
+            <div class="spec-row" *ngIf="product.category">
+              <span>Category</span>
+              <strong>{{ product.category }}</strong>
+            </div>
+
+
+            <div class="spec-row" *ngIf="product.brand">
+              <span>Brand</span>
+              <strong>{{ product.brand }}</strong>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+
+      <!-- REVIEWS -->
+
+      <div class="tab-content reviews-content" *ngIf="activeTab === 'reviews'">
+
+        <div class="review-summary">
+
+          <div class="review-score">
+
+            <strong>
+              {{ averageRating.toFixed(1) }}
+            </strong>
+
+            <span>/5</span>
+
+            <div class="summary-stars">
+              {{ '★'.repeat(roundedRating) }}
+            </div>
+
+            <small>
+              Based on {{ reviews.length }} reviews
+            </small>
+
+          </div>
+
+
+          <div class="review-form">
+
+            <h3>
+              Write a Review
+            </h3>
+
+            <input type="text" placeholder="Your Name" [(ngModel)]="newReview.name" />
+
+
+            <select [(ngModel)]="newReview.rating">
+
+              <option [ngValue]="5">
+                ★★★★★
+              </option>
+
+              <option [ngValue]="4">
+                ★★★★
+              </option>
+
+              <option [ngValue]="3">
+                ★★★
+              </option>
+
+              <option [ngValue]="2">
+                ★★
+              </option>
+
+              <option [ngValue]="1">
+                ★
+              </option>
+
+            </select>
+
+
+            <textarea rows="4" placeholder="Write your review..." [(ngModel)]="newReview.comment"></textarea>
+
+
+            <button type="button" (click)="submitReview()">
+              Submit Review
+            </button>
+
+          </div>
+
+        </div>
+
+
+
+        <!-- Review List -->
+
+        <div class="review-list" *ngIf="reviews.length">
+
+          <div class="review-item" *ngFor="let review of reviews">
+
+            <div class="review-user">
+
+              <div class="user-avatar">
+                {{ review.name?.charAt(0)?.toUpperCase() }}
+              </div>
+
+              <div>
+
+                <strong>
+                  {{ review.name }}
+                </strong>
+
+                <div class="review-stars">
+                  {{ '★'.repeat(review.rating) }}
+                </div>
+
+              </div>
+
+            </div>
+
+            <p>
+              {{ review.comment }}
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="no-reviews" *ngIf="reviews.length === 0">
+          No reviews yet. Be the first to review this product.
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RELATED PRODUCTS
+    ====================================================== -->
+
+    <section class="related-section" *ngIf="relatedProducts.length">
+
+      <div class="section-heading">
+
+        <div>
+
+          <span>
+            YOU MAY ALSO LIKE
+          </span>
+
+          <h2>
+            Related Products
+          </h2>
+
+        </div>
+
+      </div>
+
+
+      <div class="related-grid">
+
+        <article class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item._id]">
+
+          <div class="related-image">
+
+            <img [src]="item.image" [alt]="item.name" loading="lazy" />
+
+          </div>
+
+
+          <div class="related-info">
+
+            <span>
+              {{ item.category }}
+            </span>
+
+            <h3>
+              {{ item.name }}
+            </h3>
+
+            <strong>
+              ₹{{ item.price | number:'1.0-0' }}
+            </strong>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
 
   </div>
+
+
+
 
 </div>
 
-<!-- Tabs -->
-<div class="tabs-section" *ngIf="product">
+<!-- =====================================================
+     BUY NOW CHECKOUT MODAL
+===================================================== -->
 
-  <div class="tab-header">
+<div class="buy-now-overlay" *ngIf="showBuyNowModal" (click)="closeBuyNowModal()">
 
-    <button [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+  <div class="buy-now-modal" (click)="$event.stopPropagation()">
 
-      Description
+    <!-- ================= MODAL HEADER ================= -->
 
-    </button>
+    <div class="buy-now-header">
 
-    <button [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
+      <button type="button" class="modal-close" (click)="closeBuyNowModal()" aria-label="Close">
+        ×
+      </button>
 
-      Reviews ({{ reviews.length }})
-
-    </button>
-
-  </div>
-
-  <!-- Description -->
-  <div *ngIf="activeTab === 'description'" class="tab-content">
-
-    <div class="info-grid">
-
-      <div>
-
-        <span>Type</span>
-
-        <h4>{{ product.type }}</h4>
-
-      </div>
-
-      <div>
-
-        <span>Fabric</span>
-
-        <h4>{{ product.fabric }}</h4>
-
+      <div class="modal-logo">
+        TRIANGLE SPORTS
       </div>
 
     </div>
 
-    <div class="product-details">
 
-      <span>Product Details</span>
+    <!-- ================= SHIPPING BAR ================= -->
 
-      <p>• {{ product.description }}</p>
+    <div class="shipping-bar">
 
-      <p>• Four-way stretch increases mobility and adds comfort.</p>
-
-      <p>• Textured fabric adds to a classic look.</p>
-
-      <p>• Embossed contrast Triangle logo.</p>
+      FREE SHIPPING ON ALL PREPAID ORDERS
 
     </div>
 
-  </div>
 
-  <!-- Reviews -->
-  <div *ngIf="activeTab === 'reviews'" class="tab-content">
+    <!-- ================= ORDER SUMMARY ================= -->
+    <!-- ================= ORDER SUMMARY ================= -->
 
-    <div class="rating-summary">
+    <div class="order-summary" *ngIf="product as p">
 
-      <h2>
+      <div class="summary-header">
 
-        {{ averageRating.toFixed(1) }}
+        <strong>
+          Order summary
+        </strong>
 
-        <span>/5</span>
+        <span>
+          ({{ quantity }} {{ quantity === 1 ? 'Item' : 'Items' }})
+        </span>
 
-      </h2>
+        <div class="summary-price">
 
-      <p>
+          <!-- Original Price -->
+          <span class="summary-old-price" *ngIf="(p.discount ?? 0) > 0">
+            ₹{{
+            (
+            p.price +
+            (
+            p.price *
+            (p.discount ?? 0) /
+            (100 - (p.discount ?? 0))
+            )
+            ) | number:'1.0-0'
+            }}
+          </span>
 
-        {{ reviews.length }} Review(s)
+          <!-- Current Price -->
+          <strong>
+            ₹{{ (p.price * quantity) | number:'1.0-0' }}
+          </strong>
 
+          <span class="summary-arrow">
+            ⌄
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <!-- ================= COUPON ================= -->
+
+      <div class="coupon-row">
+
+        <div class="coupon-icon">
+          %
+        </div>
+
+        <input type="text" placeholder="Enter coupon code" [(ngModel)]="couponCode" (keyup.enter)="applyCoupon()" />
+
+        <button type="button" (click)="applyCoupon()">
+          Apply
+        </button>
+
+      </div>
+
+
+      <p class="coupon-message" [class.success]="couponMessage.includes('successfully')" *ngIf="couponMessage">
+        {{ couponMessage }}
       </p>
 
-      <div class="rating-stars">
+    </div>
 
-        {{ '★'.repeat(roundedRating) }}
+
+    <!-- ================= MOBILE SECTION ================= -->
+
+    <div class="mobile-section" *ngIf="!otpSent">
+
+
+
+
+      <!-- MOBILE INPUT -->
+
+      <div class="mobile-section" *ngIf="!otpSent">
+
+        <h2>Enter mobile number</h2>
+
+        <p>
+          Provide your mobile number to continue
+        </p>
+
+        <div class="mobile-input-wrapper" [class.input-error]="mobileError">
+
+          <div class="country-code">
+            <span class="india-flag">🇮🇳</span>
+            <span>+91</span>
+          </div>
+
+          <input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number"
+            [(ngModel)]="mobileNumber" (input)="onMobileInput()" />
+
+        </div>
+
+        <p class="mobile-error" *ngIf="mobileError">
+          {{ mobileError }}
+        </p>
+
+        <button type="button" class="continue-button" [disabled]="isSendingOtp" (click)="continueToCheckout()">
+          {{ isSendingOtp ? 'SENDING OTP...' : 'CONTINUE' }}
+        </button>
 
       </div>
 
+
+      <p class="mobile-error" *ngIf="mobileError">
+        {{ mobileError }}
+      </p>
+
+
+      <!-- CONTINUE -->
+
+
+
     </div>
 
-    <!-- Review Form -->
-    <div class="review-form">
+    <div class="otp-section" *ngIf="otpSent">
 
-      <input type="text" placeholder="Your Name" [(ngModel)]="newReview.name">
+      <h2>Enter OTP</h2>
 
-      <select [(ngModel)]="newReview.rating">
+      <p>
+        OTP sent to +91 {{ mobileNumber }}
+      </p>
 
-        <option [ngValue]="5">★★★★★</option>
-        <option [ngValue]="4">★★★★</option>
-        <option [ngValue]="3">★★★</option>
-        <option [ngValue]="2">★★</option>
-        <option [ngValue]="1">★</option>
+      <input type="tel" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP"
+        [(ngModel)]="otp" (input)="onOtpInput()" />
 
-      </select>
+      <p class="mobile-error" *ngIf="otpError">
+        {{ otpError }}
+      </p>
 
-      <textarea rows="4" placeholder="Write your review" [(ngModel)]="newReview.comment">
+      <button type="button" class="continue-button" [disabled]="isVerifyingOtp" (click)="verifyOtp()">
+        {{ isVerifyingOtp ? 'VERIFYING...' : 'VERIFY OTP' }}
+      </button>
 
-      </textarea>
-
-      <button (click)="submitReview()">
-
-        Submit Review
-
+      <button type="button" class="resend-button" [disabled]="resendDisabled" (click)="resendOtp()">
+        {{ resendDisabled ? 'Resend in ' + resendTimer + 's' : 'RESEND OTP' }}
       </button>
 
     </div>
 
-    <!-- Reviews List -->
-    <div *ngFor="let review of reviews" class="review-card">
 
-      <h4>{{ review.name }}</h4>
+    <!-- ================= BENEFITS ================= -->
 
-      <p class="stars">
+    <div class="checkout-benefits">
 
-        {{ '★'.repeat(review.rating) }}
+      <div class="checkout-benefit">
 
-      </p>
+        <div class="benefit-symbol">
+          ▣
+        </div>
 
-      <p>{{ review.comment }}</p>
+        <span>
+          PCI DSS certified
+        </span>
+
+      </div>
+
+
+      <div class="checkout-benefit">
+
+        <div class="benefit-symbol">
+          ▱
+        </div>
+
+        <span>
+          Secure payments
+        </span>
+
+      </div>
+
+
+      <div class="checkout-benefit">
+
+        <div class="benefit-symbol">
+          ✓
+        </div>
+
+        <span>
+          Assured delivery
+        </span>
+
+      </div>
+
+
+      <div class="checkout-benefit">
+
+        <div class="benefit-symbol">
+          ♢
+        </div>
+
+        <span>
+          Verified seller
+        </span>
+
+      </div>
 
     </div>
 
-    <p *ngIf="reviews.length === 0">
 
-      No reviews yet.
+    <!-- ================= FOOTER ================= -->
 
-    </p>
+    <div class="modal-footer">
 
-  </div>
-
-</div>
-
-<!-- Related Products -->
-<div class="related-section" *ngIf="relatedProducts.length">
-
-  <h2>Related Products</h2>
-
-  <div class="related-grid">
-
-    <div class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item._id]">
-
-      <img [src]="item.image" [alt]="item.name">
-
-      <h4>{{ item.name }}</h4>
-
-      <p>₹{{ item.price }}</p>
-      <span class="related-stock" *ngIf="item.stock! > 0">
-
-        In Stock
-
+      <span>
+        T&amp;C
       </span>
 
-      <span class="related-stock out" *ngIf="item.stock === 0">
+      <span>|</span>
 
-        Out of Stock
+      <span>
+        Privacy Policy
+      </span>
 
+      <span class="powered-by">
+        Secure Checkout
       </span>
 
     </div>
