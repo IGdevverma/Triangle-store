@@ -91,9 +91,7 @@ const getProductById = asyncHandler(async (req, res) => {
 // Update Product
 const updateProduct = asyncHandler(async (req, res) => {
 
-    console.log("========== UPDATE PRODUCT ==========");
-    console.log("BODY:", req.body);
-    console.log("FILE:", req.file);
+   
 
     const product = await Product.findById(req.params.id);
 
