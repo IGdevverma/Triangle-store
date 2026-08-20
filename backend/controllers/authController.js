@@ -1,6 +1,7 @@
 
 const User = require("../models/User");
 const mongoose = require("mongoose");
+const axios = require("axios");
 
 // Register User
 
@@ -152,6 +153,92 @@ const loginUser = async (req, res) => {
     }
 
 };
+
+
+
+//OTP
+
+const verifyMsg91Otp = async (req, res) => {
+
+    try {
+
+        const { accessToken, phone } = req.body;
+
+        if (!accessToken) {
+
+            return res.status(400).json({
+
+                success: false,
+                message: "MSG91 access token is required"
+
+            });
+
+        }
+
+        const response = await fetch(
+            "https://control.msg91.com/api/v5/widget/verifyAccessToken",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    authkey: process.env.MSG91_AUTH_KEY,
+
+                    "access-token": accessToken
+
+                })
+
+            }
+        );
+
+        const data = await response.json();
+
+        console.log("MSG91 VERIFY RESPONSE:", data);
+
+        if (!response.ok) {
+
+            return res.status(401).json({
+
+                success: false,
+                message: "MSG91 OTP verification failed",
+                data
+
+            });
+
+        }
+
+        // MSG91 verification successful
+        // User handling will be added after
+        // we confirm the exact response structure.
+
+        return res.status(200).json({
+
+            success: true,
+            message: "OTP verified successfully",
+            data
+
+        });
+
+    } catch (error) {
+
+        console.error("MSG91 OTP ERROR:", error);
+
+        return res.status(500).json({
+
+            success: false,
+            message: "OTP verification failed"
+
+        });
+
+    }
+
+};
+
+
 const updateProfile = async (req, res) => {
 
     try {
@@ -198,12 +285,16 @@ const updateProfile = async (req, res) => {
 };
 
 
+
+
+
 module.exports = {
 
     registerUser,
-
+    verifyMsg91Otp,
     loginUser,
     updateProfile,
+
 
 
 };

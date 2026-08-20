@@ -10,6 +10,7 @@ const {
     registerUser,
     loginUser,
     updateProfile,
+    verifyMsg91Otp,
     
 } = require("../controllers/authController");
 
@@ -20,6 +21,7 @@ const {
 router.post("/register", registerUser);
 
 router.post("/login", loginUser);
+router.post("/verify-otp", verifyMsg91Otp);
 
 
 router.put(

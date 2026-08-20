@@ -8,6 +8,32 @@ import { Router } from '@angular/router';
 import { Payment } from '../../services/payment';
 
 
+declare global {
+  interface Window {
+
+    sendOtp: (
+      identifier: string,
+      success?: (data: any) => void,
+      failure?: (error: any) => void
+    ) => void;
+
+    verifyOtp: (
+      otp: string | number,
+      success?: (data: any) => void,
+      failure?: (error: any) => void,
+      reqId?: string
+    ) => void;
+
+    retryOtp: (
+      channel: string | null,
+      success?: (data: any) => void,
+      failure?: (error: any) => void,
+      reqId?: string
+    ) => void;
+
+  }
+}
+
 
 declare var Razorpay: any;
 
@@ -45,6 +71,28 @@ export class Checkout implements OnInit {
   discount = 0;
   discountAmount = 0;
   isPlacingOrder = false;
+
+  mobileForOtp = '';
+  otp = '';
+
+  otpSent = false;
+  otpVerified = false;
+
+  otpLoading = false;
+
+  otpError = '';
+  otpSuccess = '';
+
+  showOtpModal = false;
+
+  get totalItems(): number {
+
+    return this.cartItems.reduce(
+      (total, item) => total + (item.quantity || 0),
+      0
+    );
+
+  }
 
 
   constructor(
@@ -107,19 +155,54 @@ export class Checkout implements OnInit {
 
   placeOrder() {
 
+    // 1️⃣ Basic checkout validation
     if (this.checkoutForm.invalid) {
 
       this.checkoutForm.markAllAsTouched();
 
       return;
-
     }
+
+
+    // 2️⃣ OTP verification check
+    if (!this.otpVerified) {
+
+      this.otpError = 'Please verify your mobile number with OTP';
+
+      this.openPhoneVerification();
+
+      return;
+    }
+
+
+    // 3️⃣ Extra safety check:
+    // verified number must match checkout phone number
+    if (
+      this.mobileForOtp !== this.checkoutForm.get('phone')?.value
+    ) {
+
+      this.otpVerified = false;
+
+      this.otpError =
+        'Mobile number changed. Please verify it again with OTP';
+
+      this.openPhoneVerification();
+
+      return;
+    }
+
+
     this.isPlacingOrder = true;
 
+
+    // 4️⃣ Save customer information
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)
     );
+
+
+    // 5️⃣ Create order object
     const order: Order = {
 
       customerName: this.checkoutForm.value.name,
@@ -138,7 +221,8 @@ export class Checkout implements OnInit {
 
       paymentMethod: this.checkoutForm.value.paymentMethod,
 
-      paymentStatus: this.paymentMethod === 'COD' ? 'Pending' : 'Paid',
+      // ⚠️ Online payment is NOT paid yet
+      paymentStatus: 'Pending',
 
       orderStatus: 'Processing',
 
@@ -150,6 +234,8 @@ export class Checkout implements OnInit {
 
     };
 
+
+    // 6️⃣ COD
     if (this.paymentMethod === 'COD') {
 
       this.orderService.addOrder(order).subscribe({
@@ -163,11 +249,6 @@ export class Checkout implements OnInit {
           this.orderPlaced = true;
 
           this.isPlacingOrder = false;
-          this.router.navigate(['/order-success'], {
-            state: {
-              orderId: response.order._id
-            }
-          });
 
           localStorage.removeItem('customerInfo');
 
@@ -177,11 +258,30 @@ export class Checkout implements OnInit {
 
           });
 
+          // Reset OTP state
+          this.otpVerified = false;
+          this.otpSent = false;
+          this.mobileForOtp = '';
+          this.otp = '';
+
+          this.router.navigate(['/order-success'], {
+
+            state: {
+
+              orderId: response.order._id
+
+            }
+
+          });
+
         },
 
         error: (error) => {
 
-
+          console.error(
+            'Order creation failed:',
+            error
+          );
 
           this.isPlacingOrder = false;
 
@@ -190,30 +290,36 @@ export class Checkout implements OnInit {
       });
 
       return;
-
     }
-    this.paymentService.createOrder(this.grandTotal).subscribe({
-
-      next: (response) => {
-
-        this.openRazorpay(response, order);
-
-      },
-
-      error: (error) => {
 
 
+    // 7️⃣ Online Payment / Razorpay
 
-        this.isPlacingOrder = false;
+    this.paymentService
+      .createOrder(this.grandTotal)
+      .subscribe({
 
-      }
+        next: (response) => {
 
+          this.openRazorpay(
+            response,
+            order
+          );
 
-    });
+        },
 
+        error: (error) => {
 
+          console.error(
+            'Razorpay order creation failed:',
+            error
+          );
 
+          this.isPlacingOrder = false;
 
+        }
+
+      });
 
   }
   get paymentMethod() {
@@ -411,5 +517,149 @@ export class Checkout implements OnInit {
   }
 
 
+  sendCheckoutOTP() {
+
+    this.otpError = '';
+    this.otpSuccess = '';
+
+    const phone = this.mobileForOtp.trim();
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+      this.otpError = 'Please enter a valid 10 digit mobile number';
+      return;
+    }
+
+    const identifier = '91' + phone;
+
+    this.otpLoading = true;
+
+    window.sendOtp(
+      identifier,
+
+      (data: any) => {
+
+        console.log('OTP sent successfully:', data);
+
+        this.otpSent = true;
+        this.otpLoading = false;
+
+        this.otpSuccess =
+          'OTP sent successfully to +91 ' + phone;
+
+      },
+
+      (error: any) => {
+
+        console.error('OTP send error:', error);
+
+        this.otpLoading = false;
+
+        this.otpError =
+          'Unable to send OTP. Please try again';
+
+      }
+    );
+  }
+
+
+  verifyCheckoutOTP() {
+
+    this.otpError = '';
+    this.otpSuccess = '';
+
+    if (!this.otp) {
+
+      this.otpError = 'Please enter OTP';
+
+      return;
+    }
+
+    this.otpLoading = true;
+
+    window.verifyOtp(
+
+      this.otp,
+
+      (data: any) => {
+
+        console.log('OTP VERIFIED:', data);
+
+        this.otpLoading = false;
+
+        this.otpVerified = true;
+
+        this.otpSuccess =
+          'Mobile number verified successfully';
+
+        /*
+         * Put verified number into checkout form
+         */
+        this.checkoutForm.patchValue({
+
+          phone: this.mobileForOtp
+
+        });
+
+        /*
+         * Close OTP modal after successful verification
+         */
+        setTimeout(() => {
+
+          this.showOtpModal = false;
+
+        }, 800);
+
+      },
+
+      (error: any) => {
+
+        console.error('OTP verification failed:', error);
+
+        this.otpLoading = false;
+
+        this.otpError =
+          'Invalid OTP. Please enter the correct OTP';
+
+      }
+    );
+  }
+
+
+  openPhoneVerification() {
+
+    const phone = this.checkoutForm.get('phone')?.value;
+
+    if (!phone) {
+
+      this.otpError = 'Please enter mobile number';
+
+      return;
+
+    }
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+
+      this.otpError =
+        'Please enter a valid 10 digit mobile number';
+
+      return;
+
+    }
+
+    this.mobileForOtp = phone;
+
+    this.otp = '';
+
+    this.otpSent = false;
+
+    this.otpVerified = false;
+
+    this.otpError = '';
+
+    this.otpSuccess = '';
+
+    this.showOtpModal = true;
+
+  }
 
 }

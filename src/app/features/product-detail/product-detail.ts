@@ -103,7 +103,7 @@ export class ProductDetail implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private productService: ProductService,
-      private router: Router,
+    private router: Router,
     private cartService: CartService,
     private notificationService: NotificationService,
     private loadingService: LoadingService,
@@ -427,26 +427,11 @@ export class ProductDetail implements OnInit {
       return;
     }
 
-    // Open Buy Now modal
-    this.showBuyNowModal = true;
+    // Add product to cart
+    this.cartService.addToCart(this.product);
 
-    // Start from mobile verification
-    this.buyNowStep = 'mobile';
-
-    // Reset mobile/OTP state
-    this.mobileNumber = '';
-    this.mobileError = '';
-
-    this.otp = '';
-    this.otpError = '';
-    this.otpSent = false;
-
-    // Reset coupon
-    this.couponCode = '';
-    this.couponMessage = '';
-
-    // Reset address error
-    this.addressError = '';
+    // Directly go to checkout
+    this.router.navigate(['/checkout']);
   }
 
   // =====================================================

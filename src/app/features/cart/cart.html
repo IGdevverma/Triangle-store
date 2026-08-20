@@ -1,73 +1,249 @@
-<div class="cart-container">
+<div class="shopping-bag">
 
-    <h1>Shopping Cart</h1>
-    <div *ngIf="cartItems.length === 0" class="empty-cart">
+    <!-- Header -->
 
-        <h2>🛒 Your cart is empty</h2>
+    <div class="bag-header">
 
-        <p>Add some products to get started.</p>
+        <button class="back-btn" routerLink="/">
+            <span>‹</span>
+        </button>
 
-        <a routerLink="/">
-            Continue Shopping
-        </a>
+        <h1>
+            Shopping Bag ({{ totalItems }})
+        </h1>
 
     </div>
 
-    <div *ngIf="cartItems.length > 0">
 
-        <div class="cart-item" *ngFor="let item of cartItems">
+    <!-- Empty Cart -->
 
-            <div class="item-details">
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
 
-                <h3>{{ item.name }}</h3>
+        <div class="empty-icon">
+            🛒
+        </div>
 
-                <p>₹{{ item.price }}</p>
+        <h2>Your shopping bag is empty</h2>
 
-                <div class="quantity-controls">
+        <p>
+            Add some products to your bag and start shopping.
+        </p>
 
-                    <button (click)="decrease(item.id!)">
-                        -
-                    </button>
+        <button routerLink="/">
+            Continue Shopping
+        </button>
 
-                    <span>
-                        {{ item.quantity }}
-                    </span>
+    </div>
 
-                    <button (click)="increase(item.id!)">
-                        +
+
+    <!-- Cart -->
+
+    <div class="cart-content" *ngIf="cartItems.length > 0">
+
+
+        <!-- Login Discount Banner -->
+
+        <div class="login-banner">
+
+            <h2>
+                Login to Unlock Exciting Discounts
+            </h2>
+
+            <p>
+                Sign in to get exclusive offers and discounts.
+            </p>
+
+        </div>
+
+
+        <!-- Free Gift Progress -->
+
+        <div class="gift-section">
+
+            <div class="gift-header">
+
+                <span *ngIf="!giftUnlocked">
+                    Shop for ₹{{ remainingForGift }} more
+                    to unlock a free gift 🎁
+                </span>
+
+                <span *ngIf="giftUnlocked">
+                    Congrats! You have unlocked best discounts 🎉
+                </span>
+
+                <strong>
+                    ₹{{ freeGiftTarget }}
+                </strong>
+
+            </div>
+
+
+            <div class="progress-wrapper">
+
+                <div class="progress-bar" [style.width.%]="giftProgress">
+                </div>
+
+            </div>
+
+
+            <div class="gift-progress-labels">
+
+                <span>
+                    🚩
+                </span>
+
+                <span>
+                    🎁
+                </span>
+
+            </div>
+
+            <div class="gift-text">
+                Free Gift
+            </div>
+
+        </div>
+
+
+        <!-- Cart Items -->
+
+        <div class="cart-list">
+
+            <div class="cart-item" *ngFor="let item of cartItems">
+
+
+                <!-- Product Image -->
+
+                <div class="product-image">
+
+                    <img [src]="item.image" [alt]="item.name">
+
+                </div>
+
+
+                <!-- Product Details -->
+
+                <div class="product-info">
+
+                    <h2>
+                        {{ item.name }}
+                    </h2>
+
+                    <p class="variant" *ngIf="item.sizes">
+                        {{ item.sizes }}
+                    </p>
+
+
+                    <div class="price">
+
+                        ₹{{ item.price }}
+
+                    </div>
+
+
+                    <!-- Quantity -->
+
+                    <div class="quantity-controls">
+
+                        <button type="button" (click)="decrease(item.id!)">
+
+                            −
+
+                        </button>
+
+                        <span>
+                            {{ item.quantity }}
+                        </span>
+
+                        <button type="button" (click)="increase(item.id!)">
+
+                            +
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Right Side -->
+
+                <div class="item-right">
+
+                    <strong>
+                        ₹{{ item.price * item.quantity }}
+                    </strong>
+
+                    <button type="button" class="remove-btn" (click)="removeItem(item.id!)">
+
+                        🗑
+
                     </button>
 
                 </div>
 
             </div>
 
-            <button (click)="removeItem(item.id!)">
-                Remove
+        </div>
+
+
+        <!-- Coupon -->
+
+        <div class="coupon-section">
+
+            <input type="text" placeholder="Enter coupon code" [(ngModel)]="couponCode">
+
+            <button type="button" (click)="applyCoupon()">
+
+                Apply
+
             </button>
 
         </div>
 
-        <div class="cart-summary">
 
-            <h3>Subtotal: ₹{{ total }}</h3>
+        <!-- Savings -->
 
-            <p>Delivery: Free</p>
+        <div class="savings-banner" *ngIf="savings > 0">
 
-            <p>Discount: ₹0</p>
+            🎉 You're saving ₹{{ savings }} 🎉
 
-            <hr>
+        </div>
 
-            <h2>Total: ₹{{ total }}</h2>
 
-            <button class="checkout-btn"
-                routerLink="/checkout">
-                Proceed to Checkout
+        <!-- Bottom Summary -->
+
+        <div class="cart-bottom">
+
+            <div class="total-section">
+
+                <span>
+                    Estimated Total
+                </span>
+
+                <div>
+
+                    <strong>
+                        ₹{{ finalTotal }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <button class="buy-now-btn" routerLink="/checkout">
+
+                Buy Now
+
+                <span class="payment-icons">
+                    💳
+                </span>
+
             </button>
 
         </div>
 
     </div>
-
-
 
 </div>

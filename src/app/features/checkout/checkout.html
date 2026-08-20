@@ -1,275 +1,620 @@
-<div class="checkout-container">
+<div class="checkout-page">
 
-    <h1>Checkout</h1>
+    <!-- Header -->
+    <div class="checkout-header">
+        <div>
+            <h1>Checkout</h1>
+            <p>Complete your order securely</p>
+        </div>
 
-    <div class="checkout-grid">
-
-        <!-- Checkout Form -->
-
-        <form [formGroup]="checkoutForm" (ngSubmit)="placeOrder()">
-
-            <input type="text" placeholder="Full Name" formControlName="name">
-            <small class="error" *ngIf="checkoutForm.get('name')?.touched &&
-
-              checkoutForm.get('name')?.invalid">
-
-                Full Name is required.
-
-            </small>
-
-            <input type="email" placeholder="Email" formControlName="email">
-            <small class="error" *ngIf="checkoutForm.get('email')?.touched &&
-
-              checkoutForm.get('email')?.errors?.['required']">
-
-                Email is required.
-
-            </small>
-
-            <small class="error" *ngIf="checkoutForm.get('email')?.touched &&
-
-              checkoutForm.get('email')?.errors?.['email']">
-
-                Please enter a valid email.
-
-            </small>
-            <input type="tel" placeholder="Phone Number" formControlName="phone">
-
-            <small class="error" *ngIf="
-    checkoutForm.get('phone')?.touched &&
-    checkoutForm.get('phone')?.invalid">
-
-                Enter valid 10 digit phone number.
-
-            </small>
-
-            <textarea rows="4" placeholder="Address" formControlName="address">
-            </textarea>
-            <small class="error" *ngIf="checkoutForm.get('address')?.touched &&
-
-              checkoutForm.get('address')?.invalid">
-
-                Address is required.
-
-            </small>
-
-            <input type="text" placeholder="City" formControlName="city">
-
-            <small class="error" *ngIf="checkoutForm.get('city')?.touched &&
-           checkoutForm.get('city')?.invalid">
-
-                City is required.
-
-            </small>
-
-            <input type="text" placeholder="State" formControlName="state">
-
-            <small class="error" *ngIf="checkoutForm.get('state')?.touched &&
-           checkoutForm.get('state')?.invalid">
-
-                State is required.
-
-            </small>
-
-            <input type="text" placeholder="Pincode" formControlName="pincode">
-
-            <small class="error" *ngIf="checkoutForm.get('pincode')?.touched &&
-           checkoutForm.get('pincode')?.invalid">
-
-                Enter a valid 6 digit pincode.
-
-            </small>
-
-            <label class="payment-label">
-                Payment Method
-            </label>
-
-            <select formControlName="paymentMethod">
-
-                <option value="COD">
-                    Cash on Delivery (COD)
-                </option>
-
-                <option value="ONLINE">
-                    Pay Online (Razorpay)
-                </option>
-
-            </select>
-
-            <small class="payment-note" *ngIf="paymentMethod === 'ONLINE'">
-
-                You can pay securely using UPI, Credit Card, Debit Card,
-                Net Banking or Wallet after clicking <strong>Place Order</strong>.
-
-            </small>
+        <div class="secure-checkout">
+            🔒 Secure Checkout
+        </div>
+    </div>
 
 
+    <form [formGroup]="checkoutForm"
+          (ngSubmit)="placeOrder()"
+          class="checkout-layout">
 
-            <button type="submit" class="place-order-btn" [disabled]="isPlacingOrder">
+        <!-- ================= LEFT : DELIVERY ================= -->
 
-                <i class="fa-solid fa-lock"></i>
+        <div class="delivery-card">
 
-                {{ isPlacingOrder ? 'Placing Order...' : 'Place Order Securely' }}
+            <div class="card-heading">
+                <div class="heading-icon">
+                    📦
+                </div>
+
+                <div>
+                    <h2>Delivery Details</h2>
+                    <p>Enter your details for delivery</p>
+                </div>
+            </div>
+
+
+            <!-- Full Name -->
+
+            <div class="form-group">
+
+                <label>
+                    Full Name <span>*</span>
+                </label>
+
+                <input
+                    type="text"
+                    placeholder="Enter your full name"
+                    formControlName="name"
+                >
+
+                <small
+                    class="error"
+                    *ngIf="
+                    checkoutForm.get('name')?.touched &&
+                    checkoutForm.get('name')?.invalid
+                    "
+                >
+                    Full name is required.
+                </small>
+
+            </div>
+
+
+            <!-- Phone -->
+
+            <div class="form-group">
+
+                <label>
+                    Mobile Number <span>*</span>
+                </label>
+
+                <div class="phone-row">
+
+                    <input
+                        type="tel"
+                        placeholder="Enter 10 digit mobile number"
+                        maxlength="10"
+                        formControlName="phone"
+                        [readonly]="otpVerified"
+                    >
+
+                    <button
+                        type="button"
+                        class="verify-btn"
+                        *ngIf="!otpVerified"
+                        (click)="openPhoneVerification()"
+                    >
+                        Verify
+                    </button>
+
+                    <div
+                        class="verified"
+                        *ngIf="otpVerified"
+                    >
+                        ✓ Verified
+                    </div>
+
+                </div>
+
+                <small
+                    class="error"
+                    *ngIf="
+                    checkoutForm.get('phone')?.touched &&
+                    checkoutForm.get('phone')?.invalid
+                    "
+                >
+                    Enter a valid 10 digit mobile number.
+                </small>
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label>
+                    Email Address <span>*</span>
+                </label>
+
+                <input
+                    type="email"
+                    placeholder="Enter your email address"
+                    formControlName="email"
+                >
+
+                <small
+                    class="error"
+                    *ngIf="
+                    checkoutForm.get('email')?.touched &&
+                    checkoutForm.get('email')?.errors?.['required']
+                    "
+                >
+                    Email is required.
+                </small>
+
+                <small
+                    class="error"
+                    *ngIf="
+                    checkoutForm.get('email')?.touched &&
+                    checkoutForm.get('email')?.errors?.['email']
+                    "
+                >
+                    Please enter a valid email.
+                </small>
+
+            </div>
+
+
+            <!-- Address -->
+
+            <div class="form-group">
+
+                <label>
+                    Delivery Address <span>*</span>
+                </label>
+
+                <textarea
+                    rows="4"
+                    placeholder="House no., street, area, landmark"
+                    formControlName="address"
+                ></textarea>
+
+                <small
+                    class="error"
+                    *ngIf="
+                    checkoutForm.get('address')?.touched &&
+                    checkoutForm.get('address')?.invalid
+                    "
+                >
+                    Address is required.
+                </small>
+
+            </div>
+
+
+            <!-- City / State -->
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label>
+                        City <span>*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        placeholder="Enter city"
+                        formControlName="city"
+                    >
+
+                    <small
+                        class="error"
+                        *ngIf="
+                        checkoutForm.get('city')?.touched &&
+                        checkoutForm.get('city')?.invalid
+                        "
+                    >
+                        City is required.
+                    </small>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>
+                        State <span>*</span>
+                    </label>
+
+                    <input
+                        type="text"
+                        placeholder="Enter state"
+                        formControlName="state"
+                    >
+
+                    <small
+                        class="error"
+                        *ngIf="
+                        checkoutForm.get('state')?.touched &&
+                        checkoutForm.get('state')?.invalid
+                        "
+                    >
+                        State is required.
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- Pincode -->
+
+            <div class="form-group">
+
+                <label>
+                    Pincode <span>*</span>
+                </label>
+
+                <input
+                    type="text"
+                    placeholder="Enter 6 digit pincode"
+                    maxlength="6"
+                    formControlName="pincode"
+                >
+
+                <small
+                    class="error"
+                    *ngIf="
+                    checkoutForm.get('pincode')?.touched &&
+                    checkoutForm.get('pincode')?.invalid
+                    "
+                >
+                    Enter a valid 6 digit pincode.
+                </small>
+
+            </div>
+
+
+            <!-- Payment -->
+
+            <div class="payment-section">
+
+                <div class="payment-heading">
+                    <div>
+                        <h3>Payment Method</h3>
+                        <p>Choose your preferred payment option</p>
+                    </div>
+                </div>
+
+
+                <div class="payment-option">
+
+                    <div class="payment-radio">
+
+                        <input
+                            type="radio"
+                            value="ONLINE"
+                            formControlName="paymentMethod"
+                            id="onlinePayment"
+                        >
+
+                        <label for="onlinePayment">
+
+                            <div class="payment-title">
+                                BUY NOW
+                                <span class="recommended">
+                                    Recommended
+                                </span>
+                            </div>
+
+                            <small>
+                                UPI, Credit Card, Debit Card,
+                                Net Banking & Wallet
+                            </small>
+
+                        </label>
+
+                    </div>
+
+                    <div class="razorpay-logo">
+                        Razorpay
+                    </div>
+
+                </div>
+
+
+            
+
+            </div>
+
+
+            <!-- Place Order -->
+
+            <button
+                type="submit"
+                class="place-order-btn"
+                [disabled]="isPlacingOrder"
+            >
+
+                <span>
+                    🔒
+                </span>
+
+                {{ isPlacingOrder
+                    ? 'Processing Order...'
+                    : 'Place Order Securely'
+                }}
 
             </button>
 
-        </form>
-
-        <!-- Order Summary -->
-
-        <div class="order-summary">
-
-            <h2>Order Summary</h2>
-
-            <div class="summary-row">
-
-                <span>Subtotal</span>
-
-                <span>₹{{ subtotal }}</span>
-
-            </div>
-
-            <div class="summary-row">
-
-                <span>Shipping</span>
-
-                <span>₹{{ shipping }}</span>
-
-            </div>
-            <p class="free-shipping" *ngIf="subtotal < 1999">
-
-                Add ₹{{1999-subtotal}}
-                more for FREE SHIPPING.
-
+            <p class="secure-note">
+                🔐 Your personal and payment information is secure.
             </p>
 
-            <div class="summary-row">
+        </div>
 
-                <span>GST (18%)</span>
 
-                <span>₹{{ gst }}</span>
+        <!-- ================= RIGHT : SUMMARY ================= -->
 
-            </div>
+        <div class="summary-card">
 
-            <div class="coupon-section">
+            <div class="summary-header">
 
-                <input type="text" placeholder="Enter Coupon Code" [(ngModel)]="couponCode">
+                <div>
+                    <h2>Order Summary</h2>
 
-                <button type="button" (click)="applyCoupon()">
-
-                    Apply
-
-                </button>
-
-            </div>
-
-            <div class="summary-row discount" *ngIf="discount > 0">
-
-                <span>
-
-                    Discount ({{ discount }}%)
-
-                </span>
-
-                <span>
-
-                    -₹{{ discountAmount }}
-
-                </span>
+                    <p>
+                        {{ cartItems.length }}
+                        {{ cartItems.length === 1 ? 'Item' : 'Items' }}
+                    </p>
+                </div>
 
             </div>
 
-            <hr>
+
+            <!-- Products -->
 
             <div class="summary-products">
 
-                <div class="summary-item" *ngFor="let item of cartItems">
+                <div
+                    class="summary-item"
+                    *ngFor="let item of cartItems"
+                >
 
-                    <img [src]="item.image" [alt]="item.name" class="summary-image">
+                    <div class="product-image">
 
-                    <div class="summary-details">
+                        <img
+                            [src]="item.image"
+                            [alt]="item.name"
+                        >
 
-                        <h4>{{ item.name }}</h4>
+                        <span>
+                            {{ item.quantity }}
+                        </span>
 
-                        <small>
-                            Qty : {{ item.quantity }}
+                    </div>
+
+
+                    <div class="product-info">
+
+                        <h4>
+                            {{ item.name }}
+                        </h4>
+
+                        <small *ngIf="item.size">
+                            Size: {{ item.size }}
                         </small>
 
                         <p>
-                            ₹{{ item.price }} × {{ item.quantity }}
+                            ₹{{ item.price | number }}
                         </p>
 
                     </div>
 
+
                     <strong>
-
-                        ₹{{ item.price * item.quantity }}
-
+                        ₹{{ item.price * item.quantity | number }}
                     </strong>
 
                 </div>
 
             </div>
 
-            <div class="summary-row total">
 
-                <span>Grand Total</span>
+            <!-- Price -->
 
-                <span>₹{{ grandTotal }}</span>
+            <div class="price-section">
+
+                <div class="price-row">
+
+                    <span>Subtotal</span>
+
+                    <strong>
+                        ₹{{ subtotal | number }}
+                    </strong>
+
+                </div>
+
+
+                <div class="price-row">
+
+                    <span>Shipping</span>
+
+                    <strong
+                        [class.free]="shipping === 0"
+                    >
+                        {{ shipping === 0
+                            ? 'FREE'
+                            : '₹' + (shipping | number)
+                        }}
+                    </strong>
+
+                </div>
+
+
+                <div class="price-row">
+
+                    <span>GST (18%)</span>
+
+                    <strong>
+                        ₹{{ gst | number }}
+                    </strong>
+
+                </div>
+
+
+                <!-- Coupon -->
+
+                <div class="coupon-box">
+
+                    <input
+                        type="text"
+                        placeholder="Enter coupon code"
+                        [(ngModel)]="couponCode"
+                        [ngModelOptions]="{standalone: true}"
+                    >
+
+                    <button
+                        type="button"
+                        (click)="applyCoupon()"
+                    >
+                        Apply
+                    </button>
+
+                </div>
+
+
+                <div
+                    class="price-row discount"
+                    *ngIf="discount > 0"
+                >
+
+                    <span>
+                        Discount ({{ discount }}%)
+                    </span>
+
+                    <strong>
+                        -₹{{ discountAmount | number }}
+                    </strong>
+
+                </div>
 
             </div>
-            
+
+
+            <!-- Total -->
+
+            <div class="total-section">
+
+                <span>
+                    Total Amount
+                </span>
+
+                <strong>
+                    ₹{{ grandTotal | number }}
+                </strong>
+
+            </div>
+
+
+            <div class="order-benefits">
+
+                <div>
+                    ✓ Secure Payment
+                </div>
+
+                <div>
+                    ✓ Easy 7-Day Exchange
+                </div>
+
+                <div>
+                    ✓ Order Tracking Available
+                </div>
+
+            </div>
 
         </div>
 
-    </div>
+    </form>
 
 
+    <!-- ================= OTP MODAL ================= -->
 
-    <!-- Success Message -->
+    <div
+        class="otp-overlay"
+        *ngIf="showOtpModal"
+    >
 
-    <div class="success-overlay" *ngIf="orderPlaced">
+        <div class="otp-modal">
 
-        <div class="success-popup">
+            <button
+                type="button"
+                class="otp-close"
+                (click)="showOtpModal = false"
+            >
+                ×
+            </button>
 
-            <div class="success-icon">
-
-                ✅
-
+            <div class="otp-icon">
+                🔐
             </div>
 
             <h2>
-
-                Order Placed Successfully!
-
+                Verify Mobile Number
             </h2>
 
             <p>
-
-                Thank you for shopping with Triangle Sports.
-
+                We'll send a verification code to
             </p>
 
-            <p>
+            <strong>
+                +91 {{ mobileForOtp }}
+            </strong>
 
-                Order ID:
-                <strong>{{ generatedOrderId }}</strong>
 
-            </p>
+            <div *ngIf="!otpSent">
 
-            <div class="popup-actions">
-
-                <a class="popup-btn" (click)="continueShopping()">
-                    Continue Shopping
-                </a>
-
-                <a routerLink="/orders" class="popup-btn secondary">
-
-                    View Orders
-
-                </a>
+                <button
+                    type="button"
+                    class="otp-btn"
+                    (click)="sendCheckoutOTP()"
+                    [disabled]="otpLoading"
+                >
+                    {{ otpLoading ? 'Sending...' : 'Send OTP' }}
+                </button>
 
             </div>
+
+
+            <div *ngIf="otpSent">
+
+                <input
+                    type="text"
+                    class="otp-input"
+                    placeholder="Enter 6 digit OTP"
+                    maxlength="6"
+                    [(ngModel)]="otp"
+                    [ngModelOptions]="{standalone: true}"
+                >
+
+                <button
+                    type="button"
+                    class="otp-btn"
+                    (click)="verifyCheckoutOTP()"
+                    [disabled]="otpLoading"
+                >
+                    {{ otpLoading
+                        ? 'Verifying...'
+                        : 'Verify OTP'
+                    }}
+                </button>
+
+                <button
+                    type="button"
+                    class="resend-btn"
+                    (click)="sendCheckoutOTP()"
+                >
+                    Resend OTP
+                </button>
+
+            </div>
+
+
+            <p
+                class="otp-error"
+                *ngIf="otpError"
+            >
+                {{ otpError }}
+            </p>
+
+            <p
+                class="otp-success"
+                *ngIf="otpSuccess"
+            >
+                {{ otpSuccess }}
+            </p>
 
         </div>
 

@@ -1,444 +1,1412 @@
-.checkout-container {
-  max-width: 600px;
-  margin: 60px auto;
-  padding: 40px;
+/* =========================================================
+   TRIANGLE SPORTS - CHECKOUT PAGE
+   Clean • Responsive • Production Ready
+========================================================= */
 
-  background: white;
 
-  border-radius: 12px;
+/* =========================================================
+   PAGE
+========================================================= */
 
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+.checkout-page {
+    width: 100%;
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    background: #f7f7f9;
+    color: #171b2d;
+
+    /*
+     * IMPORTANT:
+     * Navbar fixed hai to checkout navbar ke neeche start hoga.
+     */
+    padding: 115px 32px 70px;
 }
 
-.checkout-container h1 {
-  margin-bottom: 30px;
+
+/* =========================================================
+   CHECKOUT HEADER
+========================================================= */
+
+.checkout-header {
+    width: 100%;
+    max-width: 1280px;
+
+    margin: 0 auto 28px;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
 }
 
-.checkout-container form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.checkout-header h1 {
+    margin: 0;
+
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 800;
+
+    letter-spacing: -0.6px;
+
+    color: #171b2d;
 }
 
-.checkout-container input,
-.checkout-container textarea {
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+.checkout-header p {
+    margin: 7px 0 0;
+
+    font-size: 15px;
+    line-height: 1.5;
+
+    color: #777b89;
 }
 
-.checkout-container button {
-  padding: 15px;
 
-  border: none;
+/* Secure checkout badge */
 
-  background: black;
+.secure-checkout {
+    flex-shrink: 0;
 
-  color: white;
+    display: flex;
+    align-items: center;
+    gap: 7px;
 
-  border-radius: 8px;
+    padding: 10px 16px;
 
-  cursor: pointer;
+    border: 1px solid #e4e3eb;
+    border-radius: 999px;
+
+    background: #ffffff;
+
+    color: #5d6070;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    box-shadow: 0 3px 12px rgba(23, 27, 45, 0.04);
 }
 
-.success-message {
-  margin-top: 30px;
 
-  color: green;
+/* =========================================================
+   MAIN CHECKOUT LAYOUT
+========================================================= */
 
-  font-weight: bold;
+.checkout-layout {
+    width: 100%;
+    max-width: 1280px;
 
-  font-size: 22px;
-}
-.success-message {
-  margin-top: 30px;
-  text-align: center;
-}
-
-.success-message h2 {
-  color: green;
-  margin-bottom: 15px;
-}
-
-.success-message a {
-  display: inline-block;
-  margin-top: 20px;
-  padding: 12px 25px;
-
-  background: black;
-  color: white;
-
-  text-decoration: none;
-
-  border-radius: 8px;
-}
-
-.checkout-container select {
-  padding: 15px;
-
-  border: 1px solid #ddd;
-
-  border-radius: 8px;
-}
-.checkout-grid {
+    margin: 0 auto;
 
     display: grid;
 
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns:
+        minmax(0, 1.55fr)
+        minmax(360px, 0.85fr);
 
-    gap: 40px;
+    gap: 28px;
 
+    align-items: start;
 }
 
-.order-summary {
 
-    background: white;
+/* =========================================================
+   COMMON CARD
+========================================================= */
 
-    padding: 30px;
+.delivery-card,
+.summary-card {
+    box-sizing: border-box;
 
+    background: #ffffff;
+
+    border: 1px solid #e8e7ee;
     border-radius: 20px;
 
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
-
-    height: fit-content;
-
+    box-shadow:
+        0 8px 30px rgba(23, 27, 45, 0.055);
 }
 
-.order-summary h2 {
 
-    margin-bottom: 25px;
+/* =========================================================
+   DELIVERY CARD
+========================================================= */
 
+.delivery-card {
+    padding: 32px;
 }
 
-.summary-row {
+
+/* =========================================================
+   SUMMARY CARD
+========================================================= */
+
+.summary-card {
+    padding: 28px;
+
+    /*
+     * Keeps summary visible while scrolling.
+     * It will be disabled on smaller screens.
+     */
+    position: sticky;
+    top: 100px;
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.card-heading {
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+
+    padding-bottom: 24px;
+    margin-bottom: 26px;
+
+    border-bottom: 1px solid #eeeeF2;
+}
+
+.heading-icon {
+    width: 46px;
+    height: 46px;
+
+    flex-shrink: 0;
 
     display: flex;
+    align-items: center;
+    justify-content: center;
 
-    justify-content: space-between;
+    border-radius: 13px;
 
-    margin-bottom: 18px;
+    background: #f1e9ff;
 
-    color: #555;
-
+    font-size: 21px;
 }
 
-.summary-row.total {
+.card-heading h2 {
+    margin: 0;
 
-    font-size: 20px;
+    font-size: 22px;
+    line-height: 1.25;
 
-    font-weight: bold;
+    font-weight: 800;
 
-    color: black;
-
+    color: #171b2d;
 }
 
-.order-summary hr {
+.card-heading p {
+    margin: 5px 0 0;
 
-    margin: 20px 0;
+    font-size: 13px;
 
+    color: #858896;
 }
 
-@media (max-width: 768px) {
 
-    .checkout-grid {
+/* =========================================================
+   FORM GROUP
+========================================================= */
 
-        grid-template-columns: 1fr;
+.form-group {
+    width: 100%;
 
-    }
-
+    margin-bottom: 20px;
 }
-.coupon-section {
+
+.form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    font-size: 14px;
+    line-height: 1.3;
+
+    font-weight: 650;
+
+    color: #33384b;
+}
+
+.form-group label span {
+    color: #e53935;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    border: 1px solid #dfe1e8;
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #171b2d;
+
+    font-family: inherit;
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+.form-group input {
+    height: 50px;
+
+    padding: 0 15px;
+}
+
+.form-group textarea {
+    min-height: 115px;
+
+    padding: 14px 15px;
+
+    resize: vertical;
+
+    line-height: 1.5;
+}
+
+.form-group select {
+    height: 50px;
+
+    padding: 0 15px;
+
+    cursor: pointer;
+}
+
+
+/* Placeholder */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #a2a5ae;
+}
+
+
+/* Focus */
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    border-color: #7838e8;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(120, 56, 232, 0.08);
+}
+
+
+/* =========================================================
+   TWO COLUMN FORM
+========================================================= */
+
+.form-row {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 16px;
+}
+
+
+/* =========================================================
+   PHONE VERIFICATION
+========================================================= */
+
+.phone-row {
+    width: 100%;
 
     display: flex;
 
     gap: 10px;
 
-    margin: 20px 0;
-
+    align-items: stretch;
 }
 
-.coupon-section input {
-
+.phone-row input {
     flex: 1;
-
-    padding: 12px;
-
-    border: 1px solid #ddd;
-
-    border-radius: 8px;
-
+    min-width: 0;
 }
 
-.coupon-section button {
 
-    padding: 12px 20px;
+/* Verify button */
+
+.verify-btn {
+    width: 105px;
+
+    flex-shrink: 0;
 
     border: none;
+    border-radius: 10px;
 
-    border-radius: 8px;
+    background: #171b2d;
+    color: #ffffff;
 
-    background: black;
-
-    color: white;
+    font-size: 13px;
+    font-weight: 700;
 
     cursor: pointer;
 
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
-.coupon-section button:hover {
+.verify-btn:hover {
+    background: #7838e8;
 
-    background: #ff4d5a;
-
+    transform: translateY(-1px);
 }
 
-.discount {
 
-    color: green;
+/* Verified */
 
-    font-weight: bold;
+.verified {
+    width: 105px;
 
-}
+    flex-shrink: 0;
 
-.error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    display: block;
+    border-radius: 10px;
 
-    color: #ff4d5a;
+    background: #edf9f0;
+
+    color: #27833c;
 
     font-size: 13px;
-
-    margin-top: 5px;
-
-    margin-bottom: 10px;
-
+    font-weight: 700;
 }
-.success-overlay {
 
-    position: fixed;
 
-    top: 0;
-    left: 0;
+/* =========================================================
+   VALIDATION ERROR
+========================================================= */
+
+.error {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #df3d3d;
+
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   PAYMENT SECTION
+========================================================= */
+
+.payment-section {
+    margin-top: 28px;
+    padding-top: 26px;
+
+    border-top: 1px solid #eeeeF2;
+}
+
+.payment-heading h3 {
+    margin: 0;
+
+    font-size: 18px;
+    font-weight: 750;
+
+    color: #171b2d;
+}
+
+.payment-heading p {
+    margin: 5px 0 15px;
+
+    color: #858896;
+
+    font-size: 13px;
+}
+
+
+/* Payment option */
+
+.payment-option {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-bottom: 11px;
+
+    padding: 15px 16px;
+
+    border: 1px solid #e2e3e9;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.payment-option:hover {
+    border-color: #7838e8;
+
+    background: #fbf9ff;
+}
+
+
+/* Payment radio */
+
+.payment-radio {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    min-width: 0;
+}
+
+.payment-radio input {
+    width: 18px;
+    height: 18px;
+
+    flex-shrink: 0;
+
+    margin: 0;
+
+    accent-color: #7838e8;
+
+    cursor: pointer;
+}
+
+.payment-radio label {
+    cursor: pointer;
+}
+
+
+/* Payment title */
+
+.payment-title {
+    font-size: 14px;
+    font-weight: 700;
+
+    color: #171b2d;
+}
+
+.payment-radio small {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #888b97;
+
+    font-size: 12px;
+}
+
+
+/* Recommended badge */
+
+.recommended {
+    display: inline-block;
+
+    margin-left: 7px;
+
+    padding: 4px 7px;
+
+    border-radius: 5px;
+
+    background: #f0e7ff;
+
+    color: #7034d9;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* Razorpay text */
+
+.razorpay-logo {
+    flex-shrink: 0;
+
+    color: #253b80;
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   PLACE ORDER
+========================================================= */
+
+.place-order-btn {
+    width: 100%;
+    height: 55px;
+
+    margin-top: 27px;
+
+    border: none;
+    border-radius: 11px;
+
+    background: #171b2d;
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 15px;
+    font-weight: 750;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.place-order-btn:hover:not(:disabled) {
+    background: #7838e8;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 20px rgba(120, 56, 232, 0.20);
+}
+
+.place-order-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.place-order-btn:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+}
+
+
+/* Secure note */
+
+.secure-note {
+    margin: 12px 0 0;
+
+    text-align: center;
+
+    color: #8b8e99;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   ORDER SUMMARY HEADER
+========================================================= */
+
+.summary-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding-bottom: 19px;
+
+    border-bottom: 1px solid #eeeeF2;
+}
+
+.summary-header h2 {
+    margin: 0;
+
+    font-size: 21px;
+    font-weight: 800;
+
+    color: #171b2d;
+}
+
+.summary-header p {
+    margin: 5px 0 0;
+
+    color: #858896;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   SUMMARY PRODUCTS
+========================================================= */
+
+.summary-products {
+    padding: 16px 0;
+}
+
+.summary-item {
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px 0;
+
+    border-bottom: 1px solid #f0f0f3;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
+
+.product-image {
+    position: relative;
+
+    width: 68px;
+    height: 72px;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    border-radius: 9px;
+
+    background: #f5f5f7;
+}
+
+.product-image img {
+    display: block;
 
     width: 100%;
     height: 100%;
 
-    background: rgba(0,0,0,0.6);
+    object-fit: cover;
+}
+
+
+/* Quantity badge */
+
+.product-image span {
+    position: absolute;
+
+    top: 4px;
+    right: 4px;
+
+    min-width: 19px;
+    height: 19px;
+
+    padding: 0 4px;
+
+    box-sizing: border-box;
 
     display: flex;
-
-    justify-content: center;
     align-items: center;
-
-    z-index: 999;
-}
-
-.success-popup {
-
-    background: white;
-
-    padding: 40px;
-
-    width: 450px;
-
-    border-radius: 20px;
-
-    text-align: center;
-
-    animation: popup 0.4s ease;
-}
-
-.success-icon {
-
-    font-size: 70px;
-
-    margin-bottom: 20px;
-}
-
-.popup-actions {
-
-    display: flex;
-
     justify-content: center;
+
+    border-radius: 50%;
+
+    background: #171b2d;
+    color: #ffffff;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   PRODUCT INFO
+========================================================= */
+
+.product-info {
+    flex: 1;
+
+    min-width: 0;
+}
+
+.product-info h4 {
+    margin: 0 0 5px;
+
+    font-size: 13px;
+    line-height: 1.35;
+
+    font-weight: 650;
+
+    color: #171b2d;
+
+    display: -webkit-box;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    overflow: hidden;
+}
+
+.product-info small {
+    color: #888b96;
+
+    font-size: 11px;
+}
+
+.product-info p {
+    margin: 5px 0 0;
+
+    color: #666a78;
+
+    font-size: 12px;
+}
+
+.summary-item > strong {
+    flex-shrink: 0;
+
+    color: #171b2d;
+
+    font-size: 13px;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   PRICE SECTION
+========================================================= */
+
+.price-section {
+    padding-top: 10px;
+
+    border-top: 1px solid #eeeeF2;
+}
+
+.price-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 
     gap: 15px;
 
-    margin-top: 30px;
+    margin: 14px 0;
+
+    color: #606473;
+
+    font-size: 14px;
 }
 
-.popup-btn {
+.price-row strong {
+    color: #343847;
 
-    padding: 12px 20px;
+    font-weight: 700;
+}
+
+.price-row .free {
+    color: #27833c;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   COUPON
+========================================================= */
+
+.coupon-box {
+    display: flex;
+
+    gap: 8px;
+
+    margin: 20px 0;
+}
+
+.coupon-box input {
+    flex: 1;
+
+    min-width: 0;
+
+    height: 44px;
+
+    box-sizing: border-box;
+
+    padding: 0 12px;
+
+    border: 1px solid #dedfe6;
+    border-radius: 9px;
+
+    background: #ffffff;
+
+    outline: none;
+
+    font-family: inherit;
+    font-size: 13px;
+
+    transition: border-color 0.2s ease;
+}
+
+.coupon-box input::placeholder {
+    color: #a2a5ae;
+}
+
+.coupon-box input:focus {
+    border-color: #7838e8;
+}
+
+.coupon-box button {
+    width: 75px;
+
+    flex-shrink: 0;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #171b2d;
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.coupon-box button:hover {
+    background: #7838e8;
+}
+
+
+/* Discount */
+
+.discount {
+    color: #27833c;
+}
+
+.discount strong {
+    color: #27833c;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.total-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 8px;
+    padding-top: 20px;
+
+    border-top: 1px solid #dedfe6;
+}
+
+.total-section span {
+    font-size: 16px;
+    font-weight: 650;
+
+    color: #171b2d;
+}
+
+.total-section strong {
+    color: #171b2d;
+
+    font-size: 25px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   ORDER BENEFITS
+========================================================= */
+
+.order-benefits {
+    margin-top: 22px;
+
+    padding: 15px;
 
     border-radius: 10px;
 
-    background: black;
+    background: #faf9ff;
 
-    color: white;
+    color: #6c36c8;
 
-    text-decoration: none;
-
-    display: inline-block;
+    font-size: 11px;
+    line-height: 2;
 }
 
-.popup-btn.secondary {
 
-    background: #ff4d5a;
+/* =========================================================
+   OTP OVERLAY
+========================================================= */
+
+.otp-overlay {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 9999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    box-sizing: border-box;
+
+    background: rgba(10, 11, 20, 0.62);
+
+    backdrop-filter: blur(4px);
 }
 
-.popup-btn:hover {
 
-    opacity: 0.9;
+/* =========================================================
+   OTP MODAL
+========================================================= */
+
+.otp-modal {
+    position: relative;
+
+    width: 390px;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 32px;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    text-align: center;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.20);
+
+    animation: otpAppear 0.2s ease;
 }
 
-@keyframes popup {
 
+@keyframes otpAppear {
     from {
-
-        transform: scale(0.8);
-
         opacity: 0;
+        transform: translateY(10px) scale(0.98);
     }
 
     to {
-
-        transform: scale(1);
-
         opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+
+/* Close */
+
+.otp-close {
+    position: absolute;
+
+    top: 13px;
+    right: 15px;
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f4f4f6;
+
+    color: #444;
+
+    font-size: 20px;
+
+    cursor: pointer;
+}
+
+
+/* OTP icon */
+
+.otp-icon {
+    width: 55px;
+    height: 55px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f1e9ff;
+
+    font-size: 25px;
+}
+
+.otp-modal h2 {
+    margin: 0;
+
+    font-size: 21px;
+    font-weight: 800;
+
+    color: #171b2d;
+}
+
+.otp-modal p {
+    color: #858896;
+
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.otp-modal strong {
+    color: #171b2d;
+}
+
+
+/* OTP button */
+
+.otp-btn {
+    width: 100%;
+    height: 48px;
+
+    margin-top: 20px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: #171b2d;
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.otp-btn:hover {
+    background: #7838e8;
+}
+
+.otp-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* OTP input */
+
+.otp-input {
+    width: 100%;
+    height: 48px;
+
+    box-sizing: border-box;
+
+    margin-top: 20px;
+
+    padding: 0 15px;
+
+    border: 1px solid #dedfe6;
+    border-radius: 9px;
+
+    outline: none;
+
+    text-align: center;
+
+    letter-spacing: 5px;
+
+    font-family: inherit;
+    font-size: 18px;
+}
+
+.otp-input:focus {
+    border-color: #7838e8;
+
+    box-shadow:
+        0 0 0 3px rgba(120, 56, 232, 0.08);
+}
+
+
+/* Resend */
+
+.resend-btn {
+    margin-top: 14px;
+
+    border: none;
+
+    background: transparent;
+
+    color: #7838e8;
+
+    font-family: inherit;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+
+/* OTP messages */
+
+.otp-error {
+    color: #dc3838 !important;
+}
+
+.otp-success {
+    color: #27833c !important;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .checkout-page {
+        padding: 105px 24px 60px;
+    }
+
+    .checkout-layout {
+        grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.8fr);
+
+        gap: 22px;
+    }
+
+    .delivery-card {
+        padding: 26px;
+    }
+
+    .summary-card {
+        padding: 24px;
     }
 
 }
-.confetti{
-    font-size:40px;
-    margin-bottom:20px;
-    animation: bounce 1s infinite;
-}
 
-@keyframes bounce{
 
-    0%,100%{
-        transform:translateY(0);
+/* =========================================================
+   MOBILE / TABLET
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .checkout-page {
+        padding: 100px 20px 50px;
     }
 
-    50%{
-        transform:translateY(-10px);
+    .checkout-layout {
+        grid-template-columns: 1fr;
+
+        gap: 20px;
     }
-}
-.summary-item{
 
-display:flex;
-align-items:center;
-justify-content:space-between;
-gap:15px;
+    /*
+     * Sticky summary disabled.
+     * Better UX on mobile.
+     */
+    .summary-card {
+        position: static;
+    }
 
-padding:15px 0;
-
-border-bottom:1px solid #eee;
-
-}
-
-.summary-image{
-
-width:65px;
-
-height:65px;
-
-border-radius:10px;
-
-object-fit:cover;
+    /*
+     * Summary comes after delivery.
+     */
+    .checkout-header {
+        margin-bottom: 22px;
+    }
 
 }
 
-.summary-details{
 
-flex:1;
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .checkout-page {
+        padding: 92px 14px 40px;
+    }
+
+    .checkout-header {
+        display: block;
+
+        margin-bottom: 20px;
+    }
+
+    .checkout-header h1 {
+        font-size: 27px;
+    }
+
+    .checkout-header p {
+        font-size: 14px;
+    }
+
+    .secure-checkout {
+        display: none;
+    }
+
+
+    /* Cards */
+
+    .delivery-card,
+    .summary-card {
+        padding: 20px;
+
+        border-radius: 16px;
+    }
+
+
+    /* Card heading */
+
+    .card-heading {
+        gap: 11px;
+
+        padding-bottom: 18px;
+        margin-bottom: 20px;
+    }
+
+    .heading-icon {
+        width: 42px;
+        height: 42px;
+
+        border-radius: 11px;
+
+        font-size: 19px;
+    }
+
+    .card-heading h2 {
+        font-size: 20px;
+    }
+
+
+    /* Form */
+
+    .form-row {
+        grid-template-columns: 1fr;
+
+        gap: 0;
+    }
+
+
+    /* Phone */
+
+    .phone-row {
+        flex-direction: column;
+    }
+
+    .verify-btn,
+    .verified {
+        width: 100%;
+        height: 46px;
+    }
+
+
+    /* Payment */
+
+    .payment-option {
+        padding: 14px;
+    }
+
+
+    /* Summary */
+
+    .summary-header h2 {
+        font-size: 20px;
+    }
+
+    .product-image {
+        width: 62px;
+        height: 66px;
+    }
+
+    .total-section strong {
+        font-size: 22px;
+    }
+
+
+    /* Coupon */
+
+    .coupon-box {
+        gap: 7px;
+    }
+
+    .coupon-box button {
+        width: 70px;
+    }
 
 }
 
-.summary-details h4{
 
-margin:0;
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
 
-font-size:16px;
+@media (max-width: 400px) {
 
-}
+    .checkout-page {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
 
-.summary-details small{
+    .delivery-card,
+    .summary-card {
+        padding: 16px;
+    }
 
-display:block;
+    .checkout-header h1 {
+        font-size: 25px;
+    }
 
-color:#777;
+    .coupon-box button {
+        width: 65px;
+    }
 
-margin:4px 0;
+    .summary-item {
+        gap: 9px;
+    }
 
-}
+    .product-image {
+        width: 58px;
+        height: 62px;
+    }
 
-.summary-details p{
-
-margin:0;
-
-font-size:14px;
-
-color:#666;
-
-}
-
-.summary-item strong{
-
-font-size:18px;
-
-}
-.place-order-btn{
-
-width:100%;
-
-margin-top:25px;
-
-padding:16px;
-
-border:none;
-
-border-radius:12px;
-
-background:#6d28d9;
-
-color:#fff;
-
-font-size:17px;
-
-font-weight:600;
-
-cursor:pointer;
-
-transition:.3s;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:10px;
-
-}
-
-.place-order-btn:hover{
-
-background:#5b21b6;
-
-transform:translateY(-2px);
-
-box-shadow:0 10px 25px rgba(109,40,217,.25);
-
-}
-
-.place-order-btn:disabled{
-
-background:#bdbdbd;
-
-cursor:not-allowed;
-
-box-shadow:none;
-
-transform:none;
+    .summary-item > strong {
+        font-size: 12px;
+    }
 
 }
