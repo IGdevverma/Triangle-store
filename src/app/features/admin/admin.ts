@@ -28,6 +28,7 @@ import { NgxSpinnerService } from 'ngx-spinner';
 
 
 export class Admin implements OnInit, AfterViewInit {
+  i: any;
   changeRole(user: any, role: string) {
 
     this.userService.updateRole(user._id, role).subscribe({
@@ -87,7 +88,8 @@ export class Admin implements OnInit, AfterViewInit {
   showQuoteModal = false;
 
   loadingQuote = false;
-
+  galleryFiles: File[] = [];
+  galleryPreviews: string[] = [];
   customerSearch = '';
   salesChart: any;
   searchTerm = '';
@@ -102,11 +104,19 @@ export class Admin implements OnInit, AfterViewInit {
   totalStock = 0;
   totalCategories = 0;
   mostExpensiveProduct = '';
-  selectedFile: File | null = null;
-  imagePreview = '';
+  selectedFiles: File[] = [];
+  imagePreviews: string[] = [];
+  // Existing images already saved in Cloudinary
+  existingImages: string[] = [];
+  removedImages: string[] = [];
+
+
+  // Existing images that user wants to delete
+
   lowStockProducts: Product[] = [];
   orders: any[] = [];
   quotes: any[] = [];
+
 
   filteredQuotes: any[] = [];
 
@@ -120,6 +130,7 @@ export class Admin implements OnInit, AfterViewInit {
     'Grey',
     'Navy'
   ];
+
 
 
 
@@ -242,6 +253,37 @@ export class Admin implements OnInit, AfterViewInit {
 
     });
 
+  }
+
+  onMainImageSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const file = input.files[0];
+
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image.');
+      return;
+    }
+
+    // Main image first
+    this.selectedFiles.unshift(file);
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+      this.imagePreviews.unshift(
+        reader.result as string
+      );
+
+    };
+
+    reader.readAsDataURL(file);
   }
   loadOrders() {
 
@@ -477,6 +519,76 @@ export class Admin implements OnInit, AfterViewInit {
 
   editing = false;
 
+  onProductImagesSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // Maximum 5 images
+    if (this.selectedFiles.length + files.length > 5) {
+      this.toastr.warning(
+        'You can upload maximum 5 images.',
+        'Image Limit'
+      );
+      return;
+    }
+
+    files.forEach((file) => {
+
+      // Validate image
+      if (!file.type.startsWith('image/')) {
+        this.toastr.warning(
+          `${file.name} is not a valid image.`,
+          'Invalid File'
+        );
+        return;
+      }
+
+      // Maximum 5MB
+      if (file.size > 5 * 1024 * 1024) {
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+        return;
+      }
+
+      // Store file
+      this.selectedFiles.push(file);
+
+      // Create preview
+      const reader = new FileReader();
+
+      reader.onload = () => {
+
+        this.imagePreviews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+    // Reset input so same file can be selected again
+    input.value = '';
+
+  }
+
+  removeProductImage(index: number): void {
+
+    this.selectedFiles.splice(index, 1);
+
+    this.imagePreviews.splice(index, 1);
+
+  }
+
   addProduct() {
     console.log('addProduct called');
 
@@ -519,7 +631,19 @@ export class Admin implements OnInit, AfterViewInit {
 
     formData.append('showOnHome', String(this.newProduct.showOnHome));
 
-    formData.append('image', this.selectedFile!);
+    this.selectedFiles.forEach((file) => {
+
+      formData.append('images', file);
+
+    });
+
+
+    formData.append(
+      'removedImages',
+      JSON.stringify(this.removedImages)
+    );
+
+
 
 
 
@@ -558,14 +682,31 @@ export class Admin implements OnInit, AfterViewInit {
   }
 
 
-  editProduct(product: Product) {
+
+
+  editProduct(product: Product): void {
 
     this.editing = true;
     this.showModal = true;
 
+    // Product ki normal information
     this.newProduct = { ...product };
-    this.imagePreview =
-      product.image.startsWith('http') ? product.image : '';
+
+    // New images reset
+    this.selectedFiles = [];
+
+    // Deleted images reset
+    this.removedImages = [];
+
+    // Database/Cloudinary se already saved images
+    this.existingImages = product.images?.length
+      ? [...product.images]
+      : product.image
+        ? [product.image]
+        : [];
+
+    // UI mein jo images dikhengi
+    this.imagePreviews = [...this.existingImages];
 
   }
 
@@ -609,14 +750,22 @@ export class Admin implements OnInit, AfterViewInit {
       'sku',
       this.newProduct.sku || ''
     );
-
+    formData.append(
+      'existingImages',
+      JSON.stringify(
+        this.imagePreviews.filter(image =>
+          image.startsWith('http')
+        )
+      )
+    );
     // IMPORTANT: only append image when user selected a new file
-    if (this.selectedFile) {
+    if (this.selectedFiles.length > 0) {
 
-      formData.append(
-        'image',
-        this.selectedFile
-      );
+      this.selectedFiles.forEach((file) => {
+
+        formData.append('images', file);
+
+      });
 
     }
 
@@ -633,9 +782,9 @@ export class Admin implements OnInit, AfterViewInit {
 
         this.editing = false;
 
-        this.selectedFile = null;
+        this.selectedFiles = [];
 
-        this.imagePreview = '';
+        this.imagePreviews = [];
 
         this.newProduct = {
           _id: '',
@@ -788,10 +937,7 @@ export class Admin implements OnInit, AfterViewInit {
       this.newProduct.name.trim() &&
       this.newProduct.price > 0 &&
       this.newProduct.category.trim() &&
-      (
-        this.selectedFile ||
-        this.editing
-      )
+      this.selectedFiles.length > 0 || this.editing
 
     );
 
@@ -829,9 +975,8 @@ export class Admin implements OnInit, AfterViewInit {
 
     this.showModal = false;
 
-    this.selectedFile = null;
-
-    this.imagePreview = '';
+    this.selectedFiles = [];
+    this.imagePreviews = [];
 
     this.newProduct = {
       name: '',
@@ -869,27 +1014,63 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
 
-  onFileSelected(event: any) {
+  onFilesSelected(event: Event): void {
 
-    if (event.target.files.length > 0) {
+    const input = event.target as HTMLInputElement;
 
-      this.selectedFile = event.target.files[0];
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // Maximum 5 images
+    if (files.length > 5) {
+
+      this.toastr.warning(
+        'You can upload maximum 5 images.',
+        'Image Limit'
+      );
+
+      return;
+    }
+
+    // Reset previous selection
+    this.selectedFiles = [];
+    this.imagePreviews = [];
+
+    files.forEach((file) => {
+
+      // 5MB validation
+      if (file.size > 5 * 1024 * 1024) {
+
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+
+        return;
+      }
+
+      this.selectedFiles.push(file);
 
       const reader = new FileReader();
 
       reader.onload = () => {
 
-        this.imagePreview = reader.result as string;
+        this.imagePreviews.push(
+          reader.result as string
+        );
 
       };
 
-      if (this.selectedFile) {
-        reader.readAsDataURL(this.selectedFile);
-      }
+      reader.readAsDataURL(file);
 
-    }
+    });
 
   }
+
+
 
   createSalesChart() {
 
@@ -957,7 +1138,191 @@ export class Admin implements OnInit, AfterViewInit {
     this.invoiceService.generateInvoice(order);
   }
 
+  onGalleryFilesSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const selectedFiles = Array.from(input.files);
+
+    // Maximum 5 images
+    if (selectedFiles.length > 5) {
+
+      alert('You can upload maximum 5 images.');
+
+      return;
+    }
+
+    // Validate files
+    const invalidFile = selectedFiles.find(file =>
+      !file.type.startsWith('image/')
+    );
+
+    if (invalidFile) {
+
+      alert('Please select only image files.');
+
+      return;
+    }
+
+    // Validate size - 5MB each
+    const largeFile = selectedFiles.find(file =>
+      file.size > 5 * 1024 * 1024
+    );
+
+    if (largeFile) {
+
+      alert('Each image must be less than 5MB.');
+
+      return;
+    }
 
 
+
+
+
+    this.imagePreviews = [];
+
+    selectedFiles.forEach(file => {
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+
+        this.imagePreviews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+  }
+
+  removeGalleryImage(index: number): void {
+
+    const image = this.imagePreviews[index];
+
+    if (!image) {
+      return;
+    }
+
+    // Check if this image already exists in Cloudinary
+    const isExistingImage =
+      this.existingImages.includes(image);
+
+    if (isExistingImage) {
+
+      // Existing image ko delete list mein daalo
+      this.removedImages.push(image);
+
+      // Existing images list se hatao
+      this.existingImages =
+        this.existingImages.filter(
+          img => img !== image
+        );
+
+    } else {
+
+      // Ye NEW image hai jo abhi computer se select hui hai
+
+      const newFileIndex =
+        this.imagePreviews
+          .slice(0, index)
+          .filter(
+            img => !this.existingImages.includes(img)
+          )
+          .length;
+
+      this.selectedFiles.splice(
+        newFileIndex,
+        1
+      );
+    }
+
+    // Screen se image remove karo
+    this.imagePreviews.splice(index, 1);
+
+  }
+
+  onGalleryImagesSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // Maximum 5 total images
+    if (this.imagePreviews.length + files.length > 5) {
+      alert('You can upload maximum 5 product images.');
+      input.value = '';
+      return;
+    }
+
+    files.forEach((file) => {
+
+      if (!file.type.startsWith('image/')) {
+        return;
+      }
+
+      // IMPORTANT
+      // Actual file ko save karo
+      this.selectedFiles.push(file);
+
+      const reader = new FileReader();
+
+      reader.onload = () => {
+
+        this.imagePreviews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+    input.value = '';
+  }
+
+
+  removeImage(index: number): void {
+
+    const image = this.imagePreviews[index];
+
+    if (!image) {
+      return;
+    }
+
+    // Existing Cloudinary image
+    if (image.startsWith('http')) {
+
+      this.removedImages.push(image);
+
+    }
+    // Newly selected local image
+    else {
+
+      const localFileIndex = this.imagePreviews
+        .slice(0, index)
+        .filter(img => !img.startsWith('http'))
+        .length;
+
+      this.selectedFiles.splice(localFileIndex, 1);
+    }
+
+    // Remove from UI
+    this.imagePreviews.splice(index, 1);
+
+  }
 
 }

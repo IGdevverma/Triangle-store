@@ -45,18 +45,25 @@
 
         </div>
 
+        <!-- PRODUCT IMAGE THUMBNAILS -->
 
-        <!-- Product Thumbnails -->
         <div class="thumbnail-wrapper" *ngIf="productImages.length > 1">
 
           <button type="button" class="thumbnail" *ngFor="let image of productImages"
-            [class.active]="selectedImage === image" (click)="selectedImage = image">
+            [class.active]="selectedImage === image" (click)="selectImage(image)">
 
-            <img [src]="image" [alt]="product.name" />
+            <img [src]="image" [alt]="product?.name || 'Product image'" />
 
           </button>
 
         </div>
+
+
+
+
+
+
+
 
       </div>
 
@@ -68,10 +75,7 @@
 
       <div class="product-information">
 
-        <!-- Brand -->
-        <div class="brand-label">
-          TRIANGLE SPORTS
-        </div>
+
 
 
         <!-- Product Name -->
@@ -99,31 +103,39 @@
 
 
         <!-- Price -->
-        <div class="price-row">
+        <!-- PRICE -->
+        <div class="price-section">
 
-          <span class="current-price">
-            ₹{{ product.price | number:'1.0-0' }}
-          </span>
+          <div class="price-row">
 
-          <span class="old-price" *ngIf="product.discount && product.discount > 0">
-            ₹{{
-            product.price +
-            (
-            product.price *
-            product.discount /
-            (100 - product.discount)
-            )
-            | number:'1.0-0'
-            }}
-          </span>
+            <span class="current-price">
+              ₹{{ product.price | number:'1.0-0' }}
+            </span>
 
-          <span class="discount-text" *ngIf="product.discount && product.discount > 0">
-            {{ product.discount }}% OFF
-          </span>
+            <span class="old-price" *ngIf="product.discount && product.discount > 0">
+
+              ₹{{
+              (
+              product.price /
+              (1 - product.discount / 100)
+              ) | number:'1.0-0'
+              }}
+
+            </span>
+
+            <span class="discount-text" *ngIf="product.discount && product.discount > 0">
+
+              {{ product.discount }}% OFF
+
+            </span>
+
+          </div>
+
+          <p class="tax-text">
+            {{ product.taxText || 'Inclusive of all taxes' }}
+          </p>
 
         </div>
-
-
         <!-- Tax -->
         <p class="tax-text">
           {{ product.taxText || 'Inclusive of all taxes' }}
@@ -143,27 +155,32 @@
 
           <div class="option-heading">
 
-            <span>
-              Select Size
-            </span>
+            <div class="option-title">
+              <span>Select Size</span>
+              <strong>{{ selectedSize }}</strong>
+            </div>
 
-            <strong>
-              {{ selectedSize }}
-            </strong>
+            <button type="button" class="size-guide-button" (click)="showSizeGuide = true">
 
-          </div>
+              Sizing chart
 
-
-          <div class="size-options">
-
-            <button type="button" *ngFor="let size of ['S','M','L','XL']" [class.selected]="selectedSize === size"
-              (click)="selectedSize = size">
-              {{ size }}
             </button>
 
           </div>
 
+
+          <div class="size-options" *ngIf="product.sizes?.length">
+
+            <button type="button" *ngFor="let size of product.sizes" [class.selected]="selectedSize === size"
+              (click)="selectedSize = size">
+
+              {{ size }}
+
+            </button>
+
+          </div>
         </div>
+
 
 
 
@@ -180,7 +197,7 @@
             </span>
 
             <strong>
-              {{ product.colors?.[0] }}
+              {{ selectedColor || product.colors[0] }}
             </strong>
 
           </div>
@@ -188,7 +205,8 @@
 
           <div class="color-options">
 
-            <button type="button" class="color-option" *ngFor="let color of product.colors" [title]="color">
+            <button type="button" class="color-option" *ngFor="let color of product.colors"
+              [class.selected]="selectedColor === color" [title]="color" (click)="selectedColor = color">
 
               <span class="color-circle" [style.background-color]="color">
               </span>

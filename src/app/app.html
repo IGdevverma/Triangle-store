@@ -1,4 +1,4 @@
-<app-header></app-header>
+<app-header *ngIf="!isAdminRoute()"></app-header>
 <!-- <ngx-spinner
   bdColor="rgba(0,0,0,0.4)"
   size="medium"

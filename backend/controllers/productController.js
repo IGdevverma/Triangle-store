@@ -5,46 +5,60 @@ const ErrorHandler = require("../utils/errorHandler");
 
 // Create Product
 const createProduct = asyncHandler(async (req, res) => {
+
     try {
+
         console.log("========== CREATE PRODUCT ==========");
-        console.log("FILE:", req.file);
+        console.log("FILES:", req.files);
+        console.log("BODY:", req.body);
 
-        if (req.file) {
-            console.log("PATH:", req.file.path);
-            console.log("FILENAME:", req.file.filename);
-
-            req.body.image = req.file.path;
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "At least one product image is required"
+            });
         }
 
-        console.log("BODY:", req.body);
+        const imageUrls = req.files.map(file => file.path);
+
         const existingProduct = await Product.findOne({
             name: req.body.name
         });
 
         if (existingProduct) {
-
             return res.status(400).json({
-
                 success: false,
-
                 message: "Product with this name already exists"
-
             });
-
         }
+
         const sku = "TS-" + Date.now();
 
-        req.body.sku = sku;
-        const product = await Product.create(req.body);
+        const product = await Product.create({
+
+            ...req.body,
+
+            sku,
+
+            image: imageUrls[0],
+
+            images: imageUrls
+
+        });
 
         res.status(201).json({
             success: true,
-            product,
+            product
         });
+
     } catch (err) {
+
         console.error("CREATE PRODUCT ERROR:", err);
+
         throw err;
+
     }
+
 });
 
 // Get All Products
@@ -90,43 +104,125 @@ const getProductById = asyncHandler(async (req, res) => {
 // Update Product
 // Update Product
 const updateProduct = asyncHandler(async (req, res) => {
+    try {
+        console.log("========== UPDATE PRODUCT ==========");
+        console.log("BODY:", req.body);
+        console.log("FILES:", req.files);
 
-   
+        const product = await Product.findById(req.params.id);
 
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-        return res.status(404).json({
-            success: false,
-            message: "Product not found"
-        });
-    }
-
-    // Update image only if a new image was selected
-    if (req.file) {
-        console.log("NEW IMAGE PATH:", req.file.path);
-
-        product.image = req.file.path;
-    }
-
-    // Update other product fields
-    Object.keys(req.body).forEach((key) => {
-
-        if (key !== "image") {
-            product[key] = req.body[key];
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: "Product not found"
+            });
         }
 
-    });
+        // ==========================================
+        // 1. EXISTING IMAGES JO RAKHNI HAIN
+        // ==========================================
 
-    const updatedProduct = await product.save();
+        let existingImages = [];
 
-    console.log("UPDATED PRODUCT:", updatedProduct);
+        if (req.body.existingImages) {
+            try {
+                existingImages = JSON.parse(req.body.existingImages);
+            } catch (error) {
+                console.error("existingImages parse error:", error);
 
-    res.status(200).json({
-        success: true,
-        product: updatedProduct
-    });
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid existingImages format"
+                });
+            }
+        } else {
+            // Agar frontend existingImages nahi bhej raha
+            // to purani images preserve karo
+            existingImages = product.images || [];
+        }
 
+        // ==========================================
+        // 2. NEW UPLOADED IMAGES
+        // ==========================================
+
+        const newImages = req.files
+            ? req.files.map(file => file.path)
+            : [];
+
+        console.log("EXISTING IMAGES:", existingImages);
+        console.log("NEW IMAGES:", newImages);
+
+        // ==========================================
+        // 3. FINAL IMAGES
+        // ==========================================
+
+        const finalImages = [
+            ...existingImages,
+            ...newImages
+        ];
+
+        if (finalImages.length === 0) {
+            return res.status(400).json({
+                success: false,
+                message: "At least one product image is required"
+            });
+        }
+
+        // Maximum 5 images
+        if (finalImages.length > 5) {
+            return res.status(400).json({
+                success: false,
+                message: "Maximum 5 product images are allowed"
+            });
+        }
+
+        // ==========================================
+        // 4. UPDATE PRODUCT FIELDS
+        // ==========================================
+
+        Object.keys(req.body).forEach((key) => {
+
+            if (
+                key !== "image" &&
+                key !== "images" &&
+                key !== "existingImages"
+            ) {
+                product[key] = req.body[key];
+            }
+
+        });
+
+        // ==========================================
+        // 5. SAVE IMAGES
+        // ==========================================
+
+        product.images = finalImages;
+
+        // First image = main image
+        product.image = finalImages[0];
+
+        // ==========================================
+        // 6. SAVE PRODUCT
+        // ==========================================
+
+        const updatedProduct = await product.save();
+
+        console.log("UPDATED PRODUCT:", updatedProduct);
+
+        return res.status(200).json({
+            success: true,
+            product: updatedProduct
+        });
+
+    } catch (error) {
+
+        console.error("UPDATE PRODUCT ERROR:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to update product"
+        });
+    }
 });
 
 // Delete Product

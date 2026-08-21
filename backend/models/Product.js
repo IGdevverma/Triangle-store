@@ -18,7 +18,6 @@ const productSchema = new mongoose.Schema(
       required: [true, "Price is required"],
       min: [1, "Price must be greater than 0"],
     },
-
     category: {
       type: String,
       required: [true, "Category is required"],
@@ -26,7 +25,12 @@ const productSchema = new mongoose.Schema(
 
     image: {
       type: String,
-      required: [true, "Image is required"],
+      default: "",
+    },
+
+    images: {
+      type: [String],
+      required: [true, "Product images are required"],
     },
 
     stock: {

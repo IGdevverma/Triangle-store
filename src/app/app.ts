@@ -27,5 +27,8 @@ export class App {
   protected readonly title = signal('sportswear-store');
 
   constructor(public router: Router) {}
+  isAdminRoute(): boolean {
+    return this.router.url.startsWith('/admin');
+  }
 
 }

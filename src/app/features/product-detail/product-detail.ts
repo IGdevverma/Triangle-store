@@ -32,7 +32,7 @@ export class ProductDetail implements OnInit {
 
   selectedSize = 'M';
   quantity = 1;
-
+  selectedColor: string = '';
   selectedImage = '';
 
   relatedProducts: Product[] = [];
@@ -97,6 +97,7 @@ export class ProductDetail implements OnInit {
   };
 
   addressError = '';
+showSizeGuide: any;
 
 
 
@@ -533,6 +534,13 @@ export class ProductDetail implements OnInit {
 
   }
 
+  selectImage(image: string): void {
+    this.selectedImage = image;
+
+    // Reset zoom when image changes
+    this.zoomTransform = 'scale(1)';
+    this.zoomOrigin = 'center center';
+  }
 
   // =====================================================
   // IMAGE ZOOM

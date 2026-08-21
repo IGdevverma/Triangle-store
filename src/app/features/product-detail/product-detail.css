@@ -2522,3 +2522,127 @@
   }
 
 }
+
+/* =========================================
+   PRODUCT IMAGE GALLERY
+========================================= */
+
+.product-image-section {
+  width: 100%;
+}
+
+
+/* Main Product Image */
+
+.main-product-image {
+  width: 100%;
+  height: 700px;
+
+  overflow: hidden;
+
+  background: #f7f7f7;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-product-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  transition: transform 0.25s ease;
+}
+
+
+/* =========================================
+   THUMBNAILS
+========================================= */
+
+.product-thumbnails {
+
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 15px;
+
+  overflow-x: auto;
+
+  padding-bottom: 5px;
+
+}
+
+
+/* Remove default button styling */
+
+.thumbnail {
+
+  flex: 0 0 90px;
+
+  width: 90px;
+  height: 110px;
+
+  padding: 0;
+
+  border: 1px solid #ddd;
+
+  background: #fff;
+
+  cursor: pointer;
+
+  overflow: hidden;
+
+  transition: all 0.2s ease;
+}
+
+
+.thumbnail img {
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+}
+
+
+/* Hover */
+
+.thumbnail:hover {
+
+  border-color: #111;
+
+}
+
+
+/* Selected image */
+
+.thumbnail.active {
+
+  border: 2px solid #111;
+
+}
+
+
+/* Scrollbar */
+
+.product-thumbnails::-webkit-scrollbar {
+
+  height: 5px;
+
+}
+
+.product-thumbnails::-webkit-scrollbar-thumb {
+
+  background: #ccc;
+
+  border-radius: 10px;
+
+}
