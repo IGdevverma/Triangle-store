@@ -452,3 +452,80 @@
     }
 
 }
+
+
+/* =========================================================
+   MOBILE FIX — ABOUT SECTION
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .about-section {
+        width: 100%;
+        padding: 50px 0;
+        overflow: hidden;
+    }
+
+    .about-section .container {
+        width: calc(100% - 32px);
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0;
+    }
+
+    .about-content {
+        display: flex !important;
+        flex-direction: column !important;
+
+        grid-template-columns: none !important;
+
+        width: 100%;
+        gap: 35px;
+    }
+
+    .about-image {
+        position: relative !important;
+        top: auto !important;
+
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .about-image img {
+        display: block;
+
+        width: 100% !important;
+        max-width: 100% !important;
+
+        height: 360px !important;
+
+        object-fit: cover;
+        border-radius: 16px;
+    }
+
+    .about-text {
+        width: 100% !important;
+        max-width: 100% !important;
+
+        min-width: 0 !important;
+    }
+
+    .about-text h3 {
+        font-size: 25px;
+        line-height: 1.25;
+
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .about-text p {
+        width: 100%;
+        max-width: 100%;
+
+        font-size: 15px;
+        line-height: 1.75;
+
+        text-align: left;
+    }
+
+}
