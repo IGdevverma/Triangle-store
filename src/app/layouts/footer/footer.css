@@ -820,126 +820,602 @@ max-width:600px;
 
 }
 
-@media(max-width:768px){
+/* ====================================================
+                FOOTER RESPONSIVE
+==================================================== */
 
-.newsletter{
+/* ---------- TABLET ---------- */
 
-padding:70px 0;
+@media (max-width: 1100px) {
 
-}
+    .newsletter-wrapper {
+        grid-template-columns: 1fr;
+        gap: 45px;
+        padding: 45px;
+    }
 
-.newsletter-left h2{
+    .newsletter-right {
+        padding-left: 0;
+        padding-top: 40px;
+        border-left: none;
+        border-top: 1px solid rgba(255,255,255,.08);
+        max-width: none;
+    }
 
-font-size:36px;
-
-}
-
-.subscribe-box{
-
-flex-direction:column;
-margin-top:35px;
-background:transparent;
-max-width:620px;
-box-shadow:none;
-height:62px;
-gap:15px;
-
-}
-
-.subscribe-box input{
-
-width:100%;
-
-background:#fff;
-font-size:17px;
-border-radius:14px;
+    .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 45px;
+    }
 
 }
 
-.subscribe-box button{
 
-width:170px;
+/* ====================================================
+                MOBILE
+==================================================== */
 
-border-radius:14px;
+@media (max-width: 768px) {
+
+    /* --------------------------------
+            FOOTER BASE
+    -------------------------------- */
+
+    .footer {
+        margin-top: 80px;
+    }
+
+
+    /* --------------------------------
+            NEWSLETTER
+    -------------------------------- */
+
+    .newsletter {
+        padding: 40px 16px;
+    }
+
+    .newsletter-wrapper {
+        width: 100%;
+        box-sizing: border-box;
+
+        padding: 30px 22px;
+
+        border-radius: 20px;
+
+        grid-template-columns: 1fr;
+
+        gap: 35px;
+    }
+
+
+    /* --------------------------------
+            NEWSLETTER LEFT
+    -------------------------------- */
+
+    .footer-tag {
+        font-size: 10px;
+        letter-spacing: 1.5px;
+
+        padding: 8px 15px;
+    }
+
+    .newsletter-left h2 {
+        font-size: 36px;
+        line-height: 1.08;
+
+        margin: 18px 0;
+
+        max-width: 100%;
+    }
+
+    .newsletter-left p {
+        font-size: 14px;
+        line-height: 1.7;
+
+        margin-bottom: 24px;
+
+        max-width: 100%;
+    }
+
+
+    /* --------------------------------
+            SUBSCRIBE
+    -------------------------------- */
+
+    .subscribe-box {
+
+        display:flex;
+
+        flex-direction:column;
+
+        width:100%;
+        max-width:100%;
+
+        height:auto;
+
+        gap:10px;
+
+        background:transparent;
+
+        box-shadow:none;
+
+        overflow:visible;
+
+        margin-top:0;
+    }
+
+    .subscribe-box input {
+
+        width:100%;
+        height:54px;
+
+        box-sizing:border-box;
+
+        padding:0 16px;
+
+        background:#fff;
+
+        border:none;
+
+        border-radius:12px;
+
+        font-size:14px;
+    }
+
+    .subscribe-box button {
+
+        width:100%;
+        height:54px;
+
+        border-radius:12px;
+
+        font-size:15px;
+
+        background:#7C3AED;
+    }
+
+    .newsletter-left small {
+
+        font-size:11px;
+
+        line-height:1.7;
+
+        margin-top:15px;
+    }
+
+
+    /* --------------------------------
+            CUSTOMER SUPPORT
+    -------------------------------- */
+
+    .newsletter-right {
+
+        width:100%;
+
+        box-sizing:border-box;
+
+        padding-left:0;
+
+        padding-top:30px;
+
+        border-left:none;
+
+        border-top:1px solid rgba(255,255,255,.08);
+    }
+
+    .support-tag {
+
+        font-size:11px;
+
+        letter-spacing:1.5px;
+
+        margin-bottom:12px;
+    }
+
+    .newsletter-right h2 {
+
+        font-size:30px;
+
+        line-height:1.2;
+
+        margin-bottom:12px;
+    }
+
+    .newsletter-right p {
+
+        font-size:14px;
+
+        line-height:1.7;
+
+        margin-bottom:22px;
+    }
+
+
+    /* --------------------------------
+            SOCIAL ICONS
+    -------------------------------- */
+
+    .social-icons {
+
+        justify-content:flex-start;
+
+        gap:10px;
+
+        margin:25px 0;
+    }
+
+    .social-icons a {
+
+        width:44px;
+        height:44px;
+
+        font-size:16px;
+    }
+
+
+    /* --------------------------------
+            TRUST BADGES
+    -------------------------------- */
+
+    .trust-badges {
+
+        align-items:flex-start;
+
+        gap:10px;
+    }
+
+    .trust-badges span {
+
+        font-size:13px;
+    }
+
+
+    /* ====================================================
+                    FOOTER MAIN
+    ==================================================== */
+
+    .footer-main {
+
+        padding:45px 20px 50px;
+    }
+
+    .footer-grid {
+
+        grid-template-columns:1fr;
+
+        gap:38px;
+    }
+
+
+    /* --------------------------------
+            COMPANY
+    -------------------------------- */
+
+    .footer-company {
+
+        max-width:100%;
+    }
+
+    .footer-company img {
+
+        width:120px;
+
+        margin-bottom:18px;
+    }
+
+    .company-desc {
+
+        font-size:14px;
+
+        line-height:1.8;
+
+        margin-bottom:25px;
+    }
+
+    .company-contact {
+
+        gap:12px;
+    }
+
+    .company-contact p {
+
+        font-size:14px;
+
+        gap:10px;
+    }
+
+
+    /* --------------------------------
+            FOOTER COLUMNS
+    -------------------------------- */
+
+    .footer-grid > div:not(.footer-company) {
+
+        padding-top:0;
+    }
+
+    .footer-grid > div h4 {
+
+        font-size:16px;
+
+        margin-bottom:18px;
+
+        padding-bottom:10px;
+    }
+
+    .footer-grid > div a {
+
+        font-size:14px;
+
+        margin-bottom:13px;
+
+        width:max-content;
+    }
+
+
+    /* ====================================================
+                    PAYMENT STRIP
+    ==================================================== */
+
+    .payment-strip {
+
+        padding:25px 20px;
+    }
+
+    .payment-wrapper {
+
+        flex-direction:column;
+
+        justify-content:center;
+
+        text-align:center;
+
+        gap:18px;
+    }
+
+    .payment-wrapper span {
+
+        font-size:14px;
+    }
+
+    .payment-icons {
+
+        display:flex;
+
+        justify-content:center;
+
+        align-items:center;
+
+        flex-wrap:wrap;
+
+        gap:10px;
+    }
+
+    .payment-icons img {
+
+        height:28px;
+
+        padding:6px 10px;
+
+        border-radius:8px;
+    }
+
+
+    /* ====================================================
+                    FOOTER BOTTOM
+    ==================================================== */
+
+    .footer-bottom {
+
+        padding:22px 20px;
+    }
+
+    .bottom-wrapper {
+
+        flex-direction:column;
+
+        justify-content:center;
+
+        align-items:center;
+
+        text-align:center;
+
+        gap:12px;
+    }
+
+    .bottom-wrapper p {
+
+        font-size:12px;
+
+        line-height:1.6;
+
+        margin:0;
+    }
+
+    .bottom-links {
+
+        display:flex;
+
+        justify-content:center;
+
+        align-items:center;
+
+        flex-wrap:wrap;
+
+        gap:10px 18px;
+    }
+
+    .bottom-links a {
+
+        font-size:12px;
+    }
+
+    .made-in {
+
+        font-size:12px !important;
+    }
+
+
+    /* --------------------------------
+            BACK TO TOP
+    -------------------------------- */
+
+    .back-to-top {
+
+        width:44px;
+
+        height:44px;
+
+        right:15px;
+
+        bottom:15px;
+
+        font-size:17px;
+    }
 
 }
 
-.footer-grid{
 
-grid-template-columns:1fr;
+/* ====================================================
+                SMALL MOBILE
+==================================================== */
 
-gap:45px;
+@media (max-width: 480px) {
 
-}
+    .footer {
+        margin-top:60px;
+    }
 
-.payment-wrapper{
 
-flex-direction:column;
+    /* Newsletter */
 
-text-align:center;
+    .newsletter {
+        padding:30px 12px;
+    }
 
-}
+    .newsletter-wrapper {
 
-.bottom-wrapper{
+        padding:25px 18px;
 
-flex-direction:column;
+        border-radius:18px;
 
-text-align:center;
+        gap:30px;
+    }
 
-}
 
-.bottom-links{
+    .footer-tag {
 
-justify-content:center;
+        font-size:9px;
 
-}
+        padding:7px 12px;
 
-.social-icons{
+        letter-spacing:1.2px;
+    }
 
-justify-content:center;
 
-}
+    .newsletter-left h2 {
 
-.trust-badges{
+        font-size:30px;
 
-align-items:center;
+        line-height:1.1;
+    }
 
-}
 
-}
+    .newsletter-left p {
 
-@media(max-width:480px){
+        font-size:13px;
 
-.footer-company img{
+        line-height:1.65;
+    }
 
-width:120px;
 
-}
+    /* Support */
 
-.newsletter-left h2{
+    .newsletter-right h2 {
 
-font-size:30px;
+        font-size:25px;
 
-}
+        word-break:break-word;
+    }
 
-.newsletter-right h2{
 
-font-size:30px;
+    .social-icons {
 
-}
+        gap:8px;
+    }
 
-.payment-icons{
+    .social-icons a {
 
-flex-wrap:wrap;
+        width:40px;
 
-justify-content:center;
+        height:40px;
 
-}
+        font-size:15px;
+    }
 
-.payment-icons img{
 
-height:30px;
+    /* Footer company */
 
-}
+    .footer-company img {
+
+        width:105px;
+    }
+
+
+    .company-desc {
+
+        font-size:13px;
+    }
+
+
+    .company-contact p {
+
+        font-size:13px;
+    }
+
+
+    /* Footer links */
+
+    .footer-grid > div h4 {
+
+        font-size:15px;
+    }
+
+    .footer-grid > div a {
+
+        font-size:13px;
+    }
+
+
+    /* Payment */
+
+    .payment-wrapper span {
+
+        font-size:13px;
+    }
+
+    .payment-icons img {
+
+        height:25px;
+
+        padding:5px 8px;
+    }
+
+
+    /* Bottom */
+
+    .bottom-links {
+
+        gap:8px 14px;
+    }
+
+    .bottom-links a {
+
+        font-size:11px;
+    }
+
+    .bottom-wrapper p {
+
+        font-size:11px;
+    }
 
 }
