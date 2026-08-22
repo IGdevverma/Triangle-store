@@ -8,19 +8,6 @@
 
   <div class="product-container">
 
-    <div class="breadcrumb">
-      <a routerLink="/">Home</a>
-
-      <span>/</span>
-
-      <a [routerLink]="['/shop']">
-        {{ product.category }}
-      </a>
-
-      <span>/</span>
-
-      <strong>{{ product.name }}</strong>
-    </div>
 
 
     <!-- ================= MAIN PRODUCT ================= -->
@@ -192,27 +179,29 @@
         <!-- COLOR -->
         <!-- ================================================= -->
 
-   
+
 
         <!-- COLOR SELECTION -->
-        <div class="option-block color-section" *ngIf="product.colors?.length">
+        <!-- COLOR SELECTION -->
+        <div class="product-color-section" *ngIf="product.colors?.length">
 
-          <div class="option-heading color-heading">
+          <div class="color-header">
 
-            <span>Color -</span>
-
-            <strong>
-              {{ selectedColor || product.colors?.[0] }}
-            </strong>
+            <span class="color-label">
+              Color -
+              <strong>
+                {{ selectedColor || product.colors?.[0] }}
+              </strong>
+            </span>
 
           </div>
 
-          <div class="color-options">
+          <div class="color-swatches">
 
-            <button type="button" class="color-option" *ngFor="let color of product.colors"
+            <button type="button" class="color-swatch" *ngFor="let color of product.colors"
               [class.selected]="selectedColor === color" [title]="color" (click)="selectedColor = color">
 
-              <span class="color-swatch" [style.background-color]="color">
+              <span class="color-preview" [style.background-color]="color">
               </span>
 
             </button>
