@@ -461,3 +461,29 @@
         font-size: 13px;
     }
 }
+
+@media screen and (max-width: 768px) {
+
+    .about-section .about-content {
+        display: block !important;
+        width: 100% !important;
+    }
+
+    .about-section .about-image {
+        display: block !important;
+        width: 100% !important;
+        position: static !important;
+    }
+
+    .about-section .about-image img {
+        display: block !important;
+        width: 100% !important;
+        height: 350px !important;
+    }
+
+    .about-section .about-text {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}

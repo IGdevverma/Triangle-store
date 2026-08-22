@@ -1364,3 +1364,1146 @@
     }
 
 }
+
+
+
+/* =========================================================
+   GLOBAL RESPONSIVE FIX
+========================================================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+img {
+    max-width: 100%;
+}
+
+
+/* =========================================================
+   TABLET RESPONSIVE
+========================================================= */
+
+@media (max-width: 992px) {
+
+    /* ================= HERO ================= */
+
+    .hero-slider {
+        width: 100%;
+        height: 75vh;
+        min-height: 600px;
+        margin-top: 82px;
+    }
+
+    .hero-content {
+        width: 90%;
+        max-width: 650px;
+        margin-left: 6%;
+    }
+
+    .hero-content h1 {
+        font-size: 58px;
+        line-height: 1.05;
+    }
+
+    .description {
+        font-size: 18px;
+        max-width: 500px;
+    }
+
+
+    /* ================= FEATURED ================= */
+
+    .featured-products {
+        padding: 70px 5%;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+
+    /* ================= SERVICES ================= */
+
+    .services-section {
+        width: 92%;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin: 90px auto;
+    }
+
+
+    /* ================= TRUSTED ================= */
+
+    .trusted-section {
+        width: 92%;
+        margin: 90px auto;
+    }
+
+    .trusted-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+
+
+    /* ================= MANUFACTURING ================= */
+
+    .manufacturing {
+        width: 92%;
+        grid-template-columns: 1fr;
+        gap: 45px;
+        margin: 100px auto;
+    }
+
+    .manufacturing-content {
+        text-align: center;
+    }
+
+    .manufacturing-content h2 {
+        font-size: 42px;
+    }
+
+    .manufacturing-points {
+        grid-template-columns: repeat(2, 1fr);
+        text-align: left;
+    }
+
+    .manufacturing-buttons {
+        justify-content: center;
+    }
+
+
+    /* ================= BRAND STORY ================= */
+
+    .brand-story {
+        width: 92%;
+        grid-template-columns: 1fr;
+        gap: 45px;
+        margin: 100px auto;
+    }
+
+    .brand-content {
+        text-align: center;
+    }
+
+    .brand-content h2 {
+        font-size: 42px;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    /* =====================================================
+       GLOBAL
+    ===================================================== */
+
+    body {
+        width: 100%;
+        overflow-x: hidden;
+    }
+
+    /* Prevent sections from creating horizontal scroll */
+
+    .hero-slider,
+    .featured-products,
+    .services-section,
+    .trusted-section,
+    .manufacturing,
+    .brand-story {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+
+    /* =====================================================
+       HERO
+    ===================================================== */
+
+    .hero-slider {
+
+        width: 100%;
+
+        /*
+         IMPORTANT:
+         Mobile header ke neeche hero properly start hoga.
+        */
+
+        margin-top: 0;
+
+        height: 78vh;
+        min-height: 600px;
+    }
+
+    .slider-image {
+        width: 100%;
+        height: 100%;
+
+        object-fit: cover;
+
+        /*
+         Mobile image ko thoda zoom
+         taaki sides empty na dikhein
+        */
+
+        object-position: center;
+    }
+
+
+    .overlay {
+
+        align-items: center;
+
+        padding: 0 20px;
+
+        background:
+            linear-gradient(
+                180deg,
+                rgba(0,0,0,.35) 0%,
+                rgba(0,0,0,.55) 50%,
+                rgba(0,0,0,.85) 100%
+            );
+    }
+
+
+    .hero-content {
+
+        width: 100%;
+        max-width: 100%;
+
+        margin: 0;
+
+        text-align: center;
+
+        padding: 20px 0;
+    }
+
+
+    .hero-tag {
+
+        padding: 8px 14px;
+
+        font-size: 10px;
+
+        letter-spacing: 1.5px;
+    }
+
+
+    .hero-content h1 {
+
+        margin-top: 20px;
+
+        font-size: clamp(38px, 11vw, 48px);
+
+        line-height: 1.05;
+
+        letter-spacing: -1px;
+    }
+
+
+    .description {
+
+        width: 100%;
+
+        max-width: 340px;
+
+        margin: 20px auto 0;
+
+        font-size: 15px;
+
+        line-height: 1.6;
+    }
+
+
+    /* =====================================================
+       HERO BUTTONS
+    ===================================================== */
+
+    .hero-buttons {
+
+        width: 100%;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+        gap: 12px;
+
+        margin-top: 28px;
+    }
+
+
+    .hero-buttons .btn {
+
+        width: 100%;
+
+        min-width: 0;
+
+        height: 52px;
+
+        border-radius: 12px;
+
+        font-size: 15px;
+    }
+
+
+    /* =====================================================
+       HERO TRUST
+    ===================================================== */
+
+    .hero-trust {
+
+        margin-top: 25px;
+
+        gap: 8px;
+
+        flex-direction: column;
+
+        justify-content: center;
+
+        text-align: center;
+
+        font-size: 13px;
+    }
+
+    .stars {
+
+        font-size: 19px;
+
+        letter-spacing: 3px;
+    }
+
+
+    /* =====================================================
+       HERO NAVIGATION
+    ===================================================== */
+
+    .nav {
+
+        display: none;
+    }
+
+
+    /* =====================================================
+       HERO DOTS
+    ===================================================== */
+
+    .dots {
+
+        bottom: 20px;
+
+        gap: 8px;
+    }
+
+    .dots span {
+
+        width: 8px;
+        height: 8px;
+    }
+
+    .dots span.active {
+
+        width: 25px;
+    }
+
+
+    /* =====================================================
+       FEATURED PRODUCTS
+    ===================================================== */
+
+    .featured-products {
+
+        width: 100%;
+
+        padding: 55px 16px 65px;
+    }
+
+
+    .featured-header {
+
+        width: 100%;
+
+        margin-bottom: 30px;
+    }
+
+
+    .section-label {
+
+        font-size: 10px;
+
+        letter-spacing: 1.5px;
+
+        margin-bottom: 8px;
+    }
+
+
+    .featured-header h2 {
+
+        font-size: 28px;
+
+        line-height: 1.2;
+    }
+
+
+    .featured-header p {
+
+        width: 100%;
+
+        max-width: 340px;
+
+        font-size: 14px;
+
+        line-height: 1.6;
+
+        margin: 12px auto 0;
+    }
+
+
+    /* =====================================================
+       PRODUCT GRID
+    ===================================================== */
+
+    .products-grid {
+
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns: 1fr;
+
+        gap: 35px;
+    }
+
+
+    .product-item {
+
+        width: 100%;
+
+        max-width: 100%;
+    }
+
+
+    .product-image-wrapper {
+
+        width: 100%;
+
+        height: 390px;
+
+        border-radius: 12px;
+    }
+
+
+    .product-image {
+
+        width: 100%;
+
+        height: 100%;
+
+        object-fit: contain;
+    }
+
+
+    .discount-badge {
+
+        left: 12px;
+
+        bottom: 12px;
+
+        padding: 6px 11px;
+
+        font-size: 11px;
+    }
+
+
+    .product-name {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        margin-top: 13px;
+
+        font-size: 17px;
+
+        line-height: 1.3;
+    }
+
+
+    .price-row {
+
+        margin-top: 7px;
+    }
+
+
+    .current-price {
+
+        font-size: 17px;
+    }
+
+
+    .old-price {
+
+        font-size: 13px;
+    }
+
+
+    .view-all-wrapper {
+
+        margin-top: 30px;
+    }
+
+
+    .view-all-btn {
+
+        min-width: 130px;
+
+        padding: 12px 24px;
+
+        font-size: 14px;
+    }
+
+
+    /* =====================================================
+       SERVICES
+    ===================================================== */
+
+    .services-section {
+
+        width: calc(100% - 32px);
+
+        margin: 65px auto;
+
+        display: grid;
+
+        grid-template-columns: 1fr;
+
+        gap: 15px;
+    }
+
+
+    .service-item {
+
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+
+        text-align: left;
+
+        gap: 18px;
+
+        padding: 22px 18px;
+
+        border-radius: 16px;
+    }
+
+
+    .service-item i {
+
+        flex-shrink: 0;
+
+        width: 55px;
+
+        height: 55px;
+
+        margin: 0;
+
+        border-radius: 15px;
+
+        font-size: 22px;
+    }
+
+
+    .service-item h3 {
+
+        margin-bottom: 5px;
+
+        font-size: 17px;
+    }
+
+
+    .service-item p {
+
+        margin: 0;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+
+    /* =====================================================
+       TRUSTED BY
+    ===================================================== */
+
+    .trusted-section {
+
+        width: calc(100% - 32px);
+
+        margin: 70px auto;
+    }
+
+
+    /*
+       IMPORTANT:
+       Tumhare CSS mein .section-heading global hai.
+       Isliye yahan explicitly override kar rahe hain.
+    */
+
+    .trusted-section .section-heading {
+
+        width: 100%;
+
+        max-width: 100%;
+
+        margin: 0 auto 35px;
+
+        text-align: center;
+    }
+
+
+    .trusted-section .section-heading span {
+
+        font-size: 10px;
+
+        letter-spacing: 2px;
+    }
+
+
+    .trusted-section .section-heading h2 {
+
+        font-size: 28px;
+
+        line-height: 1.2;
+
+        margin: 12px 0;
+    }
+
+
+    .trusted-section .section-heading p {
+
+        font-size: 14px;
+
+        line-height: 1.65;
+
+        margin: 0 auto;
+    }
+
+
+    /* =====================================================
+       TRUSTED CARDS
+    ===================================================== */
+
+    .trusted-grid {
+
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns: 1fr;
+
+        gap: 15px;
+    }
+
+
+    .trusted-card {
+
+        width: 100%;
+
+        padding: 30px 20px;
+
+        border-radius: 18px;
+    }
+
+
+    .trusted-card i {
+
+        width: 65px;
+
+        height: 65px;
+
+        font-size: 27px;
+
+        margin-bottom: 18px;
+    }
+
+
+    .trusted-card h3 {
+
+        font-size: 19px;
+
+        margin-bottom: 8px;
+    }
+
+
+    .trusted-card p {
+
+        font-size: 14px;
+
+        line-height: 1.6;
+
+        margin: 0;
+    }
+
+
+    /* =====================================================
+       MANUFACTURING
+    ===================================================== */
+
+    .manufacturing {
+
+        width: calc(100% - 32px);
+
+        margin: 75px auto;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 35px;
+    }
+
+
+    .manufacturing-image {
+
+        width: 100%;
+
+        border-radius: 18px;
+    }
+
+
+    .manufacturing-image img {
+
+        width: 100%;
+
+        height: auto;
+
+        display: block;
+    }
+
+
+    .manufacturing-content {
+
+        width: 100%;
+
+        text-align: center;
+    }
+
+
+    .section-tag {
+
+        padding: 8px 15px;
+
+        font-size: 10px;
+
+        letter-spacing: 1px;
+
+        margin-bottom: 15px;
+    }
+
+
+    .manufacturing-content h2 {
+
+        font-size: 30px;
+
+        line-height: 1.2;
+
+        margin-bottom: 15px;
+    }
+
+
+    .manufacturing-content p {
+
+        font-size: 14px;
+
+        line-height: 1.7;
+
+        margin-bottom: 25px;
+    }
+
+
+    /* =====================================================
+       MANUFACTURING POINTS
+    ===================================================== */
+
+    .manufacturing-points {
+
+        width: 100%;
+
+        display: grid;
+
+        grid-template-columns: 1fr;
+
+        gap: 13px;
+
+        margin-bottom: 28px;
+
+        text-align: left;
+    }
+
+
+    .manufacturing-points div {
+
+        width: 100%;
+
+        display: flex;
+
+        align-items: center;
+
+        gap: 10px;
+
+        font-size: 14px;
+
+        line-height: 1.4;
+    }
+
+
+    .manufacturing-points i {
+
+        flex-shrink: 0;
+
+        font-size: 16px;
+    }
+
+
+    /* =====================================================
+       MANUFACTURING BUTTONS
+    ===================================================== */
+
+    .manufacturing-buttons {
+
+        width: 100%;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+
+    .manufacturing-buttons .btn {
+
+        width: 100%;
+
+        min-width: 0;
+
+        height: 52px;
+
+        border-radius: 12px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        font-size: 14px;
+    }
+
+
+    /* =====================================================
+       BRAND STORY
+    ===================================================== */
+
+    .brand-story {
+
+        width: calc(100% - 32px);
+
+        margin: 75px auto;
+
+        display: flex;
+
+        flex-direction: column;
+
+        gap: 35px;
+    }
+
+
+    .brand-image {
+
+        width: 100%;
+
+        border-radius: 18px;
+
+        overflow: hidden;
+    }
+
+
+    .brand-image img {
+
+        display: block;
+
+        width: 100%;
+
+        height: 430px;
+
+        object-fit: cover;
+    }
+
+
+    .brand-content {
+
+        width: 100%;
+
+        text-align: center;
+    }
+
+
+    .brand-content .section-tag {
+
+        margin-bottom: 15px;
+    }
+
+
+    .brand-content h2 {
+
+        font-size: 31px;
+
+        line-height: 1.15;
+
+        margin: 15px 0 20px;
+    }
+
+
+    .brand-content p {
+
+        font-size: 15px;
+
+        line-height: 1.75;
+
+        margin-bottom: 18px;
+    }
+
+
+    .brand-content .btn {
+
+        width: 100%;
+
+        height: 52px;
+
+        display: flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        border-radius: 12px;
+    }
+
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 480px) {
+
+    /* HERO */
+
+    .hero-slider {
+
+        height: 82vh;
+
+        min-height: 560px;
+    }
+
+
+    .hero-content h1 {
+
+        font-size: 38px;
+    }
+
+
+    .description {
+
+        font-size: 14px;
+
+        max-width: 320px;
+    }
+
+
+    .hero-tag {
+
+        font-size: 9px;
+
+        padding: 7px 12px;
+    }
+
+
+    .hero-buttons {
+
+        margin-top: 24px;
+    }
+
+
+    .hero-buttons .btn {
+
+        height: 50px;
+
+        font-size: 14px;
+    }
+
+
+    /* FEATURED */
+
+    .featured-products {
+
+        padding: 45px 14px 55px;
+    }
+
+
+    .featured-header h2 {
+
+        font-size: 26px;
+    }
+
+
+    .product-image-wrapper {
+
+        height: 340px;
+    }
+
+
+    .product-name {
+
+        font-size: 16px;
+    }
+
+
+    /* SERVICES */
+
+    .services-section {
+
+        width: calc(100% - 24px);
+
+        margin: 55px auto;
+    }
+
+
+    .service-item {
+
+        padding: 18px 15px;
+
+        gap: 14px;
+    }
+
+
+    .service-item i {
+
+        width: 50px;
+
+        height: 50px;
+
+        font-size: 20px;
+    }
+
+
+    .service-item h3 {
+
+        font-size: 16px;
+    }
+
+
+    .service-item p {
+
+        font-size: 12px;
+    }
+
+
+    /* TRUSTED */
+
+    .trusted-section {
+
+        width: calc(100% - 24px);
+
+        margin: 60px auto;
+    }
+
+
+    .trusted-section .section-heading h2 {
+
+        font-size: 25px;
+    }
+
+
+    .trusted-section .section-heading p {
+
+        font-size: 13px;
+    }
+
+
+    .trusted-card {
+
+        padding: 25px 18px;
+    }
+
+
+    /* MANUFACTURING */
+
+    .manufacturing {
+
+        width: calc(100% - 24px);
+
+        margin: 60px auto;
+    }
+
+
+    .manufacturing-content h2 {
+
+        font-size: 27px;
+    }
+
+
+    .manufacturing-content p {
+
+        font-size: 13px;
+    }
+
+
+    /* BRAND */
+
+    .brand-story {
+
+        width: calc(100% - 24px);
+
+        margin: 60px auto;
+    }
+
+
+    .brand-image img {
+
+        height: 360px;
+    }
+
+
+    .brand-content h2 {
+
+        font-size: 27px;
+    }
+
+
+    .brand-content p {
+
+        font-size: 14px;
+    }
+
+}
