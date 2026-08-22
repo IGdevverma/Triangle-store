@@ -93,6 +93,7 @@ export class Admin implements OnInit, AfterViewInit {
   customerSearch = '';
   salesChart: any;
   searchTerm = '';
+  newSize: string = '';
   currentPage = 1;
   showModal = false;
   activeMenu: string = 'dashboard';
@@ -121,6 +122,7 @@ export class Admin implements OnInit, AfterViewInit {
   filteredQuotes: any[] = [];
 
   quoteSearch = '';
+  availableSizes: string[] = ['S', 'M', 'L', 'XL'];
   availableColors = [
     'Black',
     'White',
@@ -130,6 +132,10 @@ export class Admin implements OnInit, AfterViewInit {
     'Grey',
     'Navy'
   ];
+  selectedSizes: string[] = [];
+  selectedColors: string[] = [];
+
+
 
 
 
@@ -621,11 +627,53 @@ export class Admin implements OnInit, AfterViewInit {
       'availableColors',
       this.newProduct.availableColors || ''
     );
+
+    // ==========================================
+    // COLORS
+    // ==========================================
+
+    const colors = (this.newProduct.availableColors || '')
+      .split(',')
+      .map((color: string) => color.trim())
+      .filter((color: string) =>
+        color && color.toLowerCase() !== 'undefined'
+      );
+
+    console.log('COLORS BEING SENT:', colors);
+
     formData.append(
       'colors',
-      JSON.stringify(this.newProduct.colors)
+      JSON.stringify(colors)
     );
 
+
+    // ==========================================
+    // SIZES
+    // ==========================================
+
+    const sizes = (this.newProduct.sizes || [])
+      .flatMap((size: string) => size.split(','))
+      .map((size: string) => size.trim())
+      .filter((size: string) => size);
+
+
+    console.log('SIZES BEING SENT:', sizes);
+    console.log('COLORS BEING SENT:', colors);
+
+
+    // ==========================================
+    // SEND COLORS + SIZES
+    // ==========================================
+
+    formData.append(
+      'colors',
+      JSON.stringify(colors)
+    );
+
+    formData.append(
+      'sizes',
+      JSON.stringify(sizes)
+    );
 
     formData.append('stock', String(this.newProduct.stock));
 
@@ -690,7 +738,23 @@ export class Admin implements OnInit, AfterViewInit {
     this.showModal = true;
 
     // Product ki normal information
-    this.newProduct = { ...product };
+    this.newProduct = {
+      ...product,
+
+      colors: Array.isArray(product.colors)
+        ? product.colors
+          .flatMap((color: string) => color.split(','))
+          .map((color: string) => color.trim())
+          .filter((color: string) => color && color !== 'undefined')
+        : [],
+
+      sizes: Array.isArray(product.sizes)
+        ? product.sizes
+          .flatMap((size: string) => size.split(','))
+          .map((size: string) => size.trim())
+          .filter((size: string) => size)
+        : []
+    };
 
     // New images reset
     this.selectedFiles = [];
@@ -731,11 +795,37 @@ export class Admin implements OnInit, AfterViewInit {
     formData.append('description', this.newProduct.description || '');
     formData.append('fabric', this.newProduct.fabric || '');
     formData.append('type', this.newProduct.type || '');
+
+
+
+    const colors = (this.newProduct.availableColors || '')
+      .split(',')
+      .map((color: string) => color.trim())
+      .filter((color: string) =>
+        color && color.toLowerCase() !== 'undefined'
+      );
+
+    console.log('COLORS BEING SENT:', colors);
+
     formData.append(
-      'availableColors',
-      this.newProduct.availableColors || ''
+      'colors',
+      JSON.stringify(colors)
     );
 
+    const sizes = (this.newProduct.sizes || [])
+      .flatMap((size: string) => size.split(','))
+      .map((size: string) => size.trim())
+      .filter((size: string) => size);
+    console.log('SIZES BEING SENT:', sizes);
+
+   
+    formData.append(
+      'sizes',
+      JSON.stringify(sizes)
+    );
+
+    console.log('SIZES BEING SENT:', sizes);
+    console.log('COLORS BEING SENT:', colors);
     formData.append(
       'showOnHome',
       String(this.newProduct.showOnHome ?? true)
@@ -787,17 +877,22 @@ export class Admin implements OnInit, AfterViewInit {
         this.imagePreviews = [];
 
         this.newProduct = {
-          _id: '',
           name: '',
           price: 0,
           image: '',
           category: '',
+          brand: '',
           description: '',
           fabric: '',
           type: '',
-          availableColors: '',
+          sku: '',
+          discount: 0,
+          colors: [],
+          sizes: [],
+          status: 'Active',
           stock: 0,
-          showOnHome: true
+          showOnHome: true,
+          availableColors: ''
         };
 
         this.toastr.success(
@@ -983,13 +1078,18 @@ export class Admin implements OnInit, AfterViewInit {
       price: 0,
       image: '',
       category: '',
+      brand: '',
       description: '',
       fabric: '',
       type: '',
-      availableColors: '',
+      sku: '',
+      discount: 0,
       colors: [],
+      sizes: [],
+      status: 'Active',
       stock: 0,
-      showOnHome: true
+      showOnHome: true,
+      availableColors: ''
     };
 
   }
@@ -1325,4 +1425,66 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
 
+  toggleSize(size: string): void {
+
+    if (this.selectedSizes.includes(size)) {
+
+      this.selectedSizes =
+        this.selectedSizes.filter(s => s !== size);
+
+    } else {
+
+      this.selectedSizes.push(size);
+
+    }
+  }
+
+  getColorValue(color: string): string {
+
+    const colorMap: { [key: string]: string } = {
+
+      Black: '#000000',
+      White: '#ffffff',
+      Grey: '#808080',
+      Red: '#dc2626',
+      Blue: '#2563eb',
+      Green: '#16a34a',
+      Navy: '#0f172a',
+      Beige: '#d6c3a5'
+
+    };
+
+    return colorMap[color] || '#e5e7eb';
+  }
+
+
+  addSize(): void {
+
+    const size = this.newSize.trim().toUpperCase();
+
+    if (!size) {
+      return;
+    }
+
+    if (!this.newProduct.sizes) {
+      this.newProduct.sizes = [];
+    }
+
+    if (this.newProduct.sizes.includes(size)) {
+      return;
+    }
+
+    this.newProduct.sizes.push(size);
+
+    this.newSize = '';
+  }
+
+  removeSize(index: number): void {
+
+    if (!this.newProduct.sizes) {
+      return;
+    }
+
+    this.newProduct.sizes.splice(index, 1);
+  }
 }

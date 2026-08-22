@@ -302,6 +302,41 @@
   margin-top: 28px;
 }
 
+.price-section {
+  margin-top: 18px;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.current-price {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.old-price {
+  font-size: 18px;
+  color: #777;
+  text-decoration: line-through;
+}
+
+.discount-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e53935;
+}
+
+.tax-text {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #777;
+}
+
 
 .current-price {
   color: #111827;
@@ -2645,4 +2680,75 @@
 
   border-radius: 10px;
 
+}
+/* ================================
+   SIZE SELECTOR
+================================ */
+
+.option-block {
+  margin-top: 28px;
+}
+
+.option-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.option-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: #333;
+}
+
+.option-title strong {
+  font-weight: 700;
+  color: #111827;
+}
+
+.size-guide-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.size-options {
+  display: flex;
+  gap: 10px;
+}
+
+.size-options button {
+  width: 62px;
+  height: 48px;
+
+  border: 1px solid #d9dce3;
+  background: #fff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.size-options button:hover {
+  border-color: #111827;
+}
+
+.size-options button.selected {
+  background: #111827;
+  border-color: #111827;
+  color: #fff;
 }

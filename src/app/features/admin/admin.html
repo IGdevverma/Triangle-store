@@ -1093,19 +1093,88 @@
 
                                     </div>
 
+                                    <div class="full-width">
 
+
+                                        <!-- Selected Sizes -->
+
+                                        <div class="selected-options" *ngIf="newProduct.sizes?.length">
+
+                                            <span class="option-tag"
+                                                *ngFor="let size of newProduct.sizes; let i = index">
+
+                                                {{ size }}
+
+                                                <button type="button" (click)="removeSize(i)">
+
+                                                    ×
+
+                                                </button>
+
+                                            </span>
+
+                                        </div>
+
+                                    </div>
                                     <!-- AVAILABLE COLORS -->
+
+                                    <div class="full-width">
+                                        <label>Available Colors</label>
+
+                                        <input type="text" [(ngModel)]="newProduct.availableColors"
+                                            placeholder="Black, White, Grey" />
+
+                                        <small class="input-hint">
+                                            Enter colors separated by commas
+                                        </small>
+                                    </div>
+
+                                    <!-- =========================
+     AVAILABLE SIZES
+========================= -->
 
                                     <div class="full-width">
 
                                         <label>
-                                            Available Colors
+                                            Available Sizes
                                         </label>
 
-                                        <input type="text" [(ngModel)]="newProduct.availableColors"
-                                            placeholder="Black, White, Grey">
+                                        <div class="size-input-row">
+
+                                            <input type="text" [(ngModel)]="newSize"
+                                                placeholder="Enter size e.g. S, M, L, XL" />
+
+                                            <button type="button" class="add-option-btn" (click)="addSize()">
+
+                                                + Add
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <!-- Selected Sizes -->
+
+                                        <div class="selected-options" *ngIf="newProduct.sizes?.length">
+
+                                            <span class="option-tag"
+                                                *ngFor="let size of newProduct.sizes; let i = index">
+
+                                                {{ size }}
+
+                                                <button type="button" (click)="removeSize(i)">
+
+                                                    ×
+
+                                                </button>
+
+                                            </span>
+
+                                        </div>
 
                                     </div>
+
+
 
 
                                     <!-- SHOW ON HOME -->

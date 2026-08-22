@@ -97,7 +97,7 @@ export class ProductDetail implements OnInit {
   };
 
   addressError = '';
-showSizeGuide: any;
+  showSizeGuide: any;
 
 
 
@@ -145,6 +145,9 @@ showSizeGuide: any;
       next: (response: any) => {
 
         const data: Product = response.product;
+        console.log('PRODUCT FROM API:', data);
+        console.log('PRODUCT SIZES:', data.sizes);
+        console.log('PRODUCT COLORS:', data.colors);
 
         if (!data) {
 

@@ -136,10 +136,8 @@
           </p>
 
         </div>
-        <!-- Tax -->
-        <p class="tax-text">
-          {{ product.taxText || 'Inclusive of all taxes' }}
-        </p>
+
+
 
 
 
@@ -151,13 +149,18 @@
         <!-- SIZE -->
         <!-- ================================================= -->
 
-        <div class="option-block">
+
+        <!-- SIZE -->
+        <div class="option-block" *ngIf="product.sizes?.length">
 
           <div class="option-heading">
 
             <div class="option-title">
               <span>Select Size</span>
-              <strong>{{ selectedSize }}</strong>
+
+              <strong>
+                {{ selectedSize }}
+              </strong>
             </div>
 
             <button type="button" class="size-guide-button" (click)="showSizeGuide = true">
@@ -169,7 +172,7 @@
           </div>
 
 
-          <div class="size-options" *ngIf="product.sizes?.length">
+          <div class="size-options">
 
             <button type="button" *ngFor="let size of product.sizes" [class.selected]="selectedSize === size"
               (click)="selectedSize = size">
@@ -179,6 +182,7 @@
             </button>
 
           </div>
+
         </div>
 
 
@@ -188,27 +192,27 @@
         <!-- COLOR -->
         <!-- ================================================= -->
 
-        <div class="option-block" *ngIf="product.colors?.length">
+   
 
-          <div class="option-heading">
+        <!-- COLOR SELECTION -->
+        <div class="option-block color-section" *ngIf="product.colors?.length">
 
-            <span>
-              Color
-            </span>
+          <div class="option-heading color-heading">
+
+            <span>Color -</span>
 
             <strong>
-              {{ selectedColor || product.colors[0] }}
+              {{ selectedColor || product.colors?.[0] }}
             </strong>
 
           </div>
-
 
           <div class="color-options">
 
             <button type="button" class="color-option" *ngFor="let color of product.colors"
               [class.selected]="selectedColor === color" [title]="color" (click)="selectedColor = color">
 
-              <span class="color-circle" [style.background-color]="color">
+              <span class="color-swatch" [style.background-color]="color">
               </span>
 
             </button>
