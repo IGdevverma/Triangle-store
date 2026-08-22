@@ -3267,3 +3267,250 @@ img {
   }
 
 }
+/* =================================================
+   BEST SELLERS
+================================================= */
+
+.best-sellers-section {
+
+  width: 100%;
+
+  margin-top: 100px;
+
+  padding: 0 0 80px;
+}
+
+
+/* =================================================
+   TITLE
+================================================= */
+
+.best-sellers-title {
+
+  text-align: center;
+
+  margin-bottom: 45px;
+}
+
+
+.best-sellers-title h2 {
+
+  margin: 0;
+
+  font-size: 32px;
+
+  font-weight: 800;
+
+  letter-spacing: -0.5px;
+
+  color: #111;
+
+}
+
+
+/* =================================================
+   PRODUCTS GRID
+================================================= */
+
+.best-sellers-grid {
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 24px;
+
+  width: 100%;
+}
+
+
+/* =================================================
+   PRODUCT CARD
+================================================= */
+
+.best-seller-card {
+
+  cursor: pointer;
+
+  background: #fff;
+
+  overflow: hidden;
+
+  transition:
+    transform 0.25s ease;
+}
+
+
+.best-seller-card:hover {
+
+  transform: translateY(-4px);
+}
+
+
+/* =================================================
+   IMAGE
+================================================= */
+
+.best-seller-image {
+
+  width: 100%;
+
+  aspect-ratio: 0.78;
+
+  background: #f7f7f7;
+
+  overflow: hidden;
+}
+
+
+.best-seller-image img {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+
+  display: block;
+
+  transition:
+    transform 0.4s ease;
+}
+
+
+.best-seller-card:hover
+.best-seller-image img {
+
+  transform: scale(1.03);
+}
+
+
+/* =================================================
+   PRODUCT INFO
+================================================= */
+
+.best-seller-info {
+
+  padding: 16px 4px 0;
+}
+
+
+.best-seller-info h3 {
+
+  margin: 0 0 8px;
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #171717;
+
+  line-height: 1.4;
+}
+
+
+/* =================================================
+   PRICE
+================================================= */
+
+.best-seller-price {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.sale-price {
+
+  font-size: 15px;
+
+  font-weight: 600;
+
+  color: #111;
+}
+
+
+.old-price {
+
+  font-size: 14px;
+
+  color: #999;
+
+  text-decoration: line-through;
+}
+
+
+/* =================================================
+   TABLET
+================================================= */
+
+@media (max-width: 1000px) {
+
+  .best-sellers-grid {
+
+    grid-template-columns:
+      repeat(3, 1fr);
+
+  }
+
+}
+
+
+/* =================================================
+   MOBILE
+================================================= */
+
+@media (max-width: 700px) {
+
+  .best-sellers-section {
+
+    margin-top: 60px;
+
+    padding-bottom: 50px;
+
+  }
+
+
+  .best-sellers-title {
+
+    margin-bottom: 25px;
+
+  }
+
+
+  .best-sellers-title h2 {
+
+    font-size: 25px;
+
+  }
+
+
+  .best-sellers-grid {
+
+    grid-template-columns:
+      repeat(2, 1fr);
+
+    gap: 14px;
+
+  }
+
+
+  .best-seller-info {
+
+    padding-top: 10px;
+
+  }
+
+
+  .best-seller-info h3 {
+
+    font-size: 13px;
+
+  }
+
+}
+

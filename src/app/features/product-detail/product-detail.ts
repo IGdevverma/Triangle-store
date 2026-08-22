@@ -35,7 +35,7 @@ export class ProductDetail implements OnInit {
   quantity = 1;
   selectedColor: string = '';
   selectedImage = '';
-
+  bestSellerProducts: any[] = [];
   relatedProducts: Product[] = [];
 
   sizes = ['S', 'M', 'L', 'XL'];
@@ -253,15 +253,21 @@ export class ProductDetail implements OnInit {
             const products: Product[] =
               res.products || [];
 
-
+            // Related Products
             this.relatedProducts = products
-
               .filter((p: Product) =>
                 p.category === data.category &&
                 p._id !== data._id
               )
-
               .slice(0, 4);
+
+
+            // Best Sellers
+            this.bestSellerProducts = products
+              .filter((p: Product) =>
+                p._id !== data._id
+              )
+              .slice(0, 3);
 
 
             this.loadingService.hide();
@@ -271,11 +277,12 @@ export class ProductDetail implements OnInit {
           error: (error) => {
 
             console.error(
-              'Error loading related products:',
+              'Error loading related/best seller products:',
               error
             );
 
             this.relatedProducts = [];
+            this.bestSellerProducts = [];
 
             this.loadingService.hide();
 
@@ -317,6 +324,7 @@ export class ProductDetail implements OnInit {
       this.checkDelivery();
 
     }
+
 
   }
 
