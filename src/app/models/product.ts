@@ -1,4 +1,5 @@
 export interface Product {
+originalPrice: any;
   id?: string;
   _id?: string;
 

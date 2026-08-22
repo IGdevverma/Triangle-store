@@ -147,6 +147,7 @@ export class Admin implements OnInit, AfterViewInit {
     image: '',
     category: '',
     brand: '',
+    originalPrice: 0,
     description: '',
     fabric: '',
     type: '',
@@ -882,6 +883,7 @@ export class Admin implements OnInit, AfterViewInit {
           image: '',
           category: '',
           brand: '',
+          originalPrice: 0,
           description: '',
           fabric: '',
           type: '',
@@ -1050,7 +1052,7 @@ export class Admin implements OnInit, AfterViewInit {
       price: 0,
 
       image: '',
-
+      originalPrice: 0,
       category: '',
 
       description: '',
@@ -1076,6 +1078,7 @@ export class Admin implements OnInit, AfterViewInit {
     this.newProduct = {
       name: '',
       price: 0,
+      originalPrice: 0,
       image: '',
       category: '',
       brand: '',

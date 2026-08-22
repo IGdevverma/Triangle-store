@@ -451,7 +451,7 @@
      BEST SELLERS
 ================================================== -->
 
-       
+
 
 
 
@@ -465,7 +465,7 @@
     </section>
 
 
- 
+
 
 
 
@@ -516,44 +516,44 @@
     </section>
 
     <!-- BEST SELLERS -->
-<section class="best-sellers-section" *ngIf="bestSellerProducts.length > 0">
+    <section class="best-sellers-section" *ngIf="bestSellerProducts.length > 0">
 
-  <h2 class="best-sellers-title">BEST SELLERS</h2>
+      <h2 class="best-sellers-title">BEST SELLERS</h2>
 
-  <div class="best-sellers-grid">
+      <div class="best-sellers-grid">
 
-    <div
-      class="best-seller-card"
-     *ngFor="let item of bestSellerProducts"
-      [routerLink]="['/product', item._id]"
-    >
+        <div class="best-seller-card" *ngFor="let item of bestSellerProducts" [routerLink]="['/product', item._id]">
 
-      <!-- Product Image -->
-      <div class="best-seller-image">
-        <img
-          [src]="item.images?.[0] || item.image"
-          [alt]="item.name"
-        />
-      </div>
+          <!-- Product Image -->
+          <div class="best-seller-image">
+            <img [src]="item.images?.[0] || item.image" [alt]="item.name" />
+          </div>
 
-      <!-- Product Info -->
-      <div class="best-seller-info">
+          <!-- Product Info -->
+          <div class="best-seller-info">
 
-        <h3>
-          {{ item.name }}
-        </h3>
+            <h3>
+              {{ item.name }}
+            </h3>
 
-        <div class="best-seller-price">
-          ₹{{ item.price }}
+            <div class="best-seller-price">
+              ₹{{ item.price }}
+            </div>
+
+          </div>
+
         </div>
 
       </div>
 
-    </div>
+      <!-- View All Button -->
+      <div class="best-sellers-view-all">
+        <button routerLink="/shop">
+          View all
+        </button>
+      </div>
 
-  </div>
-
-</section>
+    </section>
 
 
     <!-- =====================================================

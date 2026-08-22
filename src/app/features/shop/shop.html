@@ -1,189 +1,512 @@
 <div class="shop-page">
 
-    <div class="sidebar">
+    <!-- ============================= -->
+    <!-- SHOP HEADER -->
+    <!-- ============================= -->
 
-        <h2>Filters</h2>
+    <section class="shop-top">
 
-        <h3>Category</h3>
+        <h1>SHOP</h1>
 
-        <label>
-            <input type="radio" name="category" value="All" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+        <div class="shop-toolbar">
 
-            All
-        </label>
+            <!-- Search -->
+            <div class="search-box">
 
-        <label>
-            <input type="radio" name="category" value="Men" [(ngModel)]="selectedCategory" (change)="filterProducts()">
+                <input
+                    type="text"
+                    placeholder="Search products..."
+                    [(ngModel)]="searchTerm"
+                    (input)="filterProducts()"
+                >
 
-            Men
-        </label>
+            </div>
 
-        <label>
-            <input type="radio" name="category" value="Women" [(ngModel)]="selectedCategory"
-                (change)="filterProducts()">
 
-            Women
-        </label>
+            <!-- Sort -->
+            <div class="sort-box">
 
-        <label>
-            <input type="radio" name="category" value="Accessories" [(ngModel)]="selectedCategory"
-                (change)="filterProducts()">
+                <label>Sort by:</label>
 
-            Accessories
-        </label>
+                <select
+                    [(ngModel)]="selectedSort"
+                    (change)="filterProducts()"
+                >
 
-        <h3>Price</h3>
+                    <option value="latest">
+                        Featured
+                    </option>
 
-        <label>
-            <input type="radio" name="price" value="" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+                    <option value="lowToHigh">
+                        Price: Low to High
+                    </option>
 
-            All
-        </label>
+                    <option value="highToLow">
+                        Price: High to Low
+                    </option>
 
-        <label>
-            <input type="radio" name="price" value="under1000" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+                </select>
 
-            Under ₹1000
-        </label>
+            </div>
 
-        <label>
-            <input type="radio" name="price" value="1000to3000" [(ngModel)]="selectedPrice" (change)="filterProducts()">
 
-            ₹1000 – ₹3000
-        </label>
+            <!-- Product Count -->
+            <div class="product-count">
 
-        <label>
-            <input type="radio" name="price" value="above3000" [(ngModel)]="selectedPrice" (change)="filterProducts()">
+                {{ filteredProducts.length }} products
 
-            Above ₹3000
-        </label>
-
-    </div>
-
-    <div class="products-area">
-
-        <div class="shop-header">
-
-            <h1>Shop</h1>
-
-            <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterProducts()">
-
-            <select [(ngModel)]="selectedSort" (change)="filterProducts()">
-
-                <option value="latest">
-                    Latest
-                </option>
-
-                <option value="lowToHigh">
-                    Price: Low to High
-                </option>
-
-                <option value="highToLow">
-                    Price: High to Low
-                </option>
-
-            </select>
+            </div>
 
         </div>
 
-        <div class="products-grid">
+    </section>
 
-            <div class="product-card" *ngFor="let product of filteredProducts">
 
-                <div class="image-container">
+    <!-- ============================= -->
+    <!-- SHOP CONTENT -->
+    <!-- ============================= -->
 
-                    <div class="image-container">
+    <div class="shop-content">
 
-                        <a [routerLink]="['/product', product._id]">
 
-                            <img [src]="product.image" [alt]="product.name">
+        <!-- ============================= -->
+        <!-- FILTER SIDEBAR -->
+        <!-- ============================= -->
+
+        <aside class="filter-sidebar">
+
+            <div class="filter-title">
+
+                <span>Filter:</span>
+
+            </div>
+
+
+            <!-- Availability -->
+
+            <div class="filter-group">
+
+                <h3>Availability</h3>
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="availability"
+                        checked
+                    >
+
+                    <span>All</span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="availability"
+                    >
+
+                    <span>In Stock</span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="availability"
+                    >
+
+                    <span>Out of Stock</span>
+
+                </label>
+
+            </div>
+
+
+            <!-- Category -->
+
+          
+
+            <!-- Price -->
+
+            <div class="filter-group">
+
+                <h3>Price</h3>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="price"
+                        value=""
+                        [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()"
+                    >
+
+                    <span>All</span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="price"
+                        value="under1000"
+                        [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()"
+                    >
+
+                    <span>Under ₹1000</span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="price"
+                        value="1000to3000"
+                        [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()"
+                    >
+
+                    <span>₹1000 – ₹3000</span>
+
+                </label>
+
+
+                <label class="filter-option">
+
+                    <input
+                        type="radio"
+                        name="price"
+                        value="above3000"
+                        [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()"
+                    >
+
+                    <span>Above ₹3000</span>
+
+                </label>
+
+            </div>
+
+        </aside>
+
+
+        <!-- ============================= -->
+        <!-- PRODUCTS AREA -->
+        <!-- ============================= -->
+
+        <main class="products-area">
+
+
+            <!-- Products Grid -->
+
+            <div
+                class="products-grid"
+                *ngIf="filteredProducts.length > 0"
+            >
+
+
+                <!-- Product Card -->
+
+                <article
+                    class="product-card"
+                    *ngFor="let product of filteredProducts"
+                >
+
+
+                    <!-- Product Image -->
+
+                    <div class="product-image-wrapper">
+
+                        <a
+                            [routerLink]="['/product', product._id]"
+                            class="product-image-link"
+                        >
+
+                            <img
+                                [src]="product.image"
+                                [alt]="product.name"
+                                class="product-image"
+                            >
 
                         </a>
 
-                        <div class="hover-actions">
 
-                            <button class="wishlist-btn" (click)="toggleWishlist(product)">
-                                {{ isWishlisted(product._id!) ? '❤️' : '🤍' }}
+                        <!-- Product Actions -->
+
+                        <div class="product-actions">
+
+
+                            <!-- Wishlist -->
+
+                            <button
+                                type="button"
+                                class="action-btn"
+                                (click)="toggleWishlist(product)"
+                                [attr.aria-label]="
+                                    isWishlisted(product._id!)
+                                    ? 'Remove from wishlist'
+                                    : 'Add to wishlist'
+                                "
+                            >
+
+                                {{ isWishlisted(product._id!) ? '❤️' : '♡' }}
+
                             </button>
 
-                            <button class="quick-view-btn" (click)="openQuickView(product)">
+
+                            <!-- Quick View -->
+
+                            <button
+                                type="button"
+                                class="action-btn"
+                                (click)="openQuickView(product)"
+                                aria-label="Quick view"
+                            >
+
                                 👁
+
                             </button>
 
-                            <button class="cart-hover-btn" (click)="addToCart(product)"
-                                [disabled]="product.stock === 0">
 
-                                {{ product.stock === 0 ? '❌' : '🛒' }}
+                            <!-- Cart -->
+
+                            <button
+                                type="button"
+                                class="action-btn"
+                                (click)="addToCart(product)"
+                                [disabled]="product.stock === 0"
+                                aria-label="Add to cart"
+                            >
+
+                                🛒
 
                             </button>
 
                         </div>
 
+
+                        <!-- Out Of Stock Badge -->
+
+                        <span
+                            class="sold-out-badge"
+                            *ngIf="product.stock === 0"
+                        >
+
+                            Sold out
+
+                        </span>
+
                     </div>
 
-                    <h3>{{ product.name }}</h3>
 
-                    
+                    <!-- Product Information -->
 
-                    <p class="stock in-stock" *ngIf="product.stock > 5">
-                        🟢 In Stock
-                    </p>
+                    <div class="product-info">
 
-                    <p class="stock low-stock" *ngIf="product.stock > 0 && product.stock <= 5">
-                        🟡 Only {{ product.stock }} left
-                    </p>
 
-                    <p class="stock out-stock" *ngIf="product.stock === 0">
-                        🔴 Out of Stock
-                    </p>
+                        <a
+                            [routerLink]="['/product', product._id]"
+                            class="product-name"
+                        >
 
-                    <p>₹{{ product.price }}</p>
+                            {{ product.name }}
 
-                    
+                        </a>
+
+
+                        <!-- Stock -->
+
+                        <p
+                            class="stock-status in-stock"
+                            *ngIf="product.stock > 5"
+                        >
+
+                            In Stock
+
+                        </p>
+
+
+                        <p
+                            class="stock-status low-stock"
+                            *ngIf="
+                                product.stock > 0 &&
+                                product.stock <= 5
+                            "
+                        >
+
+                            Only {{ product.stock }} left
+
+                        </p>
+
+
+                        <p
+                            class="stock-status out-stock"
+                            *ngIf="product.stock === 0"
+                        >
+
+                            Out of Stock
+
+                        </p>
+
+
+                        <!-- Price -->
+
+                        <div class="product-price">
+
+                            ₹{{ product.price }}
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            </div>
+
+
+            <!-- ============================= -->
+            <!-- EMPTY PRODUCTS -->
+            <!-- ============================= -->
+
+            <div
+                class="empty-products"
+                *ngIf="filteredProducts.length === 0"
+            >
+
+                <div class="empty-icon">
+                    ×
+                </div>
+
+                <h2>No products found</h2>
+
+                <p>
+                    Try changing your filters or search term.
+                </p>
+
+            </div>
+
+        </main>
+
+    </div>
+
+
+    <!-- ============================= -->
+    <!-- QUICK VIEW MODAL -->
+    <!-- ============================= -->
+
+    <div
+        class="modal-overlay"
+        *ngIf="selectedProduct"
+        (click)="closeQuickView()"
+    >
+
+        <div
+            class="quick-view-modal"
+            (click)="$event.stopPropagation()"
+        >
+
+
+            <!-- Close -->
+
+            <button
+                type="button"
+                class="close-btn"
+                (click)="closeQuickView()"
+            >
+
+                ×
+
+            </button>
+
+
+            <!-- Image -->
+
+            <div class="quick-view-image">
+
+                <img
+                    [src]="selectedProduct.image"
+                    [alt]="selectedProduct.name"
+                >
+
+            </div>
+
+
+            <!-- Details -->
+
+            <div class="quick-view-details">
+
+                <p class="quick-view-category">
+
+                    {{ selectedProduct.category }}
+
+                </p>
+
+
+                <h2>
+
+                    {{ selectedProduct.name }}
+
+                </h2>
+
+
+                <div class="quick-view-price">
+
+                    ₹{{ selectedProduct.price }}
 
                 </div>
+
+
+                <p class="quick-view-stock">
+
+                    <span *ngIf="selectedProduct.stock > 0">
+
+                        In Stock
+
+                    </span>
+
+                    <span
+                        *ngIf="selectedProduct.stock === 0"
+                        class="out-stock"
+                    >
+
+                        Out of Stock
+
+                    </span>
+
+                </p>
+
+
+                <button
+                    type="button"
+                    class="modal-cart-btn"
+                    (click)="addToCart(selectedProduct)"
+                    [disabled]="selectedProduct.stock === 0"
+                >
+
+                    {{
+                        selectedProduct.stock === 0
+                            ? 'Out of Stock'
+                            : 'Add to Cart'
+                    }}
+
+                </button>
 
             </div>
 
         </div>
 
     </div>
-    <!-- Quick View Modal -->
 
-    <div class="modal-overlay" *ngIf="selectedProduct">
-
-        <div class="quick-view-modal">
-
-            <button class="close-btn" (click)="closeQuickView()">
-
-                ✕
-
-            </button>
-
-            <img [src]="selectedProduct.image" [alt]="selectedProduct.name">
-
-            <h2>{{ selectedProduct.name }}</h2>
-
-            <p class="price">
-
-                ₹{{ selectedProduct.price }}
-
-            </p>
-
-            <p>
-
-                Category:
-                {{ selectedProduct.category }}
-
-            </p>
-
-            <button class="modal-cart-btn" (click)="addToCart(selectedProduct)"
-                [disabled]="selectedProduct.stock === 0">
-
-                {{ selectedProduct.stock === 0 ? 'Out of Stock' : 'Add to Cart' }}
-
-            </button>
-
-        </div>
-
-    </div>
+</div>

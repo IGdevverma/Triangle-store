@@ -89,14 +89,12 @@ export class Shop implements OnInit {
       const matchesCategory =
         this.selectedCategory === 'All' ||
         product.category === this.selectedCategory;
-      const keyword = this.searchTerm.toLowerCase();
+
+      const keyword = this.searchTerm.toLowerCase().trim();
 
       const matchesSearch =
-
         product.name.toLowerCase().includes(keyword) ||
-
         product.category.toLowerCase().includes(keyword) ||
-
         (product.description || '').toLowerCase().includes(keyword);
 
       let matchesPrice = true;
@@ -105,17 +103,13 @@ export class Shop implements OnInit {
 
         matchesPrice = product.price < 1000;
 
-      }
-
-      else if (this.selectedPrice === '1000to3000') {
+      } else if (this.selectedPrice === '1000to3000') {
 
         matchesPrice =
           product.price >= 1000 &&
           product.price <= 3000;
 
-      }
-
-      else if (this.selectedPrice === 'above3000') {
+      } else if (this.selectedPrice === 'above3000') {
 
         matchesPrice = product.price > 3000;
 
@@ -126,28 +120,24 @@ export class Shop implements OnInit {
         matchesPrice &&
         matchesSearch
       );
+
     });
+
+
+    // SORT
     if (this.selectedSort === 'lowToHigh') {
 
       this.filteredProducts.sort(
-
         (a, b) => a.price - b.price
-
       );
 
-    }
-
-    else if (this.selectedSort === 'highToLow') {
+    } else if (this.selectedSort === 'highToLow') {
 
       this.filteredProducts.sort(
-
         (a, b) => b.price - a.price
-
       );
 
-    }
-
-    else if (this.selectedSort === 'latest') {
+    } else if (this.selectedSort === 'latest') {
 
       this.filteredProducts = [...this.filteredProducts];
 

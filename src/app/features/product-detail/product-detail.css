@@ -3513,4 +3513,25 @@ img {
   }
 
 }
+.best-sellers-view-all {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  padding-bottom: 20px;
+}
 
+.best-sellers-view-all button {
+  background: #111;
+  color: #fff;
+  border: none;
+  padding: 16px 42px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  min-width: 135px;
+  transition: 0.3s ease;
+}
+
+.best-sellers-view-all button:hover {
+  background: #333;
+}
