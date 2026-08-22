@@ -988,4 +988,9 @@ export class ProductDetail implements OnInit {
     });
   }
 
+
+
+  addRelatedToCart(item: Product): void {
+    this.cartService.addToCart(item);
+  }
 }

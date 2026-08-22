@@ -4,74 +4,100 @@
 
 <div class="product-page" *ngIf="product as product">
 
-  <!-- ================= BREADCRUMB ================= -->
+  <!-- =======================================================
+       BREADCRUMB
+  ======================================================== -->
 
   <div class="product-container">
 
+    <nav class="product-breadcrumb" aria-label="Breadcrumb">
+
+      <a routerLink="/">
+        Home
+      </a>
+
+      <span class="breadcrumb-separator">/</span>
+
+      <a [routerLink]="['/category', product.category]">
+        {{ product.category }}
+      </a>
+
+      <span class="breadcrumb-separator">/</span>
+
+      <span class="breadcrumb-current">
+        {{ product.name }}
+      </span>
+
+    </nav>
 
 
-    <!-- ================= MAIN PRODUCT ================= -->
+    <!-- =====================================================
+         MAIN PRODUCT SECTION
+    ====================================================== -->
+
     <section class="product-layout">
 
-      <!-- ================================================= -->
-      <!-- LEFT : PRODUCT IMAGE GALLERY -->
-      <!-- ================================================= -->
+      <!-- ===================================================
+           LEFT : PRODUCT GALLERY
+      ==================================================== -->
 
       <div class="product-gallery">
 
-        <!-- Main Product Image -->
+        <!-- MAIN IMAGE -->
+
         <div class="main-image-wrapper" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom()">
 
-          <!-- Discount Badge -->
+          <!-- DISCOUNT -->
+
           <div class="image-discount" *ngIf="product.discount && product.discount > 0">
             -{{ product.discount }}%
           </div>
+
+
+          <!-- IMAGE -->
 
           <img class="main-product-image" [src]="selectedImage" [alt]="product.name" [style.transform]="zoomTransform"
             [style.transform-origin]="zoomOrigin" />
 
         </div>
 
-        <!-- PRODUCT IMAGE THUMBNAILS -->
+
+        <!-- =================================================
+             THUMBNAILS
+        ================================================== -->
 
         <div class="thumbnail-wrapper" *ngIf="productImages.length > 1">
 
           <button type="button" class="thumbnail" *ngFor="let image of productImages"
             [class.active]="selectedImage === image" (click)="selectImage(image)">
 
-            <img [src]="image" [alt]="product?.name || 'Product image'" />
+            <img [src]="image" [alt]="product.name" loading="lazy" />
 
           </button>
 
         </div>
 
-
-
-
-
-
-
-
       </div>
 
 
-
-      <!-- ================================================= -->
-      <!-- RIGHT : PRODUCT INFORMATION -->
-      <!-- ================================================= -->
+      <!-- ===================================================
+           RIGHT : PRODUCT INFORMATION
+      ==================================================== -->
 
       <div class="product-information">
 
 
+        <!-- PRODUCT TITLE -->
 
-
-        <!-- Product Name -->
         <h1 class="product-title">
           {{ product.name }}
         </h1>
 
 
-        <!-- Rating -->
+        <!-- =================================================
+             RATING
+        ================================================== -->
+
         <div class="rating-row">
 
           <div class="stars">
@@ -89,8 +115,10 @@
         </div>
 
 
-        <!-- Price -->
-        <!-- PRICE -->
+        <!-- =================================================
+             PRICE
+        ================================================== -->
+
         <div class="price-section">
 
           <div class="price-row">
@@ -99,24 +127,23 @@
               ₹{{ product.price | number:'1.0-0' }}
             </span>
 
-            <span class="old-price" *ngIf="product.discount && product.discount > 0">
 
+            <span class="old-price" *ngIf="product.discount && product.discount > 0">
               ₹{{
               (
               product.price /
               (1 - product.discount / 100)
               ) | number:'1.0-0'
               }}
-
             </span>
 
+
             <span class="discount-text" *ngIf="product.discount && product.discount > 0">
-
               {{ product.discount }}% OFF
-
             </span>
 
           </div>
+
 
           <p class="tax-text">
             {{ product.taxText || 'Inclusive of all taxes' }}
@@ -125,35 +152,29 @@
         </div>
 
 
+        <!-- =================================================
+             SIZE
+        ================================================== -->
 
-
-
-
-
-
-
-        <!-- ================================================= -->
-        <!-- SIZE -->
-        <!-- ================================================= -->
-
-
-        <!-- SIZE -->
         <div class="option-block" *ngIf="product.sizes?.length">
 
           <div class="option-heading">
 
             <div class="option-title">
-              <span>Select Size</span>
+
+              <span>
+                Select Size
+              </span>
 
               <strong>
                 {{ selectedSize }}
               </strong>
+
             </div>
 
+
             <button type="button" class="size-guide-button" (click)="showSizeGuide = true">
-
               Sizing chart
-
             </button>
 
           </div>
@@ -163,9 +184,7 @@
 
             <button type="button" *ngFor="let size of product.sizes" [class.selected]="selectedSize === size"
               (click)="selectedSize = size">
-
               {{ size }}
-
             </button>
 
           </div>
@@ -175,30 +194,29 @@
 
 
 
-        <!-- ================================================= -->
-        <!-- COLOR -->
-        <!-- ================================================= -->
+        <!-- =================================================
+     COLOR SELECTION
+================================================== -->
 
+        <div class="color-section" *ngIf="product.colors?.length">
 
-
-        <!-- COLOR SELECTION -->
-        <!-- COLOR SELECTION -->
-        <div class="product-color-section" *ngIf="product.colors?.length">
-
+          <!-- Color Header -->
           <div class="color-header">
 
             <span class="color-label">
               Color -
               <strong>
-                {{ selectedColor || product.colors?.[0] }}
+                {{ selectedColor || product.colors?.[0] || 'Select Color' }}
               </strong>
             </span>
 
           </div>
 
+
+          <!-- Color Swatches -->
           <div class="color-swatches">
 
-            <button type="button" class="color-swatch" *ngFor="let color of product.colors"
+            <button *ngFor="let color of product.colors" type="button" class="color-swatch"
               [class.selected]="selectedColor === color" [title]="color" (click)="selectedColor = color">
 
               <span class="color-preview" [style.background-color]="color">
@@ -211,25 +229,24 @@
         </div>
 
 
-
-        <!-- ================================================= -->
-        <!-- STOCK -->
-        <!-- ================================================= -->
+        <!-- =================================================
+     STOCK STATUS
+================================================== -->
 
         <div class="stock-status">
 
-          <ng-container *ngIf="product.stock! > 10">
+          <ng-container *ngIf="product.stock !== undefined && product.stock > 10">
 
             <span class="stock-dot green"></span>
 
-            <span>
-              In Stock
-            </span>
+            <span>In Stock</span>
 
           </ng-container>
 
 
-          <ng-container *ngIf="product.stock! > 0 && product.stock! <= 10">
+          <ng-container *ngIf="product.stock !== undefined &&
+           product.stock > 0 &&
+           product.stock <= 10">
 
             <span class="stock-dot yellow"></span>
 
@@ -240,45 +257,47 @@
           </ng-container>
 
 
-          <ng-container *ngIf="product.stock === 0">
+          <ng-container *ngIf="product.stock !== undefined && product.stock <= 0">
 
             <span class="stock-dot red"></span>
 
-            <span>
-              Out of Stock
-            </span>
+            <span>Out of Stock</span>
 
           </ng-container>
 
         </div>
 
 
-
-        <!-- ================================================= -->
-        <!-- QUANTITY + ADD TO CART -->
-        <!-- ================================================= -->
+        <!-- =================================================
+             PURCHASE ACTIONS
+        ================================================== -->
 
         <div class="purchase-row">
 
-          <!-- Quantity -->
+
+          <!-- QUANTITY -->
+
           <div class="quantity-control">
 
-            <button type="button" (click)="decreaseQuantity()">
+            <button type="button" aria-label="Decrease quantity" (click)="decreaseQuantity()">
               −
             </button>
+
 
             <span>
               {{ quantity }}
             </span>
 
-            <button type="button" (click)="increaseQuantity()">
+
+            <button type="button" aria-label="Increase quantity" (click)="increaseQuantity()">
               +
             </button>
 
           </div>
 
 
-          <!-- Add To Cart -->
+          <!-- ADD TO CART -->
+
           <button type="button" class="add-cart-button" (click)="addToCart()" [disabled]="product.stock === 0">
 
             {{
@@ -292,19 +311,18 @@
         </div>
 
 
-
-        <!-- ================================================= -->
-        <!-- BUY NOW -->
-        <!-- ================================================= -->
+        <!-- =================================================
+             BUY NOW
+        ================================================== -->
 
         <button type="button" class="buy-now-button" (click)="buyNow()" [disabled]="product.stock === 0">
           BUY NOW
         </button>
 
 
-        <!-- ================================================= -->
-        <!-- DELIVERY -->
-        <!-- ================================================= -->
+        <!-- =================================================
+             DELIVERY
+        ================================================== -->
 
         <div class="delivery-card">
 
@@ -313,6 +331,7 @@
             <span class="delivery-icon">
               🚚
             </span>
+
 
             <div>
 
@@ -329,33 +348,41 @@
           </div>
 
 
-          <!-- Saved Pincode -->
+          <!-- SAVED PINCODE -->
 
           <div *ngIf="isPincodeSaved; else enterPincode" class="saved-delivery">
 
             <p>
+
               Deliver to
+
               <strong>
                 {{ pincode }}
               </strong>
+
             </p>
+
 
             <p class="delivery-message">
               {{ deliveryMessage }}
             </p>
 
+
             <p class="free-delivery" *ngIf="deliveryCharge === 0">
               Free Delivery
             </p>
 
+
             <p *ngIf="deliveryCharge > 0">
 
               Delivery Charges:
+
               <strong>
                 ₹{{ deliveryCharge }}
               </strong>
 
             </p>
+
 
             <button type="button" class="change-pincode" (click)="changePincode()">
               Change
@@ -364,13 +391,14 @@
           </div>
 
 
-          <!-- Enter Pincode -->
+          <!-- ENTER PINCODE -->
 
           <ng-template #enterPincode>
 
             <div class="pincode-box">
 
               <input type="text" maxlength="6" inputmode="numeric" placeholder="Enter Pincode" [(ngModel)]="pincode" />
+
 
               <button type="button" (click)="checkDelivery()">
                 Check
@@ -383,12 +411,12 @@
         </div>
 
 
-
-        <!-- ================================================= -->
-        <!-- BENEFITS -->
-        <!-- ================================================= -->
+        <!-- =================================================
+             BENEFITS
+        ================================================== -->
 
         <div class="benefits-grid">
+
 
           <div class="benefit">
 
@@ -455,12 +483,12 @@
         </div>
 
 
-
-        <!-- ================================================= -->
-        <!-- PRODUCT INFORMATION -->
-        <!-- ================================================= -->
+        <!-- =================================================
+             PRODUCT META
+        ================================================== -->
 
         <div class="product-meta">
+
 
           <div *ngIf="product.sku">
 
@@ -521,217 +549,71 @@
 
 
     <!-- =====================================================
-         PRODUCT INFORMATION TABS
+         PRODUCT DETAILS
     ====================================================== -->
 
     <section class="product-details-section">
 
+      <div class="product-details-header">
 
-      <div class="tabs-header">
-
-        <button type="button" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
-          Description
-        </button>
-
-
-        <button type="button" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
-          Reviews ({{ reviews.length }})
-        </button>
+        <h2>
+          Product Details
+        </h2>
 
       </div>
 
 
+      <div class="product-details-content">
 
-      <!-- DESCRIPTION -->
+        <div class="details-row" *ngIf="product.description">
 
-      <div class="tab-content" *ngIf="activeTab === 'description'">
+          <span>
+            Description
+          </span>
 
-        <div class="description-grid">
-
-          <div class="description-main">
-
-            <h2>
-              Product Details
-            </h2>
-
-            <p>
-              {{ product.description }}
-            </p>
-
-            <ul>
-
-              <li>
-                Premium quality sportswear designed for comfort.
-              </li>
-
-              <li>
-                Four-way stretch for improved mobility.
-              </li>
-
-              <li>
-                Lightweight and breathable fabric.
-              </li>
-
-              <li>
-                Designed for training, gym and everyday performance.
-              </li>
-
-              <li>
-                Triangle Sports signature branding.
-              </li>
-
-            </ul>
-
-          </div>
-
-
-          <div class="specification-card">
-
-            <h3>
-              Product Specifications
-            </h3>
-
-
-            <div class="spec-row" *ngIf="product.type">
-              <span>Type</span>
-              <strong>{{ product.type }}</strong>
-            </div>
-
-
-            <div class="spec-row" *ngIf="product.fabric">
-              <span>Fabric</span>
-              <strong>{{ product.fabric }}</strong>
-            </div>
-
-
-            <div class="spec-row" *ngIf="product.category">
-              <span>Category</span>
-              <strong>{{ product.category }}</strong>
-            </div>
-
-
-            <div class="spec-row" *ngIf="product.brand">
-              <span>Brand</span>
-              <strong>{{ product.brand }}</strong>
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-
-      <!-- REVIEWS -->
-
-      <div class="tab-content reviews-content" *ngIf="activeTab === 'reviews'">
-
-        <div class="review-summary">
-
-          <div class="review-score">
-
-            <strong>
-              {{ averageRating.toFixed(1) }}
-            </strong>
-
-            <span>/5</span>
-
-            <div class="summary-stars">
-              {{ '★'.repeat(roundedRating) }}
-            </div>
-
-            <small>
-              Based on {{ reviews.length }} reviews
-            </small>
-
-          </div>
-
-
-          <div class="review-form">
-
-            <h3>
-              Write a Review
-            </h3>
-
-            <input type="text" placeholder="Your Name" [(ngModel)]="newReview.name" />
-
-
-            <select [(ngModel)]="newReview.rating">
-
-              <option [ngValue]="5">
-                ★★★★★
-              </option>
-
-              <option [ngValue]="4">
-                ★★★★
-              </option>
-
-              <option [ngValue]="3">
-                ★★★
-              </option>
-
-              <option [ngValue]="2">
-                ★★
-              </option>
-
-              <option [ngValue]="1">
-                ★
-              </option>
-
-            </select>
-
-
-            <textarea rows="4" placeholder="Write your review..." [(ngModel)]="newReview.comment"></textarea>
-
-
-            <button type="button" (click)="submitReview()">
-              Submit Review
-            </button>
-
-          </div>
+          <p>
+            {{ product.description }}
+          </p>
 
         </div>
 
 
+        <div class="details-row" *ngIf="product.fabric">
 
-        <!-- Review List -->
+          <span>
+            Fabric
+          </span>
 
-        <div class="review-list" *ngIf="reviews.length">
-
-          <div class="review-item" *ngFor="let review of reviews">
-
-            <div class="review-user">
-
-              <div class="user-avatar">
-                {{ review.name?.charAt(0)?.toUpperCase() }}
-              </div>
-
-              <div>
-
-                <strong>
-                  {{ review.name }}
-                </strong>
-
-                <div class="review-stars">
-                  {{ '★'.repeat(review.rating) }}
-                </div>
-
-              </div>
-
-            </div>
-
-            <p>
-              {{ review.comment }}
-            </p>
-
-          </div>
+          <strong>
+            {{ product.fabric }}
+          </strong>
 
         </div>
 
 
-        <div class="no-reviews" *ngIf="reviews.length === 0">
-          No reviews yet. Be the first to review this product.
+        <div class="details-row" *ngIf="product.type">
+
+          <span>
+            Type
+          </span>
+
+          <strong>
+            {{ product.type }}
+          </strong>
+
+        </div>
+
+
+        <div class="details-row" *ngIf="product.category">
+
+          <span>
+            Category
+          </span>
+
+          <strong>
+            {{ product.category }}
+          </strong>
+
         </div>
 
       </div>
@@ -739,56 +621,121 @@
     </section>
 
 
-
     <!-- =====================================================
-         RELATED PRODUCTS
+         REVIEWS
     ====================================================== -->
 
-    <section class="related-section" *ngIf="relatedProducts.length">
+    <section class="review-section" *ngIf="reviews.length">
 
-      <div class="section-heading">
+      <div class="review-section-header">
 
-        <div>
+        <h2>
+          Customer Reviews
+        </h2>
+
+        <span>
+          {{ reviews.length }} Reviews
+        </span>
+
+      </div>
+
+
+      <div class="review-preview">
+
+        <p>
+          {{ reviews[0]?.comment }}
+        </p>
+
+
+        <div class="review-author">
 
           <span>
-            YOU MAY ALSO LIKE
+            {{ reviews[0]?.name }}
           </span>
 
-          <h2>
-            Related Products
-          </h2>
+
+          <span class="review-stars">
+
+            {{ '★'.repeat(reviews[0]?.rating || 5) }}
+
+          </span>
 
         </div>
 
       </div>
 
+    </section>
 
-      <div class="related-grid">
 
-        <article class="related-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item._id]">
+    <!-- =====================================================
+         YOU MAY ALSO LIKE
+    ====================================================== -->
 
-          <div class="related-image">
+    <section class="you-may-like-section" *ngIf="relatedProducts.length">
+
+      <div class="you-may-like-header">
+
+        <h2>
+          You may also like
+        </h2>
+
+      </div>
+
+
+      <div class="you-may-like-grid">
+
+
+        <article class="recommendation-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item._id]">
+
+
+          <!-- IMAGE -->
+
+          <div class="recommendation-image">
 
             <img [src]="item.image" [alt]="item.name" loading="lazy" />
 
           </div>
 
 
-          <div class="related-info">
+          <!-- INFO -->
 
-            <span>
-              {{ item.category }}
-            </span>
+          <div class="recommendation-info">
 
             <h3>
               {{ item.name }}
             </h3>
 
-            <strong>
-              ₹{{ item.price | number:'1.0-0' }}
-            </strong>
+
+            <div class="recommendation-price">
+
+              <span class="sale-price">
+
+                ₹{{ item.price | number:'1.0-0' }}
+
+              </span>
+
+
+              <span class="original-price" *ngIf="item.discount && item.discount > 0">
+
+                ₹{{
+                (
+                item.price /
+                (1 - item.discount / 100)
+                ) | number:'1.0-0'
+                }}
+
+              </span>
+
+            </div>
 
           </div>
+
+
+          <!-- ADD -->
+
+          <button type="button" class="recommendation-add" (click)="$event.stopPropagation(); addRelatedToCart(item)">
+            + Add
+          </button>
 
         </article>
 
@@ -798,26 +745,29 @@
 
   </div>
 
-
-
-
 </div>
 
-<!-- =====================================================
+
+<!-- =========================================================
      BUY NOW CHECKOUT MODAL
-===================================================== -->
+========================================================= -->
 
 <div class="buy-now-overlay" *ngIf="showBuyNowModal" (click)="closeBuyNowModal()">
 
+
   <div class="buy-now-modal" (click)="$event.stopPropagation()">
 
-    <!-- ================= MODAL HEADER ================= -->
+
+    <!-- =====================================================
+         MODAL HEADER
+    ====================================================== -->
 
     <div class="buy-now-header">
 
       <button type="button" class="modal-close" (click)="closeBuyNowModal()" aria-label="Close">
         ×
       </button>
+
 
       <div class="modal-logo">
         TRIANGLE SPORTS
@@ -826,7 +776,9 @@
     </div>
 
 
-    <!-- ================= SHIPPING BAR ================= -->
+    <!-- =====================================================
+         SHIPPING BAR
+    ====================================================== -->
 
     <div class="shipping-bar">
 
@@ -835,25 +787,35 @@
     </div>
 
 
-    <!-- ================= ORDER SUMMARY ================= -->
-    <!-- ================= ORDER SUMMARY ================= -->
+    <!-- =====================================================
+         ORDER SUMMARY
+    ====================================================== -->
 
     <div class="order-summary" *ngIf="product as p">
 
+
       <div class="summary-header">
 
-        <strong>
-          Order summary
-        </strong>
 
-        <span>
-          ({{ quantity }} {{ quantity === 1 ? 'Item' : 'Items' }})
-        </span>
+        <div>
+
+          <strong>
+            Order summary
+          </strong>
+
+          <span>
+            ({{ quantity }}
+            {{ quantity === 1 ? 'Item' : 'Items' }})
+          </span>
+
+        </div>
+
 
         <div class="summary-price">
 
-          <!-- Original Price -->
+
           <span class="summary-old-price" *ngIf="(p.discount ?? 0) > 0">
+
             ₹{{
             (
             p.price +
@@ -864,12 +826,14 @@
             )
             ) | number:'1.0-0'
             }}
+
           </span>
 
-          <!-- Current Price -->
+
           <strong>
             ₹{{ (p.price * quantity) | number:'1.0-0' }}
           </strong>
+
 
           <span class="summary-arrow">
             ⌄
@@ -880,7 +844,7 @@
       </div>
 
 
-      <!-- ================= COUPON ================= -->
+      <!-- COUPON -->
 
       <div class="coupon-row">
 
@@ -888,7 +852,9 @@
           %
         </div>
 
+
         <input type="text" placeholder="Enter coupon code" [(ngModel)]="couponCode" (keyup.enter)="applyCoupon()" />
+
 
         <button type="button" (click)="applyCoupon()">
           Apply
@@ -904,42 +870,39 @@
     </div>
 
 
-    <!-- ================= MOBILE SECTION ================= -->
+    <!-- =====================================================
+         MOBILE / OTP
+    ====================================================== -->
 
     <div class="mobile-section" *ngIf="!otpSent">
 
+      <h2>
+        Enter mobile number
+      </h2>
 
 
+      <p>
+        Provide your mobile number to continue
+      </p>
 
-      <!-- MOBILE INPUT -->
 
-      <div class="mobile-section" *ngIf="!otpSent">
+      <div class="mobile-input-wrapper" [class.input-error]="mobileError">
 
-        <h2>Enter mobile number</h2>
+        <div class="country-code">
 
-        <p>
-          Provide your mobile number to continue
-        </p>
+          <span class="india-flag">
+            🇮🇳
+          </span>
 
-        <div class="mobile-input-wrapper" [class.input-error]="mobileError">
-
-          <div class="country-code">
-            <span class="india-flag">🇮🇳</span>
-            <span>+91</span>
-          </div>
-
-          <input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number"
-            [(ngModel)]="mobileNumber" (input)="onMobileInput()" />
+          <span>
+            +91
+          </span>
 
         </div>
 
-        <p class="mobile-error" *ngIf="mobileError">
-          {{ mobileError }}
-        </p>
 
-        <button type="button" class="continue-button" [disabled]="isSendingOtp" (click)="continueToCheckout()">
-          {{ isSendingOtp ? 'SENDING OTP...' : 'CONTINUE' }}
-        </button>
+        <input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number"
+          [(ngModel)]="mobileNumber" (input)="onMobileInput()" />
 
       </div>
 
@@ -949,41 +912,74 @@
       </p>
 
 
-      <!-- CONTINUE -->
+      <button type="button" class="continue-button" [disabled]="isSendingOtp" (click)="continueToCheckout()">
 
+        {{
+        isSendingOtp
+        ? 'SENDING OTP...'
+        : 'CONTINUE'
+        }}
 
+      </button>
 
     </div>
 
+
+    <!-- =====================================================
+         OTP
+    ====================================================== -->
+
     <div class="otp-section" *ngIf="otpSent">
 
-      <h2>Enter OTP</h2>
+      <h2>
+        Enter OTP
+      </h2>
+
 
       <p>
         OTP sent to +91 {{ mobileNumber }}
       </p>
 
+
       <input type="tel" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP"
         [(ngModel)]="otp" (input)="onOtpInput()" />
+
 
       <p class="mobile-error" *ngIf="otpError">
         {{ otpError }}
       </p>
 
+
       <button type="button" class="continue-button" [disabled]="isVerifyingOtp" (click)="verifyOtp()">
-        {{ isVerifyingOtp ? 'VERIFYING...' : 'VERIFY OTP' }}
+
+        {{
+        isVerifyingOtp
+        ? 'VERIFYING...'
+        : 'VERIFY OTP'
+        }}
+
       </button>
 
+
       <button type="button" class="resend-button" [disabled]="resendDisabled" (click)="resendOtp()">
-        {{ resendDisabled ? 'Resend in ' + resendTimer + 's' : 'RESEND OTP' }}
+
+        {{
+        resendDisabled
+        ? 'Resend in ' + resendTimer + 's'
+        : 'RESEND OTP'
+        }}
+
       </button>
 
     </div>
 
 
-    <!-- ================= BENEFITS ================= -->
+    <!-- =====================================================
+         CHECKOUT BENEFITS
+    ====================================================== -->
 
     <div class="checkout-benefits">
+
 
       <div class="checkout-benefit">
 
@@ -1039,7 +1035,9 @@
     </div>
 
 
-    <!-- ================= FOOTER ================= -->
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
 
     <div class="modal-footer">
 
@@ -1047,7 +1045,9 @@
         T&amp;C
       </span>
 
-      <span>|</span>
+      <span>
+        |
+      </span>
 
       <span>
         Privacy Policy
