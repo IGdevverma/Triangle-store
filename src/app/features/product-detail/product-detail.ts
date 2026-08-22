@@ -29,7 +29,8 @@ export class ProductDetail implements OnInit {
 
   zoomTransform = 'scale(1)';
   zoomOrigin = 'center center';
-
+  showProductDetails = false;
+  showQualityGuarantee = false;
   selectedSize = 'M';
   quantity = 1;
   selectedColor: string = '';
@@ -40,6 +41,11 @@ export class ProductDetail implements OnInit {
   sizes = ['S', 'M', 'L', 'XL'];
 
   productImages: string[] = [];
+
+
+  toggleProductDetails(): void {
+    this.showProductDetails = !this.showProductDetails;
+  }
 
   activeTab: 'description' | 'reviews' = 'description';
 

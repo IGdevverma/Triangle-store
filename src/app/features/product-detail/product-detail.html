@@ -319,28 +319,103 @@
           BUY NOW
         </button>
 
-
         <!-- =================================================
-             DELIVERY
-        ================================================== -->
+     PRODUCT INFORMATION ACCORDION
+================================================== -->
 
-        <div class="delivery-card">
+        <div class="product-info-accordions">
 
-          <div class="delivery-header">
+          <!-- PRODUCT DETAILS -->
+          <div class="accordion-item">
 
-            <span class="delivery-icon">
-              🚚
-            </span>
+            <button type="button" class="accordion-header" (click)="showProductDetails = !showProductDetails">
+
+              <span>Product Details</span>
+
+              <span class="accordion-icon">
+                {{ showProductDetails ? '−' : '+' }}
+              </span>
+
+            </button>
 
 
-            <div>
+            <div class="accordion-content" *ngIf="showProductDetails">
 
-              <strong>
-                Check delivery
-              </strong>
+              <div class="detail-row">
+
+                <span class="detail-label">
+                  Description
+                </span>
+
+                <span class="detail-value">
+                  {{ product.description }}
+                </span>
+
+              </div>
+
+
+              <div class="detail-row">
+
+                <span class="detail-label">
+                  Fabric
+                </span>
+
+                <span class="detail-value">
+                  {{ product.fabric }}
+                </span>
+
+              </div>
+
+
+              <div class="detail-row">
+
+                <span class="detail-label">
+                  Type
+                </span>
+
+                <span class="detail-value">
+                  {{ product.type }}
+                </span>
+
+              </div>
+
+
+              <div class="detail-row">
+
+                <span class="detail-label">
+                  Category
+                </span>
+
+                <span class="detail-value">
+                  {{ product.category }}
+                </span>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- QUALITY GUARANTEE -->
+          <div class="accordion-item">
+
+            <button type="button" class="accordion-header" (click)="showQualityGuarantee = !showQualityGuarantee">
+
+              <span>Quality Guarantee</span>
+
+              <span class="accordion-icon">
+                {{ showQualityGuarantee ? '−' : '+' }}
+              </span>
+
+            </button>
+
+
+            <div class="accordion-content quality-content" *ngIf="showQualityGuarantee">
 
               <p>
-                Enter your pincode for delivery information
+                We are committed to delivering premium quality products
+                designed for comfort, durability and everyday performance.
               </p>
 
             </div>
@@ -348,133 +423,23 @@
           </div>
 
 
-          <!-- SAVED PINCODE -->
+          <!-- REVIEW -->
+          <div class="product-review">
 
-          <div *ngIf="isPincodeSaved; else enterPincode" class="saved-delivery">
-
-            <p>
-
-              Deliver to
-
-              <strong>
-                {{ pincode }}
-              </strong>
-
+            <p class="review-text">
+              Triangle Sports doesn't just fit — it performs.
+              Premium comfort, quality and a fit made for everyday movement.
             </p>
 
+            <div class="review-author">
 
-            <p class="delivery-message">
-              {{ deliveryMessage }}
-            </p>
+              <span>
+                Triangle Sports Customer
+              </span>
 
-
-            <p class="free-delivery" *ngIf="deliveryCharge === 0">
-              Free Delivery
-            </p>
-
-
-            <p *ngIf="deliveryCharge > 0">
-
-              Delivery Charges:
-
-              <strong>
-                ₹{{ deliveryCharge }}
-              </strong>
-
-            </p>
-
-
-            <button type="button" class="change-pincode" (click)="changePincode()">
-              Change
-            </button>
-
-          </div>
-
-
-          <!-- ENTER PINCODE -->
-
-          <ng-template #enterPincode>
-
-            <div class="pincode-box">
-
-              <input type="text" maxlength="6" inputmode="numeric" placeholder="Enter Pincode" [(ngModel)]="pincode" />
-
-
-              <button type="button" (click)="checkDelivery()">
-                Check
-              </button>
-
-            </div>
-
-          </ng-template>
-
-        </div>
-
-
-        <!-- =================================================
-             BENEFITS
-        ================================================== -->
-
-        <div class="benefits-grid">
-
-
-          <div class="benefit">
-
-            <span class="benefit-icon">
-              ↻
-            </span>
-
-            <div>
-
-              <strong>
-                Easy Returns
-              </strong>
-
-              <small>
-                Hassle-free returns
-              </small>
-
-            </div>
-
-          </div>
-
-
-          <div class="benefit">
-
-            <span class="benefit-icon">
-              ✓
-            </span>
-
-            <div>
-
-              <strong>
-                Quality Assured
-              </strong>
-
-              <small>
-                Premium quality
-              </small>
-
-            </div>
-
-          </div>
-
-
-          <div class="benefit">
-
-            <span class="benefit-icon">
-              🔒
-            </span>
-
-            <div>
-
-              <strong>
-                Secure Payment
-              </strong>
-
-              <small>
-                100% secure checkout
-              </small>
+              <span class="stars">
+                ★★★★★
+              </span>
 
             </div>
 
@@ -483,65 +448,13 @@
         </div>
 
 
-        <!-- =================================================
-             PRODUCT META
-        ================================================== -->
-
-        <div class="product-meta">
 
 
-          <div *ngIf="product.sku">
-
-            <span>
-              SKU
-            </span>
-
-            <strong>
-              {{ product.sku }}
-            </strong>
-
-          </div>
 
 
-          <div *ngIf="product.category">
-
-            <span>
-              Category
-            </span>
-
-            <strong>
-              {{ product.category }}
-            </strong>
-
-          </div>
 
 
-          <div *ngIf="product.type">
 
-            <span>
-              Type
-            </span>
-
-            <strong>
-              {{ product.type }}
-            </strong>
-
-          </div>
-
-
-          <div *ngIf="product.fabric">
-
-            <span>
-              Fabric
-            </span>
-
-            <strong>
-              {{ product.fabric }}
-            </strong>
-
-          </div>
-
-        </div>
 
       </div>
 
@@ -552,74 +465,9 @@
          PRODUCT DETAILS
     ====================================================== -->
 
-    <section class="product-details-section">
-
-      <div class="product-details-header">
-
-        <h2>
-          Product Details
-        </h2>
-
-      </div>
 
 
-      <div class="product-details-content">
-
-        <div class="details-row" *ngIf="product.description">
-
-          <span>
-            Description
-          </span>
-
-          <p>
-            {{ product.description }}
-          </p>
-
-        </div>
-
-
-        <div class="details-row" *ngIf="product.fabric">
-
-          <span>
-            Fabric
-          </span>
-
-          <strong>
-            {{ product.fabric }}
-          </strong>
-
-        </div>
-
-
-        <div class="details-row" *ngIf="product.type">
-
-          <span>
-            Type
-          </span>
-
-          <strong>
-            {{ product.type }}
-          </strong>
-
-        </div>
-
-
-        <div class="details-row" *ngIf="product.category">
-
-          <span>
-            Category
-          </span>
-
-          <strong>
-            {{ product.category }}
-          </strong>
-
-        </div>
-
-      </div>
-
-    </section>
-
+   
 
     <!-- =====================================================
          REVIEWS
