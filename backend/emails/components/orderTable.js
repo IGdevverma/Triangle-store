@@ -50,15 +50,26 @@ module.exports = (items = []) => {
 
             <thead>
 
-                <tr style="background:#6A11CB;color:white;">
+                <tr style="
+                    background:#6A11CB;
+                    color:white;
+                ">
 
-                    <th style="padding:14px;">Product</th>
+                    <th style="padding:14px;">
+                        Product
+                    </th>
 
-                    <th style="padding:14px;">Qty</th>
+                    <th style="padding:14px;">
+                        Qty
+                    </th>
 
-                    <th style="padding:14px;">Price</th>
+                    <th style="padding:14px;">
+                        Price
+                    </th>
 
-                    <th style="padding:14px;">Subtotal</th>
+                    <th style="padding:14px;">
+                        Subtotal
+                    </th>
 
                 </tr>
 

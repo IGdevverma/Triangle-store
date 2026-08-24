@@ -719,6 +719,16 @@ const updateOrderStatus = async (req, res) => {
 
         try {
 
+            if (orderStatus === "Processing") {
+
+                await EmailService
+                    .sendOrderProcessing(order);
+
+                console.log(
+                    "✅ Processing email sent."
+                );
+
+            }
             if (
                 orderStatus === "Packed"
             ) {
