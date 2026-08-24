@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class AuthService {
- private apiUrl = `${environment.apiUrl}/auth`;
+  private apiUrl = `${environment.apiUrl}/auth`;
   private currentUserSubject = new BehaviorSubject<any>(this.getUser());
 
   currentUser$ = this.currentUserSubject.asObservable();
@@ -103,5 +103,25 @@ export class AuthService {
     );
 
   }
+
+  verifyWidgetToken(accessToken: string, phone: string) {
+
+    const token = localStorage.getItem('token');
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    return this.http.post<any>(
+      `${this.apiUrl}/verify-widget-token`,
+      {
+        accessToken,
+        phone
+      },
+      { headers }
+    );
+
+  }
+
 
 }

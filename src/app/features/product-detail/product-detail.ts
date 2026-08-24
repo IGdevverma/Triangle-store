@@ -11,6 +11,7 @@ import { SeoService } from '../../services/seo';
 import { OtpService } from '../../services/otp.service';
 import { Product } from '../../models/product';
 import { Router } from '@angular/router';
+import { NgZone } from '@angular/core';
 
 @Component({
   selector: 'app-product-detail',
@@ -116,6 +117,7 @@ export class ProductDetail implements OnInit {
     private loadingService: LoadingService,
     private http: HttpClient,
     private otpService: OtpService,
+    private ngZone: NgZone,
 
     private seoService: SeoService
   ) { }
@@ -853,85 +855,152 @@ export class ProductDetail implements OnInit {
     console.log('Address saved:', this.address);
 
   }
-
   sendOtp(): void {
 
     this.mobileError = '';
 
-    this.http.post<any>(
-      'http://localhost:8000/api/auth/send-otp',
-      {
-        mobile: this.mobileNumber
-      }
-    ).subscribe({
+    if (!this.validateMobile()) {
+      return;
+    }
 
-      next: (response) => {
+    this.isSendingOtp = true;
+    this.otpError = '';
 
-        if (response.success) {
+    this.otpService.sendOtp(
 
+      '91' + this.mobileNumber,
+
+      (response) => {
+
+        console.log(
+          'FULL MSG91 SEND RESPONSE:',
+          response
+        );
+
+        // IMPORTANT:
+        // MSG91 callback Angular ke bahar aa sakta hai
+        this.ngZone.run(() => {
+
+          this.isSendingOtp = false;
           this.otpSent = true;
+          this.buyNowStep = 'otp';
 
-          console.log('OTP sent successfully');
-
-        }
+        });
 
       },
 
-      error: (error) => {
+      (error) => {
 
-        console.error('OTP Error:', error);
+        console.error(
+          'MSG91 WIDGET FAILURE:',
+          error
+        );
 
-        this.mobileError =
-          error.error?.message ||
-          'Unable to send OTP. Please try again.';
+        this.ngZone.run(() => {
+
+          this.isSendingOtp = false;
+
+          this.otpError =
+            error?.message ||
+            'Unable to send OTP. Please try again.';
+
+        });
 
       }
 
-    });
+    );
+
   }
 
   verifyOtp(): void {
 
     this.otpError = '';
 
-    if (this.otp.length !== 6) {
+    if (!this.otp) {
 
-      this.otpError = 'Please enter a valid 6-digit OTP';
+      this.otpError =
+        'Please enter OTP';
 
       return;
+
     }
 
-    this.http.post<any>(
-      'http://localhost:8000/api/auth/verify-otp',
-      {
-        mobile: this.mobileNumber,
-        otp: this.otp
-      }
-    ).subscribe({
 
-      next: (response) => {
+    if (!/^\d{4}$|^\d{6}$/.test(this.otp)) {
 
-        if (response.success && response.verified) {
+      this.otpError =
+        'Please enter a valid OTP';
 
-          this.showBuyNowModal = false;
+      return;
 
-          this.router.navigate(['/checkout']);
+    }
+
+
+    this.isVerifyingOtp = true;
+
+
+    this.otpService.verifyOtp(
+
+      this.otp,
+
+      (response) => {
+
+        this.isVerifyingOtp = false;
+
+        console.log(
+          'MSG91 OTP verified:',
+          response
+        );
+
+
+        /*
+        IMPORTANT:
+        MSG91 returns access token here.
+        */
+
+        const accessToken =
+          response?.token ||
+          response?.accessToken ||
+          response?.['access-token'];
+
+
+        if (!accessToken) {
+
+          this.otpError =
+            'OTP verified but access token was not received.';
+
+          return;
 
         }
 
+
+        /*
+        Next step:
+        Send this access token to backend.
+        */
+
+        this.verifyAccessTokenOnBackend(
+          accessToken
+        );
+
       },
 
-      error: (error) => {
+      (error) => {
 
-        console.error('OTP verification failed:', error);
+        this.isVerifyingOtp = false;
+
+        console.error(
+          'MSG91 Verify OTP Error:',
+          error
+        );
 
         this.otpError =
-          error.error?.message ||
           'Invalid OTP. Please try again.';
 
       }
 
-    });
+    );
+
   }
 
 
@@ -968,6 +1037,8 @@ export class ProductDetail implements OnInit {
   }
 
 
+
+
   resendOtp(): void {
 
     if (!this.mobileNumber) {
@@ -978,33 +1049,95 @@ export class ProductDetail implements OnInit {
     this.otpError = '';
     this.isSendingOtp = true;
 
-    this.otpService.sendOtp(this.mobileNumber).subscribe({
+    this.otpService.retryOtp(
 
-      next: (response) => {
+      null,
+
+      (response: any) => {
 
         this.isSendingOtp = false;
 
-        console.log('OTP resent successfully', response);
+        console.log(
+          'OTP resent successfully:',
+          response
+        );
 
       },
 
-      error: (error) => {
+      (error: any) => {
 
         this.isSendingOtp = false;
 
-        console.error('Resend OTP error:', error);
+        console.error(
+          'Resend OTP error:',
+          error
+        );
 
         this.otpError =
-          error?.error?.message ||
+          error?.message ||
           'Unable to resend OTP. Please try again.';
+
       }
 
-    });
+    );
   }
 
 
 
   addRelatedToCart(item: Product): void {
     this.cartService.addToCart(item);
+  }
+
+
+  private verifyAccessTokenOnBackend(
+    accessToken: string
+  ): void {
+
+    this.http.post<any>(
+
+      'http://localhost:8000/api/auth/verify-widget-token',
+
+      {
+        accessToken,
+        phone: this.mobileNumber
+      }
+
+    ).subscribe({
+
+      next: (response) => {
+
+        console.log(
+          'Backend OTP verification:',
+          response
+        );
+
+
+        if (response.success) {
+
+          this.showBuyNowModal = false;
+
+          this.router.navigate([
+            '/checkout'
+          ]);
+
+        }
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Backend token verification failed:',
+          error
+        );
+
+        this.otpError =
+          error?.error?.message ||
+          'OTP verification failed.';
+
+      }
+
+    });
+
   }
 }

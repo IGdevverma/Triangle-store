@@ -19,7 +19,7 @@ export class Register {
   email = '';
 
   password = '';
-  phone = '';
+
 
   confirmPassword = '';
 
@@ -45,10 +45,7 @@ export class Register {
     this.authService.register({
 
       name: this.name,
-
       email: this.email,
-      phone: this.phone,
-
       password: this.password
 
     }).subscribe({

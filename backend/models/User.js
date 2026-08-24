@@ -32,6 +32,31 @@ const userSchema = new mongoose.Schema({
         default: ""
     },
 
+
+    phoneVerified: {
+        type: Boolean,
+        default: false
+    },
+
+
+
+    phoneVerifiedAt: {
+        type: Date,
+        default: null
+    },
+
+    phoneOtp: {
+        type: String,
+        default: null,
+        select: false
+    },
+
+    phoneOtpExpires: {
+        type: Date,
+        default: null,
+        select: false
+    },
+
     gender: {
         type: String,
         enum: ["Male", "Female", "Other"],

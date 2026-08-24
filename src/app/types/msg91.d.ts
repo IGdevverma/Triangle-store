@@ -4,7 +4,9 @@ declare global {
 
   interface Window {
 
-    initSendOTP: (configuration: any) => void;
+    initSendOTP: (
+      configuration: any
+    ) => void;
 
     sendOtp: (
       identifier: string,
@@ -28,4 +30,5 @@ declare global {
 
     getWidgetData: () => any;
   }
+
 }

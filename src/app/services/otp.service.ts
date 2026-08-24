@@ -1,39 +1,150 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class OtpService {
 
-  private apiUrl = 'http://localhost:8000/api/auth';
+  constructor() {}
 
-  constructor(
-    private http: HttpClient
-  ) {}
+  sendOtp(
+    mobile: string,
+    success?: (data: any) => void,
+    failure?: (error: any) => void
+  ): void {
 
-  sendOtp(mobile: string): Observable<any> {
+    if (!mobile) {
+      failure?.({
+        message: 'Mobile number is required'
+      });
+      return;
+    }
 
-    return this.http.post(
-      `${this.apiUrl}/send-otp`,
-      {
-        mobile
+    if (typeof window.sendOtp !== 'function') {
+
+      console.error(
+        'MSG91 sendOtp function is not available'
+      );
+
+      failure?.({
+        message:
+          'MSG91 OTP widget is not initialized'
+      });
+
+      return;
+    }
+
+    window.sendOtp(
+      mobile,
+      (data) => {
+
+        console.log(
+          'FULL MSG91 SEND RESPONSE:',
+          data
+        );
+
+        success?.(data);
+
+      },
+      (error) => {
+
+        console.error(
+          'FULL MSG91 SEND ERROR:',
+          error
+        );
+
+        failure?.(error);
+
       }
     );
   }
+
 
   verifyOtp(
-    mobile: string,
-    otp: string
-  ): Observable<any> {
+    otp: string,
+    success?: (data: any) => void,
+    failure?: (error: any) => void
+  ): void {
 
-    return this.http.post(
-      `${this.apiUrl}/verify-otp`,
-      {
-        mobile,
-        otp
+    if (typeof window.verifyOtp !== 'function') {
+
+      failure?.({
+        message:
+          'MSG91 verifyOtp function is not available'
+      });
+
+      return;
+    }
+
+    window.verifyOtp(
+      otp,
+
+      (data) => {
+
+        console.log(
+          'FULL MSG91 VERIFY RESPONSE:',
+          data
+        );
+
+        success?.(data);
+
+      },
+
+      (error) => {
+
+        console.error(
+          'FULL MSG91 VERIFY ERROR:',
+          error
+        );
+
+        failure?.(error);
+
       }
     );
   }
+
+
+  retryOtp(
+    channel: string | null = null,
+    success?: (data: any) => void,
+    failure?: (error: any) => void
+  ): void {
+
+    if (typeof window.retryOtp !== 'function') {
+
+      failure?.({
+        message:
+          'MSG91 retryOtp function is not available'
+      });
+
+      return;
+    }
+
+    window.retryOtp(
+      channel,
+
+      (data) => {
+
+        console.log(
+          'FULL MSG91 RETRY RESPONSE:',
+          data
+        );
+
+        success?.(data);
+
+      },
+
+      (error) => {
+
+        console.error(
+          'FULL MSG91 RETRY ERROR:',
+          error
+        );
+
+        failure?.(error);
+
+      }
+    );
+  }
+
 }

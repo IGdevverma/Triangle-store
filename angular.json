@@ -55,54 +55,57 @@
                 }
               ]
             },
-            
-          
-          "development": {
-            "optimization": false,
-            "extractLicenses": false,
-            "sourceMap": true
-          }
-        },
-        "defaultConfiguration": "production"
-      },
-      "serve": {
-        "builder": "@angular/build:dev-server",
-        "configurations": {
-          "production": {
-            "buildTarget": "sportswear-store:build:production"
-          },
-          "development": {
-            "buildTarget": "sportswear-store:build:development"
-          }
-        },
-        "defaultConfiguration": "development"
-      },
-      "extract-i18n": {
-        "builder": "@angular/build:extract-i18n"
-      },
-      "test": {
-        "builder": "@angular/build:karma",
-        "options": {
-          "polyfills": [
-            "zone.js",
-            "zone.js/testing"
-          ],
-          "tsConfig": "tsconfig.spec.json",
-          "assets": [
-            {
-              "glob": "**/*",
-              "input": "public"
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
             }
-          ],
-          "styles": [
-            "src/styles.css"
-          ]
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "allowedHosts": [
+              "rearrange-blurred-hammock.ngrok-free.dev"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "sportswear-store:build:production"
+            },
+            "development": {
+              "buildTarget": "sportswear-store:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
+          }
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
-},
-"cli": {
-  "analytics": false
-}
 }

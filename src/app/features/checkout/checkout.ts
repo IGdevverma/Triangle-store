@@ -6,6 +6,7 @@ import { OrderService } from '../../services/order';
 import { Order } from '../../models/orders';
 import { Router } from '@angular/router';
 import { Payment } from '../../services/payment';
+import { ChangeDetectorRef } from '@angular/core';
 
 
 declare global {
@@ -101,6 +102,7 @@ export class Checkout implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private paymentService: Payment,
+    private cdr: ChangeDetectorRef
 
   ) {
     this.checkoutForm = this.fb.group({
@@ -428,24 +430,29 @@ export class Checkout implements OnInit {
 
               next: (res) => {
 
-
-
+                // 1. Save generated order ID
                 this.generatedOrderId = res.order._id;
 
+                // 2. Clear cart after order is successfully saved
                 this.cartService.clearCart();
 
-                this.orderPlaced = true;
-
+                // 3. Stop loading
                 this.isPlacingOrder = false;
 
-                localStorage.removeItem("customerInfo");
+                // 4. Clear saved checkout information
+                localStorage.removeItem('customerInfo');
 
-                this.checkoutForm.reset({
-                  paymentMethod: "COD"
-                });
+                // 5. Reset coupon
                 this.couponCode = '';
                 this.discount = 0;
                 this.discountAmount = 0;
+
+                // 6. Redirect to Order Success page
+                this.router.navigate(['/order-success'], {
+                  state: {
+                    orderId: res.order._id
+                  }
+                });
 
               },
 
@@ -546,6 +553,9 @@ export class Checkout implements OnInit {
         this.otpSuccess =
           'OTP sent successfully to +91 ' + phone;
 
+        // IMPORTANT
+        this.cdr.detectChanges();
+
       },
 
       (error: any) => {
@@ -556,6 +566,9 @@ export class Checkout implements OnInit {
 
         this.otpError =
           'Unable to send OTP. Please try again';
+
+        // IMPORTANT
+        this.cdr.detectChanges();
 
       }
     );
@@ -585,27 +598,22 @@ export class Checkout implements OnInit {
         console.log('OTP VERIFIED:', data);
 
         this.otpLoading = false;
-
         this.otpVerified = true;
 
         this.otpSuccess =
           'Mobile number verified successfully';
 
-        /*
-         * Put verified number into checkout form
-         */
         this.checkoutForm.patchValue({
-
           phone: this.mobileForOtp
-
         });
 
-        /*
-         * Close OTP modal after successful verification
-         */
+        this.cdr.detectChanges();
+
         setTimeout(() => {
 
           this.showOtpModal = false;
+
+          this.cdr.detectChanges();
 
         }, 800);
 
@@ -613,12 +621,17 @@ export class Checkout implements OnInit {
 
       (error: any) => {
 
-        console.error('OTP verification failed:', error);
+        console.error(
+          'OTP verification failed:',
+          error
+        );
 
         this.otpLoading = false;
 
         this.otpError =
           'Invalid OTP. Please enter the correct OTP';
+
+        this.cdr.detectChanges();
 
       }
     );
