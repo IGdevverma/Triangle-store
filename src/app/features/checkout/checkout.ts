@@ -387,9 +387,13 @@ export class Checkout implements OnInit {
       (this.subtotal * this.discount) / 100
     );
   }
-  openRazorpay(response: any, order: Order) {
+  openRazorpay(response: any, order: Order): void {
 
     const options = {
+
+      // ==========================================
+      // RAZORPAY CONFIG
+      // ==========================================
 
       key: response.key,
 
@@ -397,98 +401,224 @@ export class Checkout implements OnInit {
 
       currency: response.order.currency,
 
-      name: "Triangle Sports",
+      name: 'Triangle Sports',
 
-      description: "Order Payment",
+      description: 'Order Payment',
 
       order_id: response.order.id,
-      notes: {
 
-        customerName: this.checkoutForm.value.name
-
-      },
-
-
-      handler: (paymentResponse: any) => {
-
-
-
-        this.paymentService.verifyPayment(paymentResponse).subscribe({
-
-          next: (verifyRes) => {
-
-            order.paymentStatus = "Paid";
-            order.razorpayOrderId = paymentResponse.razorpay_order_id;
-            order.razorpayPaymentId = paymentResponse.razorpay_payment_id;
-            order.paymentVerifiedAt = new Date().toISOString();
-
-            this.orderService.addOrder(order).subscribe({
-
-              next: (res) => {
-
-                // 1. Save generated order ID
-                this.generatedOrderId = res.order._id;
-
-                // 2. Clear cart after order is successfully saved
-                this.cartService.clearCart();
-
-                // 3. Stop loading
-                this.isPlacingOrder = false;
-
-                // 4. Clear saved checkout information
-                localStorage.removeItem('customerInfo');
-
-                // 5. Reset coupon
-                this.couponCode = '';
-                this.discount = 0;
-                this.discountAmount = 0;
-
-                // 6. Redirect to Order Success page
-                this.router.navigate(['/order-success'], {
-                  state: {
-                    orderId: res.order._id
-                  }
-                });
-
-              },
-
-              error: (err) => {
-
-                alert(err.error.message);
-
-                this.isPlacingOrder = false;
-
-              }
-
-            });
-
-          },
-
-          error: (err) => {
-
-
-            alert("Payment verification failed.");
-            order.paymentStatus = "Failed";
-            this.isPlacingOrder = false;
-
-          }
-
-        });
-
-      },
+      // ==========================================
+      // CUSTOMER DETAILS
+      // ==========================================
 
       prefill: {
 
-        name: this.checkoutForm.value.name,
+        name:
+          this.checkoutForm.value.name,
 
-        email: this.checkoutForm.value.email,
+        email:
+          this.checkoutForm.value.email,
 
-        contact: this.checkoutForm.value.phone
+        contact:
+          this.checkoutForm.value.phone
 
       },
+
+      // ==========================================
+      // NOTES
+      // ==========================================
+
+      notes: {
+
+        customerName:
+          this.checkoutForm.value.name
+
+      },
+
+      // ==========================================
+      // PAYMENT SUCCESS
+      // ==========================================
+
+      handler: (paymentResponse: any) => {
+
+        console.log(
+          'Razorpay payment response:',
+          paymentResponse
+        );
+
+        // ----------------------------------------
+        // Verify payment from BACKEND
+        // ----------------------------------------
+
+        this.paymentService
+          .verifyPayment(paymentResponse)
+          .subscribe({
+
+            // ====================================
+            // PAYMENT VERIFIED
+            // ====================================
+
+            next: (verifyRes: any) => {
+
+              console.log(
+                'Payment verification response:',
+                verifyRes
+              );
+
+              // ----------------------------------
+              // Backend verification failed
+              // ----------------------------------
+
+              if (!verifyRes?.success) {
+
+                alert(
+                  verifyRes?.message ||
+                  'Payment verification failed.'
+                );
+
+                this.isPlacingOrder = false;
+
+                return;
+              }
+
+              // ----------------------------------
+              // Payment is verified
+              // ----------------------------------
+
+              const paidOrder: Order = {
+
+                ...order,
+
+                razorpayOrderId:
+                  verifyRes.razorpayOrderId,
+
+                razorpayPaymentId:
+                  verifyRes.razorpayPaymentId,
+
+                paymentStatus:
+                  'Paid',
+
+                paymentVerifiedAt:
+                  new Date().toISOString()
+
+              };
+
+              // ==================================
+              // CREATE ORDER IN DATABASE
+              // ==================================
+
+              this.orderService
+                .addOrder(paidOrder)
+                .subscribe({
+
+                  // ==============================
+                  // ORDER CREATED
+                  // ==============================
+
+                  next: (res: any) => {
+
+                    console.log(
+                      'Order created successfully:',
+                      res
+                    );
+
+                    // Save generated order ID
+                    this.generatedOrderId =
+                      res.order._id;
+
+                    // Clear cart
+                    this.cartService.clearCart();
+
+                    // Stop loading
+                    this.isPlacingOrder = false;
+
+                    // Clear checkout information
+                    localStorage.removeItem(
+                      'customerInfo'
+                    );
+
+                    // Reset coupon
+                    this.couponCode = '';
+
+                    this.discount = 0;
+
+                    this.discountAmount = 0;
+
+                    // =================================
+                    // REDIRECT TO SUCCESS PAGE
+                    // =================================
+
+                    this.router.navigate(
+                      ['/order-success'],
+                      {
+                        state: {
+                          orderId:
+                            res.order._id
+                        }
+                      }
+                    );
+
+                  },
+
+                  // ==============================
+                  // ORDER CREATION FAILED
+                  // ==============================
+
+                  error: (err: any) => {
+
+                    console.error(
+                      'ORDER CREATION ERROR:',
+                      err
+                    );
+
+                    alert(
+                      err?.error?.message ||
+                      'Payment succeeded but order creation failed. Please contact support.'
+                    );
+
+                    this.isPlacingOrder = false;
+
+                  }
+
+                });
+
+            },
+
+            // ====================================
+            // PAYMENT VERIFICATION ERROR
+            // ====================================
+
+            error: (err: any) => {
+
+              console.error(
+                'PAYMENT VERIFICATION ERROR:',
+                err
+              );
+
+              alert(
+                err?.error?.message ||
+                'Payment verification failed.'
+              );
+
+              this.isPlacingOrder = false;
+
+            }
+
+          });
+
+      },
+
+      // ==========================================
+      // RAZORPAY MODAL CLOSED
+      // ==========================================
+
       modal: {
 
         ondismiss: () => {
+
+          console.log(
+            'Razorpay payment window closed'
+          );
 
           this.isPlacingOrder = false;
 
@@ -496,179 +626,190 @@ export class Checkout implements OnInit {
 
       },
 
+      // ==========================================
+      // RAZORPAY THEME
+      // ==========================================
+
       theme: {
 
-        color: "#ff4d5a"
+        color: '#ff4d5a'
 
       }
 
     };
 
-    const razorpay = new Razorpay(options);
+    // ============================================
+    // OPEN RAZORPAY
+    // ============================================
+
+    const razorpay =
+      new Razorpay(options);
 
     razorpay.open();
 
   }
 
+  
 
-  continueShopping() {
 
-    this.orderPlaced = false;
+continueShopping() {
 
-    this.router.navigate(['/']);
+  this.orderPlaced = false;
 
+  this.router.navigate(['/']);
+
+}
+
+
+sendCheckoutOTP() {
+
+  this.otpError = '';
+  this.otpSuccess = '';
+
+  const phone = this.mobileForOtp.trim();
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+    this.otpError = 'Please enter a valid 10 digit mobile number';
+    return;
   }
 
+  const identifier = '91' + phone;
 
-  sendCheckoutOTP() {
+  this.otpLoading = true;
 
-    this.otpError = '';
-    this.otpSuccess = '';
+  window.sendOtp(
+    identifier,
 
-    const phone = this.mobileForOtp.trim();
+    (data: any) => {
 
-    if (!/^[0-9]{10}$/.test(phone)) {
-      this.otpError = 'Please enter a valid 10 digit mobile number';
-      return;
-    }
+      console.log('OTP sent successfully:', data);
 
-    const identifier = '91' + phone;
+      this.otpSent = true;
+      this.otpLoading = false;
 
-    this.otpLoading = true;
+      this.otpSuccess =
+        'OTP sent successfully to +91 ' + phone;
 
-    window.sendOtp(
-      identifier,
+      // IMPORTANT
+      this.cdr.detectChanges();
 
-      (data: any) => {
+    },
 
-        console.log('OTP sent successfully:', data);
+    (error: any) => {
 
-        this.otpSent = true;
-        this.otpLoading = false;
+      console.error('OTP send error:', error);
 
-        this.otpSuccess =
-          'OTP sent successfully to +91 ' + phone;
-
-        // IMPORTANT
-        this.cdr.detectChanges();
-
-      },
-
-      (error: any) => {
-
-        console.error('OTP send error:', error);
-
-        this.otpLoading = false;
-
-        this.otpError =
-          'Unable to send OTP. Please try again';
-
-        // IMPORTANT
-        this.cdr.detectChanges();
-
-      }
-    );
-  }
-
-
-  verifyCheckoutOTP() {
-
-    this.otpError = '';
-    this.otpSuccess = '';
-
-    if (!this.otp) {
-
-      this.otpError = 'Please enter OTP';
-
-      return;
-    }
-
-    this.otpLoading = true;
-
-    window.verifyOtp(
-
-      this.otp,
-
-      (data: any) => {
-
-        console.log('OTP VERIFIED:', data);
-
-        this.otpLoading = false;
-        this.otpVerified = true;
-
-        this.otpSuccess =
-          'Mobile number verified successfully';
-
-        this.checkoutForm.patchValue({
-          phone: this.mobileForOtp
-        });
-
-        this.cdr.detectChanges();
-
-        setTimeout(() => {
-
-          this.showOtpModal = false;
-
-          this.cdr.detectChanges();
-
-        }, 800);
-
-      },
-
-      (error: any) => {
-
-        console.error(
-          'OTP verification failed:',
-          error
-        );
-
-        this.otpLoading = false;
-
-        this.otpError =
-          'Invalid OTP. Please enter the correct OTP';
-
-        this.cdr.detectChanges();
-
-      }
-    );
-  }
-
-
-  openPhoneVerification() {
-
-    const phone = this.checkoutForm.get('phone')?.value;
-
-    if (!phone) {
-
-      this.otpError = 'Please enter mobile number';
-
-      return;
-
-    }
-
-    if (!/^[0-9]{10}$/.test(phone)) {
+      this.otpLoading = false;
 
       this.otpError =
-        'Please enter a valid 10 digit mobile number';
+        'Unable to send OTP. Please try again';
 
-      return;
+      // IMPORTANT
+      this.cdr.detectChanges();
 
     }
+  );
+}
 
-    this.mobileForOtp = phone;
 
-    this.otp = '';
+verifyCheckoutOTP() {
 
-    this.otpSent = false;
+  this.otpError = '';
+  this.otpSuccess = '';
 
-    this.otpVerified = false;
+  if (!this.otp) {
 
-    this.otpError = '';
+    this.otpError = 'Please enter OTP';
 
-    this.otpSuccess = '';
+    return;
+  }
 
-    this.showOtpModal = true;
+  this.otpLoading = true;
+
+  window.verifyOtp(
+
+    this.otp,
+
+    (data: any) => {
+
+      console.log('OTP VERIFIED:', data);
+
+      this.otpLoading = false;
+      this.otpVerified = true;
+
+      this.otpSuccess =
+        'Mobile number verified successfully';
+
+      this.checkoutForm.patchValue({
+        phone: this.mobileForOtp
+      });
+
+      this.cdr.detectChanges();
+
+      setTimeout(() => {
+
+        this.showOtpModal = false;
+
+        this.cdr.detectChanges();
+
+      }, 800);
+
+    },
+
+    (error: any) => {
+
+      console.error(
+        'OTP verification failed:',
+        error
+      );
+
+      this.otpLoading = false;
+
+      this.otpError =
+        'Invalid OTP. Please enter the correct OTP';
+
+      this.cdr.detectChanges();
+
+    }
+  );
+}
+
+
+openPhoneVerification() {
+
+  const phone = this.checkoutForm.get('phone')?.value;
+
+  if (!phone) {
+
+    this.otpError = 'Please enter mobile number';
+
+    return;
 
   }
+
+  if (!/^[0-9]{10}$/.test(phone)) {
+
+    this.otpError =
+      'Please enter a valid 10 digit mobile number';
+
+    return;
+
+  }
+
+  this.mobileForOtp = phone;
+
+  this.otp = '';
+
+  this.otpSent = false;
+
+  this.otpVerified = false;
+
+  this.otpError = '';
+
+  this.otpSuccess = '';
+
+  this.showOtpModal = true;
+
+}
 
 }

@@ -1,67 +1,356 @@
-<div class="success-container">
+<div class="success-page">
 
-    <div class="success-card">
+  <!-- Decorative background -->
+  <div class="success-orb success-orb-left"></div>
+  <div class="success-orb success-orb-right"></div>
+
+  <main class="success-wrapper">
+
+    <section class="success-card">
+
+      <!-- =========================================
+           SUCCESS HEADER
+      ========================================== -->
+
+      <div class="success-header">
 
         <div class="success-icon">
-
-            <i class="fa-solid fa-circle-check"></i>
-
+          <i class="fa-solid fa-check"></i>
         </div>
 
-        <h1>Order Placed Successfully 🎉</h1>
+        <span class="success-label">
+          ORDER CONFIRMED
+        </span>
 
-        <p>
+        <h1>
+          Order placed
+          <span>successfully.</span>
+        </h1>
 
-            Thank you for shopping with <strong>Triangle Sports</strong>
-
+        <p class="success-description">
+          Thank you for shopping with
+          <strong>Triangle Sports</strong>.
+          Your order has been confirmed and we're getting it ready for you.
         </p>
 
-        <div class="order-box">
+      </div>
 
-            <h3>Order ID</h3>
 
-            <p>{{ orderId }}</p>
+      <!-- =========================================
+           ORDER INFORMATION
+      ========================================== -->
+
+      <div class="order-info-card">
+
+        <div class="order-info-content">
+
+          <span class="info-label">
+            ORDER ID
+          </span>
+
+          <strong class="order-id">
+            #{{ orderId }}
+          </strong>
 
         </div>
-        <button class="secondary-btn" (click)="copyOrderId()">
 
-            {{ copied ? '✅ Copied' : '📋 Copy Order ID' }}
+        <button
+          type="button"
+          class="copy-btn"
+          (click)="copyOrderId()">
+
+          <i
+            class="fa-solid"
+            [class.fa-copy]="!copied"
+            [class.fa-check]="copied">
+          </i>
+
+          <span>
+            {{ copied ? 'Copied' : 'Copy ID' }}
+          </span>
 
         </button>
-        <div class="delivery-box">
 
-            <i class="fa-solid fa-truck-fast"></i>
+      </div>
 
-            Estimated Delivery
 
-            <strong>
+      <!-- =========================================
+           DELIVERY INFORMATION
+      ========================================== -->
 
-                {{ deliveryDate }}
+      <div class="delivery-card">
 
-            </strong>
+        <div class="delivery-icon">
+          <i class="fa-solid fa-truck-fast"></i>
+        </div>
+
+        <div class="delivery-content">
+
+          <span class="delivery-label">
+            ESTIMATED DELIVERY
+          </span>
+
+          <strong>
+            {{ deliveryDate }}
+          </strong>
+
+          <p>
+            We'll notify you when your order is shipped.
+          </p>
 
         </div>
-        <p class="success-note">
 
-            You'll receive your invoice and order updates on your registered email.
+      </div>
 
-        </p>
-        <div class="success-buttons">
 
-            <button class="primary-btn" routerLink="/orders">
+      <!-- =========================================
+           ORDER JOURNEY
+      ========================================== -->
 
-                My Orders
+      <div class="journey-section">
 
-            </button>
+        <div class="section-heading">
 
-            <button class="secondary-btn" routerLink="/shop">
+          <span>
+            WHAT'S NEXT
+          </span>
 
-                Continue Shopping
-
-            </button>
+          <h2>
+            Your order journey
+          </h2>
 
         </div>
+
+
+        <div class="journey">
+
+          <!-- Connecting line -->
+          <div class="journey-line"></div>
+
+
+          <!-- STEP 1 -->
+
+          <div class="journey-step active">
+
+            <div class="step-circle">
+              <i class="fa-solid fa-check"></i>
+            </div>
+
+            <div class="step-text">
+
+              <strong>
+                Order placed
+              </strong>
+
+              <small>
+                Order confirmed
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <!-- STEP 2 -->
+
+          <div class="journey-step">
+
+            <div class="step-circle">
+              <span>02</span>
+            </div>
+
+            <div class="step-text">
+
+              <strong>
+                Processing
+              </strong>
+
+              <small>
+                Preparing your order
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <!-- STEP 3 -->
+
+          <div class="journey-step">
+
+            <div class="step-circle">
+              <span>03</span>
+            </div>
+
+            <div class="step-text">
+
+              <strong>
+                Shipped
+              </strong>
+
+              <small>
+                On the way to you
+              </small>
+
+            </div>
+
+          </div>
+
+
+          <!-- STEP 4 -->
+
+          <div class="journey-step">
+
+            <div class="step-circle">
+              <span>04</span>
+            </div>
+
+            <div class="step-text">
+
+              <strong>
+                Delivered
+              </strong>
+
+              <small>
+                Enjoy your gear
+              </small>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- =========================================
+           EMAIL NOTICE
+      ========================================== -->
+
+      <div class="email-notice">
+
+        <div class="email-icon">
+
+          <i class="fa-regular fa-envelope"></i>
+
+        </div>
+
+        <div class="email-content">
+
+          <strong>
+            Order updates are on their way
+          </strong>
+
+          <p>
+            Your invoice and order updates will be sent
+            to your registered email address.
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- =========================================
+           ACTION BUTTONS
+      ========================================== -->
+
+      <div class="success-actions">
+
+        <a
+          routerLink="/orders"
+          class="primary-btn">
+
+          <span>
+            My Orders
+          </span>
+
+          <i class="fa-solid fa-arrow-right"></i>
+
+        </a>
+
+
+        <a
+          routerLink="/shop"
+          class="secondary-btn">
+
+          <i class="fa-solid fa-bag-shopping"></i>
+
+          <span>
+            Continue Shopping
+          </span>
+
+        </a>
+
+      </div>
+
+
+      <!-- =========================================
+           TRUST FEATURES
+      ========================================== -->
+
+      <div class="trust-features">
+
+        <div class="trust-item">
+
+          <div class="trust-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+
+          <span>
+            Secure Payment
+          </span>
+
+        </div>
+
+
+        <div class="trust-item">
+
+          <div class="trust-icon">
+            <i class="fa-solid fa-rotate-left"></i>
+          </div>
+
+          <span>
+            Easy 7-Day Exchange
+          </span>
+
+        </div>
+
+
+        <div class="trust-item">
+
+          <div class="trust-icon">
+            <i class="fa-solid fa-location-dot"></i>
+          </div>
+
+          <span>
+            Order Tracking
+          </span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         BRAND FOOTER
+    ========================================== -->
+
+    <div class="brand-footer">
+
+      <span class="brand-symbol">
+        ▲
+      </span>
+
+      <span>
+        Built for movement. Designed for you.
+      </span>
 
     </div>
+
+  </main>
 
 </div>

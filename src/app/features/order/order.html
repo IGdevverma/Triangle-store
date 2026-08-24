@@ -1,79 +1,207 @@
-<div class="orders-container">
+<div class="orders-page">
 
-  <h1>My Orders</h1>
+  <!-- ============================= -->
+  <!-- PAGE HEADER -->
+  <!-- ============================= -->
 
- 
+  <div class="page-header">
 
-  <div *ngIf="!isLoading && !hasOrders()" class="empty-orders">
-    <h2>No Orders Found</h2>
-    <p>You haven't placed any orders yet.</p>
+    <div>
+      <span class="eyebrow">YOUR ACCOUNT</span>
+
+      <h1>My Orders</h1>
+
+      <p>
+        Track, manage and review your Triangle Sports orders.
+      </p>
+    </div>
+
+    <div
+      class="order-count"
+      *ngIf="!isLoading && orders.length">
+
+      <strong>{{ orders.length }}</strong>
+
+      <span>
+        {{ orders.length === 1 ? 'Order' : 'Orders' }}
+      </span>
+
+    </div>
+
   </div>
 
-  <div class="order-card" *ngFor="let order of orders">
 
-    <!-- ================= HEADER ================= -->
+  <!-- ============================= -->
+  <!-- LOADING -->
+  <!-- ============================= -->
 
-    <div class="order-top">
+  <div
+    class="loading-state"
+    *ngIf="isLoading">
 
-      <div class="product-preview">
+    <div class="spinner"></div>
 
-        <img
-          [src]="order.items[0].image"
-          [alt]="order.items[0].name">
+    <p>Loading your orders...</p>
+
+  </div>
+
+
+  <!-- ============================= -->
+  <!-- EMPTY -->
+  <!-- ============================= -->
+
+  <div
+    class="empty-orders"
+    *ngIf="!isLoading && !hasOrders()">
+
+    <div class="empty-icon">
+      🛍️
+    </div>
+
+    <h2>No orders yet</h2>
+
+    <p>
+      You haven't placed an order with Triangle Sports yet.
+    </p>
+
+    <button class="shop-btn">
+      Start Shopping
+    </button>
+
+  </div>
+
+
+  <!-- ============================= -->
+  <!-- ORDERS -->
+  <!-- ============================= -->
+
+  <div
+    class="orders-list"
+    *ngIf="!isLoading && hasOrders()">
+
+    <article
+      class="order-card"
+      *ngFor="let order of orders">
+
+
+      <!-- ============================= -->
+      <!-- ORDER HEADER -->
+      <!-- ============================= -->
+
+      <div class="order-header">
+
+        <div>
+
+          <span class="order-label">
+            ORDER ID
+          </span>
+
+          <strong class="order-id">
+            #{{ order._id }}
+          </strong>
+
+        </div>
+
+        <div class="order-date">
+
+          <span>Placed on</span>
+
+          <strong>
+            {{ formatDate(order.createdAt) }}
+          </strong>
+
+        </div>
 
       </div>
 
-      <div class="order-summary">
 
-        <h2>{{ order.items[0].name }}</h2>
+      <!-- ============================= -->
+      <!-- PRODUCT + STATUS -->
+      <!-- ============================= -->
 
-        <p class="delivery-date">
+      <div class="order-main">
 
-          Arriving by
+        <div class="product-preview">
 
-          <strong>
-            {{ formatDate(order.createdAt!) }}
-          </strong>
+          <img
+            [src]="order.items[0]?.image"
+            [alt]="order.items[0]?.name">
 
-        </p>
+        </div>
 
-        <div class="summary-grid">
 
-          <div>
+        <div class="product-content">
 
-            <span>Order ID</span>
+          <div class="product-title-row">
 
-            <h4>#{{ order._id }}</h4>
+            <div>
 
-          </div>
+              <h2>
+                {{ order.items[0]?.name }}
+              </h2>
 
-          <div>
+              <p>
+                {{ order.items.length }} product
+                <span *ngIf="order.items.length !== 1">
+                  items
+                </span>
+                <span *ngIf="order.items.length === 1">
+                  item
+                </span>
+              </p>
 
-            <span>Total</span>
+            </div>
 
-            <h4>₹{{ order.total }}</h4>
 
-          </div>
-
-          <div>
-
-            <span>Payment</span>
-
-            <h4>{{ order.paymentMethod }}</h4>
-
-          </div>
-
-          <div>
-
-            <span>Status</span>
-
-            <h4
-              class="status"
+            <div
+              class="status-badge"
               [ngClass]="getStatusClass(order.orderStatus)">
+
+              <span class="status-dot"></span>
 
               {{ order.orderStatus }}
 
-            </h4>
+            </div>
+
+          </div>
+
+
+          <div class="order-meta">
+
+            <div>
+
+              <span>Order total</span>
+
+              <strong>
+                ₹{{ order.total | number:'1.0-0' }}
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>Payment</span>
+
+              <strong>
+                {{ getPaymentLabel(order) }}
+              </strong>
+
+            </div>
+
+            <div>
+
+              <span>Payment status</span>
+
+              <strong
+                [class.payment-paid]="
+                  order.paymentStatus === 'Paid'
+                ">
+
+                {{ order.paymentStatus }}
+
+              </strong>
+
+            </div>
 
           </div>
 
@@ -81,263 +209,556 @@
 
       </div>
 
-    </div>
 
-    <!-- ================= TRACKING ================= -->
-
-    <div class="tracking-card">
-
-      <h3>Order Tracking</h3>
-
-      <div class="tracking-timeline">
-
-        <!-- Ordered -->
-
-        <div
-          class="timeline-step completed">
-
-          <div class="circle">
-
-            ✓
-
-          </div>
-
-          <div class="content">
-
-            <h4>Order Placed</h4>
-
-            <small>
-
-              {{ formatDate(order.createdAt!) }}
-
-            </small>
-
-          </div>
-
-        </div>
-
-        <!-- Processing -->
-
-        <div
-          class="timeline-step"
-          [class.completed]="
-            order.orderStatus === 'Processing' ||
-            order.orderStatus === 'Packed' ||
-            order.orderStatus === 'Shipped' ||
-            order.orderStatus === 'Delivered'
-          "
-          [class.current]="
-            order.orderStatus === 'Processing'
-          ">
-
-          <div class="circle">
-
-            ⚙
-
-          </div>
-
-          <div class="content">
-
-            <h4>Processing</h4>
-
-            <p>Your order is being prepared.</p>
-
-          </div>
-
-        </div>
-
-        <!-- Packed -->
-
-        <div
-          class="timeline-step"
-          [class.completed]="
-            order.orderStatus === 'Packed' ||
-            order.orderStatus === 'Shipped' ||
-            order.orderStatus === 'Delivered'
-          "
-          [class.current]="
-            order.orderStatus === 'Packed'
-          ">
-
-          <div class="circle">
-
-            📦
-
-          </div>
-
-          <div class="content">
-
-            <h4>Packed</h4>
-
-            <p>Your parcel has been packed.</p>
-
-          </div>
-
-        </div>
-
-        <!-- Shipped -->
-
-        <div
-          class="timeline-step"
-          [class.completed]="
-            order.orderStatus === 'Shipped' ||
-            order.orderStatus === 'Delivered'
-          "
-          [class.current]="
-            order.orderStatus === 'Shipped'
-          ">
-
-          <div class="circle">
-
-            🚚
-
-          </div>
-
-          <div class="content">
-
-            <h4>Shipped</h4>
-
-            <p>Your order is on the way.</p>
-
-          </div>
-
-        </div>
-
-        <!-- Delivered -->
-
-        <div
-          class="timeline-step"
-          [class.completed]="
-            order.orderStatus === 'Delivered'
-          "
-          [class.current]="
-            order.orderStatus === 'Delivered'
-          ">
-
-          <div class="circle">
-
-            🏠
-
-          </div>
-
-          <div class="content">
-
-            <h4>Delivered</h4>
-
-            <p>Package delivered successfully.</p>
-
-          </div>
-
-        </div>
-
-      </div>
-
-    </div>
-
-    <!-- ================= PRODUCTS ================= -->
-
-    <div class="products-section">
-
-      <h3>Products Ordered</h3>
+      <!-- ============================= -->
+      <!-- CANCELLED INFO -->
+      <!-- ============================= -->
 
       <div
-        class="product-item"
-        *ngFor="let item of order.items">
+        class="cancelled-banner"
+        *ngIf="order.orderStatus === 'Cancelled'">
 
-        <img
-          [src]="item.image"
-          [alt]="item.name">
+        <div class="cancelled-icon">
+          ×
+        </div>
 
-        <div class="product-info">
+        <div class="cancelled-content">
 
-          <h4>{{ item.name }}</h4>
+          <strong>
+            This order was cancelled
+          </strong>
 
           <p>
+            Cancelled on
+            {{ formatDateTime(order.cancelledAt) }}
+          </p>
 
-            Quantity :
-            {{ item.quantity }}
+          <p *ngIf="order.cancellationReason">
+
+            <span>Reason:</span>
+
+            {{ order.cancellationReason }}
 
           </p>
 
         </div>
 
-        <div class="product-price">
+        <div class="refund-box">
 
-          ₹{{ item.price }}
+          <span>Refund</span>
+
+          <strong
+            [ngClass]="
+              getRefundClass(order.refundStatus)
+            ">
+
+            {{
+              order.refundStatus === 'Refunded'
+                ? 'Refunded'
+                : order.refundStatus === 'Processing'
+                  ? 'Processing'
+                  : order.refundStatus === 'Failed'
+                    ? 'Failed'
+                    : 'Not applicable'
+            }}
+
+          </strong>
 
         </div>
 
       </div>
 
-    </div>
 
-    <!-- ================= SHIPPING ================= -->
+      <!-- ============================= -->
+      <!-- TRACKING -->
+      <!-- ============================= -->
 
-    <div class="shipping-card">
+      <div
+        class="tracking-section"
+        *ngIf="order.orderStatus !== 'Cancelled'">
 
-      <h3>Shipping Address</h3>
+        <div class="tracking-header">
 
-      <p>
+          <div>
 
-        {{ order.customerName }}
+            <span class="section-eyebrow">
+              DELIVERY
+            </span>
 
-      </p>
+            <h3>Order Tracking</h3>
 
-      <p>
+          </div>
 
-        {{ order.address }}
+          <span class="estimated-delivery">
 
-      </p>
+            Estimated delivery:
+            <strong>
+              {{ formatDate(order.createdAt) }}
+            </strong>
 
-      <p>
+          </span>
 
-        {{ order.city }},
-        {{ order.state }}
+        </div>
 
-        -
 
-        {{ order.pincode }}
+        <div class="timeline">
 
-      </p>
+          <!-- PROCESSING -->
 
-      <p>
+          <div
+            class="timeline-item"
+            [class.completed]="
+              isStepCompleted(order, 'Processing')
+            "
+            [class.current]="
+              isCurrent(order, 'Processing')
+            ">
 
-        {{ order.phone }}
+            <div class="timeline-icon">
+              ✓
+            </div>
 
-      </p>
+            <div>
 
-    </div>
+              <strong>Processing</strong>
 
-    <!-- ================= ACTIONS ================= -->
+              <span>
+                Order is being prepared
+              </span>
 
-    <div class="order-actions">
+            </div>
+
+          </div>
+
+
+          <!-- PACKED -->
+
+          <div
+            class="timeline-item"
+            [class.completed]="
+              isStepCompleted(order, 'Packed')
+            "
+            [class.current]="
+              isCurrent(order, 'Packed')
+            ">
+
+            <div class="timeline-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <strong>Packed</strong>
+
+              <span>
+                Your parcel is packed
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- SHIPPED -->
+
+          <div
+            class="timeline-item"
+            [class.completed]="
+              isStepCompleted(order, 'Shipped')
+            "
+            [class.current]="
+              isCurrent(order, 'Shipped')
+            ">
+
+            <div class="timeline-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <strong>Shipped</strong>
+
+              <span>
+                Your order is on the way
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- DELIVERED -->
+
+          <div
+            class="timeline-item"
+            [class.completed]="
+              isStepCompleted(order, 'Delivered')
+            "
+            [class.current]="
+              isCurrent(order, 'Delivered')
+            ">
+
+            <div class="timeline-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <strong>Delivered</strong>
+
+              <span>
+                Package delivered successfully
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- ============================= -->
+      <!-- PRODUCTS -->
+      <!-- ============================= -->
+
+      <div class="products-section">
+
+        <div class="section-title">
+
+          <h3>Items in this order</h3>
+
+          <span>
+            {{ order.items.length }}
+            {{ order.items.length === 1 ? 'item' : 'items' }}
+          </span>
+
+        </div>
+
+
+        <div
+          class="product-row"
+          *ngFor="let item of order.items">
+
+          <img
+            [src]="item.image"
+            [alt]="item.name">
+
+          <div class="product-details">
+
+            <h4>
+              {{ item.name }}
+            </h4>
+
+            <p>
+              Quantity: {{ item.quantity }}
+            </p>
+
+          </div>
+
+          <strong>
+            ₹{{ item.price | number:'1.0-0' }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ============================= -->
+      <!-- SHIPPING -->
+      <!-- ============================= -->
+
+      <div class="shipping-section">
+
+        <div class="shipping-column">
+
+          <span class="section-eyebrow">
+            DELIVERING TO
+          </span>
+
+          <h3>
+            {{ order.customerName }}
+          </h3>
+
+          <p>
+            {{ order.address }}
+          </p>
+
+          <p>
+            {{ order.city }},
+            {{ order.state }}
+            - {{ order.pincode }}
+          </p>
+
+          <p>
+            {{ order.phone }}
+          </p>
+
+        </div>
+
+
+        <div class="shipping-column">
+
+          <span class="section-eyebrow">
+            PAYMENT
+          </span>
+
+          <h3>
+            {{ getPaymentLabel(order) }}
+          </h3>
+
+          <p>
+            Payment:
+            <strong>
+              {{ order.paymentStatus }}
+            </strong>
+          </p>
+
+          <p *ngIf="order.razorpayPaymentId">
+            Transaction:
+            {{ order.razorpayPaymentId }}
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- ============================= -->
+      <!-- ACTIONS -->
+      <!-- ============================= -->
+
+      <div class="order-actions">
+
+        <button
+          class="secondary-btn">
+
+          Download Invoice
+
+        </button>
+
+
+        <button
+          class="secondary-btn"
+          (click)="buyAgain(order)">
+
+          Buy Again
+
+        </button>
+
+
+        <button
+          class="danger-btn"
+          *ngIf="canCancel(order)"
+          (click)="openCancelModal(order)">
+
+          Cancel Order
+
+        </button>
+
+      </div>
+
+    </article>
+
+  </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- CANCEL ORDER MODAL -->
+<!-- ================================================= -->
+
+<div
+  class="modal-backdrop"
+  *ngIf="showCancelModal"
+  (click)="closeCancelModal()">
+
+  <div
+    class="cancel-modal"
+    (click)="$event.stopPropagation()">
+
+
+    <!-- HEADER -->
+
+    <div class="modal-header">
+
+      <div class="modal-title">
+
+        <div class="modal-icon">
+          !
+        </div>
+
+        <div>
+
+          <h2>
+            Cancel Order?
+          </h2>
+
+          <p>
+            We're sorry to see you cancel this order.
+          </p>
+
+        </div>
+
+      </div>
+
 
       <button
-        class="invoice-btn">
+        class="close-modal"
+        [disabled]="isCancelling"
+        (click)="closeCancelModal()">
 
-        Download Invoice
+        ×
 
       </button>
 
-      <button
-        class="buy-btn"
-        (click)="buyAgain(order)">
+    </div>
 
-        Buy Again
+
+    <!-- ORDER PREVIEW -->
+
+    <div
+      class="cancel-order-preview"
+      *ngIf="selectedOrder">
+
+      <img
+        [src]="selectedOrder.items[0]?.image"
+        [alt]="selectedOrder.items[0]?.name">
+
+      <div>
+
+        <strong>
+          {{ selectedOrder.items[0]?.name }}
+        </strong>
+
+        <span>
+          Order #{{ selectedOrder._id }}
+        </span>
+
+      </div>
+
+      <strong>
+        ₹{{ selectedOrder.total | number:'1.0-0' }}
+      </strong>
+
+    </div>
+
+
+    <!-- REASONS -->
+
+    <div class="reason-section">
+
+      <h3>
+        Why are you cancelling?
+      </h3>
+
+      <p>
+        Your feedback helps us improve our service.
+      </p>
+
+
+      <div class="reason-list">
+
+        <button
+          type="button"
+          class="reason-option"
+          *ngFor="let reason of cancellationReasons"
+          [class.selected]="
+            selectedCancellationReason === reason
+          "
+          (click)="selectCancellationReason(reason)">
+
+          <span class="radio">
+
+            <span
+              *ngIf="
+                selectedCancellationReason === reason
+              ">
+            </span>
+
+          </span>
+
+          <span>
+            {{ reason }}
+          </span>
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- REFUND INFO -->
+
+    <div
+      class="refund-notice"
+      *ngIf="selectedOrder?.paymentStatus === 'Paid'">
+
+      <div class="refund-notice-icon">
+        ₹
+      </div>
+
+      <div>
+
+        <strong>
+          Refund information
+        </strong>
+
+        <p>
+          Since this order was paid online,
+          your refund will be processed to
+          the original payment method.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ACTIONS -->
+
+    <div class="modal-actions">
+
+      <button
+        class="keep-btn"
+        [disabled]="isCancelling"
+        (click)="closeCancelModal()">
+
+        Keep Order
 
       </button>
 
-      <button
-        class="cancel-btn"
-        *ngIf="order.orderStatus !== 'Delivered' &&
-               order.orderStatus !== 'Cancelled'"
-        (click)="cancelOrder(order._id!)">
 
-        Cancel Order
+      <button
+        class="confirm-cancel-btn"
+        [disabled]="
+          !selectedCancellationReason ||
+          isCancelling
+        "
+        (click)="confirmCancellation()">
+
+        <span *ngIf="!isCancelling">
+          Confirm Cancellation
+        </span>
+
+        <span *ngIf="isCancelling">
+          Cancelling...
+        </span>
 
       </button>
 
     </div>
+
+
+    <p class="modal-footer-note">
+
+      Cancellation is subject to our cancellation policy.
+
+    </p>
 
   </div>
 

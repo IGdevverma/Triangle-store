@@ -6,6 +6,7 @@ import { ProductService } from '../../services/product';
 import { Product } from '../../models/product';
 import { ViewChild, ElementRef } from '@angular/core';
 import { OrderService } from '../../services/order';
+import { OrderStatus } from '../../models/orders';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { AdminService } from '../../services/admin';
@@ -434,39 +435,71 @@ export class Admin implements OnInit, AfterViewInit {
   }
 
 
-  changeOrderStatus(order: any, status: string) {
+  changeOrderStatus(
+    order: any,
+    status: OrderStatus
+  ): void {
 
-    this.orderService.updateOrderStatus(
+    if (!order?._id) {
+      this.toastr.error(
+        'Invalid order.',
+        'Error'
+      );
+      return;
+    }
 
-      order._id,
+    if (!status) {
+      this.toastr.warning(
+        'Please select a valid order status.',
+        'Invalid Status'
+      );
+      return;
+    }
 
-      status
+    const previousStatus =
+      order.orderStatus;
 
-    ).subscribe({
+    // Optimistic UI update avoid karna hai.
+    // Backend successful hone ke baad hi status change hoga.
+    this.orderService
+      .updateOrderStatus(
+        order._id,
+        status
+      )
+      .subscribe({
 
-      next: () => {
+        next: (response) => {
 
-        order.orderStatus = status;
+          order.orderStatus = status;
 
-        this.toastr.success(
-          'Order status updated successfully.',
-          'Updated'
-        );
+          this.toastr.success(
+            response?.message ||
+            'Order status updated successfully.',
+            'Updated'
+          );
 
-      },
+        },
 
-      error: (err) => {
+        error: (error) => {
 
-        console.error(err);
+          // Restore previous status
+          order.orderStatus =
+            previousStatus;
 
-        this.toastr.error(
-          'Failed to update order status.',
-          'Error'
-        );
+          console.error(
+            'Order status update failed:',
+            error
+          );
 
-      }
+          this.toastr.error(
+            error?.error?.message ||
+            'Failed to update order status.',
+            'Error'
+          );
 
-    });
+        }
+
+      });
 
   }
 
@@ -819,7 +852,7 @@ export class Admin implements OnInit, AfterViewInit {
       .filter((size: string) => size);
     console.log('SIZES BEING SENT:', sizes);
 
-   
+
     formData.append(
       'sizes',
       JSON.stringify(sizes)

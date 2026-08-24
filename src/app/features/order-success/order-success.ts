@@ -1,51 +1,124 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-order-success',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [
+    CommonModule,
+    RouterLink
+  ],
   templateUrl: './order-success.html',
   styleUrl: './order-success.css'
 })
-export class OrderSuccess {
+export class OrderSuccess implements OnInit {
 
-  orderId: string = '';
-  deliveryDate: string = '';
+  // =========================================
+  // ORDER DATA
+  // =========================================
 
-  // Copy Button State
-  copied: boolean = false;
+  orderId = '';
 
-  constructor() {
+  deliveryDate = '';
 
-    const navigation = history.state;
+  // =========================================
+  // UI STATE
+  // =========================================
 
-    this.orderId = navigation.orderId || 'N/A';
+  copied = false;
 
-    const date = new Date();
 
-    date.setDate(date.getDate() + 5);
+  // =========================================
+  // INITIALIZATION
+  // =========================================
 
-    this.deliveryDate = date.toLocaleDateString('en-IN', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
+  ngOnInit(): void {
+
+    this.loadOrderDetails();
 
   }
 
-  copyOrderId() {
 
-    navigator.clipboard.writeText(this.orderId);
+  // =========================================
+  // LOAD ORDER DETAILS
+  // =========================================
 
-    this.copied = true;
+  private loadOrderDetails(): void {
 
-    setTimeout(() => {
+    const navigationState = history.state;
 
-      this.copied = false;
+    this.orderId =
+      navigationState?.orderId ||
+      'N/A';
 
-    }, 2000);
+    this.deliveryDate =
+      this.calculateDeliveryDate();
+
+  }
+
+
+  // =========================================
+  // DELIVERY DATE
+  // =========================================
+
+  private calculateDeliveryDate(): string {
+
+    const date = new Date();
+
+    // Estimated delivery = 5 days
+    date.setDate(
+      date.getDate() + 5
+    );
+
+    return date.toLocaleDateString(
+      'en-IN',
+      {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      }
+    );
+
+  }
+
+
+  // =========================================
+  // COPY ORDER ID
+  // =========================================
+
+  copyOrderId(): void {
+
+    if (
+      !this.orderId ||
+      this.orderId === 'N/A'
+    ) {
+
+      return;
+
+    }
+
+    navigator.clipboard
+      .writeText(this.orderId)
+      .then(() => {
+
+        this.copied = true;
+
+        setTimeout(() => {
+
+          this.copied = false;
+
+        }, 2000);
+
+      })
+      .catch((error) => {
+
+        console.error(
+          'Unable to copy order ID:',
+          error
+        );
+
+      });
 
   }
 

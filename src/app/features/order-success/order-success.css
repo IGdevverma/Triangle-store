@@ -1,201 +1,1080 @@
-.success-container{
+/* =========================================================
+   TRIANGLE SPORTS
+   ORDER SUCCESS PAGE
+   Premium E-Commerce UI
+========================================================= */
 
-    min-height:100vh;
 
-    display:flex;
+/* =========================================================
+   PAGE
+========================================================= */
 
-    justify-content:center;
 
-    align-items:center;
+:host {
+    display: block;
+    position: relative;
+}
 
-    background:#f5f7fb;
 
-    padding:40px;
+.success-page {
+
+    min-height: 100vh;
+
+    box-sizing: border-box;
+
+    position: relative;
+
+    overflow: hidden;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: 110px 20px 70px;
+
+    background:
+        radial-gradient(circle at 10% 10%,
+            rgba(109, 40, 217, 0.08),
+            transparent 28%),
+        radial-gradient(circle at 90% 85%,
+            rgba(109, 40, 217, 0.06),
+            transparent 30%),
+        #f7f7fa;
 
 }
 
-.success-card{
 
-    width:100%;
+/* =========================================================
+   BACKGROUND DECORATION
+========================================================= */
 
-    max-width:650px;
+.success-orb {
 
-    background:#fff;
+    position: absolute;
 
-    border-radius:24px;
+    border-radius: 50%;
 
-    padding:45px;
-
-    text-align:center;
-    box-shadow:0 20px 60px rgba(0,0,0,.08);
+    pointer-events: none;
 
 }
 
-.success-icon{
 
-    font-size:90px;
+.success-orb-left {
 
-    color:#22c55e;
+    width: 320px;
 
-    margin-bottom:25px;
+    height: 320px;
 
-}
+    top: -180px;
 
-.success-card h1{
+    left: -150px;
 
-    font-size:34px;
-
-    color:var(--text);
-
-    margin-bottom:10px;
+    background: rgba(109, 40, 217, 0.06);
 
 }
 
-.success-card p{
 
-    color:#6b7280;
+.success-orb-right {
 
-    margin-bottom:25px;
+    width: 380px;
 
-}
+    height: 380px;
 
-.order-box{
+    right: -200px;
 
-    background:#f9fafb;
+    bottom: -210px;
 
-    border:1px solid #e5e7eb;
-
-    border-radius:14px;
-
-    padding:20px;
-
-    margin:25px 0;
+    background: rgba(109, 40, 217, 0.05);
 
 }
 
-.order-box h3{
 
-    margin-bottom:10px;
+/* =========================================================
+   WRAPPER
+========================================================= */
 
-    color:#374151;
+.success-wrapper {
 
-}
+    width: 100%;
 
-.order-box p{
+    max-width: 780px;
 
-    font-size:18px;
+    position: relative;
 
-    font-weight:700;
-
-    color:#6D28D9;
-
-    margin:0;
-
-    word-break:break-all;
+    z-index: 2;
 
 }
 
-.delivery-box{
 
-    display:flex;
+/* =========================================================
+   MAIN CARD
+========================================================= */
 
-    justify-content:center;
+.success-card {
 
-    align-items:center;
+    width: 100%;
 
-    gap:10px;
+    background: #ffffff;
 
-    background:#ECFDF5;
+    border: 1px solid rgba(20, 20, 30, 0.06);
 
-    color:#166534;
+    border-radius: 28px;
 
-    padding:15px;
+    padding: 48px 52px 38px;
 
-    border-radius:12px;
-
-    font-weight:600;
-
-    margin-bottom:30px;
-
-}
-
-.success-buttons{
-
-    display:flex;
-
-    gap:15px;
-
-    justify-content:center;
-
-    flex-wrap:wrap;
+    box-shadow:
+        0 30px 80px rgba(20, 20, 30, 0.08),
+        0 8px 25px rgba(20, 20, 30, 0.04);
 
 }
 
-.primary-btn{
 
-    background:#6D28D9;
+/* =========================================================
+   SUCCESS HEADER
+========================================================= */
 
-    color:#fff;
+.success-header {
 
-    border:none;
-
-    padding:14px 28px;
-
-    border-radius:12px;
-
-    cursor:pointer;
-
-    font-size:16px;
-
-    font-weight:600;
-
-    transition:.3s;
+    text-align: center;
 
 }
 
-.primary-btn:hover{
 
-    background:#5B21B6;
+.success-icon {
 
-    transform:translateY(-2px);
+    width: 78px;
+
+    height: 78px;
+
+    margin: 0 auto 22px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+
+    color: #ffffff;
+
+    font-size: 34px;
+
+    box-shadow:
+        0 0 0 8px rgba(34, 197, 94, 0.09),
+        0 14px 30px rgba(34, 197, 94, 0.20);
+
+}
+
+
+.success-label {
+
+    display: block;
+
+    margin-bottom: 10px;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+    letter-spacing: 2px;
+
+    color: #7c3aed;
 
 }
 
-.secondary-btn{
 
-    background:#fff;
+.success-header h1 {
 
-    color:#6D28D9;
+    margin: 0;
 
-    border:2px solid #6D28D9;
+    color: #171827;
 
-    padding:14px 28px;
+    font-size: clamp(34px, 5vw, 46px);
 
-    border-radius:12px;
+    line-height: 1.08;
 
-    cursor:pointer;
+    letter-spacing: -1.6px;
 
-    font-size:16px;
-
-    font-weight:600;
-
-    transition:.3s;
+    font-weight: 800;
 
 }
 
-.secondary-btn:hover{
 
-    background:#6D28D9;
+.success-header h1 span {
 
-    color:#fff;
+    display: block;
+
+    color: #6d28d9;
 
 }
-.success-note{
 
-    color:#6b7280;
 
-    margin:20px 0;
+.success-description {
 
-    font-size:15px;
+    max-width: 560px;
+
+    margin: 17px auto 32px;
+
+    color: #747681;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+
+}
+
+
+.success-description strong {
+
+    color: #292a35;
+
+}
+
+
+/* =========================================================
+   ORDER INFORMATION
+========================================================= */
+
+.order-info-card {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 19px 20px;
+
+    border: 1px solid #e8e8ee;
+
+    border-radius: 15px;
+
+    background: #fafafa;
+
+}
+
+
+.order-info-content {
+
+    min-width: 0;
+
+}
+
+
+.info-label {
+
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: #9697a1;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+}
+
+
+.order-id {
+
+    display: block;
+
+    color: #242530;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    word-break: break-all;
+
+}
+
+
+.copy-btn {
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    border: 1px solid #d9c7fb;
+
+    border-radius: 10px;
+
+    padding: 10px 14px;
+
+    background: #ffffff;
+
+    color: #6d28d9;
+
+    font-size: 11px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background .2s ease,
+        transform .2s ease,
+        border-color .2s ease;
+
+}
+
+
+.copy-btn:hover {
+
+    background: #faf7ff;
+
+    border-color: #bfa1ee;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================================
+   DELIVERY
+========================================================= */
+
+.delivery-card {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 14px;
+
+    padding: 17px 19px;
+
+    border: 1px solid #d9f1e2;
+
+    border-radius: 15px;
+
+    background: #f0fdf4;
+
+}
+
+
+.delivery-icon {
+
+    width: 45px;
+
+    height: 45px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    color: #15803d;
+
+    font-size: 17px;
+
+}
+
+
+.delivery-content {
+
+    text-align: left;
+
+}
+
+
+.delivery-label {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #5c9670;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.2px;
+
+}
+
+
+.delivery-content strong {
+
+    display: block;
+
+    color: #166534;
+
+    font-size: 17px;
+
+}
+
+
+.delivery-content p {
+
+    margin: 3px 0 0;
+
+    color: #71927d;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   JOURNEY
+========================================================= */
+
+.journey-section {
+
+    margin-top: 34px;
+
+    padding-top: 28px;
+
+    border-top: 1px solid #eeeeF2;
+
+}
+
+
+.section-heading span {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #8b5cf6;
+
+    font-size: 9px;
+
+    font-weight: 800;
+
+    letter-spacing: 1.5px;
+
+}
+
+
+.section-heading h2 {
+
+    margin: 0;
+
+    color: #242530;
+
+    font-size: 20px;
+
+    letter-spacing: -.4px;
+
+}
+
+
+/* =========================================================
+   JOURNEY TRACK
+========================================================= */
+
+.journey {
+
+    position: relative;
+
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 10px;
+
+    margin-top: 24px;
+
+}
+
+
+.journey-line {
+
+    position: absolute;
+
+    top: 17px;
+
+    left: 9%;
+
+    right: 9%;
+
+    height: 2px;
+
+    background: #e6e5eb;
+
+    z-index: 0;
+
+}
+
+
+.journey-step {
+
+    position: relative;
+
+    z-index: 1;
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    text-align: center;
+
+}
+
+
+.step-circle {
+
+    width: 36px;
+
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #ffffff;
+
+    border: 1px solid #dedee5;
+
+    color: #a3a4ad;
+
+    font-size: 10px;
+
+    font-weight: 800;
+
+}
+
+
+.journey-step.active .step-circle {
+
+    color: #ffffff;
+
+    background: #6d28d9;
+
+    border-color: #6d28d9;
+
+    box-shadow:
+        0 0 0 5px rgba(109, 40, 217, 0.09);
+
+}
+
+
+.step-text {
+
+    margin-top: 10px;
+
+}
+
+
+.step-text strong {
+
+    display: block;
+
+    color: #343541;
+
+    font-size: 11px;
+
+}
+
+
+.step-text small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: #9a9ba5;
+
+    font-size: 9px;
+
+    line-height: 1.4;
+
+}
+
+
+/* =========================================================
+   EMAIL NOTICE
+========================================================= */
+
+.email-notice {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-top: 30px;
+
+    padding: 16px;
+
+    border: 1px solid #e8e1fb;
+
+    border-radius: 14px;
+
+    background: #faf8ff;
+
+}
+
+
+.email-icon {
+
+    width: 40px;
+
+    height: 40px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #6d28d9;
+
+    font-size: 16px;
+
+}
+
+
+.email-content strong {
+
+    display: block;
+
+    color: #343541;
+
+    font-size: 12px;
+
+}
+
+
+.email-content p {
+
+    margin: 3px 0 0;
+
+    color: #8b8c96;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.success-actions {
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 12px;
+
+    margin-top: 27px;
+
+}
+
+
+.primary-btn,
+.secondary-btn {
+
+    min-height: 50px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    border-radius: 11px;
+
+    padding: 12px 18px;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease,
+        background .2s ease;
+
+}
+
+
+/* PRIMARY */
+
+.primary-btn {
+
+    background: #171827;
+
+    color: #ffffff;
+
+    border: 1px solid #171827;
+
+    box-shadow:
+        0 10px 22px rgba(23, 24, 39, 0.13);
+
+}
+
+
+.primary-btn:hover {
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 14px 28px rgba(23, 24, 39, 0.19);
+
+}
+
+
+.primary-btn i {
+
+    transition: transform .2s ease;
+
+}
+
+
+.primary-btn:hover i {
+
+    transform: translateX(4px);
+
+}
+
+
+/* SECONDARY */
+
+.secondary-btn {
+
+    background: #ffffff;
+
+    color: #6d28d9;
+
+    border: 1px solid #d8c8f5;
+
+}
+
+
+.secondary-btn:hover {
+
+    background: #faf7ff;
+
+    border-color: #bfa0ed;
+
+    transform: translateY(-2px);
+
+}
+
+
+/* =========================================================
+   TRUST FEATURES
+========================================================= */
+
+.trust-features {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 22px;
+
+    margin-top: 27px;
+
+    padding-top: 21px;
+
+    border-top: 1px solid #eeeeF2;
+
+}
+
+
+.trust-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color: #777984;
+
+    font-size: 9px;
+
+    font-weight: 700;
+
+}
+
+
+.trust-icon {
+
+    width: 20px;
+
+    height: 20px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f0fdf4;
+
+    color: #16a34a;
+
+    font-size: 9px;
+
+}
+
+
+/* =========================================================
+   BRAND FOOTER
+========================================================= */
+
+.brand-footer {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 7px;
+
+    margin-top: 22px;
+
+    color: #a0a1aa;
+
+    font-size: 10px;
+
+    letter-spacing: .3px;
+
+}
+
+
+.brand-symbol {
+
+    color: #6d28d9;
+
+    font-size: 11px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media (max-width: 700px) {
+
+
+    .success-page {
+
+        min-height: 100vh;
+
+        padding: 95px 15px 50px;
+
+    }
+
+    .success-card {
+
+        padding: 38px 22px 30px;
+
+        border-radius: 22px;
+
+    }
+
+
+    .success-header h1 {
+
+        font-size: 34px;
+
+    }
+
+
+    .journey {
+
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+
+    }
+
+
+    .journey-line {
+
+        top: 18px;
+
+        bottom: 18px;
+
+        left: 17px;
+
+        right: auto;
+
+        width: 2px;
+
+        height: auto;
+
+    }
+
+
+    .journey-step {
+
+        flex-direction: row;
+
+        align-items: center;
+
+        text-align: left;
+
+        gap: 12px;
+
+    }
+
+
+    .step-text {
+
+        margin-top: 0;
+
+    }
+
+
+    .success-actions {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+   .success-page {
+
+    padding: 90px 10px 40px;
+
+  }
+
+
+    .success-card {
+
+        padding: 30px 16px 25px;
+
+        border-radius: 19px;
+
+    }
+
+
+    .success-icon {
+
+        width: 65px;
+
+        height: 65px;
+
+        font-size: 28px;
+
+    }
+
+
+    .success-header h1 {
+
+        font-size: 29px;
+
+        letter-spacing: -1px;
+
+    }
+
+
+    .success-description {
+
+        font-size: 13px;
+
+    }
+
+
+    .order-info-card {
+
+        flex-direction: column;
+
+        align-items: stretch;
+
+    }
+
+
+    .copy-btn {
+
+        justify-content: center;
+
+        width: 100%;
+
+    }
+
+
+    .delivery-card {
+
+        align-items: flex-start;
+
+    }
+
+
+    .email-notice {
+
+        align-items: flex-start;
+
+    }
+
+
+    .trust-features {
+
+        flex-direction: column;
+
+        gap: 11px;
+
+    }
 
 }
