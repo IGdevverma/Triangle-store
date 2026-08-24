@@ -5,10 +5,16 @@ const path = require("path");
 
 dotenv.config();
 
-// Config
+// =====================================================
+// CONFIG
+// =====================================================
+
 const connectDB = require("./config/db");
 
-// Routes
+// =====================================================
+// ROUTES
+// =====================================================
+
 const authRoutes = require("./routes/authRoutes");
 const productRoutes = require("./routes/productRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -17,9 +23,11 @@ const paymentRoutes = require("./routes/paymentRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const quoteRoutes = require("./routes/quoteRoutes");
 
-// Webhook
-const { handleWebhook } = require("./controllers/paymentController");
+// =====================================================
+// WEBHOOK
+// =====================================================
 
+const { handleWebhook } = require("./controllers/paymentController");
 
 // =====================================================
 // DATABASE
@@ -27,45 +35,54 @@ const { handleWebhook } = require("./controllers/paymentController");
 
 connectDB();
 
-
 // =====================================================
 // APP
 // =====================================================
 
 const app = express();
 
-
 // =====================================================
 // CORS
 // =====================================================
 
+// Frontend URLs allowed to access the API
 const allowedOrigins = [
   "http://localhost:4200",
   "http://localhost:4000",
 
-  // Production domain — replace when ready
+  // Vercel production frontend
+  "https://triangle-store-xvak.vercel.app",
+
+  // Future custom domains
   // "https://trianglesports.in",
-  // "https://www.trianglesports.in"
+  // "https://www.trianglesports.in",
 ];
 
 app.use(
   cors({
     origin: function (origin, callback) {
 
-      // Allow requests without Origin
-      // such as Postman/server-to-server
+      // Allow server-to-server requests,
+      // Postman, curl, etc.
       if (!origin) {
         return callback(null, true);
       }
 
+      // Allow registered frontend origins
       if (allowedOrigins.includes(origin)) {
         return callback(null, true);
       }
+
+      console.error(
+        `❌ CORS blocked for origin: ${origin}`
+      );
 
       return callback(
         new Error(`CORS blocked for origin: ${origin}`)
       );
     },
+
+    credentials: true,
 
     methods: [
       "GET",
@@ -79,17 +96,14 @@ app.use(
     allowedHeaders: [
       "Content-Type",
       "Authorization"
-    ],
-
-    credentials: true
+    ]
   })
 );
-
 
 // =====================================================
 // RAZORPAY WEBHOOK
 // IMPORTANT:
-// MUST COME BEFORE express.json()
+// Must stay BEFORE express.json()
 // =====================================================
 
 app.post(
@@ -100,9 +114,8 @@ app.post(
   handleWebhook
 );
 
-
 // =====================================================
-// BODY PARSER
+// BODY PARSERS
 // =====================================================
 
 app.use(
@@ -118,7 +131,6 @@ app.use(
   })
 );
 
-
 // =====================================================
 // STATIC FILES
 // =====================================================
@@ -129,7 +141,6 @@ app.use(
     path.join(__dirname, "uploads")
   )
 );
-
 
 // =====================================================
 // API ROUTES
@@ -170,31 +181,34 @@ app.use(
   quoteRoutes
 );
 
-
 // =====================================================
 // HEALTH CHECK
 // =====================================================
 
 app.get("/", (req, res) => {
+
   res.status(200).json({
     success: true,
     message: "Triangle Sports API is running",
-    environment: process.env.NODE_ENV || "development"
+    environment:
+      process.env.NODE_ENV || "development"
   });
-});
 
+});
 
 // =====================================================
 // 404 HANDLER
 // =====================================================
 
 app.use((req, res) => {
+
   res.status(404).json({
     success: false,
-    message: "API route not found"
+    message: "API route not found",
+    path: req.originalUrl
   });
-});
 
+});
 
 // =====================================================
 // GLOBAL ERROR HANDLER
@@ -202,58 +216,84 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
 
-  console.error("❌ API Error:", err.message);
+  console.error(
+    "❌ API Error:",
+    err.message
+  );
 
   const statusCode =
     err.statusCode || 500;
 
   res.status(statusCode).json({
+
     success: false,
 
     message:
       process.env.NODE_ENV === "production"
         ? "Something went wrong"
         : err.message
-  });
-});
 
+  });
+
+});
 
 // =====================================================
 // SERVER
 // =====================================================
 
-const PORT = process.env.PORT || 8000;
+const PORT =
+  process.env.PORT || 8000;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(
+  PORT,
+  () => {
 
-  console.log(
-    `🚀 Triangle Sports API running on port ${PORT}`
-  );
+    console.log(
+      `🚀 Triangle Sports API running on port ${PORT}`
+    );
 
-  console.log(
-    `🌍 Environment: ${
-      process.env.NODE_ENV || "development"
-    }`
-  );
-});
+    console.log(
+      `🌍 Environment: ${
+        process.env.NODE_ENV || "development"
+      }`
+    );
 
+    console.log(
+      "🌐 Allowed Frontend Origins:"
+    );
+
+    allowedOrigins.forEach(
+      (origin) => {
+        console.log(`   → ${origin}`);
+      }
+    );
+
+  }
+);
 
 // =====================================================
 // GRACEFUL SHUTDOWN
 // =====================================================
 
-process.on("SIGTERM", () => {
-
-  console.log(
-    "SIGTERM received. Shutting down..."
-  );
-
-  server.close(() => {
+process.on(
+  "SIGTERM",
+  () => {
 
     console.log(
-      "HTTP server closed."
+      "SIGTERM received. Shutting down..."
     );
 
-    process.exit(0);
-  });
-});
+    server.close(
+      () => {
+
+        console.log(
+          "✅ HTTP server closed."
+        );
+
+        process.exit(0);
+
+      }
+    );
+
+  }
+);
