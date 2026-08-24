@@ -65,6 +65,7 @@ import {
 export class Checkout implements OnInit {
 
   cartItems: any[] = [];
+  checkoutStep: 'details' | 'payment' = 'details';
   checkoutForm: FormGroup;
   orderPlaced = false;
   generatedOrderId = '';
@@ -130,7 +131,7 @@ export class Checkout implements OnInit {
         Validators.pattern('^[0-9]{6}$')
       ]],
 
-      paymentMethod: ['COD', Validators.required]
+      paymentMethod: ['ONLINE', Validators.required]
 
     });
 
@@ -150,14 +151,9 @@ export class Checkout implements OnInit {
     }
 
   }
+  continueToPayment(): void {
 
-
-
-
-
-  placeOrder() {
-
-    // 1️⃣ Basic checkout validation
+    // 1. Validate delivery details
     if (this.checkoutForm.invalid) {
 
       this.checkoutForm.markAllAsTouched();
@@ -165,138 +161,138 @@ export class Checkout implements OnInit {
       return;
     }
 
-
-    // 2️⃣ OTP verification check
+    // 2. Phone OTP verification
     if (!this.otpVerified) {
 
-      this.otpError = 'Please verify your mobile number with OTP';
+      this.otpError =
+        'Please verify your mobile number before continuing.';
 
       this.openPhoneVerification();
 
       return;
     }
 
+    // 3. Ensure verified number is same as checkout number
+    const checkoutPhone =
+      this.checkoutForm.get('phone')?.value;
 
-    // 3️⃣ Extra safety check:
-    // verified number must match checkout phone number
-    if (
-      this.mobileForOtp !== this.checkoutForm.get('phone')?.value
-    ) {
+    if (this.mobileForOtp !== checkoutPhone) {
 
       this.otpVerified = false;
 
       this.otpError =
-        'Mobile number changed. Please verify it again with OTP';
+        'Mobile number changed. Please verify it again.';
 
       this.openPhoneVerification();
 
       return;
     }
 
-
-    this.isPlacingOrder = true;
-
-
-    // 4️⃣ Save customer information
+    // 4. Save delivery information
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)
     );
 
+    // 5. Move to payment step
+    this.checkoutStep = 'payment';
 
-    // 5️⃣ Create order object
-    const order: Order = {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
 
-      customerName: this.checkoutForm.value.name,
+  backToDetails(): void {
 
-      email: this.checkoutForm.value.email,
+    this.checkoutStep = 'details';
 
-      phone: this.checkoutForm.value.phone,
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
 
-      address: this.checkoutForm.value.address,
-
-      city: this.checkoutForm.value.city,
-
-      state: this.checkoutForm.value.state,
-
-      pincode: this.checkoutForm.value.pincode,
-
-      paymentMethod: this.checkoutForm.value.paymentMethod,
-
-      // ⚠️ Online payment is NOT paid yet
-      paymentStatus: 'Pending',
-
-      orderStatus: 'Processing',
-
-      items: this.cartService.getCartItems(),
-
-      total: this.grandTotal,
-
-      date: new Date().toISOString()
-
-    };
+  }
 
 
-    // 6️⃣ COD
-    if (this.paymentMethod === 'COD') {
 
-      this.orderService.addOrder(order).subscribe({
 
-        next: (response) => {
 
-          this.generatedOrderId = response.order._id;
+  placeOrder(): void {
 
-          this.cartService.clearCart();
+    // Payment step se hi order place hoga
+    if (this.checkoutStep !== 'payment') {
+      return;
+    }
 
-          this.orderPlaced = true;
+    // Prevent double click
+    if (this.isPlacingOrder) {
+      return;
+    }
 
-          this.isPlacingOrder = false;
+    // OTP safety check
+    if (!this.otpVerified) {
 
-          localStorage.removeItem('customerInfo');
+      this.otpError =
+        'Please verify your mobile number first.';
 
-          this.checkoutForm.reset({
-
-            paymentMethod: 'COD'
-
-          });
-
-          // Reset OTP state
-          this.otpVerified = false;
-          this.otpSent = false;
-          this.mobileForOtp = '';
-          this.otp = '';
-
-          this.router.navigate(['/order-success'], {
-
-            state: {
-
-              orderId: response.order._id
-
-            }
-
-          });
-
-        },
-
-        error: (error) => {
-
-          console.error(
-            'Order creation failed:',
-            error
-          );
-
-          this.isPlacingOrder = false;
-
-        }
-
-      });
+      this.openPhoneVerification();
 
       return;
     }
 
+    this.isPlacingOrder = true;
 
-    // 7️⃣ Online Payment / Razorpay
+    // Save latest customer information
+    localStorage.setItem(
+      'customerInfo',
+      JSON.stringify(this.checkoutForm.value)
+    );
 
+    const order: Order = {
+
+      customerName:
+        this.checkoutForm.value.name,
+
+      email:
+        this.checkoutForm.value.email,
+
+      phone:
+        this.checkoutForm.value.phone,
+
+      address:
+        this.checkoutForm.value.address,
+
+      city:
+        this.checkoutForm.value.city,
+
+      state:
+        this.checkoutForm.value.state,
+
+      pincode:
+        this.checkoutForm.value.pincode,
+
+      paymentMethod:
+        this.checkoutForm.value.paymentMethod,
+
+      paymentStatus:
+        'Pending',
+
+      orderStatus:
+        'Processing',
+
+      items:
+        this.cartService.getCartItems(),
+
+      total:
+        this.grandTotal,
+
+      date:
+        new Date().toISOString()
+
+    };
+
+    // Create Razorpay order
     this.paymentService
       .createOrder(this.grandTotal)
       .subscribe({
