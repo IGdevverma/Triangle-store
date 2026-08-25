@@ -51,7 +51,7 @@ const allowedOrigins = [
   "http://localhost:4000",
 
   // Vercel production frontend
-  "https://triangle-store-xvak.vercel.app",
+  "https://triangle-store.vercel.app",
 
   // Future custom domains
   // "https://trianglesports.in",
