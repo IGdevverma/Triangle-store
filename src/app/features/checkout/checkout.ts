@@ -338,26 +338,25 @@ export class Checkout implements OnInit {
 
   }
 
+  get taxableAmount(): number {
+    return Math.max(
+      this.subtotal - this.discountAmount,
+      0
+    );
+  }
+
   get gst(): number {
 
-    return Math.round(this.subtotal * 0.18);
+    return Math.round(this.subtotal * 0.05);
 
   }
 
   get grandTotal(): number {
-
     return (
-
-      this.subtotal +
-
+      this.taxableAmount +
       this.shipping +
-
-      this.gst -
-
-      this.discountAmount
-
+      this.gst
     );
-
   }
   applyCoupon() {
 
@@ -649,167 +648,167 @@ export class Checkout implements OnInit {
 
   }
 
-  
 
 
-continueShopping() {
 
-  this.orderPlaced = false;
+  continueShopping() {
 
-  this.router.navigate(['/']);
+    this.orderPlaced = false;
 
-}
+    this.router.navigate(['/']);
 
-
-sendCheckoutOTP() {
-
-  this.otpError = '';
-  this.otpSuccess = '';
-
-  const phone = this.mobileForOtp.trim();
-
-  if (!/^[0-9]{10}$/.test(phone)) {
-    this.otpError = 'Please enter a valid 10 digit mobile number';
-    return;
   }
 
-  const identifier = '91' + phone;
 
-  this.otpLoading = true;
+  sendCheckoutOTP() {
 
-  window.sendOtp(
-    identifier,
+    this.otpError = '';
+    this.otpSuccess = '';
 
-    (data: any) => {
+    const phone = this.mobileForOtp.trim();
 
-      console.log('OTP sent successfully:', data);
-
-      this.otpSent = true;
-      this.otpLoading = false;
-
-      this.otpSuccess =
-        'OTP sent successfully to +91 ' + phone;
-
-      // IMPORTANT
-      this.cdr.detectChanges();
-
-    },
-
-    (error: any) => {
-
-      console.error('OTP send error:', error);
-
-      this.otpLoading = false;
-
-      this.otpError =
-        'Unable to send OTP. Please try again';
-
-      // IMPORTANT
-      this.cdr.detectChanges();
-
+    if (!/^[0-9]{10}$/.test(phone)) {
+      this.otpError = 'Please enter a valid 10 digit mobile number';
+      return;
     }
-  );
-}
 
+    const identifier = '91' + phone;
 
-verifyCheckoutOTP() {
+    this.otpLoading = true;
 
-  this.otpError = '';
-  this.otpSuccess = '';
+    window.sendOtp(
+      identifier,
 
-  if (!this.otp) {
+      (data: any) => {
 
-    this.otpError = 'Please enter OTP';
+        console.log('OTP sent successfully:', data);
 
-    return;
+        this.otpSent = true;
+        this.otpLoading = false;
+
+        this.otpSuccess =
+          'OTP sent successfully to +91 ' + phone;
+
+        // IMPORTANT
+        this.cdr.detectChanges();
+
+      },
+
+      (error: any) => {
+
+        console.error('OTP send error:', error);
+
+        this.otpLoading = false;
+
+        this.otpError =
+          'Unable to send OTP. Please try again';
+
+        // IMPORTANT
+        this.cdr.detectChanges();
+
+      }
+    );
   }
 
-  this.otpLoading = true;
 
-  window.verifyOtp(
+  verifyCheckoutOTP() {
 
-    this.otp,
+    this.otpError = '';
+    this.otpSuccess = '';
 
-    (data: any) => {
+    if (!this.otp) {
 
-      console.log('OTP VERIFIED:', data);
+      this.otpError = 'Please enter OTP';
 
-      this.otpLoading = false;
-      this.otpVerified = true;
+      return;
+    }
 
-      this.otpSuccess =
-        'Mobile number verified successfully';
+    this.otpLoading = true;
 
-      this.checkoutForm.patchValue({
-        phone: this.mobileForOtp
-      });
+    window.verifyOtp(
 
-      this.cdr.detectChanges();
+      this.otp,
 
-      setTimeout(() => {
+      (data: any) => {
 
-        this.showOtpModal = false;
+        console.log('OTP VERIFIED:', data);
+
+        this.otpLoading = false;
+        this.otpVerified = true;
+
+        this.otpSuccess =
+          'Mobile number verified successfully';
+
+        this.checkoutForm.patchValue({
+          phone: this.mobileForOtp
+        });
 
         this.cdr.detectChanges();
 
-      }, 800);
+        setTimeout(() => {
 
-    },
+          this.showOtpModal = false;
 
-    (error: any) => {
+          this.cdr.detectChanges();
 
-      console.error(
-        'OTP verification failed:',
-        error
-      );
+        }, 800);
 
-      this.otpLoading = false;
+      },
 
-      this.otpError =
-        'Invalid OTP. Please enter the correct OTP';
+      (error: any) => {
 
-      this.cdr.detectChanges();
+        console.error(
+          'OTP verification failed:',
+          error
+        );
+
+        this.otpLoading = false;
+
+        this.otpError =
+          'Invalid OTP. Please enter the correct OTP';
+
+        this.cdr.detectChanges();
+
+      }
+    );
+  }
+
+
+  openPhoneVerification() {
+
+    const phone = this.checkoutForm.get('phone')?.value;
+
+    if (!phone) {
+
+      this.otpError = 'Please enter mobile number';
+
+      return;
 
     }
-  );
-}
 
+    if (!/^[0-9]{10}$/.test(phone)) {
 
-openPhoneVerification() {
+      this.otpError =
+        'Please enter a valid 10 digit mobile number';
 
-  const phone = this.checkoutForm.get('phone')?.value;
+      return;
 
-  if (!phone) {
+    }
 
-    this.otpError = 'Please enter mobile number';
+    this.mobileForOtp = phone;
 
-    return;
+    this.otp = '';
+
+    this.otpSent = false;
+
+    this.otpVerified = false;
+
+    this.otpError = '';
+
+    this.otpSuccess = '';
+
+    this.showOtpModal = true;
 
   }
-
-  if (!/^[0-9]{10}$/.test(phone)) {
-
-    this.otpError =
-      'Please enter a valid 10 digit mobile number';
-
-    return;
-
-  }
-
-  this.mobileForOtp = phone;
-
-  this.otp = '';
-
-  this.otpSent = false;
-
-  this.otpVerified = false;
-
-  this.otpError = '';
-
-  this.otpSuccess = '';
-
-  this.showOtpModal = true;
-
-}
 
 }
