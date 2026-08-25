@@ -384,7 +384,7 @@ export class Checkout implements OnInit {
 
   get shipping(): number {
 
-    return this.subtotal >= 1999 ? 0 : 99;
+    return 0;
 
   }
 
