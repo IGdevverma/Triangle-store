@@ -1,109 +1,341 @@
-<div class="login-container">
+<div class="login-page">
 
-    <div class="login-card">
+  <div class="login-shell">
 
-        <img src="trianglepng.png" class="login-logo" alt="Triangle Sports">
+    <!-- =====================================================
+         LEFT BRAND / SPORTS PANEL
+    ====================================================== -->
 
-        <h1>Welcome Back</h1>
+    <section class="brand-panel">
 
-        <p class="login-subtitle">
+      <!-- Decorative background -->
+      <div class="brand-glow"></div>
+      <div class="brand-rings"></div>
+
+      <!-- Athlete image -->
+      <div class="athlete-image" aria-hidden="true"></div>
+
+      <div class="brand-content">
+
+        <!-- Brand -->
+        <div class="brand-logo">
+          <span>TRIANGLE</span>
+          <small>SPORTS</small>
+        </div>
+
+
+        <!-- Heading -->
+        <div class="brand-heading">
+
+          <div class="heading-line"></div>
+
+          <span class="brand-eyebrow">
+            TRIANGLE SPORTS
+          </span>
+
+          <h1>
+            Welcome
+            <span>back.</span>
+          </h1>
+
+          <p>
+            Gear that moves with you.<br>
+            Performance that stays ahead.
+          </p>
+
+        </div>
+
+
+        <!-- =================================================
+             PERFORMANCE FEATURES
+        ================================================== -->
+
+        <div class="performance-list">
+
+          <!-- Feature 01 -->
+          <div class="performance-item">
+
+            <div class="performance-icon">
+              <i class="fa-solid fa-bolt"></i>
+            </div>
+
+            <div class="performance-text">
+              <strong>
+                Engineered to Perform
+              </strong>
+
+              <span>
+                Built for what's next.
+              </span>
+            </div>
+
+          </div>
+
+
+          <!-- Feature 02 -->
+          <div class="performance-item">
+
+            <div class="performance-icon">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+
+            <div class="performance-text">
+              <strong>
+                Made for Your Game
+              </strong>
+
+              <span>
+                Prepared for every challenge.
+              </span>
+            </div>
+
+          </div>
+
+
+          <!-- Feature 03 -->
+          <div class="performance-item">
+
+            <div class="performance-icon">
+              <i class="fa-solid fa-star"></i>
+            </div>
+
+            <div class="performance-text">
+              <strong>
+                Your Gear. Your Edge.
+              </strong>
+
+              <span>
+                Designed to elevate you.
+              </span>
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Footer -->
+        <div class="brand-footer">
+
+          <span>Premium Sportswear</span>
+
+          <i></i>
+
+          <span>Triangle Sports</span>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+
+    <!-- =====================================================
+         RIGHT LOGIN PANEL
+    ====================================================== -->
+
+    <section class="login-panel">
+
+      <div class="login-content">
+
+        <!-- Header -->
+        <header class="login-header">
+
+          <span class="login-eyebrow">
+            MEMBER LOGIN
+          </span>
+
+          <h2>
+            Welcome back
+          </h2>
+
+          <p>
             Sign in to your Triangle Sports account
-        </p>
+          </p>
+
+        </header>
 
 
-        <!-- ========================= -->
-        <!-- EMAIL / PASSWORD LOGIN -->
-        <!-- ========================= -->
+        <!-- =================================================
+             LOGIN FORM
+        ================================================== -->
 
-        <label>Email Address</label>
+        <form
+          class="login-form"
+          (submit)="$event.preventDefault(); login()"
+          novalidate
+        >
 
-        <input type="email" placeholder="Enter your email" [(ngModel)]="email">
+          <!-- EMAIL -->
+          <div class="form-group">
 
+            <label for="email">
+              Email Address
+            </label>
 
-        <label>Password</label>
+            <div class="input-wrapper">
 
-        <div class="password-box">
+              <i class="fa-regular fa-envelope input-icon"></i>
 
-            <input [type]="showPassword ? 'text' : 'password'" placeholder="Enter your password" [(ngModel)]="password">
+              <input
+                id="email"
+                type="email"
+                name="email"
+                [(ngModel)]="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
 
-            <i class="fa-solid" [ngClass]="showPassword ? 'fa-eye-slash' : 'fa-eye'"
-                (click)="showPassword = !showPassword">
-            </i>
+            </div>
 
-        </div>
-
-
-        <div class="forgot-password">
-
-            <a routerLink="/forgot-password">
-                Forgot Password?
-            </a>
-        </div>
-
-
-        <button type="button" (click)="login()">
-
-            Login
-
-        </button>
+          </div>
 
 
-        <!-- ========================= -->
-        <!-- DIVIDER -->
-        <!-- ========================= -->
+          <!-- PASSWORD -->
+          <div class="form-group">
+
+            <div class="password-header">
+
+              <label for="password">
+                Password
+              </label>
+
+              <a
+                routerLink="/forgot-password"
+                class="forgot-link"
+              >
+                Forgot password?
+              </a>
+
+            </div>
 
 
+            <div class="input-wrapper">
+
+              <i class="fa-solid fa-lock input-icon"></i>
+
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                name="password"
+                [(ngModel)]="password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+              />
+
+              <button
+                type="button"
+                class="password-toggle"
+                (click)="togglePassword()"
+                [attr.aria-label]="
+                  showPassword
+                    ? 'Hide password'
+                    : 'Show password'
+                "
+              >
+
+                <i
+                  class="fa-solid"
+                  [class.fa-eye]="!showPassword"
+                  [class.fa-eye-slash]="showPassword"
+                ></i>
+
+              </button>
+
+            </div>
+
+          </div>
 
 
-        <!-- ========================= -->
-        <!-- MOBILE OTP LOGIN -->
-        <!-- ========================= -->
+          <!-- ERROR -->
+          <div
+            class="form-message error"
+            *ngIf="errorMessage"
+          >
+
+            <i class="fa-solid fa-circle-exclamation"></i>
+
+            <span>
+              {{ errorMessage }}
+            </span>
+
+          </div>
 
 
+          <!-- SUCCESS -->
+          <div
+            class="form-message success"
+            *ngIf="successMessage"
+          >
+
+            <i class="fa-solid fa-circle-check"></i>
+
+            <span>
+              {{ successMessage }}
+            </span>
+
+          </div>
 
 
+          <!-- LOGIN BUTTON -->
+          <button
+            type="submit"
+            class="login-button"
+          >
+
+            <span>
+              Sign In
+            </span>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+          </button>
+
+        </form>
 
 
+        <!-- =================================================
+             CREATE ACCOUNT
+        ================================================== -->
 
+        <div class="register-area">
 
-
-
-        <!-- ========================= -->
-        <!-- MESSAGES -->
-        <!-- ========================= -->
-
-        <p class="success" *ngIf="successMessage">
-
-            {{ successMessage }}
-
-        </p>
-
-
-        <p class="error" *ngIf="errorMessage">
-
-            {{ errorMessage }}
-
-        </p>
-
-
-        <!-- ========================= -->
-        <!-- REGISTER -->
-        <!-- ========================= -->
-
-        <p class="register-link">
-
+          <span>
             Don't have an account?
+          </span>
 
-            <a routerLink="/register">
+          <a routerLink="/register">
+            Create Account
+          </a>
 
-                Create Account
-
-            </a>
-
-        </p>
-
-    </div>
+        </div>
 
 
+        <!-- =================================================
+             SECURITY
+        ================================================== -->
+
+        <div class="security-area">
+
+          <div class="security-line"></div>
+
+          <div class="security-content">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+              Secure &amp; protected account access
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </div>
 
 </div>

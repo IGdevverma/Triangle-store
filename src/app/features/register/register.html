@@ -1,56 +1,348 @@
-<div class="register-container">
+<div class="register-page">
 
-    <div class="register-card">
+  <div class="register-card">
 
-        <h1>Create Account</h1>
+    <!-- =========================================
+         HEADER
+    ========================================== -->
 
-        <p class="subtitle">
-            Join Triangle Sports
-        </p>
+    <header class="register-header">
 
-        <input
+      <div class="brand-badge">
+        TRIANGLE SPORTS
+      </div>
+
+      <h1>Create your account</h1>
+
+      <p>
+        Join Triangle Sports and start shopping.
+      </p>
+
+    </header>
+
+
+    <!-- =========================================
+         BENEFITS
+    ========================================== -->
+
+    <section class="register-benefits">
+
+      <div class="benefit-item">
+
+        <div class="benefit-icon">
+          <i class="fa-solid fa-cart-shopping"></i>
+        </div>
+
+        <div class="benefit-content">
+          <strong>Faster checkout</strong>
+
+          <span>
+            Save your details for a smoother purchase.
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="benefit-item">
+
+        <div class="benefit-icon">
+          <i class="fa-solid fa-arrows-rotate"></i>
+        </div>
+
+        <div class="benefit-content">
+          <strong>Easy order tracking</strong>
+
+          <span>
+            Stay updated from dispatch to delivery.
+          </span>
+        </div>
+
+      </div>
+
+
+      <div class="benefit-item">
+
+        <div class="benefit-icon">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+
+        <div class="benefit-content">
+          <strong>Exclusive access</strong>
+
+          <span>
+            Discover new collections before everyone else.
+          </span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================================
+         REGISTER FORM
+    ========================================== -->
+
+    <form
+      class="register-form"
+      (submit)="$event.preventDefault(); register()"
+      novalidate
+    >
+
+      <!-- FULL NAME -->
+
+      <div class="form-group">
+
+        <label for="name">
+          Full Name
+          <span>*</span>
+        </label>
+
+        <div class="input-wrapper">
+
+          <i class="fa-regular fa-user input-icon"></i>
+
+          <input
+            id="name"
             type="text"
-            placeholder="Full Name"
-            [(ngModel)]="name">
+            name="name"
+            [(ngModel)]="name"
+            placeholder="Your full name"
+            autocomplete="name"
+          />
 
-        <input
+        </div>
+
+      </div>
+
+
+      <!-- EMAIL -->
+
+      <div class="form-group">
+
+        <label for="email">
+          Email Address
+          <span>*</span>
+        </label>
+
+        <div class="input-wrapper">
+
+          <i class="fa-regular fa-envelope input-icon"></i>
+
+          <input
+            id="email"
             type="email"
-            placeholder="Email"
-            [(ngModel)]="email">
-        
-       
-        <input
+            name="email"
+            [(ngModel)]="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- PHONE -->
+
+      <div class="form-group">
+
+        <label for="phone">
+          Mobile Number
+          <span>*</span>
+        </label>
+
+        <div class="input-wrapper phone-wrapper">
+
+          <span class="country-code">
+            +91
+          </span>
+
+          <span class="phone-divider"></span>
+
+          <input
+            id="phone"
+            type="tel"
+            name="phone"
+            [(ngModel)]="phone"
+            (input)="onPhoneInput($event)"
+            placeholder="10-digit mobile number"
+            maxlength="10"
+            inputmode="numeric"
+            autocomplete="tel"
+          />
+
+        </div>
+
+      </div>
+
+
+      <!-- PASSWORD -->
+
+      <div class="form-group">
+
+        <label for="password">
+          Password
+          <span>*</span>
+        </label>
+
+        <div class="input-wrapper">
+
+          <i class="fa-solid fa-lock input-icon"></i>
+
+          <input
+            id="password"
             type="password"
-            placeholder="Password"
-            [(ngModel)]="password">
+            name="password"
+            [(ngModel)]="password"
+            placeholder="Enter your password"
+            autocomplete="new-password"
+          />
 
-        <input
+        </div>
+
+      </div>
+
+
+      <!-- CONFIRM PASSWORD -->
+
+      <div class="form-group">
+
+        <label for="confirmPassword">
+          Confirm Password
+          <span>*</span>
+        </label>
+
+        <div class="input-wrapper">
+
+          <i class="fa-solid fa-lock input-icon"></i>
+
+          <input
+            id="confirmPassword"
             type="password"
-            placeholder="Confirm Password"
-            [(ngModel)]="confirmPassword">
+            name="confirmPassword"
+            [(ngModel)]="confirmPassword"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+          />
 
-        <button (click)="register()">
-            Create Account
-        </button>
+        </div>
 
-        <p class="success" *ngIf="successMessage">
-            {{ successMessage }}
-        </p>
+      </div>
 
-        <p class="error" *ngIf="errorMessage">
-            {{ errorMessage }}
-        </p>
 
-        <p class="login-link">
+      <!-- ERROR MESSAGE -->
 
-            Already have an account?
+      <div
+        class="message error"
+        *ngIf="errorMessage"
+      >
 
-            <a routerLink="/login">
-                Login
-            </a>
+        <i class="fa-solid fa-circle-exclamation"></i>
 
-        </p>
+        <span>
+          {{ errorMessage }}
+        </span>
+
+      </div>
+
+
+      <!-- SUCCESS MESSAGE -->
+
+      <div
+        class="message success"
+        *ngIf="successMessage"
+      >
+
+        <i class="fa-solid fa-circle-check"></i>
+
+        <span>
+          {{ successMessage }}
+        </span>
+
+      </div>
+
+
+      <!-- TERMS -->
+
+      <p class="terms-text">
+
+        By creating an account, you agree to our
+
+        <a routerLink="/terms">
+          Terms
+        </a>
+
+        &
+
+        <a routerLink="/privacy-policy">
+          Privacy Policy
+        </a>.
+
+      </p>
+
+
+      <!-- CREATE ACCOUNT -->
+
+      <button
+        type="submit"
+        class="register-button"
+        [disabled]="isLoading"
+      >
+
+        <span *ngIf="!isLoading">
+          Create Account
+        </span>
+
+        <span
+          class="button-loading"
+          *ngIf="isLoading"
+        >
+          Creating account...
+        </span>
+
+        <i
+          *ngIf="!isLoading"
+          class="fa-solid fa-arrow-right"
+        ></i>
+
+      </button>
+
+    </form>
+
+
+    <!-- =========================================
+         LOGIN LINK
+    ========================================== -->
+
+    <div class="login-link">
+
+      <span>
+        Already have an account?
+      </span>
+
+      <a routerLink="/login">
+        Sign in
+      </a>
 
     </div>
+
+
+    <!-- =========================================
+         SECURITY
+    ========================================== -->
+
+    <div class="security-note">
+
+      <i class="fa-solid fa-shield-halved"></i>
+
+      <span>
+        Your information is securely protected
+      </span>
+
+    </div>
+
+  </div>
 
 </div>

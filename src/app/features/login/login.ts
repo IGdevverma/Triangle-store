@@ -25,11 +25,14 @@ export class Login {
   successMessage = '';
 
   showPassword = false;
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   constructor(
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   login() {
 
