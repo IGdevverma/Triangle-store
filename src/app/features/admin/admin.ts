@@ -242,7 +242,8 @@ export class Admin implements OnInit, AfterViewInit {
         ).size;
 
         this.inventoryValue = data.reduce(
-          (sum: number, product: Product) => sum + product.price,
+          (sum: number, product: Product) =>
+            sum + (product.price * (product.stock ?? 0)),
           0
         );
 
@@ -411,10 +412,9 @@ export class Admin implements OnInit, AfterViewInit {
       next: (response: any) => {
 
         this.toastr.success(
-          'Product deleted successfully.',
+          'Customer deleted successfully.',
           'Deleted'
         );
-
         this.loadCustomers();
 
       },
@@ -630,7 +630,7 @@ export class Admin implements OnInit, AfterViewInit {
   }
 
   addProduct() {
-    console.log('addProduct called');
+
 
 
 
@@ -673,12 +673,9 @@ export class Admin implements OnInit, AfterViewInit {
         color && color.toLowerCase() !== 'undefined'
       );
 
-    console.log('COLORS BEING SENT:', colors);
 
-    formData.append(
-      'colors',
-      JSON.stringify(colors)
-    );
+
+
 
 
     // ==========================================
@@ -858,8 +855,7 @@ export class Admin implements OnInit, AfterViewInit {
       JSON.stringify(sizes)
     );
 
-    console.log('SIZES BEING SENT:', sizes);
-    console.log('COLORS BEING SENT:', colors);
+
     formData.append(
       'showOnHome',
       String(this.newProduct.showOnHome ?? true)
@@ -1062,15 +1058,19 @@ export class Admin implements OnInit, AfterViewInit {
   }
   isFormValid(): boolean {
 
-    return !!(
-
-      this.newProduct.name.trim() &&
+    const basicFieldsValid =
+      !!this.newProduct.name?.trim() &&
       this.newProduct.price > 0 &&
-      this.newProduct.category.trim() &&
-      this.selectedFiles.length > 0 || this.editing
+      !!this.newProduct.category?.trim();
 
+    if (this.editing) {
+      return basicFieldsValid;
+    }
+
+    return (
+      basicFieldsValid &&
+      this.selectedFiles.length > 0
     );
-
   }
   openAddModal() {
 
@@ -1208,66 +1208,64 @@ export class Admin implements OnInit, AfterViewInit {
 
 
 
-  createSalesChart() {
+  createSalesChart(): void {
 
-    // Purana chart destroy karo
+    if (!this.salesCanvas?.nativeElement) {
+      return;
+    }
+
     if (this.salesChart) {
       this.salesChart.destroy();
     }
 
-    const labels = this.dashboardData.monthlySales.map((item: any) => {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr',
+      'May', 'Jun', 'Jul', 'Aug',
+      'Sep', 'Oct', 'Nov', 'Dec'
+    ];
 
-      const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-      ];
+    const labels =
+      (this.dashboardData.monthlySales || []).map(
+        (item: any) =>
+          months[(item?._id?.month ?? 1) - 1]
+      );
 
-      return months[item._id.month - 1];
+    const revenue =
+      (this.dashboardData.monthlySales || []).map(
+        (item: any) => item?.revenue ?? 0
+      );
 
-    });
+    this.salesChart = new Chart(
+      this.salesCanvas.nativeElement,
+      {
+        type: 'line',
 
-    const revenue = this.dashboardData.monthlySales.map((item: any) => item.revenue);
+        data: {
+          labels,
 
-    this.salesChart = new Chart(this.salesCanvas.nativeElement, {
+          datasets: [
+            {
+              label: 'Monthly Revenue',
+              data: revenue,
 
-      type: 'line',
+              borderColor: '#7C3AED',
 
-      data: {
+              backgroundColor:
+                'rgba(124,58,237,0.15)',
 
-        labels,
+              fill: true,
 
-        datasets: [
+              tension: 0.4
+            }
+          ]
+        },
 
-          {
-
-            label: 'Monthly Revenue',
-
-            data: revenue,
-
-            borderColor: '#7C3AED',
-
-            backgroundColor: 'rgba(124,58,237,0.15)',
-
-            fill: true,
-
-            tension: 0.4
-
-          }
-
-        ]
-
-      },
-
-      options: {
-
-        responsive: true,
-
-        maintainAspectRatio: false
-
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
       }
-
-    });
-
+    );
   }
 
   downloadInvoice(order: any): void {

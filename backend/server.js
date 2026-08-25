@@ -54,8 +54,8 @@ const allowedOrigins = [
   "https://triangle-store.vercel.app",
 
   // Future custom domains
-  // "https://trianglesports.in",
-  // "https://www.trianglesports.in",
+  "https://trianglesports.in",
+  "https://www.trianglesports.in",
 ];
 
 app.use(
@@ -253,8 +253,7 @@ const server = app.listen(
     );
 
     console.log(
-      `🌍 Environment: ${
-        process.env.NODE_ENV || "development"
+      `🌍 Environment: ${process.env.NODE_ENV || "development"
       }`
     );
 

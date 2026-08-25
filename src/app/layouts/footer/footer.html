@@ -4,148 +4,213 @@
                         NEWSLETTER
     ==================================================== -->
 
-    <section class="newsletter">
+<section class="newsletter">
 
-        <div class="container newsletter-wrapper">
+    <div class="container newsletter-wrapper">
 
-            <div class="newsletter-left">
+        <!-- =========================================
+             NEWSLETTER LEFT
+        ========================================== -->
 
-                <span class="footer-tag">
-                    JOIN TRIANGLE SPORTS
+        <div class="newsletter-left">
+
+            <span class="footer-tag">
+                JOIN TRIANGLE SPORTS
+            </span>
+
+            <h2>
+                Stay Ahead With
+                <br>
+                Every Drop.
+            </h2>
+
+            <p>
+                Subscribe to receive exclusive product launches,
+                special offers, manufacturing updates and sportswear
+                insights directly in your inbox.
+            </p>
+
+
+            <!-- =====================================
+                 SUBSCRIBE FORM
+            ====================================== -->
+
+            <form
+                class="subscribe-box"
+                (ngSubmit)="subscribe()"
+                #subscribeForm="ngForm"
+            >
+
+                <input
+                    type="email"
+                    name="subscriberEmail"
+                    [(ngModel)]="subscriberEmail"
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    required
+                >
+
+                <button
+                    type="submit"
+                    [disabled]="isSubscribing || subscribeForm.invalid"
+                >
+
+                    <span>
+                        {{ isSubscribing ? 'Subscribing...' : 'Subscribe' }}
+                    </span>
+
+                    <i
+                        *ngIf="!isSubscribing"
+                        class="fa-solid fa-arrow-right"
+                    ></i>
+
+                </button>
+
+            </form>
+
+
+            <!-- =====================================
+                 SUCCESS MESSAGE
+            ====================================== -->
+
+            <div
+                class="subscribe-message success"
+                *ngIf="subscribeSuccess"
+            >
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <span>
+                    {{ subscribeSuccess }}
                 </span>
-
-                <h2>
-
-                    Stay Ahead With
-                    <br>
-                    Every Drop.
-
-                </h2>
-
-                <p>
-
-                    Subscribe to receive exclusive product launches,
-                    special offers, manufacturing updates and sportswear
-                    insights directly in your inbox.
-
-                </p>
-
-                <form class="subscribe-box">
-
-                    <input
-                        type="email"
-                        placeholder="Enter your email address">
-
-                    <button
-                        type="submit">
-
-                        Subscribe
-
-                    </button>
-
-                </form>
-
-                <small>
-
-                    By subscribing you agree to our
-
-                    <a routerLink="/terms">
-
-                        Terms & Conditions
-
-                    </a>
-
-                    and
-
-                    <a routerLink="/privacy-policy">
-
-                        Privacy Policy.
-
-                    </a>
-
-                </small>
 
             </div>
 
-            <div class="newsletter-right">
 
-                <span class="support-tag">
+            <!-- =====================================
+                 ERROR MESSAGE
+            ====================================== -->
 
-                    CUSTOMER SUPPORT
+            <div
+                class="subscribe-message error"
+                *ngIf="subscribeError"
+            >
 
+                <i class="fa-solid fa-circle-exclamation"></i>
+
+                <span>
+                    {{ subscribeError }}
                 </span>
 
-                <h2>
+            </div>
 
-                    +91 9990180409
 
-                </h2>
+            <!-- =====================================
+                 PRIVACY NOTE
+            ====================================== -->
 
-                <p>
+            <small class="newsletter-note">
 
-                    Monday – Saturday
+                By subscribing you agree to our
 
-                    <br>
+                <a routerLink="/terms">
+                    Terms & Conditions
+                </a>
 
-                    10:00 AM – 6:00 PM
+                and
 
-                </p>
+                <a routerLink="/privacy-policy">
+                    Privacy Policy.
+                </a>
 
-                <div class="social-icons">
+            </small>
 
-                    <a href="#" aria-label="Facebook">
+        </div>
 
-                        <i class="fab fa-facebook-f"></i>
 
-                    </a>
+        <!-- =========================================
+             CUSTOMER SUPPORT
+        ========================================== -->
 
-                    <a href="#" aria-label="Instagram">
+        <div class="newsletter-right">
 
-                        <i class="fab fa-instagram"></i>
+            <span class="support-tag">
+                CUSTOMER SUPPORT
+            </span>
 
-                    </a>
+            <h2>
+                +91 9990180409
+            </h2>
 
-                    <a href="#" aria-label="YouTube">
+            <p>
+                Monday – Saturday
+                <br>
+                10:00 AM – 6:00 PM
+            </p>
 
-                        <i class="fab fa-youtube"></i>
 
-                    </a>
+            <!-- =====================================
+                 SOCIAL MEDIA
+            ====================================== -->
 
-                    <a href="#" aria-label="LinkedIn">
+            <div class="social-icons">
 
-                        <i class="fab fa-linkedin-in"></i>
+                <a
+                    href="#"
+                    aria-label="Facebook"
+                >
+                    <i class="fab fa-facebook-f"></i>
+                </a>
 
-                    </a>
+                <a
+                    href="#"
+                    aria-label="Instagram"
+                >
+                    <i class="fab fa-instagram"></i>
+                </a>
 
-                </div>
+                <a
+                    href="#"
+                    aria-label="YouTube"
+                >
+                    <i class="fab fa-youtube"></i>
+                </a>
 
-                <div class="trust-badges">
+                <a
+                    href="#"
+                    aria-label="LinkedIn"
+                >
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
 
-                    <span>
+            </div>
 
-                        🏭 Own Manufacturing
 
-                    </span>
+            <!-- =====================================
+                 TRUST BADGES
+            ====================================== -->
 
-                    <span>
+            <div class="trust-badges">
 
-                        🚚 Pan India Delivery
+                <span>
+                    🏭 Own Manufacturing
+                </span>
 
-                    </span>
+                <span>
+                    🚚 Pan India Delivery
+                </span>
 
-                    <span>
-
-                        🔒 Secure Payments
-
-                    </span>
-
-                </div>
+                <span>
+                    🔒 Secure Payments
+                </span>
 
             </div>
 
         </div>
 
-    </section>
+    </div>
+
+</section>
 
     <!-- ===================================================
                         FOOTER
