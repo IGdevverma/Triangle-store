@@ -438,20 +438,34 @@ export class ProductDetail implements OnInit {
     }
 
     if (this.product.stock === 0) {
+
       alert('This product is Out of Stock');
+
       return;
+
     }
 
     if (this.quantity > this.product.stock) {
-      alert(`Only ${this.product.stock} items available`);
+
+      alert(
+        `Only ${this.product.stock} items available`
+      );
+
       return;
+
     }
 
-    // Add product to cart
-    this.cartService.addToCart(this.product);
+    // Only selected product goes to Buy Now checkout
+    this.cartService.buyNow(
+      this.product,
+      this.quantity,
+      this.selectedSize
+    );
 
-    // Directly go to checkout
-    this.router.navigate(['/checkout']);
+    this.router.navigate([
+      '/checkout'
+    ]);
+
   }
 
   // =====================================================

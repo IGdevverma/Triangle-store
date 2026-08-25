@@ -73,7 +73,7 @@ export class Checkout implements OnInit {
   discount = 0;
   discountAmount = 0;
   isPlacingOrder = false;
-
+  isBuyNow = false;
   mobileForOtp = '';
   otp = '';
 
@@ -137,8 +137,40 @@ export class Checkout implements OnInit {
 
   }
 
+
+
+
   ngOnInit(): void {
-    this.cartItems = this.cartService.getCartItems();
+
+    // ==============================
+    // CHECK BUY NOW FIRST
+    // ==============================
+
+    const buyNowItem =
+      this.cartService.getBuyNowItem();
+
+    if (buyNowItem) {
+
+      this.isBuyNow = true;
+
+      this.cartItems = [
+        buyNowItem
+      ];
+
+    } else {
+
+      this.isBuyNow = false;
+
+      this.cartItems =
+        this.cartService.getCartItems();
+
+    }
+
+
+    // ==============================
+    // LOAD CUSTOMER INFORMATION
+    // ==============================
+
     const savedData =
       localStorage.getItem('customerInfo');
 
@@ -151,6 +183,8 @@ export class Checkout implements OnInit {
     }
 
   }
+
+
   continueToPayment(): void {
 
     // 1. Validate delivery details
@@ -282,7 +316,9 @@ export class Checkout implements OnInit {
         'Processing',
 
       items:
-        this.cartService.getCartItems(),
+        this.isBuyNow
+          ? this.cartItems
+          : this.cartService.getCartItems(),
 
       total:
         this.grandTotal,
@@ -327,6 +363,20 @@ export class Checkout implements OnInit {
 
 
   get subtotal(): number {
+
+    if (this.isBuyNow) {
+
+      const item =
+        this.cartItems[0];
+
+      if (!item) {
+        return 0;
+      }
+
+      return Number(item.price) *
+        Number(item.quantity);
+
+    }
 
     return this.cartService.getTotal();
 
@@ -526,7 +576,15 @@ export class Checkout implements OnInit {
                       res.order._id;
 
                     // Clear cart
-                    this.cartService.clearCart();
+                    if (this.isBuyNow) {
+
+                      this.cartService.clearBuyNow();
+
+                    } else {
+
+                      this.cartService.clearCart();
+
+                    }
 
                     // Stop loading
                     this.isPlacingOrder = false;
