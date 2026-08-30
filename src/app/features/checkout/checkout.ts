@@ -7,7 +7,7 @@ import { Order } from '../../models/orders';
 import { Router } from '@angular/router';
 import { Payment } from '../../services/payment';
 import { ChangeDetectorRef } from '@angular/core';
-
+import { CartItem } from '../../services/cart';
 
 declare global {
   interface Window {
@@ -64,7 +64,7 @@ import {
 
 export class Checkout implements OnInit {
 
-  cartItems: any[] = [];
+  cartItems: CartItem[] = [];
   checkoutStep: 'details' | 'payment' = 'details';
   checkoutForm: FormGroup;
   orderPlaced = false;
@@ -145,24 +145,38 @@ export class Checkout implements OnInit {
     // ==============================
     // CHECK BUY NOW FIRST
     // ==============================
-
     const buyNowItem =
       this.cartService.getBuyNowItem();
 
+    const cartItems =
+      this.cartService.getCartItems();
+
     if (buyNowItem) {
 
+      // Direct Buy Now checkout
       this.isBuyNow = true;
 
       this.cartItems = [
         buyNowItem
       ];
 
-    } else {
+    } else if (cartItems.length > 0) {
 
+      // Normal cart checkout
       this.isBuyNow = false;
 
-      this.cartItems =
-        this.cartService.getCartItems();
+      this.cartItems = cartItems;
+
+    } else {
+
+      // Nothing to checkout
+      this.isBuyNow = false;
+
+      this.cartItems = [];
+
+      this.router.navigate(['/']);
+
+      return;
 
     }
 
@@ -396,9 +410,7 @@ export class Checkout implements OnInit {
   }
 
   get gst(): number {
-
-    return Math.round(this.subtotal * 0.05);
-
+    return Math.round(this.taxableAmount * 0.05);
   }
 
   get grandTotal(): number {

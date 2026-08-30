@@ -11,6 +11,9 @@ import { SeoService } from '../../services/seo';
 import { OtpService } from '../../services/otp.service';
 import { Product } from '../../models/product';
 import { Router } from '@angular/router';
+import {  CartItem
+} from '../../services/cart';
+
 import { NgZone } from '@angular/core';
 
 @Component({
@@ -399,15 +402,13 @@ export class ProductDetail implements OnInit {
     }
 
 
-    this.cartService.addToCart({
-
-      ...this.product,
-
-      quantity: this.quantity,
-
-      selectedSize: this.selectedSize
-
-    });
+    this.cartService.addToCart(
+      {
+        ...this.product,
+        selectedSize: this.selectedSize
+      },
+      this.quantity
+    );
 
 
     this.notificationService.show(
@@ -455,11 +456,19 @@ export class ProductDetail implements OnInit {
 
     }
 
-    // Only selected product goes to Buy Now checkout
-    this.cartService.buyNow(
-      this.product,
-      this.quantity,
-      this.selectedSize
+    const buyNowItem: CartItem = {
+
+      ...this.product,
+
+      selectedSize: this.selectedSize,
+
+      quantity: this.quantity
+
+    };
+
+    // Temporary Buy Now item
+    this.cartService.setBuyNowItem(
+      buyNowItem
     );
 
     this.router.navigate([

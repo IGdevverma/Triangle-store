@@ -5,7 +5,7 @@
 
         <div class="logo">
             <img src="assets/images/trianglepng.png" alt="Triangle Sports">
-            
+
         </div>
 
         <ul class="menu">
@@ -856,7 +856,7 @@
                                         MAIN IMAGE
                                     </span>
 
-                                    <button type="button" class="image-remove-btn" (click)="removeImage(i + 1)">
+                                    <button type="button" class="image-remove-btn" (click)="removeImage(0)">
                                         ×
                                     </button>
 
@@ -1129,8 +1129,9 @@
                                         </small>
                                     </div>
 
-                                    <!-- =========================    AVAILABLE SIZES
- 
+                                    <!-- =========================
+     AVAILABLE SIZES
+========================= -->
 
                                     <div class="full-width">
 
@@ -1141,30 +1142,32 @@
                                         <div class="size-input-row">
 
                                             <input type="text" [(ngModel)]="newSize"
-                                                placeholder="Enter size e.g. S, M, L, XL" />
+                                                placeholder="Enter size e.g. S, M, L, XL" (keyup.enter)="addSize()" />
 
                                             <button type="button" class="add-option-btn" (click)="addSize()">
-
                                                 + Add
-
                                             </button>
 
                                         </div>
+
+                                        <small class="input-hint">
+                                            Add sizes one by one. Example: S, M, L, XL
+                                        </small>
 
 
                                         <!-- Selected Sizes -->
 
                                         <div class="selected-options" *ngIf="newProduct.sizes?.length">
 
-                                            <span class="option-tag"
-                                                *ngFor="let size of newProduct.sizes; let i = index">
+                                            <span class="option-tag" *ngFor="
+                let size of newProduct.sizes;
+                let i = index
+            ">
 
                                                 {{ size }}
 
                                                 <button type="button" (click)="removeSize(i)">
-
                                                     ×
-
                                                 </button>
 
                                             </span>
@@ -1172,7 +1175,6 @@
                                         </div>
 
                                     </div>
-
 
 
 

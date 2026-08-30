@@ -878,6 +878,23 @@ export class Admin implements OnInit, AfterViewInit {
         )
       )
     );
+
+
+    // Main image
+    if (this.imagePreviews.length > 0) {
+
+      const mainImage = this.imagePreviews[0];
+
+      if (mainImage.startsWith('http')) {
+
+        formData.append(
+          'mainImage',
+          mainImage
+        );
+
+      }
+
+    }
     // IMPORTANT: only append image when user selected a new file
     if (this.selectedFiles.length > 0) {
 
@@ -1520,5 +1537,21 @@ export class Admin implements OnInit, AfterViewInit {
     }
 
     this.newProduct.sizes.splice(index, 1);
+  }
+
+
+  setMainImage(index: number): void {
+
+    if (index < 0 || index >= this.imagePreviews.length) {
+      return;
+    }
+
+    const selectedImage =
+      this.imagePreviews[index];
+
+    this.imagePreviews.splice(index, 1);
+
+    this.imagePreviews.unshift(selectedImage);
+
   }
 }

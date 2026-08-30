@@ -1,13 +1,17 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService, CartItem } from '../../services/cart';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    FormsModule
+  ],
   templateUrl: './cart.html',
   styleUrl: './cart.css'
 })
@@ -21,7 +25,10 @@ export class Cart {
 
   readonly freeGiftTarget = 4000;
 
-  constructor(private cartService: CartService) {
+  constructor(
+    private cartService: CartService,
+    private router: Router
+  ) {
 
     this.cartService.cart$.subscribe(items => {
 
@@ -33,26 +40,39 @@ export class Cart {
 
   }
 
-  calculateTotal() {
+  // ================= TOTAL =================
 
-    this.subtotal = this.cartService.getTotal();
+  calculateTotal(): void {
+
+    this.subtotal =
+      this.cartService.getTotal();
 
   }
+
+  // ================= ITEMS =================
 
   get totalItems(): number {
 
     return this.cartItems.reduce(
-      (total, item) => total + (item.quantity || 0),
+
+      (total, item) =>
+        total + (item.quantity || 0),
+
       0
+
     );
 
   }
+
+  // ================= SAVINGS =================
 
   get savings(): number {
 
     return this.couponDiscount;
 
   }
+
+  // ================= FINAL TOTAL =================
 
   get finalTotal(): number {
 
@@ -62,6 +82,8 @@ export class Cart {
     );
 
   }
+
+  // ================= GIFT PROGRESS =================
 
   get giftProgress(): number {
 
@@ -87,27 +109,36 @@ export class Cart {
 
   }
 
-  increase(id: string) {
+  // ================= QUANTITY =================
+
+  increase(id: string): void {
 
     this.cartService.increaseQuantity(id);
 
   }
 
-  decrease(id: string) {
+  decrease(id: string): void {
 
     this.cartService.decreaseQuantity(id);
 
   }
 
-  removeItem(id: string) {
+  // ================= REMOVE =================
+
+  removeItem(id: string): void {
 
     this.cartService.removeFromCart(id);
 
   }
 
-  applyCoupon() {
+  // ================= COUPON =================
 
-    const code = this.couponCode.trim().toUpperCase();
+  applyCoupon(): void {
+
+    const code =
+      this.couponCode
+        .trim()
+        .toUpperCase();
 
     if (!code) {
       return;
@@ -116,14 +147,18 @@ export class Cart {
     if (code === 'SAVE10') {
 
       this.couponDiscount =
-        Math.round(this.subtotal * 0.10);
+        Math.round(
+          this.subtotal * 0.10
+        );
 
     }
 
     else if (code === 'WELCOME20') {
 
       this.couponDiscount =
-        Math.round(this.subtotal * 0.20);
+        Math.round(
+          this.subtotal * 0.20
+        );
 
     }
 
@@ -134,6 +169,25 @@ export class Cart {
       alert('Invalid Coupon Code');
 
     }
+
+  }
+
+  // ================= CHECKOUT =================
+
+  goToCheckout(): void {
+
+    // Don't proceed if cart is empty
+    if (!this.cartItems.length) {
+      return;
+    }
+
+    // Cart checkout should NOT use Buy Now item
+    this.cartService.clearBuyNow();
+
+    // Go to checkout with complete cart
+    this.router.navigate([
+      '/checkout'
+    ]);
 
   }
 

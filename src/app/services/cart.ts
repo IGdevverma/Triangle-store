@@ -12,56 +12,102 @@ export interface CartItem extends Product {
 })
 export class CartService {
 
-  // ================= NORMAL CART =================
-
   private cartItems: CartItem[] = [];
 
   private cartSubject =
     new BehaviorSubject<CartItem[]>([]);
 
-  cart$ = this.cartSubject.asObservable();
-
-
-  // ================= BUY NOW =================
+  cart$ =
+    this.cartSubject.asObservable();
 
   private buyNowItem: CartItem | null = null;
 
 
-  // ================= CONSTRUCTOR =================
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
 
   constructor() {
+
+    this.loadCart();
+
+  }
+
+
+  // =====================================================
+  // LOAD CART
+  // =====================================================
+
+  private loadCart(): void {
 
     const savedCart =
       localStorage.getItem('cart');
 
-    if (savedCart) {
+    if (!savedCart) {
 
-      try {
+      return;
+
+    }
+
+    try {
+
+      const parsedCart =
+        JSON.parse(savedCart);
+
+      if (Array.isArray(parsedCart)) {
 
         this.cartItems =
-          JSON.parse(savedCart);
+          parsedCart.map(item => ({
+
+            ...item,
+
+            quantity:
+              Number(item.quantity) > 0
+                ? Number(item.quantity)
+                : 1
+
+          }));
 
         this.cartSubject.next(
-          this.cartItems
+          [...this.cartItems]
         );
-
-      } catch (error) {
-
-        console.error(
-          'Error loading cart:',
-          error
-        );
-
-        this.cartItems = [];
 
       }
+
+    } catch (error) {
+
+      console.error(
+        'Invalid cart data:',
+        error
+      );
+
+      this.cartItems = [];
+
+      localStorage.removeItem('cart');
 
     }
 
   }
 
 
-  // ================= ADD TO CART =================
+  // =====================================================
+  // PRODUCT ID
+  // =====================================================
+
+  private getProductId(
+    product: Product
+  ): string {
+
+    return String(
+      product._id || product.id
+    );
+
+  }
+
+
+  // =====================================================
+  // ADD TO CART
+  // =====================================================
 
   addToCart(
     product: Product,
@@ -69,21 +115,107 @@ export class CartService {
     selectedSize?: string
   ): void {
 
+    const productId =
+      this.getProductId(product);
+
+    if (!productId) {
+
+      console.error(
+        'Product ID missing:',
+        product
+      );
+
+      return;
+
+    }
+
+
+    // -----------------------------------------------
+    // VALIDATE QUANTITY
+    // -----------------------------------------------
+
+    quantity =
+      Math.floor(Number(quantity));
+
+    if (quantity < 1) {
+
+      quantity = 1;
+
+    }
+
+
+    // -----------------------------------------------
+    // STOCK CHECK
+    // -----------------------------------------------
+
+    if (
+      product.stock !== undefined &&
+      quantity > product.stock
+    ) {
+
+      console.warn(
+        'Requested quantity exceeds stock'
+      );
+
+      quantity = product.stock;
+
+    }
+
+    if (quantity <= 0) {
+
+      return;
+
+    }
+
+
+    // -----------------------------------------------
+    // FIND EXISTING ITEM
+    // -----------------------------------------------
+
     const existingItem =
       this.cartItems.find(
-        item => item.id === product.id
+
+        item =>
+
+          this.getProductId(item) === productId &&
+
+          (item.selectedSize || '') ===
+          (selectedSize || '')
+
       );
+
+
+    // -----------------------------------------------
+    // UPDATE EXISTING ITEM
+    // -----------------------------------------------
 
     if (existingItem) {
 
-      existingItem.quantity += quantity;
+      let newQuantity =
+        existingItem.quantity + quantity;
 
-      if (selectedSize) {
-        existingItem.selectedSize =
-          selectedSize;
+
+      if (
+        existingItem.stock !== undefined &&
+        newQuantity > existingItem.stock
+      ) {
+
+        newQuantity =
+          existingItem.stock;
+
       }
 
-    } else {
+
+      existingItem.quantity =
+        newQuantity;
+
+    }
+
+    // -----------------------------------------------
+    // ADD NEW ITEM
+    // -----------------------------------------------
+
+    else {
 
       this.cartItems.push({
 
@@ -97,14 +229,200 @@ export class CartService {
 
     }
 
+
     this.saveCart();
 
   }
 
 
-  // ================= BUY NOW =================
+  // =====================================================
+  // INCREASE QUANTITY
+  // =====================================================
 
-  buyNow(
+  increaseQuantity(
+    productId: string
+  ): void {
+
+    const item =
+      this.cartItems.find(
+
+        item =>
+          this.getProductId(item) ===
+          String(productId)
+
+      );
+
+
+    if (!item) {
+
+      console.warn(
+        'Cart item not found:',
+        productId
+      );
+
+      return;
+
+    }
+
+
+    if (
+      item.stock !== undefined &&
+      item.quantity >= item.stock
+    ) {
+
+      return;
+
+    }
+
+
+    item.quantity++;
+
+    this.saveCart();
+
+  }
+
+
+  // =====================================================
+  // DECREASE QUANTITY
+  // =====================================================
+
+  decreaseQuantity(
+    productId: string
+  ): void {
+
+    const item =
+      this.cartItems.find(
+
+        item =>
+          this.getProductId(item) ===
+          String(productId)
+
+      );
+
+
+    if (!item) {
+
+      return;
+
+    }
+
+
+    if (item.quantity > 1) {
+
+      item.quantity--;
+
+      this.saveCart();
+
+    }
+
+    else {
+
+      this.removeFromCart(productId);
+
+    }
+
+  }
+
+
+  // =====================================================
+  // REMOVE FROM CART
+  // =====================================================
+
+  removeFromCart(
+    productId: string
+  ): void {
+
+    this.cartItems =
+      this.cartItems.filter(
+
+        item =>
+          this.getProductId(item) !==
+          String(productId)
+
+      );
+
+
+    this.saveCart();
+
+  }
+
+
+  // =====================================================
+  // GET TOTAL
+  // =====================================================
+
+  getTotal(): number {
+
+    return this.cartItems.reduce(
+
+      (total, item) =>
+
+        total +
+
+        Number(item.price || 0) *
+
+        Number(item.quantity || 0),
+
+      0
+
+    );
+
+  }
+
+
+  // =====================================================
+  // GET CART ITEMS
+  // =====================================================
+
+  getCartItems(): CartItem[] {
+
+    return [...this.cartItems];
+
+  }
+
+
+  // =====================================================
+  // GET TOTAL ITEMS
+  // =====================================================
+
+  getTotalItems(): number {
+
+    return this.cartItems.reduce(
+
+      (total, item) =>
+
+        total +
+        Number(item.quantity || 0),
+
+      0
+
+    );
+
+  }
+
+
+  // =====================================================
+  // CLEAR CART
+  // =====================================================
+
+  clearCart(): void {
+
+    this.cartItems = [];
+
+    this.buyNowItem = null;
+
+    this.cartSubject.next([]);
+
+    localStorage.removeItem('cart');
+
+  }
+
+
+  // =====================================================
+  // BUY NOW
+  // =====================================================
+
+  setBuyNowItem(
     product: Product,
     quantity: number = 1,
     selectedSize?: string
@@ -120,181 +438,26 @@ export class CartService {
 
     };
 
-    localStorage.setItem(
-      'buyNowItem',
-      JSON.stringify(this.buyNowItem)
-    );
-
   }
 
-
-  // ================= GET BUY NOW ITEM =================
 
   getBuyNowItem(): CartItem | null {
 
-    if (this.buyNowItem) {
-
-      return {
-        ...this.buyNowItem
-      };
-
-    }
-
-    const savedBuyNow =
-      localStorage.getItem('buyNowItem');
-
-    if (!savedBuyNow) {
-      return null;
-    }
-
-    try {
-
-      this.buyNowItem =
-        JSON.parse(savedBuyNow);
-
-      return {
-        ...this.buyNowItem!
-      };
-
-    } catch (error) {
-
-      console.error(
-        'Error loading Buy Now item:',
-        error
-      );
-
-      return null;
-
-    }
+    return this.buyNowItem;
 
   }
 
-
-  // ================= CLEAR BUY NOW =================
 
   clearBuyNow(): void {
 
     this.buyNowItem = null;
 
-    localStorage.removeItem(
-      'buyNowItem'
-    );
-
   }
 
 
-  // ================= CLEAR CART =================
-
-  clearCart(): void {
-
-    this.cartItems = [];
-
-    this.cartSubject.next([]);
-
-    localStorage.removeItem('cart');
-
-  }
-
-
-  // ================= REMOVE ITEM =================
-
-  removeFromCart(
-    productId: string
-  ): void {
-
-    this.cartItems =
-      this.cartItems.filter(
-        item => item.id !== productId
-      );
-
-    this.saveCart();
-
-  }
-
-
-  // ================= INCREASE =================
-
-  increaseQuantity(
-    productId: string
-  ): void {
-
-    const item =
-      this.cartItems.find(
-        i => i.id === productId
-      );
-
-    if (!item) {
-      return;
-    }
-
-    item.quantity++;
-
-    this.saveCart();
-
-  }
-
-
-  // ================= DECREASE =================
-
-  decreaseQuantity(
-    productId: string
-  ): void {
-
-    const item =
-      this.cartItems.find(
-        i => i.id === productId
-      );
-
-    if (!item) {
-      return;
-    }
-
-    if (item.quantity > 1) {
-
-      item.quantity--;
-
-      this.saveCart();
-
-    } else {
-
-      this.removeFromCart(productId);
-
-    }
-
-  }
-
-
-  // ================= TOTAL =================
-
-  getTotal(): number {
-
-    return this.cartItems.reduce(
-
-      (total, item) =>
-
-        total +
-        (Number(item.price) *
-         Number(item.quantity)),
-
-      0
-
-    );
-
-  }
-
-
-  // ================= CART ITEMS =================
-
-  getCartItems(): CartItem[] {
-
-    return [
-      ...this.cartItems
-    ];
-
-  }
-
-
-  // ================= SAVE CART =================
+  // =====================================================
+  // SAVE CART
+  // =====================================================
 
   private saveCart(): void {
 
@@ -303,8 +466,11 @@ export class CartService {
     );
 
     localStorage.setItem(
+
       'cart',
+
       JSON.stringify(this.cartItems)
+
     );
 
   }

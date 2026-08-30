@@ -21,16 +21,6 @@ const createProduct = asyncHandler(async (req, res) => {
 
         const imageUrls = req.files.map(file => file.path);
 
-        const existingProduct = await Product.findOne({
-            name: req.body.name
-        });
-
-        if (existingProduct) {
-            return res.status(400).json({
-                success: false,
-                message: "Product with this name already exists"
-            });
-        }
 
         const sku = "TS-" + Date.now();
 
@@ -229,6 +219,22 @@ const updateProduct = asyncHandler(async (req, res) => {
                 success: false,
                 message: "Maximum 5 product images are allowed"
             });
+        }
+
+        // ==========================================
+        // 3.5 MAIN IMAGE
+        // ==========================================
+
+        const mainImage = req.body.mainImage;
+
+        if (mainImage && finalImages.includes(mainImage)) {
+
+            const mainIndex = finalImages.indexOf(mainImage);
+
+            finalImages.splice(mainIndex, 1);
+
+            finalImages.unshift(mainImage);
+
         }
 
 

@@ -171,11 +171,17 @@ export class Header implements OnInit {
 
   }
 
-  goToCheckout() {
+  goToCheckout(): void {
 
     this.isCartOpen = false;
 
-    this.router.navigate(['/checkout']);
+    // Header cart se checkout ja rahe hain,
+    // isliye Buy Now mode cancel karo.
+    this.cartService.clearBuyNow();
+
+    this.router.navigate([
+      '/checkout'
+    ]);
 
   }
   isMenuOpen = false;

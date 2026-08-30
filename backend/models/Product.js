@@ -18,6 +18,7 @@ const productSchema = new mongoose.Schema(
       required: [true, "Price is required"],
       min: [1, "Price must be greater than 0"],
     },
+
     category: {
       type: String,
       required: [true, "Category is required"],
@@ -45,8 +46,6 @@ const productSchema = new mongoose.Schema(
       default: false,
     },
 
-
-
     brand: {
       type: String,
       default: "",
@@ -72,12 +71,14 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
+    // Product colors
     colors: [
       {
         type: String,
       },
     ],
 
+    // Product sizes
     sizes: [
       {
         type: String,
@@ -94,20 +95,10 @@ const productSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    availableColors: {
-      type: String,
-      default: ""
-    },
   },
   {
     timestamps: true,
   }
-
-
-
-
-
-
 );
 
 module.exports = mongoose.model("Product", productSchema);
