@@ -145,20 +145,16 @@
 
                     <div class="quantity-controls">
 
-                        <button type="button" (click)="decrease(item.id!)">
-
+                        <button type="button" (click)="decrease(item)">
                             −
-
                         </button>
 
                         <span>
                             {{ item.quantity }}
                         </span>
 
-                        <button type="button" (click)="increase(item.id!)">
-
+                        <button type="button" (click)="increase(item)">
                             +
-
                         </button>
 
                     </div>
@@ -174,10 +170,8 @@
                         ₹{{ item.price * item.quantity }}
                     </strong>
 
-                    <button type="button" class="remove-btn" (click)="removeItem(item.id!)">
-
+                    <button type="button" class="remove-btn" (click)="removeItem(item)">
                         🗑
-
                     </button>
 
                 </div>

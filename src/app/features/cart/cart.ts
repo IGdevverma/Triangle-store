@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService, CartItem } from '../../services/cart';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-cart',
@@ -15,32 +16,79 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './cart.html',
   styleUrl: './cart.css'
 })
-export class Cart {
+export class Cart implements OnDestroy {
+
+  // =====================================================
+  // CART ITEMS
+  // =====================================================
 
   cartItems: CartItem[] = [];
 
+
+  // =====================================================
+  // TOTALS
+  // =====================================================
+
   subtotal = 0;
+
   couponDiscount = 0;
+
   couponCode = '';
 
+
+  // =====================================================
+  // FREE GIFT
+  // =====================================================
+
   readonly freeGiftTarget = 4000;
+
+
+  // =====================================================
+  // SUBSCRIPTION
+  // =====================================================
+
+  private cartSubscription?: Subscription;
+
+
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
 
   constructor(
     private cartService: CartService,
     private router: Router
   ) {
 
-    this.cartService.cart$.subscribe(items => {
+    // ---------------------------------------------------
+    // LISTEN TO CART CHANGES
+    // ---------------------------------------------------
 
-      this.cartItems = items;
+    this.cartSubscription =
+      this.cartService.cart$.subscribe(items => {
 
-      this.calculateTotal();
+        this.cartItems = items;
 
-    });
+        this.calculateTotal();
+
+      });
 
   }
 
-  // ================= TOTAL =================
+
+  // =====================================================
+  // CLEANUP
+  // =====================================================
+
+  ngOnDestroy(): void {
+
+    this.cartSubscription?.unsubscribe();
+
+  }
+
+
+  // =====================================================
+  // TOTAL
+  // =====================================================
 
   calculateTotal(): void {
 
@@ -49,14 +97,19 @@ export class Cart {
 
   }
 
-  // ================= ITEMS =================
+
+  // =====================================================
+  // TOTAL ITEMS
+  // =====================================================
 
   get totalItems(): number {
 
     return this.cartItems.reduce(
 
       (total, item) =>
-        total + (item.quantity || 0),
+
+        total +
+        Number(item.quantity || 0),
 
       0
 
@@ -64,7 +117,10 @@ export class Cart {
 
   }
 
-  // ================= SAVINGS =================
+
+  // =====================================================
+  // SAVINGS
+  // =====================================================
 
   get savings(): number {
 
@@ -72,66 +128,111 @@ export class Cart {
 
   }
 
-  // ================= FINAL TOTAL =================
+
+  // =====================================================
+  // FINAL TOTAL
+  // =====================================================
 
   get finalTotal(): number {
 
     return Math.max(
+
       0,
-      this.subtotal - this.couponDiscount
+
+      this.subtotal -
+      this.couponDiscount
+
     );
 
   }
 
-  // ================= GIFT PROGRESS =================
+
+  // =====================================================
+  // FREE GIFT PROGRESS
+  // =====================================================
 
   get giftProgress(): number {
 
     return Math.min(
+
       100,
-      (this.subtotal / this.freeGiftTarget) * 100
+
+      (
+        this.subtotal /
+        this.freeGiftTarget
+      ) * 100
+
     );
 
   }
+
+
+  // =====================================================
+  // REMAINING FOR FREE GIFT
+  // =====================================================
 
   get remainingForGift(): number {
 
     return Math.max(
+
       0,
-      this.freeGiftTarget - this.subtotal
+
+      this.freeGiftTarget -
+      this.subtotal
+
     );
 
   }
 
+
+  // =====================================================
+  // FREE GIFT UNLOCKED
+  // =====================================================
+
   get giftUnlocked(): boolean {
 
-    return this.subtotal >= this.freeGiftTarget;
+    return this.subtotal >=
+      this.freeGiftTarget;
 
   }
 
-  // ================= QUANTITY =================
 
-  increase(id: string): void {
+  // =====================================================
+  // INCREASE QUANTITY
+  // =====================================================
 
-    this.cartService.increaseQuantity(id);
+  increase(item: CartItem): void {
 
-  }
-
-  decrease(id: string): void {
-
-    this.cartService.decreaseQuantity(id);
+    this.cartService.increaseQuantity(item);
 
   }
 
-  // ================= REMOVE =================
 
-  removeItem(id: string): void {
+  // =====================================================
+  // DECREASE QUANTITY
+  // =====================================================
 
-    this.cartService.removeFromCart(id);
+  decrease(item: CartItem): void {
+
+    this.cartService.decreaseQuantity(item);
 
   }
 
-  // ================= COUPON =================
+
+  // =====================================================
+  // REMOVE ITEM
+  // =====================================================
+
+  removeItem(item: CartItem): void {
+
+    this.cartService.removeFromCart(item);
+
+  }
+
+
+  // =====================================================
+  // APPLY COUPON
+  // =====================================================
 
   applyCoupon(): void {
 
@@ -140,9 +241,17 @@ export class Cart {
         .trim()
         .toUpperCase();
 
+
     if (!code) {
+
       return;
+
     }
+
+
+    // ---------------------------------------------------
+    // SAVE10
+    // ---------------------------------------------------
 
     if (code === 'SAVE10') {
 
@@ -151,43 +260,103 @@ export class Cart {
           this.subtotal * 0.10
         );
 
+      return;
+
     }
 
-    else if (code === 'WELCOME20') {
+
+    // ---------------------------------------------------
+    // WELCOME20
+    // ---------------------------------------------------
+
+    if (code === 'WELCOME20') {
 
       this.couponDiscount =
         Math.round(
           this.subtotal * 0.20
         );
 
-    }
-
-    else {
-
-      this.couponDiscount = 0;
-
-      alert('Invalid Coupon Code');
+      return;
 
     }
+
+
+    // ---------------------------------------------------
+    // INVALID
+    // ---------------------------------------------------
+
+    this.couponDiscount = 0;
+
+    alert(
+      'Invalid Coupon Code'
+    );
 
   }
 
-  // ================= CHECKOUT =================
+
+  // =====================================================
+  // REMOVE COUPON
+  // =====================================================
+
+  removeCoupon(): void {
+
+    this.couponDiscount = 0;
+
+    this.couponCode = '';
+
+  }
+
+
+  // =====================================================
+  // CHECKOUT
+  // =====================================================
 
   goToCheckout(): void {
 
-    // Don't proceed if cart is empty
+    // ---------------------------------------------------
+    // EMPTY CART CHECK
+    // ---------------------------------------------------
+
     if (!this.cartItems.length) {
+
       return;
+
     }
 
-    // Cart checkout should NOT use Buy Now item
+
+    // ---------------------------------------------------
+    // CLEAR BUY NOW
+    // ---------------------------------------------------
+
     this.cartService.clearBuyNow();
 
-    // Go to checkout with complete cart
+
+    // ---------------------------------------------------
+    // GO TO CHECKOUT
+    // ---------------------------------------------------
+
     this.router.navigate([
       '/checkout'
     ]);
+
+  }
+
+
+  // =====================================================
+  // IMAGE URL
+  // =====================================================
+
+  getImageUrl(
+    image: string | undefined
+  ): string {
+
+    if (!image) {
+
+      return 'assets/images/placeholder.png';
+
+    }
+
+    return image;
 
   }
 

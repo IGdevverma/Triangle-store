@@ -129,25 +129,17 @@
     <!-- PRODUCTS -->
     <div class="products-grid">
 
-        <div
-            class="product-item"
-            *ngFor="let product of bestSellerProducts"
-            [routerLink]="['/product', product._id]"
-        >
+        <div class="product-item" *ngFor="let product of bestSellerProducts" [routerLink]="['/product', product._id]">
 
             <!-- IMAGE -->
             <div class="product-image-wrapper">
 
                 <!-- DISCOUNT -->
-                <span class="discount-badge">
-                    SAVE 9%
+                <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
+                    SAVE {{ product.discount }}%
                 </span>
 
-                <img
-                    [src]="getImageUrl(product.image)"
-                    [alt]="product.name"
-                    class="product-image"
-                />
+                <img [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" />
 
             </div>
 
@@ -179,10 +171,7 @@
     <!-- VIEW ALL -->
     <div class="view-all-wrapper">
 
-        <a
-            routerLink="/shop"
-            class="view-all-btn"
-        >
+        <a routerLink="/shop" class="view-all-btn">
             View all
         </a>
 

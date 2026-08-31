@@ -5,6 +5,7 @@ import { Product } from '../models/product';
 export interface CartItem extends Product {
   quantity: number;
   selectedSize?: string;
+  selectedColor?: string;
 }
 
 @Injectable({
@@ -35,6 +36,32 @@ export class CartService {
 
 
   // =====================================================
+  // PRODUCT ID
+  // =====================================================
+
+  private getProductId(product: Product): string {
+
+    return String(
+      product._id || product.id || ''
+    );
+
+  }
+
+
+  // =====================================================
+  // CART ITEM KEY
+  // IMPORTANT FOR CLOTHING STORE
+  // Same product + different size/color = separate item
+  // =====================================================
+
+  private getCartItemKey(item: CartItem): string {
+
+    return `${this.getProductId(item)}_${item.selectedSize || ''}_${item.selectedColor || ''}`;
+
+  }
+
+
+  // =====================================================
   // LOAD CART
   // =====================================================
 
@@ -44,6 +71,8 @@ export class CartService {
       localStorage.getItem('cart');
 
     if (!savedCart) {
+
+      this.cartSubject.next([]);
 
       return;
 
@@ -68,9 +97,9 @@ export class CartService {
 
           }));
 
-        this.cartSubject.next(
-          [...this.cartItems]
-        );
+        this.cartSubject.next([
+          ...this.cartItems
+        ]);
 
       }
 
@@ -85,22 +114,9 @@ export class CartService {
 
       localStorage.removeItem('cart');
 
+      this.cartSubject.next([]);
+
     }
-
-  }
-
-
-  // =====================================================
-  // PRODUCT ID
-  // =====================================================
-
-  private getProductId(
-    product: Product
-  ): string {
-
-    return String(
-      product._id || product.id
-    );
 
   }
 
@@ -112,7 +128,8 @@ export class CartService {
   addToCart(
     product: Product,
     quantity: number = 1,
-    selectedSize?: string
+    selectedSize?: string,
+    selectedColor?: string
   ): void {
 
     const productId =
@@ -130,9 +147,9 @@ export class CartService {
     }
 
 
-    // -----------------------------------------------
-    // VALIDATE QUANTITY
-    // -----------------------------------------------
+    // ---------------------------------------------------
+    // QUANTITY VALIDATION
+    // ---------------------------------------------------
 
     quantity =
       Math.floor(Number(quantity));
@@ -144,50 +161,64 @@ export class CartService {
     }
 
 
-    // -----------------------------------------------
+    // ---------------------------------------------------
     // STOCK CHECK
-    // -----------------------------------------------
+    // ---------------------------------------------------
 
-    if (
-      product.stock !== undefined &&
-      quantity > product.stock
-    ) {
+    const stock =
+      Number(product.stock ?? 0);
+
+    if (stock <= 0) {
 
       console.warn(
-        'Requested quantity exceeds stock'
+        'Product is out of stock'
       );
-
-      quantity = product.stock;
-
-    }
-
-    if (quantity <= 0) {
 
       return;
 
     }
 
+    if (quantity > stock) {
 
-    // -----------------------------------------------
-    // FIND EXISTING ITEM
-    // -----------------------------------------------
+      quantity = stock;
+
+    }
+
+
+    // ---------------------------------------------------
+    // TEMP ITEM FOR KEY
+    // ---------------------------------------------------
+
+    const newItem: CartItem = {
+
+      ...product,
+
+      quantity,
+
+      selectedSize,
+      selectedColor
+
+    };
+
+
+    const newKey =
+      this.getCartItemKey(newItem);
+
+
+    // ---------------------------------------------------
+    // FIND SAME VARIANT
+    // ---------------------------------------------------
 
     const existingItem =
       this.cartItems.find(
-
         item =>
-
-          this.getProductId(item) === productId &&
-
-          (item.selectedSize || '') ===
-          (selectedSize || '')
-
+          this.getCartItemKey(item) === newKey
       );
 
 
-    // -----------------------------------------------
-    // UPDATE EXISTING ITEM
-    // -----------------------------------------------
+    // ---------------------------------------------------
+    // EXISTING ITEM
+    // ---------------------------------------------------
 
     if (existingItem) {
 
@@ -211,21 +242,14 @@ export class CartService {
 
     }
 
-    // -----------------------------------------------
-    // ADD NEW ITEM
-    // -----------------------------------------------
+
+    // ---------------------------------------------------
+    // NEW ITEM
+    // ---------------------------------------------------
 
     else {
 
-      this.cartItems.push({
-
-        ...product,
-
-        quantity,
-
-        selectedSize
-
-      });
+      this.cartItems.push(newItem);
 
     }
 
@@ -239,25 +263,24 @@ export class CartService {
   // INCREASE QUANTITY
   // =====================================================
 
-  increaseQuantity(
-    productId: string
-  ): void {
+  increaseQuantity(item: CartItem): void {
 
-    const item =
+    const key =
+      this.getCartItemKey(item);
+
+
+    const cartItem =
       this.cartItems.find(
-
-        item =>
-          this.getProductId(item) ===
-          String(productId)
-
+        cart =>
+          this.getCartItemKey(cart) === key
       );
 
 
-    if (!item) {
+    if (!cartItem) {
 
       console.warn(
         'Cart item not found:',
-        productId
+        item
       );
 
       return;
@@ -265,9 +288,13 @@ export class CartService {
     }
 
 
+    // ---------------------------------------------------
+    // STOCK LIMIT
+    // ---------------------------------------------------
+
     if (
-      item.stock !== undefined &&
-      item.quantity >= item.stock
+      cartItem.stock !== undefined &&
+      cartItem.quantity >= cartItem.stock
     ) {
 
       return;
@@ -275,7 +302,7 @@ export class CartService {
     }
 
 
-    item.quantity++;
+    cartItem.quantity++;
 
     this.saveCart();
 
@@ -286,30 +313,29 @@ export class CartService {
   // DECREASE QUANTITY
   // =====================================================
 
-  decreaseQuantity(
-    productId: string
-  ): void {
+  decreaseQuantity(item: CartItem): void {
 
-    const item =
+    const key =
+      this.getCartItemKey(item);
+
+
+    const cartItem =
       this.cartItems.find(
-
-        item =>
-          this.getProductId(item) ===
-          String(productId)
-
+        cart =>
+          this.getCartItemKey(cart) === key
       );
 
 
-    if (!item) {
+    if (!cartItem) {
 
       return;
 
     }
 
 
-    if (item.quantity > 1) {
+    if (cartItem.quantity > 1) {
 
-      item.quantity--;
+      cartItem.quantity--;
 
       this.saveCart();
 
@@ -317,7 +343,7 @@ export class CartService {
 
     else {
 
-      this.removeFromCart(productId);
+      this.removeFromCart(cartItem);
 
     }
 
@@ -328,17 +354,16 @@ export class CartService {
   // REMOVE FROM CART
   // =====================================================
 
-  removeFromCart(
-    productId: string
-  ): void {
+  removeFromCart(item: CartItem): void {
+
+    const key =
+      this.getCartItemKey(item);
+
 
     this.cartItems =
       this.cartItems.filter(
-
-        item =>
-          this.getProductId(item) !==
-          String(productId)
-
+        cart =>
+          this.getCartItemKey(cart) !== key
       );
 
 
@@ -358,9 +383,7 @@ export class CartService {
       (total, item) =>
 
         total +
-
         Number(item.price || 0) *
-
         Number(item.quantity || 0),
 
       0
@@ -376,13 +399,15 @@ export class CartService {
 
   getCartItems(): CartItem[] {
 
-    return [...this.cartItems];
+    return [
+      ...this.cartItems
+    ];
 
   }
 
 
   // =====================================================
-  // GET TOTAL ITEMS
+  // TOTAL ITEMS
   // =====================================================
 
   getTotalItems(): number {
@@ -425,7 +450,8 @@ export class CartService {
   setBuyNowItem(
     product: Product,
     quantity: number = 1,
-    selectedSize?: string
+    selectedSize?: string,
+    selectedColor?: string
   ): void {
 
     this.buyNowItem = {
@@ -433,13 +459,17 @@ export class CartService {
       ...product,
 
       quantity,
-
-      selectedSize
+      selectedSize,
+      selectedColor
 
     };
 
   }
 
+
+  // =====================================================
+  // GET BUY NOW
+  // =====================================================
 
   getBuyNowItem(): CartItem | null {
 
@@ -447,6 +477,10 @@ export class CartService {
 
   }
 
+
+  // =====================================================
+  // CLEAR BUY NOW
+  // =====================================================
 
   clearBuyNow(): void {
 
@@ -461,16 +495,13 @@ export class CartService {
 
   private saveCart(): void {
 
-    this.cartSubject.next(
-      [...this.cartItems]
-    );
+    this.cartSubject.next([
+      ...this.cartItems
+    ]);
 
     localStorage.setItem(
-
       'cart',
-
       JSON.stringify(this.cartItems)
-
     );
 
   }

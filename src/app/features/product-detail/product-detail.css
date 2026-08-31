@@ -742,7 +742,11 @@ img {
 ========================================================= */
 
 .add-cart-button {
+  
   height: 56px;
+  width: 483%;
+  flex: 1;
+
 
   border: 1px solid #111;
   background: #111;

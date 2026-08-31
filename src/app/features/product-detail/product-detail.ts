@@ -37,7 +37,7 @@ export class ProductDetail implements OnInit {
   showProductDetails = false;
   showQualityGuarantee = false;
   selectedSize = 'M';
-  quantity = 1;
+  quantity: number = 1;
   selectedColor: string = '';
   selectedImage = '';
   bestSellerProducts: any[] = [];
@@ -257,11 +257,9 @@ export class ProductDetail implements OnInit {
 
 
     this.cartService.addToCart(
-      {
-        ...this.product,
-        selectedSize: this.selectedSize
-      },
-      this.quantity
+      this.product,
+      this.quantity,
+      this.selectedSize
     );
 
 

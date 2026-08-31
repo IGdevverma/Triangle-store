@@ -153,21 +153,23 @@ export class Header implements OnInit {
 
 
 
-  removeItem(productId: string) {
+  removeItem(item: CartItem): void {
 
-    this.cartService.removeFromCart(productId);
-
-  }
-
-  increase(productId: string) {
-
-    this.cartService.increaseQuantity(productId);
+    this.cartService.removeFromCart(item);
 
   }
 
-  decrease(productId: string) {
 
-    this.cartService.decreaseQuantity(productId);
+  increase(item: CartItem): void {
+
+    this.cartService.increaseQuantity(item);
+
+  }
+
+
+  decrease(item: CartItem): void {
+
+    this.cartService.decreaseQuantity(item);
 
   }
 
