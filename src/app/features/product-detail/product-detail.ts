@@ -11,7 +11,8 @@ import { SeoService } from '../../services/seo';
 import { OtpService } from '../../services/otp.service';
 import { Product } from '../../models/product';
 import { Router } from '@angular/router';
-import {  CartItem
+import {
+  CartItem
 } from '../../services/cart';
 
 import { NgZone } from '@angular/core';
@@ -132,184 +133,39 @@ export class ProductDetail implements OnInit {
 
   ngOnInit(): void {
 
+    // =====================================================
+    // SCROLL TO TOP
+    // =====================================================
+
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
 
-    const id = this.route.snapshot.paramMap.get('id');
-
-    if (!id) {
-      console.error('Product ID not found');
-      return;
-    }
-
-    this.loadingService.show();
-
 
     // =====================================================
-    // GET PRODUCT
+    // GET PRODUCT ID
     // =====================================================
 
-    this.productService.getProductById(id).subscribe({
+    this.route.paramMap.subscribe(params => {
 
-      next: (response: any) => {
+      const id = params.get('id');
 
-        const data: Product = response.product;
-        console.log('PRODUCT FROM API:', data);
-        console.log('PRODUCT SIZES:', data.sizes);
-        console.log('PRODUCT COLORS:', data.colors);
+      if (!id) {
 
-        if (!data) {
+        console.error('Product ID not found');
 
-          console.error('Product not found');
-
-          this.loadingService.hide();
-
-          return;
-        }
-
-
-        // -----------------------------------------------
-        // SET PRODUCT
-        // -----------------------------------------------
-
-        this.product = data;
-
-
-        // -----------------------------------------------
-        // PRODUCT IMAGES
-        // -----------------------------------------------
-
-        this.productImages =
-          data.images?.length
-            ? data.images
-            : data.image
-              ? [data.image]
-              : [];
-
-
-        this.selectedImage =
-          this.productImages.length
-            ? this.productImages[0]
-            : '';
-
-
-        // -----------------------------------------------
-        // REVIEWS
-        // -----------------------------------------------
-
-        const savedReviews = localStorage.getItem(
-          `reviews_${data._id}`
-        );
-
-        if (savedReviews) {
-
-          try {
-
-            this.reviews = JSON.parse(savedReviews);
-
-          } catch (error) {
-
-            console.error(
-              'Error parsing reviews:',
-              error
-            );
-
-            this.reviews = [];
-
-          }
-
-        }
-
-
-        // -----------------------------------------------
-        // SEO
-        // IMPORTANT:
-        // Use data instead of this.product
-        // -----------------------------------------------
-
-        this.seoService.updateSeo(
-
-          `${data.name} | Triangle Sports`,
-
-          data.description ||
-          'Premium sportswear by Triangle Sports.',
-
-          `
-          ${data.category || ''},
-          ${data.brand || ''},
-          ${data.type || ''},
-          Sportswear,
-          Gym Wear
-          `
-
-        );
-
-
-        // -----------------------------------------------
-        // RELATED PRODUCTS
-        // -----------------------------------------------
-
-        this.productService.getProducts().subscribe({
-
-          next: (res: any) => {
-
-            const products: Product[] =
-              res.products || [];
-
-            // Related Products
-            this.relatedProducts = products
-              .filter((p: Product) =>
-                p.category === data.category &&
-                p._id !== data._id
-              )
-              .slice(0, 4);
-
-
-            // Best Sellers
-            this.bestSellerProducts = products
-              .filter((p: Product) =>
-                p._id !== data._id
-              )
-              .slice(0, 3);
-
-
-            this.loadingService.hide();
-
-          },
-
-          error: (error) => {
-
-            console.error(
-              'Error loading related/best seller products:',
-              error
-            );
-
-            this.relatedProducts = [];
-            this.bestSellerProducts = [];
-
-            this.loadingService.hide();
-
-          }
-
-        });
-
-      },
-
-
-      error: (err) => {
-
-        console.error(
-          'Error loading product:',
-          err
-        );
-
-        this.loadingService.hide();
-
+        return;
       }
 
+      console.log('PRODUCT ID:', id);
+
+      // Product load karo
+      this.loadProduct(id);
+
     });
+
+
 
 
     // =====================================================
@@ -330,9 +186,7 @@ export class ProductDetail implements OnInit {
 
     }
 
-
   }
-
 
   // =====================================================
   // QUANTITY
@@ -1157,6 +1011,188 @@ export class ProductDetail implements OnInit {
         this.otpError =
           error?.error?.message ||
           'OTP verification failed.';
+
+      }
+
+    });
+
+  }
+
+
+
+  loadProduct(id: string): void {
+
+    this.loadingService.show();
+
+    this.productService.getProductById(id).subscribe({
+
+      next: (response: any) => {
+
+        const data: Product = response.product;
+
+        console.log('PRODUCT FROM API:', data);
+        console.log('PRODUCT SIZES:', data.sizes);
+        console.log('PRODUCT COLORS:', data.colors);
+
+
+        if (!data) {
+
+          console.error('Product not found');
+
+          this.loadingService.hide();
+
+          return;
+        }
+
+
+        // =================================================
+        // SET PRODUCT
+        // =================================================
+
+        this.product = data;
+
+
+        // =================================================
+        // PRODUCT IMAGES
+        // =================================================
+
+        this.productImages =
+          data.images?.length
+            ? data.images
+            : data.image
+              ? [data.image]
+              : [];
+
+
+        this.selectedImage =
+          this.productImages.length
+            ? this.productImages[0]
+            : '';
+
+
+        // =================================================
+        // REVIEWS
+        // =================================================
+
+        const savedReviews =
+          localStorage.getItem(
+            `reviews_${data._id}`
+          );
+
+
+        if (savedReviews) {
+
+          try {
+
+            this.reviews =
+              JSON.parse(savedReviews);
+
+          } catch (error) {
+
+            console.error(
+              'Error parsing reviews:',
+              error
+            );
+
+            this.reviews = [];
+
+          }
+
+        }
+
+
+        // =================================================
+        // SEO
+        // =================================================
+
+        this.seoService.updateSeo(
+
+          `${data.name} | Triangle Sports`,
+
+          data.description ||
+          'Premium sportswear by Triangle Sports.',
+
+          `
+        ${data.category || ''},
+        ${data.brand || ''},
+        ${data.type || ''},
+        Sportswear,
+        Gym Wear
+        `
+
+        );
+
+
+        // =================================================
+        // RELATED + BEST SELLERS
+        // =================================================
+
+        this.productService.getProducts().subscribe({
+
+          next: (res: any) => {
+
+            const products: Product[] =
+              res.products || [];
+
+
+            // =================================================
+            // RELATED PRODUCTS
+            // =================================================
+
+            this.relatedProducts =
+              products
+                .filter((p: Product) =>
+                  p.category === data.category &&
+                  p._id !== data._id
+                )
+                .slice(0, 4);
+
+
+            // =================================================
+            // BEST SELLERS
+            // =================================================
+
+            this.bestSellerProducts =
+              products
+                .filter((p: Product) =>
+                  p._id !== data._id
+                )
+                .slice(0, 3);
+
+
+            this.loadingService.hide();
+
+          },
+
+
+          error: (error) => {
+
+            console.error(
+              'Error loading related/best seller products:',
+              error
+            );
+
+            this.relatedProducts = [];
+
+            this.bestSellerProducts = [];
+
+            this.loadingService.hide();
+
+          }
+
+        });
+
+      },
+
+
+      error: (err) => {
+
+        console.error(
+          'Error loading product:',
+          err
+        );
+
+        this.loadingService.hide();
 
       }
 
