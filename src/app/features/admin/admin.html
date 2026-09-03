@@ -85,13 +85,14 @@
 
                     <i class="fa-solid fa-magnifying-glass"></i>
 
-                    <input type="text" placeholder="Search Products..." [(ngModel)]="searchTerm">
+                    <input type="text" placeholder="Search Products..." [(ngModel)]="searchTerm"
+                        (ngModelChange)="onProductFilterChange()">
 
                 </div>
 
                 <div class="filters">
 
-                    <select [(ngModel)]="selectedStock">
+                    <select [(ngModel)]="selectedStock" (ngModelChange)="onProductFilterChange()">
 
                         <option>All</option>
 
@@ -990,6 +991,10 @@
                                                 </option>
 
                                                 <option>
+                                                    Vests 3 pack
+                                                </option>
+
+                                                <option>
                                                     Shorts
                                                 </option>
 
@@ -1155,28 +1160,62 @@
                                         </small>
 
 
-                                        <!-- Selected Sizes -->
 
-                                        <div class="selected-options" *ngIf="newProduct.sizes?.length">
 
-                                            <span class="option-tag" *ngFor="
-                let size of newProduct.sizes;
-                let i = index
-            ">
+                                    </div>
 
-                                                {{ size }}
+                                    <!-- =========================
+     PRODUCT PACK OPTIONS
+========================= -->
 
-                                                <button type="button" (click)="removeSize(i)">
-                                                    ×
-                                                </button>
+                                    <div class="full-width pack-section">
 
-                                            </span>
+                                        <label>Pack Options</label>
+
+                                        <div class="pack-options">
+
+                                            <!-- ========================= -->
+                                            <!-- 1 VEST -->
+                                            <!-- ========================= -->
+
+                                            <div class="pack-card">
+
+                                                <h4>1 Vest</h4>
+
+                                                <input type="number" placeholder="Selling Price"
+                                                    [(ngModel)]="packOnePrice">
+
+                                                <input type="number" placeholder="Original Price"
+                                                    [(ngModel)]="packOneOriginalPrice">
+
+                                                <input type="number" placeholder="Discount %"
+                                                    [(ngModel)]="packOneDiscount">
+
+                                            </div>
+
+
+                                            <!-- ========================= -->
+                                            <!-- 3 PACK -->
+                                            <!-- ========================= -->
+
+                                            <div class="pack-card">
+
+                                                <h4>3 Pack</h4>
+
+                                                <input type="number" placeholder="Selling Price"
+                                                    [(ngModel)]="packThreePrice">
+
+                                                <input type="number" placeholder="Original Price"
+                                                    [(ngModel)]="packThreeOriginalPrice">
+
+                                                <input type="number" placeholder="Discount %"
+                                                    [(ngModel)]="packThreeDiscount">
+
+                                            </div>
 
                                         </div>
 
                                     </div>
-
-
 
                                     <!-- SHOW ON HOME -->
 

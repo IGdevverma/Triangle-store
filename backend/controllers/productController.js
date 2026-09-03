@@ -71,15 +71,40 @@ const createProduct = asyncHandler(async (req, res) => {
             .filter(size => size);
 
         // ==============================
-        // CREATE PRODUCT
+        // PACKS
         // ==============================
 
+        let packs = [];
+
+        if (req.body.packs) {
+            try {
+
+                packs = JSON.parse(req.body.packs);
+
+                if (!Array.isArray(packs)) {
+                    packs = [];
+                }
+
+            } catch (error) {
+
+                console.error("packs parse error:", error);
+                packs = [];
+
+            }
+        }
+
+        // ==============================
+        // CREATE PRODUCT
+        // ==============================
+       console.log("FINAL PACKS TO SAVE:", packs);
         const product = await Product.create({
+            
 
             ...req.body,
 
             colors,
             sizes,
+            packs,
 
             sku,
 
@@ -104,24 +129,21 @@ const createProduct = asyncHandler(async (req, res) => {
 
 });
 
+
 // Get All Products
 const getProducts = asyncHandler(async (req, res) => {
 
-    const resultPerPage = 8;
+    const products = await Product.find();
 
-    const totalProducts = await Product.countDocuments();
-
-    const apiFeature = new ApiFeatures(Product.find(), req.query)
-        .search()
-        .filter()
-        .sort()
-        .pagination(resultPerPage);
-
-    const products = await apiFeature.query;
+    console.log("========== GET PRODUCTS ==========");
+    console.log("PRODUCT COUNT:", products.length);
+    console.log("FIRST PRODUCT ID:", products[0]?._id);
+    console.log("FIRST PRODUCT NAME:", products[0]?.name);
+    console.log("FIRST PRODUCT PACKS:", products[0]?.packs);
 
     res.status(200).json({
         success: true,
-        totalProducts,
+        totalProducts: products.length,
         count: products.length,
         products
     });
@@ -144,13 +166,16 @@ const getProductById = asyncHandler(async (req, res) => {
 
 });
 
-// Update Product
+
 // Update Product
 const updateProduct = asyncHandler(async (req, res) => {
     try {
         console.log("========== UPDATE PRODUCT ==========");
         console.log("BODY:", req.body);
         console.log("FILES:", req.files);
+        console.log("========== PACK DEBUG ==========");
+        console.log("REQ.BODY.PACKS:", req.body.packs);
+        console.log("PACKS TYPE:", typeof req.body.packs);
 
         const product = await Product.findById(req.params.id);
 
@@ -238,6 +263,40 @@ const updateProduct = asyncHandler(async (req, res) => {
         }
 
 
+
+
+        // ==========================================
+        // 3.8 PACK OPTIONS
+        // ==========================================
+
+        let packs = product.packs || [];
+
+        if (req.body.packs !== undefined) {
+            try {
+
+                packs = JSON.parse(req.body.packs);
+
+                if (!Array.isArray(packs)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Packs must be an array"
+                    });
+                }
+
+            } catch (error) {
+
+                console.error("PACKS PARSE ERROR:", error);
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid packs format"
+                });
+            }
+        }
+
+        console.log("FINAL PACKS:", packs);
+
+
         // ==========================================
         // 4. COLORS
         // ==========================================
@@ -318,7 +377,8 @@ const updateProduct = asyncHandler(async (req, res) => {
                 key !== "images" &&
                 key !== "existingImages" &&
                 key !== "sizes" &&
-                key !== "colors"
+                key !== "colors" &&
+                key !== "packs"
             ) {
                 product[key] = req.body[key];
             }
@@ -326,6 +386,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         });
         product.sizes = sizes;
         product.colors = colors;
+        product.packs = packs;
 
 
         // ==========================================
@@ -351,6 +412,9 @@ const updateProduct = asyncHandler(async (req, res) => {
         // ==========================================
 
         const updatedProduct = await product.save();
+        console.log("========== AFTER SAVE ==========");
+        console.log("UPDATED PRODUCT ID:", updatedProduct._id);
+        console.log("UPDATED PRODUCT PACKS:", updatedProduct.packs);
 
 
         console.log("UPDATED PRODUCT:", updatedProduct);

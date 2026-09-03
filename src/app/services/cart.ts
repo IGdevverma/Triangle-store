@@ -1,27 +1,132 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { Product } from '../models/product';
+
+import {
+  Product,
+  ProductPack
+} from '../models/product';
+
+
+// =====================================================
+// CART ITEM
+// =====================================================
 
 export interface CartItem extends Product {
+
+  /**
+   * Number of selected packs.
+   *
+   * Example:
+   * 1 x 3 Pack
+   * 2 x 3 Pack
+   */
   quantity: number;
+
+
+  /**
+   * Selected product size.
+   *
+   * Example:
+   * M, L, XL
+   */
   selectedSize?: string;
+
+
+  /**
+   * Selected single color.
+   *
+   * Used for 1 Piece / single-color products.
+   */
   selectedColor?: string;
+
+
+  /**
+   * Selected pack.
+   *
+   * Example:
+   * single
+   * pack-3
+   */
+  selectedPack?: string;
+
+
+  /**
+   * Selected color combination.
+   *
+   * Example:
+   * Blue + Grey + White
+   */
+  selectedCombination?: string;
+
+
+  /**
+   * Actual selling price of ONE selected pack.
+   *
+   * Example:
+   *
+   * 1 Piece = ₹499
+   * 3 Pack  = ₹1299
+   */
+  cartPrice: number;
+
+
+  /**
+   * Number of physical products inside ONE pack.
+   *
+   * Example:
+   *
+   * 1 Piece = 1
+   * 3 Pack  = 3
+   */
+  packQuantity: number;
+
+
+  /**
+   * Unique identifier for the exact variant.
+   *
+   * Product + Pack + Size + Color + Combination
+   */
+  cartItemKey: string;
+
 }
+
+
+// =====================================================
+// CART SERVICE
+// =====================================================
 
 @Injectable({
   providedIn: 'root'
 })
 export class CartService {
 
+  // =====================================================
+  // CART STATE
+  // =====================================================
+
   private cartItems: CartItem[] = [];
 
-  private cartSubject =
+
+  private readonly cartSubject =
     new BehaviorSubject<CartItem[]>([]);
 
-  cart$ =
+
+  readonly cart$ =
     this.cartSubject.asObservable();
 
+
+  // =====================================================
+  // BUY NOW
+  // =====================================================
+
   private buyNowItem: CartItem | null = null;
+
+
+  // =====================================================
+  // STORAGE KEY
+  // =====================================================
+
+  private readonly CART_STORAGE_KEY = 'cart';
 
 
   // =====================================================
@@ -36,27 +141,207 @@ export class CartService {
 
 
   // =====================================================
-  // PRODUCT ID
+  // GET PRODUCT ID
   // =====================================================
 
-  private getProductId(product: Product): string {
+  private getProductId(
+    product: Product
+  ): string {
 
     return String(
-      product._id || product.id || ''
+      product._id ||
+      product.id ||
+      ''
+    ).trim();
+
+  }
+
+
+  // =====================================================
+  // CREATE CART ITEM KEY
+  // =====================================================
+
+  /**
+   * Generates a unique key for the exact product variant.
+   *
+   * Example:
+   *
+   * product123|single|M|Black|
+   *
+   * product123|pack-3|M||combo-1
+   *
+   * Therefore different variants never merge.
+   */
+
+  private createCartItemKey(
+    product: Product,
+    selectedSize?: string,
+    selectedColor?: string,
+    selectedPack?: string,
+    selectedCombination?: string
+  ): string {
+
+    const productId =
+      this.getProductId(product);
+
+
+    const pack =
+      selectedPack?.trim() || 'single';
+
+
+    const size =
+      selectedSize?.trim() || '';
+
+
+    const color =
+      selectedColor?.trim() || '';
+
+
+    const combination =
+      selectedCombination?.trim() || '';
+
+
+    return [
+      productId,
+      pack,
+      size,
+      color,
+      combination
+    ].join('|');
+
+  }
+
+
+  // =====================================================
+  // FIND SELECTED PACK
+  // =====================================================
+
+  private getSelectedPack(
+    product: Product,
+    selectedPack?: string
+  ): ProductPack | undefined {
+
+    if (
+      !selectedPack ||
+      !product.packs?.length
+    ) {
+
+      return undefined;
+
+    }
+
+
+    return product.packs.find(
+      pack =>
+        pack.id === selectedPack
     );
 
   }
 
 
   // =====================================================
-  // CART ITEM KEY
-  // IMPORTANT FOR CLOTHING STORE
-  // Same product + different size/color = separate item
+  // GET PACK QUANTITY
   // =====================================================
 
-  private getCartItemKey(item: CartItem): string {
+  private getPackQuantity(
+    product: Product,
+    selectedPack?: string
+  ): number {
 
-    return `${this.getProductId(item)}_${item.selectedSize || ''}_${item.selectedColor || ''}`;
+    const pack =
+      this.getSelectedPack(
+        product,
+        selectedPack
+      );
+
+
+    const quantity =
+      Number(
+        pack?.quantity ?? 1
+      );
+
+
+    return quantity > 0
+      ? Math.floor(quantity)
+      : 1;
+
+  }
+
+
+  // =====================================================
+  // GET PACK PRICE
+  // =====================================================
+
+  private getPackPrice(
+    product: Product,
+    selectedPack?: string
+  ): number {
+
+    const pack =
+      this.getSelectedPack(
+        product,
+        selectedPack
+      );
+
+
+    return Number(
+      pack?.price ??
+      product.price ??
+      0
+    );
+
+  }
+
+
+  // =====================================================
+  // GET MAXIMUM PACK QUANTITY
+  // =====================================================
+
+  /**
+   * Stock represents INDIVIDUAL physical products.
+   *
+   * Example:
+   *
+   * stock = 10
+   *
+   * 1 Piece:
+   * 10 packs available
+   *
+   * 3 Pack:
+   * floor(10 / 3) = 3 packs available
+   */
+
+  private getMaxPackQuantity(
+    product: Product,
+    selectedPack?: string
+  ): number {
+
+    const stock =
+      Number(
+        product.stock ?? 0
+      );
+
+
+    const packQuantity =
+      this.getPackQuantity(
+        product,
+        selectedPack
+      );
+
+
+    if (
+      stock <= 0 ||
+      packQuantity <= 0
+    ) {
+
+      return 0;
+
+    }
+
+
+    return Math.floor(
+      stock / packQuantity
+    );
 
   }
 
@@ -68,53 +353,120 @@ export class CartService {
   private loadCart(): void {
 
     const savedCart =
-      localStorage.getItem('cart');
+      localStorage.getItem(
+        this.CART_STORAGE_KEY
+      );
+
 
     if (!savedCart) {
 
-      this.cartSubject.next([]);
+      this.publishCart();
 
       return;
 
     }
+
 
     try {
 
       const parsedCart =
         JSON.parse(savedCart);
 
-      if (Array.isArray(parsedCart)) {
 
-        this.cartItems =
-          parsedCart.map(item => ({
+      if (!Array.isArray(parsedCart)) {
 
-            ...item,
+        this.clearStoredCart();
 
-            quantity:
-              Number(item.quantity) > 0
-                ? Number(item.quantity)
-                : 1
-
-          }));
-
-        this.cartSubject.next([
-          ...this.cartItems
-        ]);
+        return;
 
       }
 
-    } catch (error) {
+
+      this.cartItems =
+        parsedCart
+          .filter(
+            item =>
+              item &&
+              typeof item === 'object'
+          )
+          .map(
+            item => {
+
+              const quantity =
+                Number(
+                  item.quantity
+                );
+
+
+              const packQuantity =
+                Number(
+                  item.packQuantity
+                );
+
+
+              const cartPrice =
+                Number(
+                  item.cartPrice ??
+                  item.price ??
+                  0
+                );
+
+
+              const normalizedPackQuantity =
+                packQuantity > 0
+                  ? Math.floor(packQuantity)
+                  : 1;
+
+
+              const normalizedQuantity =
+                quantity > 0
+                  ? Math.floor(quantity)
+                  : 1;
+
+
+              const cartItemKey =
+                item.cartItemKey ||
+                this.createCartItemKey(
+                  item,
+                  item.selectedSize,
+                  item.selectedColor,
+                  item.selectedPack,
+                  item.selectedCombination
+                );
+
+
+              return {
+
+                ...item,
+
+                quantity:
+                  normalizedQuantity,
+
+                packQuantity:
+                  normalizedPackQuantity,
+
+                cartPrice,
+
+                cartItemKey
+
+              } as CartItem;
+
+            }
+          );
+
+
+      this.publishCart();
+
+    }
+
+    catch (error) {
 
       console.error(
-        'Invalid cart data:',
+        'Unable to load cart:',
         error
       );
 
-      this.cartItems = [];
-
-      localStorage.removeItem('cart');
-
-      this.cartSubject.next([]);
+      this.clearStoredCart();
 
     }
 
@@ -129,16 +481,23 @@ export class CartService {
     product: Product,
     quantity: number = 1,
     selectedSize?: string,
-    selectedColor?: string
+    selectedColor?: string,
+    selectedPack?: string,
+    selectedCombination?: string
   ): void {
+
+    // ---------------------------------------------------
+    // PRODUCT ID
+    // ---------------------------------------------------
 
     const productId =
       this.getProductId(product);
 
+
     if (!productId) {
 
       console.error(
-        'Product ID missing:',
+        'Cannot add product without ID:',
         product
       );
 
@@ -148,11 +507,35 @@ export class CartService {
 
 
     // ---------------------------------------------------
-    // QUANTITY VALIDATION
+    // STOCK
+    // ---------------------------------------------------
+
+    const stock =
+      Number(
+        product.stock ?? 0
+      );
+
+
+    if (stock <= 0) {
+
+      console.warn(
+        'Product is out of stock.'
+      );
+
+      return;
+
+    }
+
+
+    // ---------------------------------------------------
+    // NORMALIZE QUANTITY
     // ---------------------------------------------------
 
     quantity =
-      Math.floor(Number(quantity));
+      Math.floor(
+        Number(quantity)
+      );
+
 
     if (quantity < 1) {
 
@@ -162,99 +545,186 @@ export class CartService {
 
 
     // ---------------------------------------------------
-    // STOCK CHECK
+    // PACK QUANTITY
     // ---------------------------------------------------
 
-    const stock =
-      Number(product.stock ?? 0);
+    const packQuantity =
+      this.getPackQuantity(
+        product,
+        selectedPack
+      );
 
-    if (stock <= 0) {
+
+    // ---------------------------------------------------
+    // MAX AVAILABLE PACKS
+    // ---------------------------------------------------
+
+    const maxPackQuantity =
+      this.getMaxPackQuantity(
+        product,
+        selectedPack
+      );
+
+
+    if (maxPackQuantity <= 0) {
 
       console.warn(
-        'Product is out of stock'
+        'Selected pack is unavailable.'
       );
 
       return;
 
     }
 
-    if (quantity > stock) {
 
-      quantity = stock;
+    if (
+      quantity >
+      maxPackQuantity
+    ) {
+
+      quantity =
+        maxPackQuantity;
 
     }
 
 
     // ---------------------------------------------------
-    // TEMP ITEM FOR KEY
+    // CART PRICE
     // ---------------------------------------------------
 
-    const newItem: CartItem = {
-
-      ...product,
-
-      quantity,
-
-      selectedSize,
-      selectedColor
-
-    };
-
-
-    const newKey =
-      this.getCartItemKey(newItem);
+    const cartPrice =
+      this.getPackPrice(
+        product,
+        selectedPack
+      );
 
 
     // ---------------------------------------------------
-    // FIND SAME VARIANT
+    // UNIQUE CART KEY
+    // ---------------------------------------------------
+
+    const cartItemKey =
+      this.createCartItemKey(
+
+        product,
+
+        selectedSize,
+
+        selectedColor,
+
+        selectedPack,
+
+        selectedCombination
+
+      );
+
+
+    // ---------------------------------------------------
+    // FIND EXISTING VARIANT
     // ---------------------------------------------------
 
     const existingItem =
       this.cartItems.find(
         item =>
-          this.getCartItemKey(item) === newKey
+          item.cartItemKey ===
+          cartItemKey
       );
 
 
-    // ---------------------------------------------------
+    // ===================================================
     // EXISTING ITEM
-    // ---------------------------------------------------
+    // ===================================================
 
     if (existingItem) {
 
-      let newQuantity =
-        existingItem.quantity + quantity;
+      const requestedQuantity =
+        existingItem.quantity +
+        quantity;
 
 
-      if (
-        existingItem.stock !== undefined &&
-        newQuantity > existingItem.stock
-      ) {
-
-        newQuantity =
-          existingItem.stock;
-
-      }
+      const maxQuantity =
+        this.getMaxPackQuantity(
+          product,
+          selectedPack
+        );
 
 
       existingItem.quantity =
-        newQuantity;
+        Math.min(
+          requestedQuantity,
+          maxQuantity
+        );
+
+
+      // Keep latest product pricing
+      existingItem.cartPrice =
+        cartPrice;
+
+
+      existingItem.packQuantity =
+        packQuantity;
 
     }
 
 
-    // ---------------------------------------------------
+    // ===================================================
     // NEW ITEM
-    // ---------------------------------------------------
+    // ===================================================
 
     else {
 
-      this.cartItems.push(newItem);
+      const newItem: CartItem = {
+
+        ...product,
+
+        quantity,
+
+        selectedSize,
+
+        selectedColor,
+
+        selectedPack,
+
+        selectedCombination,
+
+        cartPrice,
+
+        packQuantity,
+
+        cartItemKey
+
+      };
+
+
+      this.cartItems.push(
+        newItem
+      );
 
     }
 
 
+    // ---------------------------------------------------
+    // SAVE
+    // ---------------------------------------------------
+
     this.saveCart();
+
+  }
+
+
+  // =====================================================
+  // FIND CART ITEM
+  // =====================================================
+
+  private findCartItem(
+    item: CartItem
+  ): CartItem | undefined {
+
+    return this.cartItems.find(
+      cartItem =>
+        cartItem.cartItemKey ===
+        item.cartItemKey
+    );
 
   }
 
@@ -263,17 +733,12 @@ export class CartService {
   // INCREASE QUANTITY
   // =====================================================
 
-  increaseQuantity(item: CartItem): void {
-
-    const key =
-      this.getCartItemKey(item);
-
+  increaseQuantity(
+    item: CartItem
+  ): void {
 
     const cartItem =
-      this.cartItems.find(
-        cart =>
-          this.getCartItemKey(cart) === key
-      );
+      this.findCartItem(item);
 
 
     if (!cartItem) {
@@ -289,12 +754,19 @@ export class CartService {
 
 
     // ---------------------------------------------------
-    // STOCK LIMIT
+    // MAX PACKS AVAILABLE
     // ---------------------------------------------------
 
+    const maxQuantity =
+      this.getMaxPackQuantity(
+        cartItem,
+        cartItem.selectedPack
+      );
+
+
     if (
-      cartItem.stock !== undefined &&
-      cartItem.quantity >= cartItem.stock
+      cartItem.quantity >=
+      maxQuantity
     ) {
 
       return;
@@ -303,6 +775,7 @@ export class CartService {
 
 
     cartItem.quantity++;
+
 
     this.saveCart();
 
@@ -313,17 +786,12 @@ export class CartService {
   // DECREASE QUANTITY
   // =====================================================
 
-  decreaseQuantity(item: CartItem): void {
-
-    const key =
-      this.getCartItemKey(item);
-
+  decreaseQuantity(
+    item: CartItem
+  ): void {
 
     const cartItem =
-      this.cartItems.find(
-        cart =>
-          this.getCartItemKey(cart) === key
-      );
+      this.findCartItem(item);
 
 
     if (!cartItem) {
@@ -333,19 +801,25 @@ export class CartService {
     }
 
 
-    if (cartItem.quantity > 1) {
+    if (
+      cartItem.quantity > 1
+    ) {
 
       cartItem.quantity--;
 
       this.saveCart();
 
-    }
-
-    else {
-
-      this.removeFromCart(cartItem);
+      return;
 
     }
+
+
+    // Quantity is 1
+    // Remove item
+
+    this.removeFromCart(
+      cartItem
+    );
 
   }
 
@@ -354,41 +828,19 @@ export class CartService {
   // REMOVE FROM CART
   // =====================================================
 
-  removeFromCart(item: CartItem): void {
-
-    const key =
-      this.getCartItemKey(item);
-
+  removeFromCart(
+    item: CartItem
+  ): void {
 
     this.cartItems =
       this.cartItems.filter(
-        cart =>
-          this.getCartItemKey(cart) !== key
+        cartItem =>
+          cartItem.cartItemKey !==
+          item.cartItemKey
       );
 
 
     this.saveCart();
-
-  }
-
-
-  // =====================================================
-  // GET TOTAL
-  // =====================================================
-
-  getTotal(): number {
-
-    return this.cartItems.reduce(
-
-      (total, item) =>
-
-        total +
-        Number(item.price || 0) *
-        Number(item.quantity || 0),
-
-      0
-
-    );
 
   }
 
@@ -407,17 +859,112 @@ export class CartService {
 
 
   // =====================================================
-  // TOTAL ITEMS
+  // GET TOTAL PACKS / CART QUANTITY
   // =====================================================
 
   getTotalItems(): number {
 
     return this.cartItems.reduce(
 
-      (total, item) =>
+      (
+        total,
+        item
+      ) => {
 
-        total +
-        Number(item.quantity || 0),
+        return total +
+          Number(
+            item.quantity || 0
+          );
+
+      },
+
+      0
+
+    );
+
+  }
+
+
+  // =====================================================
+  // GET TOTAL PHYSICAL PRODUCTS
+  // =====================================================
+
+  /**
+   * Example:
+   *
+   * 1 x Single = 1
+   *
+   * 2 x 3 Pack = 6
+   *
+   * 1 x 3 Pack + 2 x Single = 5
+   */
+
+  getTotalProductUnits(): number {
+
+    return this.cartItems.reduce(
+
+      (
+        total,
+        item
+      ) => {
+
+        return total +
+
+          (
+            Number(
+              item.quantity || 0
+            )
+
+            *
+
+            Number(
+              item.packQuantity || 1
+            )
+          );
+
+      },
+
+      0
+
+    );
+
+  }
+
+
+  // =====================================================
+  // GET TOTAL
+  // =====================================================
+
+  getTotal(): number {
+
+    return this.cartItems.reduce(
+
+      (
+        total,
+        item
+      ) => {
+
+        const price =
+          Number(
+            item.cartPrice ??
+            item.price ??
+            0
+          );
+
+
+        const quantity =
+          Number(
+            item.quantity || 0
+          );
+
+
+        return total +
+          (
+            price *
+            quantity
+          );
+
+      },
 
       0
 
@@ -436,9 +983,13 @@ export class CartService {
 
     this.buyNowItem = null;
 
-    this.cartSubject.next([]);
 
-    localStorage.removeItem('cart');
+    localStorage.removeItem(
+      this.CART_STORAGE_KEY
+    );
+
+
+    this.publishCart();
 
   }
 
@@ -451,16 +1002,135 @@ export class CartService {
     product: Product,
     quantity: number = 1,
     selectedSize?: string,
-    selectedColor?: string
+    selectedColor?: string,
+    selectedPack?: string,
+    selectedCombination?: string
   ): void {
+
+    // ---------------------------------------------------
+    // PRODUCT ID
+    // ---------------------------------------------------
+
+    const productId =
+      this.getProductId(product);
+
+
+    if (!productId) {
+
+      console.error(
+        'Cannot create Buy Now item without ID.'
+      );
+
+      return;
+
+    }
+
+
+    // ---------------------------------------------------
+    // MAX QUANTITY
+    // ---------------------------------------------------
+
+    const maxQuantity =
+      this.getMaxPackQuantity(
+        product,
+        selectedPack
+      );
+
+
+    if (maxQuantity <= 0) {
+
+      this.buyNowItem = null;
+
+      return;
+
+    }
+
+
+    // ---------------------------------------------------
+    // NORMALIZE QUANTITY
+    // ---------------------------------------------------
+
+    quantity =
+      Math.floor(
+        Number(quantity)
+      );
+
+
+    quantity =
+      Math.max(
+        1,
+        Math.min(
+          quantity,
+          maxQuantity
+        )
+      );
+
+
+    // ---------------------------------------------------
+    // PACK QUANTITY
+    // ---------------------------------------------------
+
+    const packQuantity =
+      this.getPackQuantity(
+        product,
+        selectedPack
+      );
+
+
+    // ---------------------------------------------------
+    // CART PRICE
+    // ---------------------------------------------------
+
+    const cartPrice =
+      this.getPackPrice(
+        product,
+        selectedPack
+      );
+
+
+    // ---------------------------------------------------
+    // CART KEY
+    // ---------------------------------------------------
+
+    const cartItemKey =
+      this.createCartItemKey(
+
+        product,
+
+        selectedSize,
+
+        selectedColor,
+
+        selectedPack,
+
+        selectedCombination
+
+      );
+
+
+    // ---------------------------------------------------
+    // BUY NOW ITEM
+    // ---------------------------------------------------
 
     this.buyNowItem = {
 
       ...product,
 
       quantity,
+
       selectedSize,
-      selectedColor
+
+      selectedColor,
+
+      selectedPack,
+
+      selectedCombination,
+
+      cartPrice,
+
+      packQuantity,
+
+      cartItemKey
 
     };
 
@@ -495,14 +1165,48 @@ export class CartService {
 
   private saveCart(): void {
 
+    localStorage.setItem(
+
+      this.CART_STORAGE_KEY,
+
+      JSON.stringify(
+        this.cartItems
+      )
+
+    );
+
+
+    this.publishCart();
+
+  }
+
+
+  // =====================================================
+  // PUBLISH CART
+  // =====================================================
+
+  private publishCart(): void {
+
     this.cartSubject.next([
       ...this.cartItems
     ]);
 
-    localStorage.setItem(
-      'cart',
-      JSON.stringify(this.cartItems)
+  }
+
+
+  // =====================================================
+  // CLEAR INVALID STORAGE
+  // =====================================================
+
+  private clearStoredCart(): void {
+
+    this.cartItems = [];
+
+    localStorage.removeItem(
+      this.CART_STORAGE_KEY
     );
+
+    this.publishCart();
 
   }
 

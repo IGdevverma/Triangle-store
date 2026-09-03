@@ -1,18 +1,24 @@
 import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { CartService, CartItem } from '../../services/cart';
-import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
+
+import {
+  CartService,
+  CartItem
+} from '../../services/cart';
 
 @Component({
   selector: 'app-cart',
   standalone: true,
+
   imports: [
     CommonModule,
-    RouterLink,
-    FormsModule
+    FormsModule,
+    RouterLink
   ],
+
   templateUrl: './cart.html',
   styleUrl: './cart.css'
 })
@@ -34,6 +40,8 @@ export class Cart implements OnDestroy {
   couponDiscount = 0;
 
   couponCode = '';
+
+  couponMessage = '';
 
 
   // =====================================================
@@ -59,10 +67,6 @@ export class Cart implements OnDestroy {
     private router: Router
   ) {
 
-    // ---------------------------------------------------
-    // LISTEN TO CART CHANGES
-    // ---------------------------------------------------
-
     this.cartSubscription =
       this.cartService.cart$.subscribe(items => {
 
@@ -87,7 +91,7 @@ export class Cart implements OnDestroy {
 
 
   // =====================================================
-  // TOTAL
+  // CALCULATE SUBTOTAL
   // =====================================================
 
   calculateTotal(): void {
@@ -95,14 +99,43 @@ export class Cart implements OnDestroy {
     this.subtotal =
       this.cartService.getTotal();
 
+    // Coupon ko subtotal change hone par
+    // automatically recalculate karna
+    this.recalculateCoupon();
+
   }
 
 
   // =====================================================
-  // TOTAL ITEMS
+  // TOTAL PRODUCT UNITS
   // =====================================================
 
   get totalItems(): number {
+
+    return this.cartItems.reduce(
+
+      (total, item) => {
+
+        return total +
+          (
+            Number(item.quantity || 0) *
+            Number(item.packQuantity || 1)
+          );
+
+      },
+
+      0
+
+    );
+
+  }
+
+
+  // =====================================================
+  // TOTAL CART LINES
+  // =====================================================
+
+  get totalCartItems(): number {
 
     return this.cartItems.reduce(
 
@@ -153,6 +186,12 @@ export class Cart implements OnDestroy {
 
   get giftProgress(): number {
 
+    if (this.freeGiftTarget <= 0) {
+
+      return 100;
+
+    }
+
     return Math.min(
 
       100,
@@ -191,8 +230,10 @@ export class Cart implements OnDestroy {
 
   get giftUnlocked(): boolean {
 
-    return this.subtotal >=
-      this.freeGiftTarget;
+    return (
+      this.subtotal >=
+      this.freeGiftTarget
+    );
 
   }
 
@@ -242,16 +283,91 @@ export class Cart implements OnDestroy {
         .toUpperCase();
 
 
+    this.couponMessage = '';
+
+
     if (!code) {
+
+      this.couponDiscount = 0;
+
+      this.couponMessage =
+        'Please enter a coupon code';
 
       return;
 
     }
 
 
-    // ---------------------------------------------------
+    // ===================================================
     // SAVE10
-    // ---------------------------------------------------
+    // ===================================================
+
+    if (code === 'SAVE10') {
+
+      this.couponDiscount =
+        Math.round(
+          this.subtotal * 0.10
+        );
+
+      this.couponMessage =
+        'Coupon applied successfully';
+
+      return;
+
+    }
+
+
+    // ===================================================
+    // WELCOME20
+    // ===================================================
+
+    if (code === 'WELCOME20') {
+
+      this.couponDiscount =
+        Math.round(
+          this.subtotal * 0.20
+        );
+
+      this.couponMessage =
+        'Coupon applied successfully';
+
+      return;
+
+    }
+
+
+    // ===================================================
+    // INVALID COUPON
+    // ===================================================
+
+    this.couponDiscount = 0;
+
+    this.couponMessage =
+      'Invalid coupon code';
+
+  }
+
+
+  // =====================================================
+  // RECALCULATE COUPON
+  // =====================================================
+
+  private recalculateCoupon(): void {
+
+    const code =
+      this.couponCode
+        .trim()
+        .toUpperCase();
+
+
+    if (!code) {
+
+      this.couponDiscount = 0;
+
+      return;
+
+    }
+
 
     if (code === 'SAVE10') {
 
@@ -265,10 +381,6 @@ export class Cart implements OnDestroy {
     }
 
 
-    // ---------------------------------------------------
-    // WELCOME20
-    // ---------------------------------------------------
-
     if (code === 'WELCOME20') {
 
       this.couponDiscount =
@@ -281,15 +393,7 @@ export class Cart implements OnDestroy {
     }
 
 
-    // ---------------------------------------------------
-    // INVALID
-    // ---------------------------------------------------
-
     this.couponDiscount = 0;
-
-    alert(
-      'Invalid Coupon Code'
-    );
 
   }
 
@@ -304,6 +408,8 @@ export class Cart implements OnDestroy {
 
     this.couponCode = '';
 
+    this.couponMessage = '';
+
   }
 
 
@@ -314,7 +420,7 @@ export class Cart implements OnDestroy {
   goToCheckout(): void {
 
     // ---------------------------------------------------
-    // EMPTY CART CHECK
+    // EMPTY CART
     // ---------------------------------------------------
 
     if (!this.cartItems.length) {
@@ -325,19 +431,140 @@ export class Cart implements OnDestroy {
 
 
     // ---------------------------------------------------
-    // CLEAR BUY NOW
+    // BUY NOW CLEAR
     // ---------------------------------------------------
 
     this.cartService.clearBuyNow();
 
 
     // ---------------------------------------------------
-    // GO TO CHECKOUT
+    // CHECKOUT
     // ---------------------------------------------------
 
     this.router.navigate([
       '/checkout'
     ]);
+
+  }
+
+
+  // =====================================================
+  // GET ITEM PRICE
+  // =====================================================
+
+  getItemPrice(item: CartItem): number {
+
+    return Number(
+      item.cartPrice ??
+      item.price ??
+      0
+    );
+
+  }
+
+
+  // =====================================================
+  // GET ITEM TOTAL
+  // =====================================================
+
+  getItemTotal(item: CartItem): number {
+
+    return (
+      this.getItemPrice(item) *
+      Number(item.quantity || 0)
+    );
+
+  }
+
+
+  // =====================================================
+  // GET PACK LABEL
+  // =====================================================
+
+  getPackLabel(item: CartItem): string {
+
+    const packQuantity =
+      Number(item.packQuantity || 1);
+
+
+    if (packQuantity === 1) {
+
+      return '1 Piece';
+
+    }
+
+
+    return `${packQuantity} Pack`;
+
+  }
+
+
+  // =====================================================
+  // GET VARIANT LABEL
+  // =====================================================
+
+  getVariantLabel(item: CartItem): string {
+
+    const parts: string[] = [];
+
+
+    // ---------------------------------------------------
+    // SIZE
+    // ---------------------------------------------------
+
+    if (item.selectedSize) {
+
+      parts.push(
+        `Size: ${item.selectedSize}`
+      );
+
+    }
+
+
+    // ---------------------------------------------------
+    // SINGLE COLOR
+    // ---------------------------------------------------
+
+    if (
+      item.selectedColor &&
+      !item.selectedCombination
+    ) {
+
+      parts.push(
+        `Color: ${item.selectedColor}`
+      );
+
+    }
+
+
+    // ---------------------------------------------------
+    // COLOR COMBINATION
+    // ---------------------------------------------------
+
+    if (item.selectedCombination) {
+
+      parts.push(
+        item.selectedCombination
+      );
+
+    }
+
+
+    // ---------------------------------------------------
+    // PACK
+    // ---------------------------------------------------
+
+    if (item.selectedPack) {
+
+      const packLabel =
+        this.getPackLabel(item);
+
+      parts.push(packLabel);
+
+    }
+
+
+    return parts.join(' • ');
 
   }
 

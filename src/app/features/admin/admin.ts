@@ -29,6 +29,14 @@ import { NgxSpinnerService } from 'ngx-spinner';
 
 
 export class Admin implements OnInit, AfterViewInit {
+
+  packOnePrice: number = 0;
+  packOneOriginalPrice: number = 0;
+  packOneDiscount: number = 0;
+
+  packThreePrice: number = 0;
+  packThreeOriginalPrice: number = 0;
+  packThreeDiscount: number = 0;
   i: any;
   changeRole(user: any, role: string) {
 
@@ -95,6 +103,7 @@ export class Admin implements OnInit, AfterViewInit {
   salesChart: any;
   searchTerm = '';
   newSize: string = '';
+
   currentPage = 1;
   showModal = false;
   activeMenu: string = 'dashboard';
@@ -159,7 +168,9 @@ export class Admin implements OnInit, AfterViewInit {
     status: 'Active',
     stock: 0,
     showOnHome: true,
-    availableColors: ''
+    availableColors: '',
+    packs: [],
+    colorCombinations: [],
 
   };
   get totalPages(): number {
@@ -171,19 +182,27 @@ export class Admin implements OnInit, AfterViewInit {
     );
 
     if (this.selectedStock === 'In Stock') {
-      filtered = filtered.filter(product => (product.stock ?? 0) > 0);
+      filtered = filtered.filter(
+        product => (product.stock ?? 0) > 0
+      );
     }
 
     if (this.selectedStock === 'Out of Stock') {
-      filtered = filtered.filter(product => (product.stock ?? 0) === 0);
+      filtered = filtered.filter(
+        product => (product.stock ?? 0) === 0
+      );
     }
 
     if (this.selectedStock === 'Low Stock') {
-      filtered = filtered.filter(product => (product.stock ?? 0) <= 5);
+      filtered = filtered.filter(
+        product => (product.stock ?? 0) <= 5
+      );
     }
 
-    return Math.ceil(filtered.length / this.itemsPerPage);
-
+    return Math.max(
+      1,
+      Math.ceil(filtered.length / this.itemsPerPage)
+    );
   }
 
   constructor(
@@ -216,48 +235,67 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
   loadProducts() {
-    this.productService.getProducts().subscribe({
 
+    this.productService.getProducts().subscribe({
 
       next: (response: any) => {
 
+        console.log('PRODUCTS FROM API:', response);
+        console.log('FIRST PRODUCT:', response.products?.[0]);
+        console.log('FIRST PRODUCT PACKS:', response.products?.[0]?.packs);
 
         const data: Product[] = response.products;
 
-
         this.products = data;
 
-
+        // Total Products
         this.totalProducts = data.length;
+
+        // Total Stock
         this.totalStock = data.reduce(
           (sum, product) => sum + (product.stock ?? 0),
           0
         );
+
+        // Low Stock Products
         this.lowStockProducts = data.filter(
           product => (product.stock ?? 0) <= 5
         );
 
+        // Total Categories
         this.totalCategories = new Set(
           data.map((product: Product) => product.category)
         ).size;
 
+        // Inventory Value
         this.inventoryValue = data.reduce(
           (sum: number, product: Product) =>
             sum + (product.price * (product.stock ?? 0)),
           0
         );
 
-        const expensive = data.reduce(
-          (prev: Product, current: Product) =>
-            prev.price > current.price ? prev : current
-        );
+        // Most Expensive Product
+        if (data.length > 0) {
 
-        this.mostExpensiveProduct = expensive.name;
+          const expensive = data.reduce(
+            (prev: Product, current: Product) =>
+              prev.price > current.price ? prev : current
+          );
+
+          this.mostExpensiveProduct = expensive.name;
+
+        } else {
+
+          this.mostExpensiveProduct = '';
+
+        }
 
       },
 
       error: (err) => {
-        console.error(err);
+
+        console.error('Failed to load products:', err);
+
       }
 
     });
@@ -621,6 +659,11 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
 
+
+  onProductFilterChange(): void {
+    this.currentPage = 1;
+  }
+
   removeProductImage(index: number): void {
 
     this.selectedFiles.splice(index, 1);
@@ -646,6 +689,32 @@ export class Admin implements OnInit, AfterViewInit {
 
     const formData = new FormData();
 
+    // ==========================================
+    // PACK OPTIONS
+    // ==========================================
+    const packs = [
+      {
+        id: 'single',
+        name: '1 Vest',
+        quantity: 1,
+        price: this.packOnePrice,
+        originalPrice: this.packOneOriginalPrice,
+        discount: this.packOneDiscount
+      },
+      {
+        id: 'pack-3',
+        name: '3 Pack',
+        quantity: 3,
+        price: this.packThreePrice,
+        originalPrice: this.packThreeOriginalPrice,
+        discount: this.packThreeDiscount
+      }
+    ];
+
+    formData.append(
+      'packs',
+      JSON.stringify(packs)
+    );
     formData.append('name', this.newProduct.name);
 
     formData.append('price', this.newProduct.price.toString());
@@ -762,49 +831,124 @@ export class Admin implements OnInit, AfterViewInit {
 
 
 
-
   editProduct(product: Product): void {
+
+    console.log('========== EDIT PRODUCT ==========');
+    console.log('PRODUCT:', product);
+    console.log('PACKS:', product.packs);
 
     this.editing = true;
     this.showModal = true;
 
-    // Product ki normal information
+    // ==========================================
+    // COLORS
+    // ==========================================
+
+    const colors = Array.isArray(product.colors)
+      ? product.colors
+        .flatMap((color: string) => color.split(','))
+        .map((color: string) => color.trim())
+        .filter(
+          (color: string) =>
+            color && color.toLowerCase() !== 'undefined'
+        )
+      : [];
+
+    // ==========================================
+    // SIZES
+    // ==========================================
+
+    const sizes = Array.isArray(product.sizes)
+      ? product.sizes
+        .flatMap((size: string) => size.split(','))
+        .map((size: string) => size.trim())
+        .filter((size: string) => size)
+      : [];
+
+    // ==========================================
+    // PRODUCT DATA
+    // ==========================================
+
     this.newProduct = {
       ...product,
 
-      colors: Array.isArray(product.colors)
-        ? product.colors
-          .flatMap((color: string) => color.split(','))
-          .map((color: string) => color.trim())
-          .filter((color: string) => color && color !== 'undefined')
-        : [],
+      colors: colors,
+      sizes: sizes,
 
-      sizes: Array.isArray(product.sizes)
-        ? product.sizes
-          .flatMap((size: string) => size.split(','))
-          .map((size: string) => size.trim())
-          .filter((size: string) => size)
-        : []
+      availableColors: colors.join(', ')
     };
 
-    // New images reset
-    this.selectedFiles = [];
+    // ==========================================
+    // PACK OPTIONS
+    // ==========================================
 
-    // Deleted images reset
+    const packs = Array.isArray(product.packs)
+      ? product.packs
+      : [];
+
+    const singlePack = packs.find(
+      pack => pack.id === 'single'
+    );
+
+    const threePack = packs.find(
+      pack => pack.id === 'pack-3'
+    );
+
+    console.log('SINGLE PACK:', singlePack);
+    console.log('THREE PACK:', threePack);
+
+    // ==========================================
+    // 1 VEST
+    // ==========================================
+
+    this.packOnePrice =
+      Number(singlePack?.price ?? 0);
+
+    this.packOneOriginalPrice =
+      Number(singlePack?.originalPrice ?? 0);
+
+    this.packOneDiscount =
+      Number(singlePack?.discount ?? 0);
+
+    // ==========================================
+    // 3 PACK
+    // ==========================================
+
+    this.packThreePrice =
+      Number(threePack?.price ?? 0);
+
+    this.packThreeOriginalPrice =
+      Number(threePack?.originalPrice ?? 0);
+
+    this.packThreeDiscount =
+      Number(threePack?.discount ?? 0);
+
+    // ==========================================
+    // IMAGES
+    // ==========================================
+
+    this.selectedFiles = [];
     this.removedImages = [];
 
-    // Database/Cloudinary se already saved images
     this.existingImages = product.images?.length
       ? [...product.images]
       : product.image
         ? [product.image]
         : [];
 
-    // UI mein jo images dikhengi
     this.imagePreviews = [...this.existingImages];
 
+    console.log('EDIT DATA:', {
+      colors: this.newProduct.colors,
+      sizes: this.newProduct.sizes,
+      packOnePrice: this.packOnePrice,
+      packOneOriginalPrice: this.packOneOriginalPrice,
+      packOneDiscount: this.packOneDiscount,
+      packThreePrice: this.packThreePrice,
+      packThreeOriginalPrice: this.packThreeOriginalPrice,
+      packThreeDiscount: this.packThreeDiscount
+    });
   }
-
   updateProduct() {
 
     if (!this.isFormValid()) {
@@ -818,6 +962,37 @@ export class Admin implements OnInit, AfterViewInit {
     }
 
     const formData = new FormData();
+
+
+    // ==========================================
+    // PACK OPTIONS
+    // ==========================================
+
+    const packs = [
+      {
+        id: 'single',
+        name: '1 Vest',
+        quantity: 1,
+        price: Number(this.packOnePrice) || 0,
+        originalPrice: Number(this.packOneOriginalPrice) || 0,
+        discount: Number(this.packOneDiscount) || 0
+      },
+      {
+        id: 'pack-3',
+        name: '3 Pack',
+        quantity: 3,
+        price: Number(this.packThreePrice) || 0,
+        originalPrice: Number(this.packThreeOriginalPrice) || 0,
+        discount: Number(this.packThreeDiscount) || 0
+      }
+    ];
+
+
+    formData.append(
+      'packs',
+      JSON.stringify(packs)
+    );
+    console.log('PACKS BEING SENT:', packs);
 
     formData.append('name', this.newProduct.name || '');
     formData.append('price', String(this.newProduct.price || 0));
@@ -1091,39 +1266,84 @@ export class Admin implements OnInit, AfterViewInit {
   }
   openAddModal() {
 
-
     this.editing = false;
-
     this.showModal = true;
+    this.packOnePrice = 0;
+    this.packOneOriginalPrice = 0;
+    this.packOneDiscount = 0;
+
+    this.packThreePrice = 0;
+    this.packThreeOriginalPrice = 0;
+    this.packThreeDiscount = 0;
+
+    this.selectedFiles = [];
+    this.imagePreviews = [];
+    this.existingImages = [];
+    this.removedImages = [];
+    this.newSize = '';
+
 
     this.newProduct = {
+
       name: '',
 
       price: 0,
 
       image: '',
-      originalPrice: 0,
+
       category: '',
+
+      brand: '',
+
+      originalPrice: 0,
 
       description: '',
 
       fabric: '',
 
       type: '',
-      availableColors: '',
+
+      sku: '',
+
+      discount: 0,
+
+      colors: [],
+
+      sizes: [],
+
+      status: 'Active',
 
       stock: 0,
 
-      showOnHome: true
+      showOnHome: true,
+
+      availableColors: ''
+
     };
 
   }
+
+
   closeModal() {
+
 
     this.showModal = false;
 
+    this.packOnePrice = 0;
+    this.packOneOriginalPrice = 0;
+    this.packOneDiscount = 0;
+
+    this.packThreePrice = 0;
+    this.packThreeOriginalPrice = 0;
+    this.packThreeDiscount = 0;
+
     this.selectedFiles = [];
     this.imagePreviews = [];
+
+    this.existingImages = [];
+    this.removedImages = [];
+
+    this.newSize = '';
 
     this.newProduct = {
       name: '',

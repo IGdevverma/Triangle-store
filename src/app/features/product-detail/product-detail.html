@@ -1,14 +1,38 @@
 <!-- =========================================================
-     PRODUCT DETAIL PAGE
+     TRIANGLE SPORTS — PRODUCT DETAIL PAGE
 ========================================================= -->
 
-<div class="product-page" *ngIf="product as product">
+<div class="product-page" *ngIf="product as p">
 
   <!-- =======================================================
-       BREADCRUMB
+       TOP PROMO BAR
   ======================================================== -->
 
-  <div class="product-container">
+  <div class="product-promo-bar">
+
+    <div class="promo-item">
+      <span class="promo-icon">🚚</span>
+      FREE SHIPPING ON ORDERS ₹999+
+    </div>
+
+    <div class="promo-item">
+      <span class="promo-icon">↻</span>
+      EASY 7 DAY RETURNS
+    </div>
+
+  </div>
+
+
+  <!-- =======================================================
+       MAIN CONTAINER
+  ======================================================== -->
+
+  <main class="product-container">
+
+
+    <!-- =====================================================
+         BREADCRUMB
+    ====================================================== -->
 
     <nav class="product-breadcrumb" aria-label="Breadcrumb">
 
@@ -16,64 +40,555 @@
         Home
       </a>
 
-      <span class="breadcrumb-separator">/</span>
+      <span>/</span>
 
-      <a [routerLink]="['/category', product.category]">
-        {{ product.category }}
+      <a [routerLink]="['/category', p.category]">
+        {{ p.category }}
       </a>
 
-      <span class="breadcrumb-separator">/</span>
+      <span>/</span>
 
       <span class="breadcrumb-current">
-        {{ product.name }}
+        {{ p.name }}
       </span>
 
     </nav>
 
 
     <!-- =====================================================
-         MAIN PRODUCT SECTION
+         PRODUCT MAIN GRID
     ====================================================== -->
 
     <section class="product-layout">
 
+
       <!-- ===================================================
-           LEFT : PRODUCT GALLERY
+           LEFT — PRODUCT GALLERY
       ==================================================== -->
 
       <div class="product-gallery">
 
-        <!-- MAIN IMAGE -->
 
-        <div class="main-image-wrapper" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom()">
+        <!-- =================================================
+             IMAGE GALLERY
+        ================================================== -->
 
-          <!-- DISCOUNT -->
+        <div class="gallery-layout">
 
-          <div class="image-discount" *ngIf="product.discount && product.discount > 0">
-            -{{ product.discount }}%
+
+          <!-- ===============================================
+               THUMBNAILS
+          ================================================ -->
+
+          <div class="product-thumbnails">
+
+            <button type="button" class="thumbnail-item" *ngFor="let image of productImages"
+              [class.active]="selectedImage === image" (click)="selectImage(image)"
+              [attr.aria-label]="'View ' + p.name">
+
+              <img [src]="image" [alt]="p.name" loading="lazy">
+
+            </button>
+
           </div>
 
 
-          <!-- IMAGE -->
+          <!-- ===============================================
+               MAIN PRODUCT IMAGE
+          ================================================ -->
 
-          <img class="main-product-image" [src]="selectedImage" [alt]="product.name" [style.transform]="zoomTransform"
-            [style.transform-origin]="zoomOrigin" />
+          <div class="main-image-wrapper" (mousemove)="onMouseMove($event)" (mouseleave)="resetZoom">
+
+
+            <!-- DISCOUNT BADGE -->
+
+            <div class="image-discount" *ngIf="currentDiscount > 0">
+
+              -{{ currentDiscount }}%
+
+            </div>
+
+
+            <!-- WISHLIST -->
+
+            <button type="button" class="image-wishlist" aria-label="Add to wishlist">
+
+              ♡
+
+            </button>
+
+
+            <!-- PREVIOUS IMAGE -->
+
+            <button type="button" class="gallery-arrow gallery-prev" *ngIf="productImages.length > 1"
+              (click)="previousImage()" aria-label="Previous image">
+
+              ‹
+
+            </button>
+
+
+            <!-- MAIN IMAGE -->
+
+            <img class="main-product-image" [src]="selectedImage" [alt]="p.name" [style.transform]="zoomTransform"
+              [style.transform-origin]="zoomOrigin" loading="eager">
+
+
+            <!-- NEXT IMAGE -->
+
+            <button type="button" class="gallery-arrow gallery-next" *ngIf="productImages.length > 1"
+              (click)="nextImage()" aria-label="Next image">
+
+              ›
+
+            </button>
+
+          </div>
 
         </div>
 
 
         <!-- =================================================
-             THUMBNAILS
+             PRODUCT BENEFITS
         ================================================== -->
 
-        <div class="thumbnail-wrapper" *ngIf="productImages.length > 1">
+        <div class="product-benefits">
 
-          <button type="button" class="thumbnail" *ngFor="let image of productImages"
-            [class.active]="selectedImage === image" (click)="selectImage(image)">
 
-            <img [src]="image" [alt]="product.name" loading="lazy" />
+          <div class="benefit-item">
 
-          </button>
+            <div class="benefit-icon">
+              ♢
+            </div>
+
+            <strong>
+              100% PREMIUM
+            </strong>
+
+            <span>
+              COTTON
+            </span>
+
+          </div>
+
+
+          <div class="benefit-item">
+
+            <div class="benefit-icon">
+              ◇
+            </div>
+
+            <strong>
+              SUPER SOFT
+            </strong>
+
+            <span>
+              & BREATHABLE
+            </span>
+
+          </div>
+
+
+          <div class="benefit-item">
+
+            <div class="benefit-icon">
+              ✦
+            </div>
+
+            <strong>
+              NO SHRINKAGE
+            </strong>
+
+            <span>
+              GUARANTEED
+            </span>
+
+          </div>
+
+
+          <div class="benefit-item">
+
+            <div class="benefit-icon">
+              ♧
+            </div>
+
+            <strong>
+              BIO WASH
+            </strong>
+
+            <span>
+              PRE-SHRUNK
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             PRODUCT CONTENT TABS
+        ================================================== -->
+
+        <div class="product-content-section">
+
+
+          <!-- =================================================
+               TAB HEADERS
+          ================================================== -->
+
+          <div class="product-tabs">
+
+
+            <!-- DESCRIPTION -->
+
+            <button type="button" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
+
+              DESCRIPTION
+
+            </button>
+
+
+            <!-- FABRIC & CARE -->
+
+            <button type="button" [class.active]="activeTab === 'fabric'" (click)="activeTab = 'fabric'">
+
+              FABRIC & CARE
+
+            </button>
+
+
+            <!-- REVIEWS -->
+
+            <button type="button" [class.active]="activeTab === 'reviews'" (click)="activeTab = 'reviews'">
+
+              REVIEWS ({{ reviews.length }})
+
+            </button>
+
+
+            <!-- DELIVERY -->
+
+            <button type="button" [class.active]="activeTab === 'delivery'" (click)="activeTab = 'delivery'">
+
+              DELIVERY & RETURNS
+
+            </button>
+
+          </div>
+
+
+          <!-- =================================================
+               DESCRIPTION TAB
+          ================================================== -->
+
+          <div class="product-description" *ngIf="activeTab === 'description'">
+
+
+            <div class="description-copy">
+
+              <p>
+                {{ p.description }}
+              </p>
+
+
+              <ul>
+
+                <li *ngIf="p.fabric">
+                  {{ p.fabric }}
+                </li>
+
+                <li>
+                  Premium quality sportswear
+                </li>
+
+                <li>
+                  Soft and breathable fabric
+                </li>
+
+                <li>
+                  Comfortable fit for everyday movement
+                </li>
+
+                <li>
+                  Designed for performance and durability
+                </li>
+
+              </ul>
+
+            </div>
+
+
+            <div class="description-image" *ngIf="productImages.length">
+
+              <img [src]="productImages[productImages.length - 1]" [alt]="p.name" loading="lazy">
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================
+               FABRIC & CARE TAB
+          ================================================== -->
+
+          <div class="fabric-care-content" *ngIf="activeTab === 'fabric'">
+
+            <div class="fabric-care-grid">
+
+              <div class="fabric-care-card">
+                <div class="fabric-care-icon">◇</div>
+
+                <div>
+                  <h3>Fabric</h3>
+                  <p>{{ p.fabric || 'Premium quality fabric' }}</p>
+                </div>
+              </div>
+
+              <div class="fabric-care-card">
+                <div class="fabric-care-icon">◎</div>
+
+                <div>
+                  <h3>Fit</h3>
+                  <p>Designed for a comfortable athletic fit with easy movement.</p>
+                </div>
+              </div>
+
+              <div class="fabric-care-card">
+                <div class="fabric-care-icon">♧</div>
+
+                <div>
+                  <h3>Machine Wash</h3>
+                  <p>Machine wash cold with similar colours.</p>
+                </div>
+              </div>
+
+              <div class="fabric-care-card">
+                <div class="fabric-care-icon">◌</div>
+
+                <div>
+                  <h3>Drying</h3>
+                  <p>Tumble dry low. Do not use bleach.</p>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="care-instructions">
+
+              <h3>CARE INSTRUCTIONS</h3>
+
+              <ul>
+                <li>Machine wash cold</li>
+                <li>Wash with similar colours</li>
+                <li>Do not bleach</li>
+                <li>Tumble dry low</li>
+                <li>Do not iron directly on prints</li>
+              </ul>
+
+            </div>
+
+          </div>
+
+
+          <!-- =================================================
+               REVIEWS TAB
+          ================================================== -->
+
+          <div class="reviews-content" *ngIf="activeTab === 'reviews'">
+
+
+            <div class="review-item" *ngFor="let review of reviews">
+
+
+              <div class="review-stars">
+
+                <span *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= review.rating">
+
+                  ★
+
+                </span>
+
+              </div>
+
+
+              <p>
+                {{ review.comment }}
+              </p>
+
+
+              <strong>
+                {{ review.name }}
+              </strong>
+
+            </div>
+
+
+            <p class="no-reviews" *ngIf="!reviews.length">
+
+              No reviews yet.
+
+            </p>
+
+          </div>
+
+
+          <!-- =================================================
+               DELIVERY & RETURNS TAB
+          ================================================== -->
+
+          <!-- =================================================
+     DELIVERY & RETURNS
+================================================== -->
+
+          <div class="delivery-tab-content" *ngIf="activeTab === 'delivery'">
+
+            <div class="delivery-tab-grid">
+
+              <div class="delivery-tab-card">
+
+                <span class="delivery-tab-icon">🚚</span>
+
+                <div>
+                  <h3>Fast Delivery</h3>
+
+                  <p>
+                    Free delivery on orders above ₹999.
+                    Orders are dispatched quickly from our facility.
+                  </p>
+                </div>
+
+              </div>
+
+
+              <div class="delivery-tab-card">
+
+                <span class="delivery-tab-icon">↻</span>
+
+                <div>
+                  <h3>7 Day Returns</h3>
+
+                  <p>
+                    Easy returns are available within 7 days
+                    of delivery, subject to our return policy.
+                  </p>
+                </div>
+
+              </div>
+
+
+              <div class="delivery-tab-card">
+
+                <span class="delivery-tab-icon">✓</span>
+
+                <div>
+                  <h3>Secure Packaging</h3>
+
+                  <p>
+                    Every order is carefully packed to ensure
+                    your product reaches you safely.
+                  </p>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================================
+             TRUSTED CUSTOMERS
+        ================================================== -->
+
+        <div class="trusted-section">
+
+
+          <div class="trusted-heading">
+
+            <span></span>
+
+            <h3>
+              TRUSTED BY 50,000+ CUSTOMERS
+            </h3>
+
+            <span></span>
+
+          </div>
+
+
+          <div class="trusted-grid">
+
+
+            <div class="trusted-item">
+
+              <div class="trusted-icon">
+                ♧
+              </div>
+
+              <strong>
+                Premium Quality
+              </strong>
+
+              <span>
+                Made to last
+              </span>
+
+            </div>
+
+
+            <div class="trusted-item">
+
+              <div class="trusted-icon">
+                ◇
+              </div>
+
+              <strong>
+                Best Price
+              </strong>
+
+              <span>
+                Guaranteed
+              </span>
+
+            </div>
+
+
+            <div class="trusted-item">
+
+              <div class="trusted-icon">
+                ♡
+              </div>
+
+              <strong>
+                Loved by Customers
+              </strong>
+
+              <span>
+                50K+ Happy Customers
+              </span>
+
+            </div>
+
+
+            <div class="trusted-item">
+
+              <div class="trusted-icon">
+                ▢
+              </div>
+
+              <strong>
+                Secure Checkout
+              </strong>
+
+              <span>
+                Safe & Fast
+              </span>
+
+            </div>
+
+          </div>
 
         </div>
 
@@ -81,16 +596,31 @@
 
 
       <!-- ===================================================
-           RIGHT : PRODUCT INFORMATION
+           RIGHT — PRODUCT INFORMATION
       ==================================================== -->
 
       <div class="product-information">
 
 
-        <!-- PRODUCT TITLE -->
+        <!-- =================================================
+             PRODUCT BADGE
+        ================================================== -->
+
+        <div class="product-badge">
+
+          BESTSELLER
+
+        </div>
+
+
+        <!-- =================================================
+             PRODUCT TITLE
+        ================================================== -->
 
         <h1 class="product-title">
-          {{ product.name }}
+
+          {{ p.name }}
+
         </h1>
 
 
@@ -100,16 +630,22 @@
 
         <div class="rating-row">
 
+
           <div class="stars">
 
             <span *ngFor="let star of [1,2,3,4,5]" [class.filled]="star <= roundedRating">
+
               ★
+
             </span>
 
           </div>
 
+
           <span class="review-count">
-            {{ reviews.length }} Reviews
+
+            ({{ reviews.length }} reviews)
+
           </span>
 
         </div>
@@ -121,100 +657,305 @@
 
         <div class="price-section">
 
+
           <div class="price-row">
 
             <span class="current-price">
-              ₹{{ product.price | number:'1.0-0' }}
+
+              ₹{{ currentPrice | number:'1.0-0' }}
+
             </span>
 
 
-            <span class="old-price" *ngIf="product.discount && product.discount > 0">
-              ₹{{
-              (
-              product.price /
-              (1 - product.discount / 100)
-              ) | number:'1.0-0'
-              }}
+            <span class="old-price" *ngIf="currentDiscount > 0">
+
+              ₹{{ currentOriginalPrice | number:'1.0-0' }}
+
             </span>
 
 
-            <span class="discount-text" *ngIf="product.discount && product.discount > 0">
-              {{ product.discount }}% OFF
+            <span class="discount-text" *ngIf="currentDiscount > 0">
+
+              {{ currentDiscount }}% OFF
+
             </span>
 
           </div>
 
 
           <p class="tax-text">
-            {{ product.taxText || 'Inclusive of all taxes' }}
+
+            {{ p.taxText || 'Inclusive of all taxes' }}
+
           </p>
 
         </div>
 
 
         <!-- =================================================
-             SIZE
+             PACK SELECTION
         ================================================== -->
 
-        <div class="option-block" *ngIf="product.sizes?.length">
-
-          <div class="option-heading">
-
-            <div class="option-title">
-
-              <span>
-                Select Size
-              </span>
-
-              <strong>
-                {{ selectedSize }}
-              </strong>
-
-            </div>
+        <section class="pack-selection" *ngIf="availablePacks.length > 0">
 
 
-          
+          <div class="option-section-heading">
+
+            <strong>
+              SELECT PACK
+            </strong>
+
           </div>
 
 
-          <div class="size-options">
+          <div class="pack-grid">
 
-            <button type="button" *ngFor="let size of product.sizes" [class.selected]="selectedSize === size"
-              (click)="selectedSize = size">
-              {{ size }}
+
+            <button type="button" class="pack-card" *ngFor="let pack of availablePacks"
+              [class.selected]="selectedPack === pack.id" (click)="selectPack(pack)">
+
+
+              <!-- SELECTED CHECK -->
+
+              <span class="pack-check" *ngIf="selectedPack === pack.id">
+
+                ✓
+
+              </span>
+
+
+              <!-- SAVE BADGE -->
+
+              <span class="pack-save" *ngIf="pack.discount && pack.discount > 0">
+
+                SAVE {{ pack.discount }}%
+
+              </span>
+
+
+              <!-- PACK IMAGE -->
+
+              <div class="pack-image">
+
+                <img *ngIf="productImages.length" [src]="productImages[0]" [alt]="pack.quantity === 1
+                    ? '1 Vest'
+                    : pack.quantity + ' Pack'" loading="lazy">
+
+              </div>
+
+
+              <!-- PACK NAME -->
+
+              <div class="pack-name">
+
+                {{
+                pack.quantity === 1
+                ? '1 Vest'
+                : pack.quantity + ' Pack'
+                }}
+
+              </div>
+
+
+              <!-- PACK PRICE -->
+
+              <div class="pack-price">
+
+                ₹{{ pack.price | number:'1.0-0' }}
+
+              </div>
+
+
+              <!-- PACK OLD PRICE -->
+
+              <div class="pack-old-price" *ngIf="
+                  pack.originalPrice &&
+                  pack.originalPrice > pack.price
+                ">
+
+                ₹{{ pack.originalPrice | number:'1.0-0' }}
+
+              </div>
+
             </button>
 
           </div>
 
-        </div>
-
-
+        </section>
 
 
         <!-- =================================================
-     COLOR SELECTION
-================================================== -->
+             PACK COMBINATION
+        ================================================== -->
 
-        <div class="color-section" *ngIf="product.colors?.length">
+        <section class="combination-section" *ngIf="
+            selectedPackData &&
+            selectedPackData.quantity > 1 &&
+            availableCombinations.length > 0
+          ">
 
-          <!-- Color Header -->
-          <div class="color-header">
 
-            <span class="color-label">
-              Color -
-              <strong>
-                {{ selectedColor || product.colors?.[0] || 'Select Color' }}
-              </strong>
+          <!-- HEADER -->
+
+          <div class="combination-heading">
+
+            <strong>
+              SELECT PACK COMBINATION
+            </strong>
+
+            <span>
+              ({{ selectedPackData.quantity }} Pack)
             </span>
 
           </div>
 
 
-          <!-- Color Swatches -->
+          <!-- COMBINATION GRID -->
+
+          <div class="combination-grid">
+
+
+            <button type="button" class="combination-card" *ngFor="let combination of availableCombinations"
+              [class.selected]="selectedCombination === combination.id" (click)="selectCombination(combination)">
+
+
+              <!-- CHECK -->
+
+              <span class="combination-check" *ngIf="selectedCombination === combination.id">
+
+                ✓
+
+              </span>
+
+
+              <!-- COMBINATION IMAGE -->
+
+              <div class="combination-image">
+
+
+                <!-- IMAGE -->
+
+                <ng-container *ngIf="
+                    combination.images?.[0] as combinationImage
+                  ">
+
+                  <img [src]="combinationImage" alt="Pack combination" loading="lazy">
+
+                </ng-container>
+
+
+                <!-- COLOR FALLBACK -->
+
+                <div class="combination-colors" *ngIf="!combination.images?.[0]">
+
+
+                  <span *ngFor="let color of combination.colors" [style.background-color]="color" [attr.title]="color">
+                  </span>
+
+                </div>
+
+              </div>
+
+            </button>
+
+          </div>
+
+
+          <!-- COUNT -->
+
+          <div class="combination-count">
+
+            {{ availableCombinations.length }}
+            Combination Options
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SIZE
+        ================================================== -->
+
+        <section class="size-section" *ngIf="availableSizes.length > 0">
+
+
+          <div class="size-heading">
+
+
+            <strong>
+              SELECT SIZE
+            </strong>
+
+
+            <span>
+              {{ selectedSize }}
+            </span>
+
+
+            <button type="button" class="size-guide-button" (click)="showSizeGuide = !showSizeGuide">
+
+              ▣ Size Guide
+
+            </button>
+
+          </div>
+
+
+          <!-- SIZE GUIDE -->
+
+          <div class="size-guide-content" *ngIf="showSizeGuide">
+
+            <p>
+              Choose your regular size for the best fit.
+            </p>
+
+          </div>
+
+
+          <!-- SIZE OPTIONS -->
+
+          <div class="size-options">
+
+            <button type="button" *ngFor="let size of availableSizes" [class.selected]="selectedSize === size"
+              (click)="selectSize(size)">
+
+              {{ size }}
+
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COLOR
+        ================================================== -->
+
+        <section class="color-section" *ngIf="availableColors.length > 0">
+
+
+          <div class="color-heading">
+
+            <span>
+
+              Color -
+
+              <strong>
+                {{ displayColor }}
+              </strong>
+
+            </span>
+
+          </div>
+
+
           <div class="color-swatches">
 
-            <button *ngFor="let color of product.colors" type="button" class="color-swatch"
-              [class.selected]="selectedColor === color" [title]="color" (click)="selectedColor = color">
+            <button type="button" class="color-swatch" *ngFor="let color of availableColors"
+              [class.selected]="selectedColor === color" [title]="color" (click)="selectColor(color)">
+
 
               <span class="color-preview" [style.background-color]="color">
               </span>
@@ -223,42 +964,51 @@
 
           </div>
 
-        </div>
+        </section>
 
 
         <!-- =================================================
-     STOCK STATUS
-================================================== -->
+             STOCK
+        ================================================== -->
 
         <div class="stock-status">
 
-          <ng-container *ngIf="product.stock !== undefined && product.stock > 10">
+
+          <!-- IN STOCK -->
+
+          <ng-container *ngIf="p.stock > 10">
 
             <span class="stock-dot green"></span>
 
-            <span>In Stock</span>
+            <strong>
+              In Stock
+            </strong>
 
           </ng-container>
 
 
-          <ng-container *ngIf="product.stock !== undefined &&
-           product.stock > 0 &&
-           product.stock <= 10">
+          <!-- LOW STOCK -->
+
+          <ng-container *ngIf="p.stock > 0 && p.stock <= 10">
 
             <span class="stock-dot yellow"></span>
 
-            <span>
-              Only {{ product.stock }} left
-            </span>
+            <strong>
+              Only {{ p.stock }} left
+            </strong>
 
           </ng-container>
 
 
-          <ng-container *ngIf="product.stock !== undefined && product.stock <= 0">
+          <!-- OUT OF STOCK -->
+
+          <ng-container *ngIf="p.stock <= 0">
 
             <span class="stock-dot red"></span>
 
-            <span>Out of Stock</span>
+            <strong>
+              Out of Stock
+            </strong>
 
           </ng-container>
 
@@ -266,53 +1016,225 @@
 
 
         <!-- =================================================
-             PURCHASE ACTIONS
+             QUANTITY
         ================================================== -->
 
-        <div class="purchase-row">
+        <section class="quantity-section">
 
 
-          <!-- QUANTITY -->
+          <div class="quantity-heading">
+            Quantity
+          </div>
 
+
+          <div class="quantity-control">
+
+
+            <button type="button" (click)="decreaseQuantity()" [disabled]="quantity <= 1">
+
+              −
+
+            </button>
+
+
+            <span>
+              {{ quantity }}
+            </span>
+
+
+            <button type="button" (click)="increaseQuantity()" [disabled]="p.stock <= quantity">
+
+              +
+
+            </button>
+
+          </div>
+
+        </section>
+
+
+        <!-- =================================================
+             TOTAL
+        ================================================== -->
+
+        <div class="total-row">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+            ₹{{ totalPrice | number:'1.0-0' }}
+          </strong>
+
+        </div>
+
+
+        <!-- =================================================
+             PURCHASE BUTTONS
+        ================================================== -->
+
+        <div class="purchase-actions">
 
 
           <!-- ADD TO CART -->
 
-          <button type="button" class="add-cart-button" (click)="addToCart()" [disabled]="product.stock === 0">
+          <button type="button" class="add-cart-button" (click)="addToCart()" [disabled]="p.stock <= 0">
+
+
+            <span class="cart-button-icon">
+              🛒
+            </span>
+
 
             {{
-            product.stock === 0
-            ? 'OUT OF STOCK'
-            : 'ADD TO CART'
-            }}
+            p.stock <= 0 ? 'OUT OF STOCK' : 'ADD TO CART' }} </button>
 
-          </button>
+
+              <!-- BUY NOW -->
+
+              <button type="button" class="buy-now-button" (click)="buyNow()" [disabled]="p.stock <= 0">
+
+                BUY NOW
+
+              </button>
 
         </div>
 
 
         <!-- =================================================
-             BUY NOW
+             DELIVERY BENEFITS
         ================================================== -->
 
-        <button type="button" class="buy-now-button" (click)="buyNow()" [disabled]="product.stock === 0">
-          BUY NOW
-        </button>
+        <div class="delivery-benefits">
+
+
+          <div class="delivery-benefit">
+
+            <div class="delivery-icon">
+              🚚
+            </div>
+
+            <div>
+
+              <strong>
+                Free Delivery
+              </strong>
+
+              <span>
+                On orders above ₹999
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="delivery-benefit">
+
+            <div class="delivery-icon">
+              ↻
+            </div>
+
+            <div>
+
+              <strong>
+                7 Day Returns
+              </strong>
+
+              <span>
+                Return available
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <div class="delivery-benefit">
+
+            <div class="delivery-icon">
+              ✓
+            </div>
+
+            <div>
+
+              <strong>
+                Secure Payment
+              </strong>
+
+              <span>
+                100% protected
+              </span>
+
+            </div>
+
+          </div>
+
+        </div>
+
 
         <!-- =================================================
-     PRODUCT INFORMATION ACCORDION
-================================================== -->
+             DELIVERY / PINCODE
+        ================================================== -->
 
-        <div class="product-info-accordions">
+        <div class="delivery-box">
+
+
+          <div class="delivery-box-header">
+
+            <strong>
+              Delivery & Returns
+            </strong>
+
+          </div>
+
+
+          <div class="pincode-row">
+
+
+            <input type="text" maxlength="6" inputmode="numeric" placeholder="Enter Pincode" [(ngModel)]="pincode">
+
+
+            <button type="button" (click)="checkDelivery()">
+
+              CHECK
+
+            </button>
+
+          </div>
+
+
+          <p class="delivery-message" *ngIf="deliveryMessage">
+
+            {{ deliveryMessage }}
+
+          </p>
+
+        </div>
+
+
+        <!-- =================================================
+             PRODUCT DETAILS ACCORDION
+        ================================================== -->
+
+        <div class="product-accordions">
+
 
           <!-- PRODUCT DETAILS -->
+
           <div class="accordion-item">
+
 
             <button type="button" class="accordion-header" (click)="showProductDetails = !showProductDetails">
 
-              <span>Product Details</span>
 
-              <span class="accordion-icon">
+              <span>
+                Product Details
+              </span>
+
+
+              <span>
                 {{ showProductDetails ? '−' : '+' }}
               </span>
 
@@ -321,54 +1243,55 @@
 
             <div class="accordion-content" *ngIf="showProductDetails">
 
+
               <div class="detail-row">
 
-                <span class="detail-label">
+                <span>
                   Description
                 </span>
 
-                <span class="detail-value">
-                  {{ product.description }}
-                </span>
+                <strong>
+                  {{ p.description }}
+                </strong>
 
               </div>
 
 
               <div class="detail-row">
 
-                <span class="detail-label">
+                <span>
                   Fabric
                 </span>
 
-                <span class="detail-value">
-                  {{ product.fabric }}
-                </span>
+                <strong>
+                  {{ p.fabric || 'Premium Fabric' }}
+                </strong>
 
               </div>
 
 
               <div class="detail-row">
 
-                <span class="detail-label">
+                <span>
                   Type
                 </span>
 
-                <span class="detail-value">
-                  {{ product.type }}
-                </span>
+                <strong>
+                  {{ p.type }}
+                </strong>
 
               </div>
 
 
               <div class="detail-row">
 
-                <span class="detail-label">
+                <span>
                   Category
                 </span>
 
-                <span class="detail-value">
-                  {{ product.category }}
-                </span>
+                <strong>
+                  {{ p.category }}
+                </strong>
 
               </div>
 
@@ -378,159 +1301,105 @@
 
 
           <!-- QUALITY GUARANTEE -->
+
           <div class="accordion-item">
+
 
             <button type="button" class="accordion-header" (click)="showQualityGuarantee = !showQualityGuarantee">
 
-              <span>Quality Guarantee</span>
 
-              <span class="accordion-icon">
+              <span>
+                Quality Guarantee
+              </span>
+
+
+              <span>
                 {{ showQualityGuarantee ? '−' : '+' }}
               </span>
 
             </button>
 
 
-            <div class="accordion-content quality-content" *ngIf="showQualityGuarantee">
+            <div class="accordion-content" *ngIf="showQualityGuarantee">
 
               <p>
-                We are committed to delivering premium quality products
-                designed for comfort, durability and everyday performance.
+
+                We are committed to delivering premium quality
+                sportswear designed for comfort, durability
+                and everyday performance.
+
               </p>
 
             </div>
 
           </div>
 
-
-          <!-- REVIEW -->
-          <div class="product-review">
-
-            <p class="review-text">
-              Triangle Sports doesn't just fit — it performs.
-              Premium comfort, quality and a fit made for everyday movement.
-            </p>
-
-            <div class="review-author">
-
-              <span>
-                Triangle Sports Customer
-              </span>
-
-              <span class="stars">
-                ★★★★★
-              </span>
-
-            </div>
-
-          </div>
-
         </div>
-
-        <!-- =================================================
-     BEST SELLERS
-================================================== -->
-
-
-
-
-
-
-
-
-
 
       </div>
 
     </section>
-
-
-
-
-
 
 
     <!-- =====================================================
-         REVIEWS
+         BEST SELLERS
     ====================================================== -->
 
-    <section class="review-section" *ngIf="reviews.length">
-
-      <div class="review-section-header">
-
-        <h2>
-          Customer Reviews
-        </h2>
-
-        <span>
-          {{ reviews.length }} Reviews
-        </span>
-
-      </div>
-
-
-      <div class="review-preview">
-
-        <p>
-          {{ reviews[0]?.comment }}
-        </p>
-
-
-        <div class="review-author">
-
-          <span>
-            {{ reviews[0]?.name }}
-          </span>
-
-
-          <span class="review-stars">
-
-            {{ '★'.repeat(reviews[0]?.rating || 5) }}
-
-          </span>
-
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- BEST SELLERS -->
     <section class="best-sellers-section" *ngIf="bestSellerProducts.length > 0">
 
-      <h2 class="best-sellers-title">BEST SELLERS</h2>
+
+      <div class="section-heading">
+
+        <span></span>
+
+        <h2>
+          BEST SELLERS
+        </h2>
+
+        <span></span>
+
+      </div>
+
 
       <div class="best-sellers-grid">
 
-        <div class="best-seller-card" *ngFor="let item of bestSellerProducts" [routerLink]="['/product', item._id]">
 
-          <!-- Product Image -->
+        <article class="best-seller-card" *ngFor="let item of bestSellerProducts"
+          [routerLink]="['/product', item._id || item.id]">
+
+
           <div class="best-seller-image">
-            <img [src]="item.images?.[0] || item.image" [alt]="item.name" />
+
+            <img [src]="item.images?.[0] || item.image" [alt]="item.name" loading="lazy">
+
           </div>
 
-          <!-- Product Info -->
+
           <div class="best-seller-info">
 
             <h3>
               {{ item.name }}
             </h3>
 
-            <div class="best-seller-price">
-              ₹{{ item.price }}
-            </div>
+            <strong>
+              ₹{{ item.price | number:'1.0-0' }}
+            </strong>
 
           </div>
 
-        </div>
+        </article>
 
       </div>
 
-      <!-- View All Button -->
-      <div class="best-sellers-view-all">
-        <button routerLink="/shop">
-          View all
+
+      <div class="section-view-all">
+
+        <button type="button" routerLink="/shop">
+
+          VIEW ALL
+
         </button>
+
       </div>
 
     </section>
@@ -540,35 +1409,38 @@
          YOU MAY ALSO LIKE
     ====================================================== -->
 
-    <section class="you-may-like-section" *ngIf="relatedProducts.length">
+    <section class="you-may-like-section" *ngIf="relatedProducts.length > 0">
 
-      <div class="you-may-like-header">
+
+      <div class="section-heading">
+
+        <span></span>
 
         <h2>
-          You may also like
+          YOU MAY ALSO LIKE
         </h2>
+
+        <span></span>
 
       </div>
 
 
-      <div class="you-may-like-grid">
+      <div class="recommendation-grid">
 
 
-        <article class="recommendation-card" *ngFor="let item of relatedProducts" [routerLink]="['/product', item._id]">
+        <article class="recommendation-card" *ngFor="let item of relatedProducts"
+          [routerLink]="['/product', item._id || item.id]">
 
-
-          <!-- IMAGE -->
 
           <div class="recommendation-image">
 
-            <img [src]="item.image" [alt]="item.name" loading="lazy" />
+            <img [src]="item.images?.[0] || item.image" [alt]="item.name" loading="lazy">
 
           </div>
 
 
-          <!-- INFO -->
-
           <div class="recommendation-info">
+
 
             <h3>
               {{ item.name }}
@@ -577,14 +1449,13 @@
 
             <div class="recommendation-price">
 
-              <span class="sale-price">
 
+              <strong>
                 ₹{{ item.price | number:'1.0-0' }}
+              </strong>
 
-              </span>
 
-
-              <span class="original-price" *ngIf="item.discount && item.discount > 0">
+              <span *ngIf="item.discount && item.discount > 0">
 
                 ₹{{
                 (
@@ -600,10 +1471,13 @@
           </div>
 
 
-          <!-- ADD -->
+          <button type="button" class="recommendation-add" (click)="
+              $event.stopPropagation();
+              addRelatedToCart(item)
+            ">
 
-          <button type="button" class="recommendation-add" (click)="$event.stopPropagation(); addRelatedToCart(item)">
-            + Add
+            + ADD
+
           </button>
 
         </article>
@@ -612,322 +1486,6 @@
 
     </section>
 
-  </div>
-
-</div>
-
-
-<!-- =========================================================
-     BUY NOW CHECKOUT MODAL
-========================================================= -->
-
-<div class="buy-now-overlay" *ngIf="showBuyNowModal" (click)="closeBuyNowModal()">
-
-
-  <div class="buy-now-modal" (click)="$event.stopPropagation()">
-
-
-    <!-- =====================================================
-         MODAL HEADER
-    ====================================================== -->
-
-    <div class="buy-now-header">
-
-      <button type="button" class="modal-close" (click)="closeBuyNowModal()" aria-label="Close">
-        ×
-      </button>
-
-
-      <div class="modal-logo">
-        TRIANGLE SPORTS
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         SHIPPING BAR
-    ====================================================== -->
-
-    <div class="shipping-bar">
-
-      FREE SHIPPING ON ALL PREPAID ORDERS
-
-    </div>
-
-
-    <!-- =====================================================
-         ORDER SUMMARY
-    ====================================================== -->
-
-    <div class="order-summary" *ngIf="product as p">
-
-
-      <div class="summary-header">
-
-
-        <div>
-
-          <strong>
-            Order summary
-          </strong>
-
-          <span>
-            ({{ quantity }}
-            {{ quantity === 1 ? 'Item' : 'Items' }})
-          </span>
-
-        </div>
-
-
-        <div class="summary-price">
-
-
-          <span class="summary-old-price" *ngIf="(p.discount ?? 0) > 0">
-
-            ₹{{
-            (
-            p.price +
-            (
-            p.price *
-            (p.discount ?? 0) /
-            (100 - (p.discount ?? 0))
-            )
-            ) | number:'1.0-0'
-            }}
-
-          </span>
-
-
-          <strong>
-            ₹{{ (p.price * quantity) | number:'1.0-0' }}
-          </strong>
-
-
-          <span class="summary-arrow">
-            ⌄
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- COUPON -->
-
-      <div class="coupon-row">
-
-        <div class="coupon-icon">
-          %
-        </div>
-
-
-        <input type="text" placeholder="Enter coupon code" [(ngModel)]="couponCode" (keyup.enter)="applyCoupon()" />
-
-
-        <button type="button" (click)="applyCoupon()">
-          Apply
-        </button>
-
-      </div>
-
-
-      <p class="coupon-message" [class.success]="couponMessage.includes('successfully')" *ngIf="couponMessage">
-        {{ couponMessage }}
-      </p>
-
-    </div>
-
-
-    <!-- =====================================================
-         MOBILE / OTP
-    ====================================================== -->
-
-    <div class="mobile-section" *ngIf="!otpSent">
-
-      <h2>
-        Enter mobile number
-      </h2>
-
-
-      <p>
-        Provide your mobile number to continue
-      </p>
-
-
-      <div class="mobile-input-wrapper" [class.input-error]="mobileError">
-
-        <div class="country-code">
-
-          <span class="india-flag">
-            🇮🇳
-          </span>
-
-          <span>
-            +91
-          </span>
-
-        </div>
-
-
-        <input type="tel" maxlength="10" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile number"
-          [(ngModel)]="mobileNumber" (input)="onMobileInput()" />
-
-      </div>
-
-
-      <p class="mobile-error" *ngIf="mobileError">
-        {{ mobileError }}
-      </p>
-
-
-      <button type="button" class="continue-button" [disabled]="isSendingOtp" (click)="continueToCheckout()">
-
-        {{
-        isSendingOtp
-        ? 'SENDING OTP...'
-        : 'CONTINUE'
-        }}
-
-      </button>
-
-    </div>
-
-
-    <!-- =====================================================
-         OTP
-    ====================================================== -->
-
-    <div class="otp-section" *ngIf="otpSent">
-
-      <h2>
-        Enter OTP
-      </h2>
-
-
-      <p>
-        OTP sent to +91 {{ mobileNumber }}
-      </p>
-
-
-      <input type="tel" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="Enter 6-digit OTP"
-        [(ngModel)]="otp" (input)="onOtpInput()" />
-
-
-      <p class="mobile-error" *ngIf="otpError">
-        {{ otpError }}
-      </p>
-
-
-      <button type="button" class="continue-button" [disabled]="isVerifyingOtp" (click)="verifyOtp()">
-
-        {{
-        isVerifyingOtp
-        ? 'VERIFYING...'
-        : 'VERIFY OTP'
-        }}
-
-      </button>
-
-
-      <button type="button" class="resend-button" [disabled]="resendDisabled" (click)="resendOtp()">
-
-        {{
-        resendDisabled
-        ? 'Resend in ' + resendTimer + 's'
-        : 'RESEND OTP'
-        }}
-
-      </button>
-
-    </div>
-
-
-    <!-- =====================================================
-         CHECKOUT BENEFITS
-    ====================================================== -->
-
-    <div class="checkout-benefits">
-
-
-      <div class="checkout-benefit">
-
-        <div class="benefit-symbol">
-          ▣
-        </div>
-
-        <span>
-          PCI DSS certified
-        </span>
-
-      </div>
-
-
-      <div class="checkout-benefit">
-
-        <div class="benefit-symbol">
-          ▱
-        </div>
-
-        <span>
-          Secure payments
-        </span>
-
-      </div>
-
-
-      <div class="checkout-benefit">
-
-        <div class="benefit-symbol">
-          ✓
-        </div>
-
-        <span>
-          Assured delivery
-        </span>
-
-      </div>
-
-
-      <div class="checkout-benefit">
-
-        <div class="benefit-symbol">
-          ♢
-        </div>
-
-        <span>
-          Verified seller
-        </span>
-
-      </div>
-
-    </div>
-
-
-    <!-- =====================================================
-         FOOTER
-    ====================================================== -->
-
-    <div class="modal-footer">
-
-      <span>
-        T&amp;C
-      </span>
-
-      <span>
-        |
-      </span>
-
-      <span>
-        Privacy Policy
-      </span>
-
-      <span class="powered-by">
-        Secure Checkout
-      </span>
-
-    </div>
-
-  </div>
+  </main>
 
 </div>

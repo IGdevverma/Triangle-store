@@ -90,6 +90,79 @@ const productSchema = new mongoose.Schema(
       enum: ["Active", "Draft", "Hidden"],
       default: "Active",
     },
+    // =====================================================
+    // PRODUCT PACKS
+    // =====================================================
+
+    packs: [
+      {
+        id: {
+          type: String,
+          required: true
+        },
+
+        name: {
+          type: String,
+          required: true
+        },
+
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1
+        },
+
+        price: {
+          type: Number,
+          required: true,
+          min: 0
+        },
+
+        originalPrice: {
+          type: Number,
+          default: 0
+        },
+
+        discount: {
+          type: Number,
+          default: 0
+        },
+
+        image: {
+          type: String,
+          default: ''
+        }
+      }
+    ],
+
+
+    // =====================================================
+    // 3-PACK COLOR COMBINATIONS
+    // =====================================================
+
+    colorCombinations: [
+      {
+        id: {
+          type: String,
+          required: true
+        },
+
+        name: {
+          type: String,
+          required: true
+        },
+
+        colors: {
+          type: [String],
+          default: []
+        },
+
+        images: {
+          type: [String],
+          default: []
+        }
+      }
+    ],
 
     showOnHome: {
       type: Boolean,
