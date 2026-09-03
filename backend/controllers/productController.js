@@ -96,9 +96,9 @@ const createProduct = asyncHandler(async (req, res) => {
         // ==============================
         // CREATE PRODUCT
         // ==============================
-       console.log("FINAL PACKS TO SAVE:", packs);
+        console.log("FINAL PACKS TO SAVE:", packs);
         const product = await Product.create({
-            
+
 
             ...req.body,
 
@@ -151,7 +151,7 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 
 // Get Single Product
-const getProductById = asyncHandler(async (req, res) => {
+const getProductById = asyncHandler(async (req, res, next) => {
 
     const product = await Product.findById(req.params.id);
 
