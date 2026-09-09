@@ -129,15 +129,14 @@
                         {{ item.name }}
                     </h2>
 
-                    <p class="variant" *ngIf="item.sizes">
-                        {{ item.sizes }}
+
+                    <p class="variant" *ngIf="getVariantLabel(item)">
+                        {{ getVariantLabel(item) }}
                     </p>
 
 
                     <div class="price">
-
-                        ₹{{ item.price }}
-
+                        ₹{{ getItemPrice(item) }}
                     </div>
 
 
@@ -167,7 +166,7 @@
                 <div class="item-right">
 
                     <strong>
-                        ₹{{ item.price * item.quantity }}
+                        ₹{{ getItemTotal(item) }}
                     </strong>
 
                     <button type="button" class="remove-btn" (click)="removeItem(item)">

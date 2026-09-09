@@ -25,332 +25,332 @@
 
 
 
-    
 
-      <!-- ================= MEN ================= -->
 
-      <li class="dropdown mega-small">
+    <!-- ================= MEN ================= -->
 
-        <span class="menu-title">
-          MEN
-          <i class="fa-solid fa-chevron-down arrow"></i>
-        </span>
+    <li class="dropdown mega-small">
 
-        <div class="mega-menu">
+      <span class="menu-title">
+        MEN
+        <i class="fa-solid fa-chevron-down arrow"></i>
+      </span>
 
-          <div class="mega-column">
+      <div class="mega-menu">
 
-            <h4>Topwear</h4>
+        <div class="mega-column">
 
-            <a routerLink="/shop">T-Shirts</a>
-            <a routerLink="/shop">Uppers</a>
-            <a routerLink="/shop">Compressions</a>
+          <h4>Topwear</h4>
 
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Bottomwear</h4>
-
-            <a routerLink="/shop">Shorts</a>
-            <a routerLink="/shop">Track Pants</a>
-
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Shop By Sport</h4>
-
-            <a routerLink="/shop">Cricket</a>
-            <a routerLink="/shop">Gym</a>
-            <a routerLink="/shop">Running</a>
-
-          </div>
+          <a routerLink="/shop">T-Shirts</a>
+          <a routerLink="/shop">Uppers</a>
+          <a routerLink="/shop">Compressions</a>
 
         </div>
 
-      </li>
+        <div class="mega-column">
 
-      <!-- ================= WOMEN ================= -->
+          <h4>Bottomwear</h4>
 
-      <li class="dropdown mega-small">
-
-        <span class="menu-title">
-          WOMEN
-          <i class="fa-solid fa-chevron-down arrow"></i>
-        </span>
-
-        <div class="mega-menu">
-
-          <div class="mega-column">
-
-            <h4>Topwear</h4>
-
-            <a routerLink="/shop">T-Shirts</a>
-            <a routerLink="/shop">Uppers</a>
-            <a routerLink="/shop">Compressions</a>
-
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Bottomwear</h4>
-
-            <a routerLink="/shop">Shorts</a>
-            <a routerLink="/shop">Track Pants</a>
-
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Shop By Sport</h4>
-
-            <a routerLink="/shop">Cricket</a>
-            <a routerLink="/shop">Gym</a>
-            <a routerLink="/shop">Running</a>
-
-          </div>
+          <a routerLink="/shop">Shorts</a>
+          <a routerLink="/shop">Track Pants</a>
 
         </div>
 
-      </li>
+        <div class="mega-column">
 
-      <!-- ================= ACCESSORIES ================= -->
+          <h4>Shop By Sport</h4>
 
-      <li class="dropdown mega-large">
-
-        <span class="menu-title">
-          ACCESSORIES
-          <i class="fa-solid fa-chevron-down arrow"></i>
-        </span>
-
-        <div class="mega-menu">
-
-          <div class="mega-column">
-
-            <h4>Performance</h4>
-
-            <a routerLink="/shop">Arm Sleeves</a>
-            <a routerLink="/shop">Wrist Bands</a>
-
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Training Gear</h4>
-
-            <a routerLink="/shop">Gym Gloves</a>
-            <a routerLink="/shop">Head Bands</a>
-            <a routerLink="/shop">Sports Socks</a>
-
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Essentials</h4>
-
-            <a routerLink="/shop">Caps</a>
-            <a routerLink="/shop">Water Bottles</a>
-            <a routerLink="/shop">Gym Bags</a>
-
-          </div>
-
-          <div class="mega-column">
-
-            <h4>Custom Orders</h4>
-
-            <a routerLink="/request-quote">Corporate T-Shirts & Caps</a>
-            <a routerLink="/request-quote">Tournament Jerseys</a>
-            <a routerLink="/request-quote">Bulk Orders</a>
-
-          </div>
-
-        </div>
-
-      </li>
-
-      <!-- ================= DESIGN ================= -->
-
-      <li class="design-link" routerLink="/team-kit-designer">
-
-        DESIGN YOUR OWN
-
-      </li>
-
-    </ul>
-
-    <!-- Right Icons -->
-
-    <div class="nav-icons">
-
-      <!-- User Menu -->
-
-      <div class="user-menu" (click)="toggleUserMenu()">
-
-        <i class="fa-solid fa-user"></i>
-
-        <span>
-
-          {{ isLoggedIn() ? getUserName() : 'Sign In' }}
-
-        </span>
-
-        <i class="fa-solid fa-chevron-down"></i>
-
-        <div class="user-dropdown" *ngIf="isUserMenuOpen">
-
-          <!-- Guest -->
-
-          <ng-container *ngIf="!isLoggedIn()">
-
-            <a routerLink="/login">
-              <i class="fa-solid fa-right-to-bracket"></i>
-              <span>Login</span>
-            </a>
-
-
-
-            <a routerLink="/register">
-
-              <i class="fa-solid fa-user-plus"></i>
-
-              Signup
-
-            </a>
-
-          </ng-container>
-
-          <!-- Logged In -->
-
-          <ng-container *ngIf="isLoggedIn()">
-
-            <!-- Admin -->
-
-            <ng-container *ngIf="isAdmin(); else userMenu">
-
-              <a routerLink="/admin">
-                <i class="fa-solid fa-gauge"></i>
-                <span>Dashboard</span>
-              </a>
-
-
-
-            </ng-container>
-
-            <!-- User -->
-
-            <ng-template #userMenu>
-
-
-
-
-              <a routerLink="/profile/edit">
-                <i class="fa-solid fa-user-pen"></i>
-                <span> Profile</span>
-              </a>
-
-              <a routerLink="/orders">
-                <i class="fa-solid fa-bag-shopping"></i>
-                <span>My Orders</span>
-              </a>
-
-              <a routerLink="/dashboard">
-
-                <i class="fa-solid fa-gauge-high"></i>
-
-                <span>Dashboard</span>
-
-              </a>
-
-            </ng-template>
-
-            <hr>
-
-            <a (click)="logout()">
-              <i class="fa-solid fa-right-from-bracket"></i>
-              <span>Logout</span>
-            </a>
-
-          </ng-container>
+          <a routerLink="/shop">Cricket</a>
+          <a routerLink="/shop">Gym</a>
+          <a routerLink="/shop">Running</a>
 
         </div>
 
       </div>
 
-      <!--Search-->
-      <div class="search-container">
-        <i class="fa-solid fa-magnifying-glass" (click)="toggleSearch()"></i>
-        <div class="search-dropdown" *ngIf="isSearchOpen">
+    </li>
 
-          <div class="search-input">
+    <!-- ================= WOMEN ================= -->
 
-            <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterSearch()"
-              (keyup.enter)="searchProducts()">
+    <li class="dropdown mega-small">
 
-            <div class="search-results" *ngIf="searchResults.length > 0">
+      <span class="menu-title">
+        WOMEN
+        <i class="fa-solid fa-chevron-down arrow"></i>
+      </span>
 
-              <div class="search-item" *ngFor="let product of searchResults" [routerLink]="['/product', product._id]"
-                (click)="isSearchOpen = false">
+      <div class="mega-menu">
 
-                <img [src]="product.image" [alt]="product.name">
+        <div class="mega-column">
 
-                <div>
+          <h4>Topwear</h4>
 
-                  <strong>{{ product.name }}</strong>
+          <a routerLink="/shop">T-Shirts</a>
+          <a routerLink="/shop">Uppers</a>
+          <a routerLink="/shop">Compressions</a>
 
-                  <p>₹{{ product.price }}</p>
+        </div>
 
-                </div>
+        <div class="mega-column">
+
+          <h4>Bottomwear</h4>
+
+          <a routerLink="/shop">Shorts</a>
+          <a routerLink="/shop">Track Pants</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Shop By Sport</h4>
+
+          <a routerLink="/shop">Cricket</a>
+          <a routerLink="/shop">Gym</a>
+          <a routerLink="/shop">Running</a>
+
+        </div>
+
+      </div>
+
+    </li>
+
+    <!-- ================= ACCESSORIES ================= -->
+
+    <li class="dropdown mega-large">
+
+      <span class="menu-title">
+        ACCESSORIES
+        <i class="fa-solid fa-chevron-down arrow"></i>
+      </span>
+
+      <div class="mega-menu">
+
+        <div class="mega-column">
+
+          <h4>Performance</h4>
+
+          <a routerLink="/shop">Arm Sleeves</a>
+          <a routerLink="/shop">Wrist Bands</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Training Gear</h4>
+
+          <a routerLink="/shop">Gym Gloves</a>
+          <a routerLink="/shop">Head Bands</a>
+          <a routerLink="/shop">Sports Socks</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Essentials</h4>
+
+          <a routerLink="/shop">Caps</a>
+          <a routerLink="/shop">Water Bottles</a>
+          <a routerLink="/shop">Gym Bags</a>
+
+        </div>
+
+        <div class="mega-column">
+
+          <h4>Custom Orders</h4>
+
+          <a routerLink="/request-quote">Corporate T-Shirts & Caps</a>
+          <a routerLink="/request-quote">Tournament Jerseys</a>
+          <a routerLink="/request-quote">Bulk Orders</a>
+
+        </div>
+
+      </div>
+
+    </li>
+
+    <!-- ================= DESIGN ================= -->
+
+    <li class="design-link" routerLink="/team-kit-designer">
+
+      DESIGN YOUR OWN
+
+    </li>
+
+  </ul>
+
+  <!-- Right Icons -->
+
+  <div class="nav-icons">
+
+    <!-- User Menu -->
+
+    <div class="user-menu" (click)="toggleUserMenu()">
+
+      <i class="fa-solid fa-user"></i>
+
+      <span>
+
+        {{ isLoggedIn() ? getUserName() : 'Sign In' }}
+
+      </span>
+
+      <i class="fa-solid fa-chevron-down"></i>
+
+      <div class="user-dropdown" *ngIf="isUserMenuOpen">
+
+        <!-- Guest -->
+
+        <ng-container *ngIf="!isLoggedIn()">
+
+          <a routerLink="/login">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            <span>Login</span>
+          </a>
+
+
+
+          <a routerLink="/register">
+
+            <i class="fa-solid fa-user-plus"></i>
+
+            Signup
+
+          </a>
+
+        </ng-container>
+
+        <!-- Logged In -->
+
+        <ng-container *ngIf="isLoggedIn()">
+
+          <!-- Admin -->
+
+          <ng-container *ngIf="isAdmin(); else userMenu">
+
+            <a routerLink="/admin">
+              <i class="fa-solid fa-gauge"></i>
+              <span>Dashboard</span>
+            </a>
+
+
+
+          </ng-container>
+
+          <!-- User -->
+
+          <ng-template #userMenu>
+
+
+
+
+            <a routerLink="/profile/edit">
+              <i class="fa-solid fa-user-pen"></i>
+              <span> Profile</span>
+            </a>
+
+            <a routerLink="/orders">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>My Orders</span>
+            </a>
+
+            <a routerLink="/dashboard">
+
+              <i class="fa-solid fa-gauge-high"></i>
+
+              <span>Dashboard</span>
+
+            </a>
+
+          </ng-template>
+
+          <hr>
+
+          <a (click)="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </a>
+
+        </ng-container>
+
+      </div>
+
+    </div>
+
+    <!--Search-->
+    <div class="search-container">
+      <i class="fa-solid fa-magnifying-glass" (click)="toggleSearch()"></i>
+      <div class="search-dropdown" *ngIf="isSearchOpen">
+
+        <div class="search-input">
+
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterSearch()"
+            (keyup.enter)="searchProducts()">
+
+          <div class="search-results" *ngIf="searchResults.length > 0">
+
+            <div class="search-item" *ngFor="let product of searchResults" [routerLink]="['/product', product._id]"
+              (click)="isSearchOpen = false">
+
+              <img [src]="product.image" [alt]="product.name">
+
+              <div>
+
+                <strong>{{ product.name }}</strong>
+
+                <p>₹{{ product.price }}</p>
 
               </div>
 
             </div>
 
-            <span (click)="toggleSearch(); $event.stopPropagation()">
-              ✕
-            </span>
-
           </div>
 
-        </div>
-
-      </div>
-      <!-- Wishlist -->
-      <div routerLink="/wishlist" class="wishlist-icon">
-
-        <i class="fa-regular fa-heart"></i>
-
-        <span class="wishlist-badge" *ngIf="wishlistCount > 0">
-
-          {{ wishlistCount }}
-
-        </span>
-
-        <span>Wishlist</span>
-
-      </div>
-
-      <!-- Cart -->
-      <div class="cart-icon" (click)="toggleCart()">
-
-        <div class="cart-wrapper">
-
-          <i class="fa-solid fa-cart-shopping"></i>
-
-          <span class="cart-badge">
-
-            {{ cartCount }}
-
+          <span (click)="toggleSearch(); $event.stopPropagation()">
+            ✕
           </span>
 
         </div>
 
-        <span>Cart</span>
-
       </div>
 
     </div>
+    <!-- Wishlist -->
+    <div routerLink="/wishlist" class="wishlist-icon">
+
+      <i class="fa-regular fa-heart"></i>
+
+      <span class="wishlist-badge" *ngIf="wishlistCount > 0">
+
+        {{ wishlistCount }}
+
+      </span>
+
+      <span>Wishlist</span>
+
+    </div>
+
+    <!-- Cart -->
+    <div class="cart-icon" (click)="toggleCart()">
+
+      <div class="cart-wrapper">
+
+        <i class="fa-solid fa-cart-shopping"></i>
+
+        <span class="cart-badge">
+
+          {{ cartCount }}
+
+        </span>
+
+      </div>
+
+      <span>Cart</span>
+
+    </div>
+
+  </div>
 
 </nav>
 
@@ -408,10 +408,10 @@
 
         </h4>
 
+
+
         <p class="price">
-
-          ₹{{ item.price }}
-
+          ₹{{ item.cartPrice }}
         </p>
 
         <div class="quantity-controls">

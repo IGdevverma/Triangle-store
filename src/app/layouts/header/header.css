@@ -2002,7 +2002,7 @@ body {
         padding-left: 16px;
         padding-right: 16px;
     }
-
+    
 
     /* -----------------------------------------
        CART
@@ -2034,4 +2034,9 @@ body {
 
         font-size: 14px;
     }
+}
+
+.quantity-controls button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }

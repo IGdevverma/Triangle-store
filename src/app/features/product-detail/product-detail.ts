@@ -107,6 +107,24 @@ export class ProductDetail implements OnInit {
   selectedCombination = '';
 
   quantity = 1;
+
+
+
+  get cartQuantity(): number {
+
+    if (!this.product) {
+      return 0;
+    }
+
+    return this.cartService.getProductQuantity(
+      this.product,
+      this.selectedSize,
+      this.selectedColor,
+      this.selectedPack,
+      this.selectedCombination
+    );
+
+  }
   get displayColor(): string {
 
     return (
@@ -144,7 +162,7 @@ export class ProductDetail implements OnInit {
   // REVIEWS
   // =====================================================
 
- activeTab: 'description' | 'fabric' | 'reviews' | 'delivery' = 'description';
+  activeTab: 'description' | 'fabric' | 'reviews' | 'delivery' = 'description';
 
   reviews: any[] = [];
 
@@ -380,7 +398,7 @@ export class ProductDetail implements OnInit {
 
   get totalPrice(): number {
 
-    return this.currentPrice * this.quantity;
+    return this.currentPrice;
 
   }
 
@@ -480,6 +498,22 @@ export class ProductDetail implements OnInit {
   }
 
 
+  private addCurrentVariantToCart(quantity: number): void {
+
+    if (!this.product) {
+      return;
+    }
+
+    this.cartService.addToCart(
+      this.product,
+      quantity,
+      this.selectedSize,
+      this.selectedColor,
+      this.selectedPack,
+      this.selectedCombination
+    );
+
+  }
   // =====================================================
   // QUANTITY
   // =====================================================
@@ -494,30 +528,56 @@ export class ProductDetail implements OnInit {
       Number(this.product.stock ?? 0);
 
     if (stock <= 0) {
-      return;
-    }
-
-    if (this.quantity >= stock) {
 
       this.notificationService.show(
-        `Only ${stock} items available`
+        'This product is Out of Stock'
       );
 
       return;
     }
 
-    this.quantity++;
+    this.cartService.increaseProductQuantity(
+      this.product,
+      this.selectedSize,
+      this.selectedColor,
+      this.selectedPack,
+      this.selectedCombination
+    );
 
   }
 
 
+
+
+
   decreaseQuantity(): void {
 
-    if (this.quantity <= 1) {
+    if (!this.product) {
       return;
     }
 
-    this.quantity--;
+    const currentQuantity =
+      this.cartService.getProductQuantity(
+        this.product,
+        this.selectedSize,
+        this.selectedColor,
+        this.selectedPack,
+        this.selectedCombination
+      );
+
+    // Quantity 0 ya 1 hai
+    // Product detail par decrease mat karo
+    if (currentQuantity <= 1) {
+      return;
+    }
+
+    this.cartService.decreaseProductQuantity(
+      this.product,
+      this.selectedSize,
+      this.selectedColor,
+      this.selectedPack,
+      this.selectedCombination
+    );
 
   }
 
@@ -561,7 +621,7 @@ export class ProductDetail implements OnInit {
 
     this.cartService.addToCart(
       this.product,
-      this.quantity,
+      1,
       this.selectedSize,
       this.selectedColor,
       this.selectedPack,
@@ -917,6 +977,9 @@ export class ProductDetail implements OnInit {
     // ---------------------------------------------------
 
     this.quantity = 1;
+
+
+
 
 
 

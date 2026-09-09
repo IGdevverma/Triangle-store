@@ -729,6 +729,117 @@ export class CartService {
   }
 
 
+
+  getProductQuantity(
+    product: Product,
+    selectedSize?: string,
+    selectedColor?: string,
+    selectedPack?: string,
+    selectedCombination?: string
+  ): number {
+
+    const cartItemKey =
+      this.createCartItemKey(
+        product,
+        selectedSize,
+        selectedColor,
+        selectedPack,
+        selectedCombination
+      );
+
+    const cartItem =
+      this.cartItems.find(
+        item =>
+          item.cartItemKey === cartItemKey
+      );
+
+    return cartItem?.quantity ?? 0;
+  }
+
+
+
+  increaseProductQuantity(
+    product: Product,
+    selectedSize?: string,
+    selectedColor?: string,
+    selectedPack?: string,
+    selectedCombination?: string
+  ): void {
+
+    const cartItemKey =
+      this.createCartItemKey(
+        product,
+        selectedSize,
+        selectedColor,
+        selectedPack,
+        selectedCombination
+      );
+
+    const existingItem =
+      this.cartItems.find(
+        item =>
+          item.cartItemKey === cartItemKey
+      );
+
+    // Product cart mein nahi hai
+    if (!existingItem) {
+
+      this.addToCart(
+        product,
+        1,
+        selectedSize,
+        selectedColor,
+        selectedPack,
+        selectedCombination
+      );
+
+      return;
+    }
+
+    // Product already cart mein hai
+    this.increaseQuantity(existingItem);
+
+  }
+
+
+  decreaseProductQuantity(
+    product: Product,
+    selectedSize?: string,
+    selectedColor?: string,
+    selectedPack?: string,
+    selectedCombination?: string
+  ): void {
+
+    const cartItemKey =
+      this.createCartItemKey(
+        product,
+        selectedSize,
+        selectedColor,
+        selectedPack,
+        selectedCombination
+      );
+
+    const existingItem =
+      this.cartItems.find(
+        item =>
+          item.cartItemKey === cartItemKey
+      );
+
+    // Product cart mein nahi hai
+    if (!existingItem) {
+      return;
+    }
+
+   
+   
+
+    // Quantity decrease
+    existingItem.quantity--;
+
+    // Save updated cart
+    this.saveCart();
+  }
+
   // =====================================================
   // INCREASE QUANTITY
   // =====================================================
@@ -751,6 +862,12 @@ export class CartService {
       return;
 
     }
+
+
+
+
+
+
 
 
     // ---------------------------------------------------

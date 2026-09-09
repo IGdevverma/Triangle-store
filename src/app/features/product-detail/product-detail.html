@@ -241,12 +241,7 @@
 
             <!-- DESCRIPTION -->
 
-            <button type="button" [class.active]="activeTab === 'description'" (click)="activeTab = 'description'">
-
-              DESCRIPTION
-
-            </button>
-
+           
 
             <!-- FABRIC & CARE -->
 
@@ -281,50 +276,6 @@
                DESCRIPTION TAB
           ================================================== -->
 
-          <div class="product-description" *ngIf="activeTab === 'description'">
-
-
-            <div class="description-copy">
-
-              <p>
-                {{ p.description }}
-              </p>
-
-
-              <ul>
-
-                <li *ngIf="p.fabric">
-                  {{ p.fabric }}
-                </li>
-
-                <li>
-                  Premium quality sportswear
-                </li>
-
-                <li>
-                  Soft and breathable fabric
-                </li>
-
-                <li>
-                  Comfortable fit for everyday movement
-                </li>
-
-                <li>
-                  Designed for performance and durability
-                </li>
-
-              </ul>
-
-            </div>
-
-
-            <div class="description-image" *ngIf="productImages.length">
-
-              <img [src]="productImages[productImages.length - 1]" [alt]="p.name" loading="lazy">
-
-            </div>
-
-          </div>
 
 
           <!-- =================================================
@@ -1030,19 +981,17 @@
           <div class="quantity-control">
 
 
-            <button type="button" (click)="decreaseQuantity()" [disabled]="quantity <= 1">
-
+            <button type="button" (click)="decreaseQuantity()">
               −
-
             </button>
 
 
             <span>
-              {{ quantity }}
+              {{ cartQuantity || 1 }}
             </span>
 
 
-            <button type="button" (click)="increaseQuantity()" [disabled]="p.stock <= quantity">
+            <button type="button" (click)="increaseQuantity()">
 
               +
 

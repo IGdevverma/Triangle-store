@@ -29,19 +29,25 @@ const createProduct = asyncHandler(async (req, res) => {
         // ==============================
 
 
+
         let colors = [];
 
-        if (req.body.colors) {
+        if (req.body.colors !== undefined) {
             try {
                 colors = JSON.parse(req.body.colors);
 
                 if (!Array.isArray(colors)) {
-                    colors = [];
+                    return res.status(400).json({
+                        success: false,
+                        message: "Colors must be an array"
+                    });
                 }
 
             } catch (error) {
-                console.error("colors parse error:", error);
-                colors = [];
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid colors format"
+                });
             }
         }
 
@@ -51,6 +57,8 @@ const createProduct = asyncHandler(async (req, res) => {
                 color &&
                 color.toLowerCase() !== "undefined"
             );
+
+
 
         // ==============================
         // SIZES
@@ -301,27 +309,27 @@ const updateProduct = asyncHandler(async (req, res) => {
         // 4. COLORS
         // ==========================================
 
-        let colors = [];
+        let colors = product.colors || [];
 
-        if (req.body.colors) {
+        if (req.body.colors !== undefined) {
             try {
-
                 colors = JSON.parse(req.body.colors);
 
                 if (!Array.isArray(colors)) {
-                    colors = [];
+                    return res.status(400).json({
+                        success: false,
+                        message: "Colors must be an array"
+                    });
                 }
 
             } catch (error) {
-
-                console.error("colors parse error:", error);
-
-                colors = [];
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid colors format"
+                });
             }
         }
 
-
-        // Clean colors
         colors = colors
             .map(color => String(color).trim())
             .filter(color =>
