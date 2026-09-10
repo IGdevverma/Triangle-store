@@ -10,14 +10,6 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET
 
 });
-console.log("========== CREATE ORDER START ==========");
-console.log("CREATE ORDER BODY:", {
-    couponCode: req.body?.couponCode,
-    itemsCount: Array.isArray(req.body?.items)
-        ? req.body.items.length
-        : 0
-});
-console.log("USER:", req.user?._id);
 
 exports.createOrder = async (req, res) => {
 
