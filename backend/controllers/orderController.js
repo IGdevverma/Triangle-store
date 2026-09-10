@@ -33,7 +33,8 @@ const createOrder = async (req, res) => {
             pincode,
             paymentMethod,
             razorpayOrderId,
-            razorpayPaymentId
+            razorpayPaymentId,
+            couponCode
         } = req.body;
 
         // ==========================================
@@ -144,14 +145,12 @@ const createOrder = async (req, res) => {
                 });
             }
 
-            const quantity =
-                Number(item.quantity);
+            const quantity = Number(item.quantity);
 
             if (
                 !Number.isInteger(quantity) ||
                 quantity < 1
             ) {
-
                 await session.abortTransaction();
 
                 return res.status(400).json({
@@ -161,17 +160,60 @@ const createOrder = async (req, res) => {
                 });
             }
 
-            // Initial stock check
-            if (
-                product.stock < quantity
-            ) {
+            // ==========================================
+            // PACK INFORMATION
+            // ==========================================
+
+            const selectedPack =
+                item.selectedPack || "single";
+
+            let packQuantity = 1;
+            let packPrice = Number(product.price || 0);
+
+            if (selectedPack !== "single") {
+
+                const pack =
+                    product.packs?.find(
+                        p => p.id === selectedPack
+                    );
+
+                if (!pack) {
+
+                    await session.abortTransaction();
+
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            `Selected pack is not available for ${product.name}`
+                    });
+                }
+
+                packQuantity =
+                    Number(pack.quantity || 1);
+
+                packPrice =
+                    Number(pack.price ?? product.price ?? 0);
+            }
+
+            // ==========================================
+            // TOTAL PHYSICAL UNITS
+            // ==========================================
+
+            const totalUnits =
+                quantity * packQuantity;
+
+            // ==========================================
+            // STOCK CHECK
+            // ==========================================
+
+            if (product.stock < totalUnits) {
 
                 await session.abortTransaction();
 
                 return res.status(400).json({
                     success: false,
                     message:
-                        `Only ${product.stock} ${product.name} left in stock`
+                        `Only ${product.stock} pieces of ${product.name} are available`
                 });
             }
 
@@ -187,9 +229,25 @@ const createOrder = async (req, res) => {
                     product.image,
 
                 price:
-                    product.price,
+                    packPrice,
 
-                quantity
+                quantity,
+
+                packQuantity,
+
+                selectedSize:
+                    item.selectedSize || "",
+
+                selectedColor:
+                    item.selectedColor || "",
+
+                selectedPack:
+                    selectedPack,
+
+                selectedCombination:
+                    item.selectedCombination || "",
+
+                totalUnits
 
             });
         }
@@ -212,6 +270,10 @@ const createOrder = async (req, res) => {
         // 7. CALCULATE TOTAL FROM DATABASE
         // ==========================================
 
+        // ==========================================
+        // 7. CALCULATE TOTAL FROM DATABASE
+        // ==========================================
+
         const subtotal =
             items.reduce(
                 (sum, item) =>
@@ -221,21 +283,62 @@ const createOrder = async (req, res) => {
                 0
             );
 
+        // ==========================================
+        // COUPON DISCOUNT
+        // ==========================================
+
+        let discountAmount = 0;
+
+        const normalizedCoupon =
+            couponCode?.trim().toUpperCase();
+
+        if (normalizedCoupon === "SAVE10") {
+
+            discountAmount =
+                Math.round(subtotal * 0.10);
+
+        } else if (normalizedCoupon === "WELCOME20") {
+
+            discountAmount =
+                Math.round(subtotal * 0.20);
+        }
+
+        // ==========================================
+        // TAXABLE AMOUNT
+        // ==========================================
+
+        const taxableAmount =
+            Math.max(
+                subtotal - discountAmount,
+                0
+            );
+
+        // ==========================================
+        // SHIPPING
+        // ==========================================
+
         const shipping =
-            subtotal >= 1999
+            subtotal >= 999
                 ? 0
                 : 99;
 
+        // ==========================================
+        // GST 5%
+        // ==========================================
+
         const gst =
             Math.round(
-                subtotal * 0.18
+                taxableAmount * 0.05
             );
 
+        // ==========================================
+        // FINAL TOTAL
+        // ==========================================
+
         const total =
-            subtotal +
+            taxableAmount +
             shipping +
             gst;
-
         // ==========================================
         // 8. ATOMIC STOCK DEDUCTION
         // ==========================================
@@ -251,14 +354,14 @@ const createOrder = async (req, res) => {
 
                         stock: {
                             $gte:
-                                item.quantity
+                                item.totalUnits
                         }
                     },
 
                     {
                         $inc: {
                             stock:
-                                -item.quantity
+                                -item.totalUnits
                         }
                     },
 

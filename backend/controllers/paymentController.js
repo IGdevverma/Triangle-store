@@ -13,7 +13,17 @@ exports.createOrder = async (req, res) => {
 
     try {
 
-        const { amount } = req.body;
+        const { amount, couponCode } = req.body;
+
+
+        const allowedCoupons = ['SAVE10', 'WELCOME20'];
+
+        if (couponCode && !allowedCoupons.includes(couponCode.trim().toUpperCase())) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid coupon code'
+            });
+        }
 
         const options = {
 
@@ -124,6 +134,16 @@ exports.verifyPayment = async (req, res) => {
         const payment =
             await razorpay.payments.fetch(
                 razorpay_payment_id
+            );
+
+
+        // ==========================================
+        // 4.5. FETCH RAZORPAY ORDER
+        // ==========================================
+
+        const razorpayOrder =
+            await razorpay.orders.fetch(
+                razorpay_order_id
             );
 
         // ==========================================

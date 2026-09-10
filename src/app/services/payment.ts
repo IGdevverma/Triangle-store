@@ -7,26 +7,23 @@ import { environment } from '../../environments/environment';
 })
 export class Payment {
 
-private apiUrl = `${environment.apiUrl}/payment`;
+  private apiUrl = `${environment.apiUrl}/payment`;
 
   constructor(
     private http: HttpClient
   ) { }
 
-  createOrder(amount: number): Observable<any> {
-
+  createOrder(
+    amount: number,
+    couponCode: string = ''
+  ): Observable<any> {
     return this.http.post(
-
       `${this.apiUrl}/create-order`,
-
       {
-
-        amount
-
+        amount,
+        couponCode
       }
-
     );
-
   }
   verifyPayment(data: any): Observable<any> {
 

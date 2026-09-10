@@ -183,20 +183,56 @@ const orderSchema = new mongoose.Schema(
           default: ""
         },
 
+        // Price of the selected pack
         price: {
           type: Number,
           required: true,
           min: 0
         },
 
+        // Number of selected packs
         quantity: {
           type: Number,
           required: true,
           min: 1
+        },
+
+        // Physical pieces inside one pack
+        packQuantity: {
+          type: Number,
+          default: 1,
+          min: 1
+        },
+
+        // Total physical pieces
+        totalUnits: {
+          type: Number,
+          default: 1,
+          min: 1
+        },
+
+        // Selected product variant
+        selectedSize: {
+          type: String,
+          default: ""
+        },
+
+        selectedColor: {
+          type: String,
+          default: ""
+        },
+
+        selectedPack: {
+          type: String,
+          default: "single"
+        },
+
+        selectedCombination: {
+          type: String,
+          default: ""
         }
       }
     ],
-
     // ==========================================
     // TOTAL
     // ==========================================

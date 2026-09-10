@@ -131,7 +131,7 @@ export class Checkout implements OnInit {
         Validators.pattern('^[0-9]{6}$')
       ]],
 
-      paymentMethod: ['ONLINE', Validators.required]
+      paymentMethod: ['UPI', Validators.required]
 
     });
 
@@ -344,7 +344,7 @@ export class Checkout implements OnInit {
 
     // Create Razorpay order
     this.paymentService
-      .createOrder(this.grandTotal)
+      .createOrder(this.grandTotal, this.couponCode)
       .subscribe({
 
         next: (response) => {
