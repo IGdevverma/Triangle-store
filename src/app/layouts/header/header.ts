@@ -18,6 +18,37 @@ import { ProductService } from '../../services/product';
   styleUrl: './header.css',
 })
 export class Header implements OnInit {
+  getVariantLabel(item: CartItem): string {
+    const parts: string[] = [];
+
+    if (item.selectedSize) {
+      parts.push(`Size: ${item.selectedSize}`);
+    }
+
+    if (item.selectedColor && !item.selectedCombination) {
+      parts.push(`Color: ${item.selectedColor}`);
+    }
+
+    if (item.selectedCombination) {
+      parts.push(item.selectedCombination);
+    }
+
+    const packQuantity = Number(item.packQuantity || 1);
+
+    if (item.selectedPack) {
+      parts.push(
+        packQuantity === 1
+          ? '1 Piece'
+          : `${packQuantity} Pack`
+      );
+    }
+
+    return parts.join(' • ');
+  }
+
+  getItemPrice(item: CartItem): number {
+    return Number(item.cartPrice ?? item.price ?? 0);
+  }
 
   isScrolled = false;
   cartItems: CartItem[] = [];

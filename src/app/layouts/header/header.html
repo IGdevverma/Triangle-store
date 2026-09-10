@@ -410,6 +410,12 @@
 
 
 
+        <p class="variant" *ngIf="getVariantLabel(item)">
+          {{ getVariantLabel(item) }}
+        </p>
+
+
+
         <p class="price">
           ₹{{ item.cartPrice }}
         </p>

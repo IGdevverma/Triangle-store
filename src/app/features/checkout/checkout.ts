@@ -380,20 +380,20 @@ export class Checkout implements OnInit {
 
     if (this.isBuyNow) {
 
-      const item =
-        this.cartItems[0];
+      const item = this.cartItems[0];
 
       if (!item) {
         return 0;
       }
 
-      return Number(item.price) *
-        Number(item.quantity);
+      const price = Number(
+        item.cartPrice ?? item.price ?? 0
+      );
 
+      return price * Number(item.quantity || 0);
     }
 
     return this.cartService.getTotal();
-
   }
 
   get shipping(): number {
