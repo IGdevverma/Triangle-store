@@ -1,3 +1,4 @@
+const { calculatePricing } = require("../utils/pricing");
 const mongoose = require("mongoose");
 const EmailService = require("../services/emailService");
 const Order = require("../models/Order");
@@ -267,78 +268,39 @@ const createOrder = async (req, res) => {
         }
 
         // ==========================================
-        // 7. CALCULATE TOTAL FROM DATABASE
+        // CALCULATE PRICING
         // ==========================================
 
-        // ==========================================
-        // 7. CALCULATE TOTAL FROM DATABASE
-        // ==========================================
+        let pricing;
 
-        const subtotal =
-            items.reduce(
-                (sum, item) =>
-                    sum +
-                    item.price *
-                    item.quantity,
-                0
+        try {
+            pricing = calculatePricing(
+                items.map(item => ({
+                    packPrice: item.price,
+                    quantity: item.quantity
+                })),
+                couponCode
             );
+        } catch (error) {
 
-        // ==========================================
-        // COUPON DISCOUNT
-        // ==========================================
+            await session.abortTransaction();
 
-        let discountAmount = 0;
-
-        const normalizedCoupon =
-            couponCode?.trim().toUpperCase();
-
-        if (normalizedCoupon === "SAVE10") {
-
-            discountAmount =
-                Math.round(subtotal * 0.10);
-
-        } else if (normalizedCoupon === "WELCOME20") {
-
-            discountAmount =
-                Math.round(subtotal * 0.20);
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
         }
 
-        // ==========================================
-        // TAXABLE AMOUNT
-        // ==========================================
+        const {
+            subtotal,
+            discountAmount,
+            taxableAmount,
+            shipping,
+            gst,
+            total
+        } = pricing;
 
-        const taxableAmount =
-            Math.max(
-                subtotal - discountAmount,
-                0
-            );
 
-        // ==========================================
-        // SHIPPING
-        // ==========================================
-
-        const shipping =
-            subtotal >= 999
-                ? 0
-                : 99;
-
-        // ==========================================
-        // GST 5%
-        // ==========================================
-
-        const gst =
-            Math.round(
-                taxableAmount * 0.05
-            );
-
-        // ==========================================
-        // FINAL TOTAL
-        // ==========================================
-
-        const total =
-            taxableAmount +
-            shipping +
-            gst;
         // ==========================================
         // 8. ATOMIC STOCK DEDUCTION
         // ==========================================
@@ -423,6 +385,11 @@ const createOrder = async (req, res) => {
                             new Date(),
 
                         items,
+                        subtotal,
+                        discountAmount,
+                        shipping,
+                        gst,
+                        couponCode,
 
                         total,
 

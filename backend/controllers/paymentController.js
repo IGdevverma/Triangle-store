@@ -1,6 +1,8 @@
+const { calculatePricing } = require("../utils/pricing");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
 const Order = require("../models/Order");
+const Product = require("../models/Product");
 const razorpay = new Razorpay({
 
     key_id: process.env.RAZORPAY_KEY_ID,
@@ -13,21 +15,187 @@ exports.createOrder = async (req, res) => {
 
     try {
 
-        const { amount, couponCode } = req.body;
+        const { couponCode, items } = req.body;
 
 
-        const allowedCoupons = ['SAVE10', 'WELCOME20'];
-
-        if (couponCode && !allowedCoupons.includes(couponCode.trim().toUpperCase())) {
+        if (!Array.isArray(items) || items.length === 0) {
             return res.status(400).json({
                 success: false,
-                message: 'Invalid coupon code'
+                message: "Order items are required"
             });
         }
 
+
+        // ==========================================
+        // VALIDATE PRODUCTS & GET DATABASE PRICES
+        // ==========================================
+
+        const verifiedItems = [];
+
+
+        for (const item of items) {
+
+            const productId =
+                item.productId ||
+                item._id ||
+                item.id;
+
+            if (!productId) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Product ID is missing"
+                });
+            }
+
+            const product =
+                await Product.findById(productId);
+
+            if (!product) {
+                return res.status(404).json({
+                    success: false,
+                    message: "Product not found"
+                });
+            }
+
+            const quantity =
+                Number(item.quantity);
+
+            if (
+                !Number.isInteger(quantity) ||
+                quantity < 1
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: `Invalid quantity for ${product.name}`
+                });
+            }
+
+            // ------------------------------------------
+            // PACK PRICE
+            // ------------------------------------------
+
+            const selectedPack =
+                item.selectedPack || "single";
+
+            let packQuantity = 1;
+            let packPrice =
+                Number(product.price || 0);
+
+            if (selectedPack !== "single") {
+
+                const pack =
+                    product.packs?.find(
+                        p => p.id === selectedPack
+                    );
+
+                if (!pack) {
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            `Selected pack is not available for ${product.name}`
+                    });
+                }
+
+                packQuantity =
+                    Number(pack.quantity || 1);
+
+                packPrice =
+                    Number(
+                        pack.price ??
+                        product.price ??
+                        0
+                    );
+            }
+
+            // ------------------------------------------
+            // TOTAL PHYSICAL UNITS
+            // ------------------------------------------
+
+            const totalUnits =
+                quantity * packQuantity;
+
+            // ------------------------------------------
+            // STOCK CHECK
+            // ------------------------------------------
+
+            if (
+                Number(product.stock) <
+                totalUnits
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        `Only ${product.stock} pieces of ${product.name} are available`
+                });
+            }
+
+            verifiedItems.push({
+                productId:
+                    product._id.toString(),
+
+                quantity,
+
+                packQuantity,
+
+                packPrice,
+
+                selectedPack,
+
+                totalUnits
+            });
+        }
+
+
+
+        // ==========================================
+        // CALCULATE PRICING
+        // ==========================================
+
+        let pricing;
+
+        try {
+            pricing = calculatePricing(
+                verifiedItems,
+                couponCode
+            );
+        } catch (error) {
+            return res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+
+        const {
+            subtotal,
+            discountAmount,
+            taxableAmount,
+            shipping,
+            gst,
+            total
+        } = pricing;
+
+
+        const totalInPaise =
+            Math.round(total * 100);
+
+        if (
+            !Number.isInteger(totalInPaise) ||
+            totalInPaise <= 0
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid order total"
+            });
+        }
+
+
+
+
+
+
         const options = {
 
-            amount: amount * 100, // paise
+            amount: totalInPaise, // paise
 
             currency: "INR",
 
@@ -146,6 +314,44 @@ exports.verifyPayment = async (req, res) => {
                 razorpay_order_id
             );
 
+
+        // ==========================================
+        // 4.6. VERIFY PAYMENT AMOUNT
+        // ==========================================
+
+        if (
+            Number(payment.amount) !==
+            Number(razorpayOrder.amount)
+        ) {
+
+            console.error(
+                "❌ Payment amount mismatch:",
+                {
+                    expected: razorpayOrder.amount,
+                    received: payment.amount
+                }
+            );
+
+            return res.status(400).json({
+                success: false,
+                message: "Payment amount mismatch"
+            });
+        }
+
+        // ==========================================
+        // 4.7. VERIFY RAZORPAY ORDER STATUS
+        // ==========================================
+
+        if (
+            razorpayOrder.status !== "paid"
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Razorpay order is not marked as paid"
+            });
+        }
+
         // ==========================================
         // 4. Verify payment belongs to order
         // ==========================================
@@ -158,6 +364,22 @@ exports.verifyPayment = async (req, res) => {
                 success: false,
                 message:
                     "Payment does not belong to this order"
+            });
+        }
+
+
+        // ==========================================
+        // 4.8. VERIFY PAYMENT CURRENCY
+        // ==========================================
+
+        if (
+            payment.currency !== "INR" ||
+            razorpayOrder.currency !== "INR"
+        ) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Invalid payment currency"
             });
         }
 

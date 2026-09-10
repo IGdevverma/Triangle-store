@@ -14,14 +14,15 @@ export class Payment {
   ) { }
 
   createOrder(
-    amount: number,
-    couponCode: string = ''
+    couponCode: string = '',
+    items: any[] = []
   ): Observable<any> {
+
     return this.http.post(
       `${this.apiUrl}/create-order`,
       {
-        amount,
-        couponCode
+        couponCode,
+        items
       }
     );
   }

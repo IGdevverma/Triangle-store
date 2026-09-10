@@ -344,7 +344,12 @@ export class Checkout implements OnInit {
 
     // Create Razorpay order
     this.paymentService
-      .createOrder(this.grandTotal, this.couponCode)
+      .createOrder(
+        this.couponCode,
+        this.isBuyNow
+          ? this.cartItems
+          : this.cartService.getCartItems()
+      )
       .subscribe({
 
         next: (response) => {
