@@ -1,3 +1,4 @@
+const helmet = require("helmet");
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -40,6 +41,7 @@ connectDB();
 // =====================================================
 
 const app = express();
+app.use(helmet());
 
 // =====================================================
 // CORS

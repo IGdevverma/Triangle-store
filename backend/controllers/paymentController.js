@@ -500,7 +500,7 @@ exports.handleWebhook = async (req, res) => {
 
             const alreadyProcessed =
                 await Order.findOne({
-                    razorpayEventId: eventId
+                    processedWebhookEvents: eventId
                 });
 
             if (alreadyProcessed) {
@@ -514,9 +514,7 @@ exports.handleWebhook = async (req, res) => {
                     success: true,
                     message: "Duplicate webhook ignored"
                 });
-
             }
-
         }
 
         // -----------------------------------------
@@ -605,8 +603,10 @@ exports.handleWebhook = async (req, res) => {
                 new Date();
 
             if (eventId) {
-                order.razorpayEventId = eventId;
+                order.processedWebhookEvents.push(eventId);
             }
+
+
 
             await order.save();
 
@@ -644,11 +644,12 @@ exports.handleWebhook = async (req, res) => {
                 order.paymentStatus = "Failed";
 
                 if (eventId) {
-                    order.razorpayEventId =
-                        eventId;
+                    order.processedWebhookEvents.push(eventId);
                 }
 
                 await order.save();
+
+
 
                 console.log(
                     "❌ Payment marked Failed:",

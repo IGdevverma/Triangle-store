@@ -334,13 +334,20 @@ export class Checkout implements OnInit {
           ? this.cartItems
           : this.cartService.getCartItems(),
 
+
+
       total:
         this.grandTotal,
+
+      couponCode:
+        this.couponCode?.trim().toUpperCase() || '',
 
       date:
         new Date().toISOString()
 
     };
+
+
 
     // Create Razorpay order
     this.paymentService
