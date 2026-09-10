@@ -398,10 +398,9 @@ export class Checkout implements OnInit {
 
   get shipping(): number {
 
-    return 0;
+    return this.subtotal >= 999 ? 0 : 99;
 
   }
-
   get taxableAmount(): number {
     return Math.max(
       this.subtotal - this.discountAmount,

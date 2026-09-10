@@ -690,15 +690,27 @@
                             Size: {{ item.selectedSize }}
                         </small>
 
+                        <small *ngIf="item.selectedColor && !item.selectedCombination">
+                            Color: {{ item.selectedColor }}
+                        </small>
+
+                        <small *ngIf="item.selectedCombination">
+                            {{ item.selectedCombination }}
+                        </small>
+
+                        <small *ngIf="item.selectedPack">
+                            {{ item.packQuantity === 1 ? '1 Piece' : item.packQuantity + ' Pack' }}
+                        </small>
+
                         <p>
-                            ₹{{ item.price | number }}
+                            ₹{{ (item.cartPrice ?? item.price) | number }}
                         </p>
 
                     </div>
 
 
                     <strong class="item-total">
-                        ₹{{ item.price * item.quantity | number }}
+                        ₹{{ ((item.cartPrice ?? item.price) * item.quantity) | number }}
                     </strong>
 
                 </div>
