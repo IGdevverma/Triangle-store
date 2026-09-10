@@ -30,6 +30,30 @@ class EmailService {
 
     }
 
+    static async sendAdminNewOrder(order) {
+
+        const adminEmail = process.env.ADMIN_EMAIL;
+
+        console.log("📧 ADMIN_EMAIL:", adminEmail);
+
+        if (!adminEmail) {
+            throw new Error("ADMIN_EMAIL is missing in .env");
+        }
+
+        return sendEmail({
+
+            to: adminEmail,
+
+            subject:
+                "🛒 New Order Received - Triangle Sports",
+
+            html:
+                orderPlaced(order)
+
+        });
+
+    }
+
 
     // ==========================================
     // ORDER PROCESSING

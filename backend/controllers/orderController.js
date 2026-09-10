@@ -423,17 +423,17 @@ const createOrder = async (req, res) => {
         try {
 
             await EmailService
-                .sendOrderPlaced(order);
+                .sendAdminNewOrder(order);
 
             console.log(
-                "✅ Order confirmation email sent."
+                "✅ Admin order notification email sent."
             );
 
-        } catch (mailError) {
+        } catch (adminMailError) {
 
             console.error(
-                "❌ Order confirmation email failed:",
-                mailError
+                "❌ Admin order notification email failed:",
+                adminMailError
             );
 
         }
