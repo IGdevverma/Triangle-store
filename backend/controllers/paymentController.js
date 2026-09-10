@@ -10,6 +10,14 @@ const razorpay = new Razorpay({
     key_secret: process.env.RAZORPAY_KEY_SECRET
 
 });
+console.log("========== CREATE ORDER START ==========");
+console.log("CREATE ORDER BODY:", {
+    couponCode: req.body?.couponCode,
+    itemsCount: Array.isArray(req.body?.items)
+        ? req.body.items.length
+        : 0
+});
+console.log("USER:", req.user?._id);
 
 exports.createOrder = async (req, res) => {
 
@@ -150,10 +158,17 @@ exports.createOrder = async (req, res) => {
                 couponCode
             );
         } catch (error) {
+
+
+            console.error("========== CREATE ORDER ERROR ==========");
+            console.error("ERROR MESSAGE:", error.message);
+            console.error("ERROR STACK:", error.stack);
             return res.status(400).json({
                 success: false,
                 message: error.message
             });
+
+
         }
 
         const {
