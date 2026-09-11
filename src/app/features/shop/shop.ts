@@ -190,4 +190,19 @@ export class Shop implements OnInit {
 
   }
 
+  getImageUrl(image: string): string {
+    if (!image) {
+      return 'assets/no-image.png';
+    }
+
+    if (image.includes('res.cloudinary.com')) {
+      return image.replace(
+        '/image/upload/',
+        '/image/upload/w_1600,q_auto,f_auto/'
+      );
+    }
+
+    return image;
+  }
+
 }
