@@ -80,10 +80,22 @@ exports.createOrder = async (req, res) => {
             let packQuantity = 1;
             let packPrice = Number(product.price || 0);
 
-            if (selectedPack !== "single") {
+            // ==========================================
+            // PACK HANDLING
+            // ==========================================
+
+            // Product has no packs → treat as single piece
+            if (
+                (!product.packs || product.packs.length === 0)
+            ) {
+
+                packQuantity = 1;
+                packPrice = Number(product.price || 0);
+
+            } else if (selectedPack !== "single") {
 
                 const pack =
-                    product.packs?.find(
+                    product.packs.find(
                         p => p.id === selectedPack
                     );
 
@@ -99,7 +111,11 @@ exports.createOrder = async (req, res) => {
                     Number(pack.quantity || 1);
 
                 packPrice =
-                    Number(pack.price ?? product.price ?? 0);
+                    Number(
+                        pack.price ??
+                        product.price ??
+                        0
+                    );
             }
 
 
