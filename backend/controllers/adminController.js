@@ -1,160 +1,176 @@
+
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const User = require("../models/User");
+
+
+let dashboardCache = null;
+let dashboardCacheTime = 0;
+
+const DASHBOARD_CACHE_TTL = 30 * 1000; // 30 seconds
+
 
 exports.getDashboard = async (req, res) => {
 
     try {
 
+        const now = Date.now();
+
+        if (
+            dashboardCache &&
+            now - dashboardCacheTime < DASHBOARD_CACHE_TTL
+        ) {
+            return res.status(200).json(dashboardCache);
+        }
+
+
         const [
-            totalProducts,
             totalOrders,
-            totalUsers
+            totalUsers,
+            productStats,
+
         ] = await Promise.all([
-            Product.countDocuments(),
             Order.countDocuments(),
-            User.countDocuments()
-        ]);
-        const lowStockProducts = await Product.countDocuments({
-            stock: { $lte: 5 }
-        });
-        const categories = await Product.distinct("category");
+            User.countDocuments(),
 
-        const totalCategories = categories.length;
-
-        const revenue = await Order.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    totalRevenue: {
-                        $sum: "$total"
-                    }
-                }
-            }
-        ]);
-
-
-        const monthlySales = await Order.aggregate([
-            {
-                $group: {
-                    _id: {
-                        month: {
-                            $month: "$createdAt"
-                        }
-                    },
-                    revenue: {
-                        $sum: "$total"
-                    }
-                }
-            },
-            {
-                $sort: {
-                    "_id.month": 1
-                }
-            }
-        ]);
-
-        const [
-            processingOrders,
-            packedOrders,
-            shippedOrders,
-            deliveredOrders,
-            cancelledOrders
-        ] = await Promise.all([
-
-            Order.countDocuments({
-                orderStatus: "Processing"
-            }),
-
-            Order.countDocuments({
-                orderStatus: "Packed"
-            }),
-
-            Order.countDocuments({
-                orderStatus: "Shipped"
-            }),
-
-            Order.countDocuments({
-                orderStatus: "Delivered"
-            }),
-
-            Order.countDocuments({
-                orderStatus: "Cancelled"
-            })
-
-        ]);
-
-
-
-
-
-        const stock = await Product.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    totalStock: {
-                        $sum: "$stock"
-                    }
-                }
-            }
-        ]);
-
-        const inventory = await Product.aggregate([
-            {
-                $group: {
-                    _id: null,
-                    inventoryValue: {
-                        $sum: {
-                            $multiply: [
-                                "$price",
-                                "$stock"
-                            ]
+            Product.aggregate([
+                {
+                    $group: {
+                        _id: null,
+                        totalProducts: { $sum: 1 },
+                        lowStockProducts: {
+                            $sum: {
+                                $cond: [
+                                    { $lte: ["$stock", 5] },
+                                    1,
+                                    0
+                                ]
+                            }
+                        },
+                        totalStock: { $sum: "$stock" },
+                        inventoryValue: {
+                            $sum: {
+                                $multiply: ["$price", "$stock"]
+                            }
+                        },
+                        categories: {
+                            $addToSet: "$category"
                         }
                     }
                 }
+            ])
+        ]);
+
+        const stats = productStats[0] || {};
+
+        const totalProducts = stats.totalProducts || 0;
+        const lowStockProducts = stats.lowStockProducts || 0;
+        const totalStock = stats.totalStock || 0;
+        const inventoryValue = stats.inventoryValue || 0;
+        const totalCategories = stats.categories?.length || 0;
+
+
+        const orderStats = await Order.aggregate([
+            {
+                $facet: {
+                    revenue: [
+                        {
+                            $group: {
+                                _id: null,
+                                totalRevenue: {
+                                    $sum: "$total"
+                                }
+                            }
+                        }
+                    ],
+
+                    monthlySales: [
+                        {
+                            $group: {
+                                _id: {
+                                    month: {
+                                        $month: "$createdAt"
+                                    }
+                                },
+                                revenue: {
+                                    $sum: "$total"
+                                }
+                            }
+                        },
+                        {
+                            $sort: {
+                                "_id.month": 1
+                            }
+                        }
+                    ],
+
+                    statusCounts: [
+                        {
+                            $group: {
+                                _id: "$orderStatus",
+                                count: { $sum: 1 }
+                            }
+                        }
+                    ]
+                }
             }
         ]);
 
+        const orderData = orderStats[0] || {};
 
-        res.status(200).json({
+        const totalRevenue =
+            orderData.revenue?.[0]?.totalRevenue || 0;
 
+        const monthlySales =
+            orderData.monthlySales || [];
+
+        const orderStatusMap = Object.fromEntries(
+            (orderData.statusCounts || []).map(
+                item => [item._id, item.count]
+            )
+        );
+
+        const processingOrders = orderStatusMap.Processing || 0;
+        const packedOrders = orderStatusMap.Packed || 0;
+        const shippedOrders = orderStatusMap.Shipped || 0;
+        const deliveredOrders = orderStatusMap.Delivered || 0;
+        const cancelledOrders = orderStatusMap.Cancelled || 0;
+
+
+
+
+
+
+
+
+        const responseData = {
             success: true,
 
             dashboard: {
-
                 processingOrders,
-
                 packedOrders,
-
                 shippedOrders,
-
                 deliveredOrders,
-
                 cancelledOrders,
 
                 totalProducts,
-
                 totalOrders,
-
                 totalUsers,
 
-                totalRevenue: revenue[0]?.totalRevenue || 0,
-
+                totalRevenue,
                 totalCategories,
-
                 lowStockProducts,
+                totalStock,
+                inventoryValue,
 
-                totalStock: stock[0]?.totalStock || 0,
-
-                inventoryValue: inventory[0]?.inventoryValue || 0,
                 monthlySales
-                
-
-
-
             }
+        };
 
-        });
+        dashboardCache = responseData;
+        dashboardCacheTime = Date.now();
+
+        res.status(200).json(responseData);
 
     } catch (error) {
 
