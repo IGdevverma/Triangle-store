@@ -78,25 +78,30 @@ exports.createOrder = async (req, res) => {
                 item.selectedPack || "single";
 
             let packQuantity = 1;
+            let packPrice = Number(product.price || 0);
 
-            const pack =
-                product.packs?.find(
-                    p => p.id === selectedPack
-                );
+            if (selectedPack !== "single") {
 
-            if (!pack) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        `Selected pack is not available for ${product.name}`
-                });
+                const pack =
+                    product.packs?.find(
+                        p => p.id === selectedPack
+                    );
+
+                if (!pack) {
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            `Selected pack is not available for ${product.name}`
+                    });
+                }
+
+                packQuantity =
+                    Number(pack.quantity || 1);
+
+                packPrice =
+                    Number(pack.price ?? product.price ?? 0);
             }
 
-            packQuantity =
-                Number(pack.quantity || 1);
-
-            const packPrice =
-                Number(pack.price || 0);
 
             // ------------------------------------------
             // TOTAL PHYSICAL UNITS
@@ -200,6 +205,18 @@ exports.createOrder = async (req, res) => {
             receipt: `receipt_${Date.now()}`
 
         };
+
+
+        console.log("========== RAZORPAY CREATE ==========");
+        console.log("Subtotal:", subtotal);
+        console.log("Discount:", discountAmount);
+        console.log("Taxable:", taxableAmount);
+        console.log("Shipping:", shipping);
+        console.log("GST:", gst);
+        console.log("Final Total:", total);
+        console.log("Amount Paise:", totalInPaise);
+        console.log("Coupon:", couponCode);
+        console.log("Items:", verifiedItems);
 
         const order = await razorpay.orders.create(options);
 
