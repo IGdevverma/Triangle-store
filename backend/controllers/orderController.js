@@ -165,6 +165,7 @@ const createOrder = async (req, res) => {
                 });
             }
 
+          
             // ==========================================
             // PACK INFORMATION
             // ==========================================
@@ -173,25 +174,50 @@ const createOrder = async (req, res) => {
                 item.selectedPack || "single";
 
             let packQuantity = 1;
+            let packPrice = Number(product.price || 0);
 
-            const pack =
-                product.packs?.find(
-                    p => p.id === selectedPack
-                );
+            // ------------------------------------------
+            // SINGLE PIECE
+            // ------------------------------------------
 
-            if (!pack) {
-                return res.status(400).json({
-                    success: false,
-                    message:
-                        `Selected pack is not available for ${product.name}`
-                });
+            if (selectedPack === "single") {
+
+                packQuantity = 1;
+
+                packPrice =
+                    Number(product.price || 0);
+
             }
 
-            packQuantity =
-                Number(pack.quantity || 1);
+            // ------------------------------------------
+            // PACK PRODUCT
+            // ------------------------------------------
 
-            const packPrice =
-                Number(pack.price || 0);
+            else {
+
+                const pack =
+                    product.packs?.find(
+                        p => p.id === selectedPack
+                    );
+
+                if (!pack) {
+
+                    await session.abortTransaction();
+
+                    return res.status(400).json({
+                        success: false,
+                        message:
+                            `Selected pack is not available for ${product.name}`
+                    });
+
+                }
+
+                packQuantity =
+                    Number(pack.quantity || 1);
+
+                packPrice =
+                    Number(pack.price ?? product.price ?? 0);
+            }
 
             // ==========================================
             // TOTAL PHYSICAL UNITS
