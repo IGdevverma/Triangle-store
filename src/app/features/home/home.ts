@@ -321,18 +321,19 @@ export class Home implements OnInit {
   }
 
   getImageUrl(image: string): string {
-
     if (!image) {
       return 'assets/no-image.png';
     }
 
-    if (image.startsWith('http')) {
-      return image;
+    if (image.includes('res.cloudinary.com')) {
+      return image.replace(
+        '/image/upload/',
+        '/image/upload/w_1600,q_auto,f_auto/'
+      );
     }
 
     return image;
-
   }
-
-
 }
+
+
