@@ -37,6 +37,27 @@ export class Admin implements OnInit, AfterViewInit {
   packThreePrice: number = 0;
   packThreeOriginalPrice: number = 0;
   packThreeDiscount: number = 0;
+
+
+  // ==========================================
+  // GENERIC PACK BUILDER
+  // ==========================================
+
+  productPacks: any[] = [];
+
+  colorCombinations: any[] = [];
+
+
+
+  // ==========================================
+  // PACK-WISE IMAGES
+  // ==========================================
+
+  singleVestFiles: File[] = [];
+  singleVestPreviews: string[] = [];
+
+  threePackFiles: File[] = [];
+  threePackPreviews: string[] = [];
   i: any;
   changeRole(user: any, role: string) {
 
@@ -692,24 +713,64 @@ export class Admin implements OnInit, AfterViewInit {
     // ==========================================
     // PACK OPTIONS
     // ==========================================
-    const packs = [
-      {
-        id: 'single',
-        name: '1 Vest',
-        quantity: 1,
-        price: this.packOnePrice,
-        originalPrice: this.packOneOriginalPrice,
-        discount: this.packOneDiscount
-      },
-      {
-        id: 'pack-3',
-        name: '3 Pack',
-        quantity: 3,
-        price: this.packThreePrice,
-        originalPrice: this.packThreeOriginalPrice,
-        discount: this.packThreeDiscount
+    // ==========================================
+    // GENERIC PACK OPTIONS
+    // ==========================================
+    const packs = this.productPacks.map((pack: any) => ({
+      id: pack.id,
+      name: pack.name,
+      quantity: Number(pack.quantity) || 1,
+      price: Number(pack.price) || 0,
+      originalPrice: Number(pack.originalPrice) || 0,
+      discount: Number(pack.discount) || 0,
+      colors: pack.colors || [],
+      sizes: pack.sizes || [],
+
+      // Number of photos selected for this pack
+      imageCount: Array.isArray(pack.files)
+        ? pack.files.length
+        : 0
+    }));
+
+
+    // ==========================================
+    // COLOR COMBINATIONS
+    // ==========================================
+
+    const combinations = this.colorCombinations.map(
+      (combination: any) => {
+
+        return {
+          id: combination.id,
+
+          name:
+            combination.name?.trim() ||
+            'Color Combination',
+
+          colors:
+            Array.isArray(combination.colors)
+              ? combination.colors
+              : [],
+
+          // Number of photos selected
+          imageCount:
+            Array.isArray(combination.files)
+              ? combination.files.length
+              : 0
+        };
+
       }
-    ];
+    );
+
+    formData.append(
+      'colorCombinations',
+      JSON.stringify(combinations)
+    );
+
+    console.log(
+      'COLOR COMBINATIONS BEING SENT:',
+      combinations
+    );
 
     formData.append(
       'packs',
@@ -786,6 +847,47 @@ export class Admin implements OnInit, AfterViewInit {
     });
 
 
+    // ==========================================
+    // PACK IMAGES
+    // ==========================================
+
+    this.productPacks.forEach((pack: any) => {
+
+      if (Array.isArray(pack.files)) {
+
+        pack.files.forEach((file: File) => {
+
+          formData.append('packImages', file);
+
+        });
+
+      }
+
+    });
+
+
+    // ==========================================
+    // COLOR COMBINATION IMAGES
+    // ==========================================
+
+    this.colorCombinations.forEach((combination: any) => {
+
+      if (Array.isArray(combination.files)) {
+
+        combination.files.forEach((file: File) => {
+
+          formData.append('combinationImages', file);
+
+        });
+
+      }
+
+    });
+
+
+
+
+
     formData.append(
       'removedImages',
       JSON.stringify(this.removedImages)
@@ -830,12 +932,12 @@ export class Admin implements OnInit, AfterViewInit {
   }
 
 
-
   editProduct(product: Product): void {
 
     console.log('========== EDIT PRODUCT ==========');
     console.log('PRODUCT:', product);
     console.log('PACKS:', product.packs);
+    console.log('COLOR COMBINATIONS:', product.colorCombinations);
 
     this.editing = true;
     this.showModal = true;
@@ -850,7 +952,8 @@ export class Admin implements OnInit, AfterViewInit {
         .map((color: string) => color.trim())
         .filter(
           (color: string) =>
-            color && color.toLowerCase() !== 'undefined'
+            color &&
+            color.toLowerCase() !== 'undefined'
         )
       : [];
 
@@ -879,52 +982,124 @@ export class Admin implements OnInit, AfterViewInit {
     };
 
     // ==========================================
-    // PACK OPTIONS
+    // GENERIC PACK BUILDER
     // ==========================================
 
     const packs = Array.isArray(product.packs)
       ? product.packs
       : [];
 
-    const singlePack = packs.find(
-      pack => pack.id === 'single'
-    );
+    this.productPacks = packs.map((pack: any) => {
 
-    const threePack = packs.find(
-      pack => pack.id === 'pack-3'
-    );
+      return {
 
-    console.log('SINGLE PACK:', singlePack);
-    console.log('THREE PACK:', threePack);
+        id:
+          pack.id ||
+          'pack-' + Date.now() + Math.random(),
+
+        name:
+          pack.name || '',
+
+        quantity:
+          Number(pack.quantity) || 1,
+
+        price:
+          Number(pack.price) || 0,
+
+        originalPrice:
+          Number(pack.originalPrice) || 0,
+
+        discount:
+          Number(pack.discount) || 0,
+
+        colors:
+          Array.isArray(pack.colors)
+            ? [...pack.colors]
+            : [],
+
+        sizes:
+          Array.isArray(pack.sizes)
+            ? [...pack.sizes]
+            : [],
+
+        // Existing pack images
+        existingImages:
+          Array.isArray(pack.images)
+            ? [...pack.images]
+            : pack.image
+              ? [pack.image]
+              : [],
+
+        // New files selected during editing
+        files: [] as File[],
+
+        // Preview existing images
+        previews:
+          Array.isArray(pack.images)
+            ? [...pack.images]
+            : pack.image
+              ? [pack.image]
+              : [],
+
+        // Existing images removed during editing
+        removedImages: [] as string[]
+
+      };
+
+    });
 
     // ==========================================
-    // 1 VEST
+    // COLOR COMBINATIONS
     // ==========================================
 
-    this.packOnePrice =
-      Number(singlePack?.price ?? 0);
+    const combinations =
+      Array.isArray(product.colorCombinations)
+        ? product.colorCombinations
+        : [];
 
-    this.packOneOriginalPrice =
-      Number(singlePack?.originalPrice ?? 0);
+    this.colorCombinations =
+      combinations.map((combination: any) => {
 
-    this.packOneDiscount =
-      Number(singlePack?.discount ?? 0);
+        return {
+
+          id:
+            combination.id ||
+            'combination-' +
+            Date.now() +
+            Math.random(),
+
+          name:
+            combination.name || '',
+
+          colors:
+            Array.isArray(combination.colors)
+              ? [...combination.colors]
+              : [],
+
+          // Existing combination images
+          existingImages:
+            Array.isArray(combination.images)
+              ? [...combination.images]
+              : [],
+
+          // New files selected during editing
+          files: [] as File[],
+
+          // Existing images as preview
+          previews:
+            Array.isArray(combination.images)
+              ? [...combination.images]
+              : [],
+
+          // Existing images removed during editing
+          removedImages: [] as string[]
+
+        };
+
+      });
 
     // ==========================================
-    // 3 PACK
-    // ==========================================
-
-    this.packThreePrice =
-      Number(threePack?.price ?? 0);
-
-    this.packThreeOriginalPrice =
-      Number(threePack?.originalPrice ?? 0);
-
-    this.packThreeDiscount =
-      Number(threePack?.discount ?? 0);
-
-    // ==========================================
-    // IMAGES
+    // PRODUCT IMAGES
     // ==========================================
 
     this.selectedFiles = [];
@@ -936,18 +1111,51 @@ export class Admin implements OnInit, AfterViewInit {
         ? [product.image]
         : [];
 
-    this.imagePreviews = [...this.existingImages];
+    this.imagePreviews = [
+      ...this.existingImages
+    ];
 
-    console.log('EDIT DATA:', {
-      colors: this.newProduct.colors,
-      sizes: this.newProduct.sizes,
-      packOnePrice: this.packOnePrice,
-      packOneOriginalPrice: this.packOneOriginalPrice,
-      packOneDiscount: this.packOneDiscount,
-      packThreePrice: this.packThreePrice,
-      packThreeOriginalPrice: this.packThreeOriginalPrice,
-      packThreeDiscount: this.packThreeDiscount
-    });
+    // ==========================================
+    // RESET OLD VEST-SPECIFIC DATA
+    // ==========================================
+
+    this.singleVestFiles = [];
+    this.singleVestPreviews = [];
+
+    this.threePackFiles = [];
+    this.threePackPreviews = [];
+
+    // ==========================================
+    // RESET OLD PACK PRICE VARIABLES
+    // ==========================================
+
+    this.packOnePrice = 0;
+    this.packOneOriginalPrice = 0;
+    this.packOneDiscount = 0;
+
+    this.packThreePrice = 0;
+    this.packThreeOriginalPrice = 0;
+    this.packThreeDiscount = 0;
+
+    // ==========================================
+    // LOG EDIT DATA
+    // ==========================================
+
+    console.log(
+      'EDIT PRODUCT PACKS:',
+      this.productPacks
+    );
+
+    console.log(
+      'EDIT COLOR COMBINATIONS:',
+      this.colorCombinations
+    );
+
+    console.log(
+      'EDIT PRODUCT IMAGES:',
+      this.imagePreviews
+    );
+
   }
   updateProduct() {
 
@@ -965,34 +1173,141 @@ export class Admin implements OnInit, AfterViewInit {
 
 
     // ==========================================
-    // PACK OPTIONS
+    // GENERIC PACK OPTIONS
     // ==========================================
+    const packs = this.productPacks.map((pack: any) => {
 
-    const packs = [
-      {
-        id: 'single',
-        name: '1 Vest',
-        quantity: 1,
-        price: Number(this.packOnePrice) || 0,
-        originalPrice: Number(this.packOneOriginalPrice) || 0,
-        discount: Number(this.packOneDiscount) || 0
-      },
-      {
-        id: 'pack-3',
-        name: '3 Pack',
-        quantity: 3,
-        price: Number(this.packThreePrice) || 0,
-        originalPrice: Number(this.packThreeOriginalPrice) || 0,
-        discount: Number(this.packThreeDiscount) || 0
-      }
-    ];
+      const existingImages =
+        Array.isArray(pack.existingImages)
+          ? pack.existingImages
+          : [];
 
+      const newImageCount =
+        Array.isArray(pack.files)
+          ? pack.files.length
+          : 0;
+
+      return {
+        id: pack.id,
+
+        name:
+          pack.name?.trim() || 'Pack',
+
+        quantity:
+          Number(pack.quantity) || 1,
+
+        price:
+          Number(pack.price) || 0,
+
+        originalPrice:
+          Number(pack.originalPrice) || 0,
+
+        discount:
+          Number(pack.discount) || 0,
+
+        colors:
+          Array.isArray(pack.colors)
+            ? pack.colors
+            : [],
+
+        sizes:
+          Array.isArray(pack.sizes)
+            ? pack.sizes
+            : [],
+
+        // Existing pack images
+        images: existingImages,
+
+        image:
+          existingImages[0] || '',
+
+        // New images
+        imageCount: newImageCount,
+
+        // Images removed while editing
+        removedImages:
+          Array.isArray(pack.removedImages)
+            ? pack.removedImages
+            : []
+      };
+
+
+
+    });
 
     formData.append(
       'packs',
       JSON.stringify(packs)
     );
-    console.log('PACKS BEING SENT:', packs);
+
+    // ==========================================
+    // COLOR COMBINATIONS
+    // ==========================================
+
+    // ==========================================
+    // COLOR COMBINATIONS
+    // ==========================================
+
+    const combinations =
+      this.colorCombinations.map(
+        (combination: any) => {
+
+          const existingImages =
+            Array.isArray(combination.existingImages)
+              ? combination.existingImages
+              : [];
+
+          const newImageCount =
+            Array.isArray(combination.files)
+              ? combination.files.length
+              : 0;
+
+          return {
+
+            id: combination.id,
+
+            name:
+              combination.name?.trim() ||
+              'Color Combination',
+
+            colors:
+              Array.isArray(combination.colors)
+                ? combination.colors
+                : [],
+
+            // Existing combination images
+            images: existingImages,
+
+            image:
+              existingImages[0] || '',
+
+            // New images selected during edit
+            imageCount: newImageCount,
+
+            // Existing images removed during edit
+            removedImages:
+              Array.isArray(combination.removedImages)
+                ? combination.removedImages
+                : []
+          };
+
+        }
+      );
+
+    formData.append(
+      'colorCombinations',
+      JSON.stringify(combinations)
+    );
+
+    console.log(
+      'COLOR COMBINATIONS BEING SENT:',
+      combinations
+    );
+
+    console.log(
+      'GENERIC PACKS BEING SENT:',
+      packs
+    );
 
     formData.append('name', this.newProduct.name || '');
     formData.append('price', String(this.newProduct.price || 0));
@@ -1080,6 +1395,48 @@ export class Admin implements OnInit, AfterViewInit {
       });
 
     }
+    // ==========================================
+    // GENERIC PACK-WISE IMAGES
+    // ==========================================
+
+    this.productPacks.forEach((pack: any) => {
+
+      if (Array.isArray(pack.files)) {
+
+        pack.files.forEach((file: File) => {
+
+          formData.append('packImages', file);
+
+        });
+
+      }
+
+    });
+
+    // ==========================================
+    // COLOR COMBINATION IMAGES
+    // ==========================================
+
+    this.colorCombinations.forEach(
+      (combination: any) => {
+
+        if (Array.isArray(combination.files)) {
+
+          combination.files.forEach(
+            (file: File) => {
+
+              formData.append(
+                'combinationImages',
+                file
+              );
+
+            }
+          );
+
+        }
+
+      }
+    );
 
     this.productService.updateProduct(
       this.newProduct._id!,
@@ -1321,12 +1678,16 @@ export class Admin implements OnInit, AfterViewInit {
 
     };
 
+    this.productPacks = [];
+    this.colorCombinations = [];
+
   }
 
 
   closeModal() {
 
-
+    this.productPacks = [];
+    this.colorCombinations = [];
     this.showModal = false;
 
     this.packOnePrice = 0;
@@ -1575,6 +1936,187 @@ export class Admin implements OnInit, AfterViewInit {
 
   }
 
+
+  // ==========================================
+  // SINGLE VEST PACK IMAGES
+  // ==========================================
+
+  onSingleVestImagesSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // Maximum 5 images
+    if (this.singleVestFiles.length + files.length > 5) {
+
+      this.toastr.warning(
+        'You can upload maximum 5 Single Vest photos.',
+        'Image Limit'
+      );
+
+      input.value = '';
+      return;
+    }
+
+    files.forEach((file) => {
+
+      // Image validation
+      if (!file.type.startsWith('image/')) {
+
+        this.toastr.warning(
+          `${file.name} is not a valid image.`,
+          'Invalid File'
+        );
+
+        return;
+      }
+
+      // 5MB validation
+      if (file.size > 5 * 1024 * 1024) {
+
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+
+        return;
+      }
+
+      // Save actual file
+      this.singleVestFiles.push(file);
+
+      // Create preview
+      const reader = new FileReader();
+
+      reader.onload = () => {
+
+        this.singleVestPreviews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+    // Allow same file to be selected again
+    input.value = '';
+
+  }
+
+
+  removeSingleVestImage(index: number): void {
+
+    if (
+      index < 0 ||
+      index >= this.singleVestPreviews.length
+    ) {
+      return;
+    }
+
+    this.singleVestFiles.splice(index, 1);
+
+    this.singleVestPreviews.splice(index, 1);
+
+  }
+
+
+
+  // ==========================================
+  // 3 VEST PACK IMAGES
+  // ==========================================
+
+  onThreePackImagesSelected(event: Event): void {
+
+    const input = event.target as HTMLInputElement;
+
+    if (!input.files || input.files.length === 0) {
+      return;
+    }
+
+    const files = Array.from(input.files);
+
+    // Maximum 5 images
+    if (this.threePackFiles.length + files.length > 5) {
+
+      this.toastr.warning(
+        'You can upload maximum 5 Three Pack photos.',
+        'Image Limit'
+      );
+
+      input.value = '';
+      return;
+    }
+
+    files.forEach((file) => {
+
+      // Image validation
+      if (!file.type.startsWith('image/')) {
+
+        this.toastr.warning(
+          `${file.name} is not a valid image.`,
+          'Invalid File'
+        );
+
+        return;
+      }
+
+      // 5MB validation
+      if (file.size > 5 * 1024 * 1024) {
+
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+
+        return;
+      }
+
+      // Save actual file
+      this.threePackFiles.push(file);
+
+      // Create preview
+      const reader = new FileReader();
+
+      reader.onload = () => {
+
+        this.threePackPreviews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+    // Allow same file to be selected again
+    input.value = '';
+
+  }
+
+
+  removeThreePackImage(index: number): void {
+
+    if (
+      index < 0 ||
+      index >= this.threePackPreviews.length
+    ) {
+      return;
+    }
+
+    this.threePackFiles.splice(index, 1);
+
+    this.threePackPreviews.splice(index, 1);
+
+  }
+
   removeGalleryImage(index: number): void {
 
     const image = this.imagePreviews[index];
@@ -1698,16 +2240,27 @@ export class Admin implements OnInit, AfterViewInit {
 
   toggleSize(size: string): void {
 
-    if (this.selectedSizes.includes(size)) {
+    const currentSizes = Array.isArray(this.newProduct.sizes)
+      ? [...this.newProduct.sizes]
+      : [];
 
-      this.selectedSizes =
-        this.selectedSizes.filter(s => s !== size);
+    if (currentSizes.includes(size)) {
+
+      this.newProduct.sizes =
+        currentSizes.filter(s => s !== size);
 
     } else {
 
-      this.selectedSizes.push(size);
-
+      this.newProduct.sizes = [
+        ...currentSizes,
+        size
+      ];
     }
+
+    // Keep selectedSizes in sync
+    this.selectedSizes = [...this.newProduct.sizes];
+
+    console.log('Selected Sizes:', this.newProduct.sizes);
   }
 
   getColorValue(color: string): string {
@@ -1728,6 +2281,572 @@ export class Admin implements OnInit, AfterViewInit {
     return colorMap[color] || '#e5e7eb';
   }
 
+
+  // ==========================================
+  // GENERIC PACK BUILDER METHODS
+  // ==========================================
+
+  addPack(): void {
+
+    const pack = {
+      id: 'pack-' + Date.now(),
+
+      name: '',
+
+      quantity: 1,
+
+      price: 0,
+
+      originalPrice: 0,
+
+      discount: 0,
+
+      colors: [],
+
+      sizes: [],
+
+      files: [] as File[],
+
+      previews: [] as string[]
+    };
+
+    this.productPacks.push(pack);
+  }
+
+
+  // ==========================================
+  // REMOVE PACK
+  // ==========================================
+
+  removePack(index: number): void {
+
+    if (
+      index < 0 ||
+      index >= this.productPacks.length
+    ) {
+      return;
+    }
+
+    this.productPacks.splice(index, 1);
+  }
+
+
+  // ==========================================
+  // PACK COLOR
+  // ==========================================
+
+  togglePackColor(
+    pack: any,
+    color: string
+  ): void {
+
+    if (!pack.colors) {
+      pack.colors = [];
+    }
+
+    const index = pack.colors.indexOf(color);
+
+    if (index > -1) {
+
+      pack.colors.splice(index, 1);
+
+    } else {
+
+      pack.colors.push(color);
+
+    }
+  }
+
+
+  // ==========================================
+  // PACK SIZE
+  // ==========================================
+
+  togglePackSize(
+    pack: any,
+    size: string
+  ): void {
+
+    if (!pack.sizes) {
+      pack.sizes = [];
+    }
+
+    const index = pack.sizes.indexOf(size);
+
+    if (index > -1) {
+
+      pack.sizes.splice(index, 1);
+
+    } else {
+
+      pack.sizes.push(size);
+
+    }
+  }
+
+
+  // ==========================================
+  // PACK IMAGES
+  // ==========================================
+
+  onPackImagesSelected(
+    event: Event,
+    packIndex: number
+  ): void {
+
+    const input =
+      event.target as HTMLInputElement;
+
+    if (
+      !input.files ||
+      input.files.length === 0
+    ) {
+      return;
+    }
+
+    const pack =
+      this.productPacks[packIndex];
+
+    if (!pack) {
+      return;
+    }
+
+    if (!pack.files) {
+      pack.files = [];
+    }
+
+    if (!pack.previews) {
+      pack.previews = [];
+    }
+
+
+    const files =
+      Array.from(input.files);
+
+
+    // Maximum 5 photos per pack
+    if (
+      pack.files.length + files.length > 5
+    ) {
+
+      this.toastr.warning(
+        'Maximum 5 photos allowed per pack.',
+        'Image Limit'
+      );
+
+      input.value = '';
+
+      return;
+    }
+
+
+    files.forEach((file: File) => {
+
+      // Image validation
+      if (!file.type.startsWith('image/')) {
+
+        this.toastr.warning(
+          `${file.name} is not a valid image.`,
+          'Invalid File'
+        );
+
+        return;
+      }
+
+
+      // 5MB validation
+      if (
+        file.size > 5 * 1024 * 1024
+      ) {
+
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+
+        return;
+      }
+
+
+      // Save actual file
+      pack.files.push(file);
+
+
+      // Create preview
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+
+        pack.previews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+
+    // Allow same file again
+    input.value = '';
+  }
+
+  removePackImage(
+    packIndex: number,
+    imageIndex: number
+  ): void {
+
+    const pack = this.productPacks[packIndex];
+
+    if (!pack) {
+      return;
+    }
+
+    const image = pack.previews?.[imageIndex];
+
+    if (!image) {
+      return;
+    }
+
+    // ==========================================
+    // EXISTING IMAGE
+    // ==========================================
+
+    if (
+      image.startsWith('http') &&
+      Array.isArray(pack.existingImages)
+    ) {
+
+      pack.existingImages =
+        pack.existingImages.filter(
+          (existingImage: string) =>
+            existingImage !== image
+        );
+
+      if (!Array.isArray(pack.removedImages)) {
+        pack.removedImages = [];
+      }
+
+      pack.removedImages.push(image);
+    }
+
+    // ==========================================
+    // REMOVE FROM PREVIEW
+    // ==========================================
+
+    pack.previews =
+      pack.previews.filter(
+        (_: string, index: number) =>
+          index !== imageIndex
+      );
+
+    // ==========================================
+    // NEWLY SELECTED FILE
+    // ==========================================
+
+    if (
+      Array.isArray(pack.files) &&
+      !image.startsWith('http')
+    ) {
+
+      const fileIndex =
+        imageIndex - pack.existingImages.length;
+
+      if (
+        fileIndex >= 0 &&
+        fileIndex < pack.files.length
+      ) {
+        pack.files.splice(fileIndex, 1);
+      }
+    }
+
+    console.log(
+      'PACK AFTER IMAGE REMOVE:',
+      pack
+    );
+  }
+
+
+  // ==========================================
+  // COLOR COMBINATION
+  // ==========================================
+
+  addColorCombination(): void {
+
+    const combination = {
+
+      id:
+        'combination-' +
+        Date.now(),
+
+      name: '',
+
+      colors: [],
+
+      files: [] as File[],
+
+      previews: [] as string[]
+
+    };
+
+    this.colorCombinations.push(
+      combination
+    );
+  }
+
+
+  // ==========================================
+  // REMOVE COLOR COMBINATION
+  // ==========================================
+
+  removeColorCombination(
+    index: number
+  ): void {
+
+    if (
+      index < 0 ||
+      index >= this.colorCombinations.length
+    ) {
+      return;
+    }
+
+    this.colorCombinations.splice(
+      index,
+      1
+    );
+  }
+
+
+  // ==========================================
+  // COMBINATION COLOR
+  // ==========================================
+
+  toggleCombinationColor(
+    combination: any,
+    color: string
+  ): void {
+
+    if (!combination.colors) {
+      combination.colors = [];
+    }
+
+    const index =
+      combination.colors.indexOf(color);
+
+    if (index > -1) {
+
+      combination.colors.splice(
+        index,
+        1
+      );
+
+    } else {
+
+      combination.colors.push(
+        color
+      );
+
+    }
+  }
+
+
+  // ==========================================
+  // COMBINATION IMAGES
+  // ==========================================
+
+  onCombinationImagesSelected(
+    event: Event,
+    combinationIndex: number
+  ): void {
+
+    const input =
+      event.target as HTMLInputElement;
+
+    if (
+      !input.files ||
+      input.files.length === 0
+    ) {
+      return;
+    }
+
+    const combination =
+      this.colorCombinations[
+      combinationIndex
+      ];
+
+    if (!combination) {
+      return;
+    }
+
+    if (!combination.files) {
+      combination.files = [];
+    }
+
+    if (!combination.previews) {
+      combination.previews = [];
+    }
+
+
+    const files =
+      Array.from(input.files);
+
+
+    // Maximum 5 photos
+    if (
+      combination.files.length +
+      files.length > 5
+    ) {
+
+      this.toastr.warning(
+        'Maximum 5 photos allowed per combination.',
+        'Image Limit'
+      );
+
+      input.value = '';
+
+      return;
+    }
+
+
+    files.forEach((file: File) => {
+
+      if (!file.type.startsWith('image/')) {
+
+        this.toastr.warning(
+          `${file.name} is not a valid image.`,
+          'Invalid File'
+        );
+
+        return;
+      }
+
+
+      if (
+        file.size > 5 * 1024 * 1024
+      ) {
+
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+
+        return;
+      }
+
+
+      combination.files.push(file);
+
+
+      const reader =
+        new FileReader();
+
+      reader.onload = () => {
+
+        combination.previews.push(
+          reader.result as string
+        );
+
+      };
+
+      reader.readAsDataURL(file);
+
+    });
+
+
+    input.value = '';
+  }
+
+
+  // ==========================================
+  // REMOVE COMBINATION IMAGE
+  // ==========================================
+
+  removeCombinationImage(
+    combinationIndex: number,
+    imageIndex: number
+  ): void {
+
+    const combination =
+      this.colorCombinations[combinationIndex];
+
+    if (!combination) {
+      return;
+    }
+
+    const image =
+      combination.previews?.[imageIndex];
+
+    if (!image) {
+      return;
+    }
+
+    // ==========================================
+    // EXISTING IMAGE
+    // ==========================================
+
+    if (
+      image.startsWith('http') &&
+      Array.isArray(combination.existingImages)
+    ) {
+
+      combination.existingImages =
+        combination.existingImages.filter(
+          (existingImage: string) =>
+            existingImage !== image
+        );
+
+      if (
+        !Array.isArray(
+          combination.removedImages
+        )
+      ) {
+        combination.removedImages = [];
+      }
+
+      combination.removedImages.push(image);
+    }
+
+    // ==========================================
+    // REMOVE PREVIEW
+    // ==========================================
+
+    combination.previews =
+      combination.previews.filter(
+        (_: string, index: number) =>
+          index !== imageIndex
+      );
+
+    // ==========================================
+    // NEWLY SELECTED FILE
+    // ==========================================
+
+    if (
+      Array.isArray(combination.files) &&
+      !image.startsWith('http')
+    ) {
+
+      const fileIndex =
+        imageIndex -
+        combination.existingImages.length;
+
+      if (
+        fileIndex >= 0 &&
+        fileIndex < combination.files.length
+      ) {
+        combination.files.splice(
+          fileIndex,
+          1
+        );
+      }
+    }
+
+    console.log(
+      'COMBINATION AFTER IMAGE REMOVE:',
+      combination
+    );
+  }
 
   addSize(): void {
 

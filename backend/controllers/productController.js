@@ -3,6 +3,8 @@ const Product = require("../models/Product");
 const asyncHandler = require("../middleware/asyncHandler");
 const ErrorHandler = require("../utils/errorHandler");
 
+
+
 // Create Product
 const createProduct = asyncHandler(async (req, res) => {
 
@@ -12,14 +14,26 @@ const createProduct = asyncHandler(async (req, res) => {
         console.log("FILES:", req.files);
         console.log("BODY:", req.body);
 
-        if (!req.files || req.files.length === 0) {
+        if (!req.files || Object.keys(req.files).length === 0) {
             return res.status(400).json({
                 success: false,
                 message: "At least one product image is required"
             });
         }
 
-        const imageUrls = req.files.map(file => file.path);
+        // ==========================================
+        // PRODUCT + PACK IMAGES
+        // ==========================================
+
+        const productFiles = req.files?.images || [];
+        const packFiles = req.files?.packImages || [];
+        const combinationFiles = req.files?.combinationImages || [];
+
+        const imageUrls = productFiles.map(file => file.path);
+
+        const packImageUrls = packFiles.map(file => file.path);
+
+        const combinationImageUrls = combinationFiles.map(file => file.path);
 
 
         const sku = "TS-" + Date.now();
@@ -101,6 +115,135 @@ const createProduct = asyncHandler(async (req, res) => {
             }
         }
 
+
+        // ==========================================
+        // PREPARE PACK IMAGE COUNTS
+        // ==========================================
+
+        packs = packs.map(pack => ({
+            ...pack,
+            imageCount: Number(pack.imageCount) || 0
+        }));
+
+
+
+        // ==========================================
+        // GENERIC COLOR COMBINATION IMAGES
+        // ==========================================
+
+        let combinationImageIndex = 0;
+
+        colorCombinations = colorCombinations.map(combination => {
+
+            const imageCount =
+                Number(combination.imageCount) || 0;
+
+            const images = combinationImageUrls.slice(
+                combinationImageIndex,
+                combinationImageIndex + imageCount
+            );
+
+            combinationImageIndex += imageCount;
+
+            return {
+                ...combination,
+                image: images[0] || "",
+                images
+            };
+
+        });
+
+        // ==========================================
+        // COLOR COMBINATIONS
+        // ==========================================
+
+        let colorCombinations = [];
+
+        if (req.body.colorCombinations) {
+            try {
+
+                colorCombinations = JSON.parse(
+                    req.body.colorCombinations
+                );
+
+                if (!Array.isArray(colorCombinations)) {
+                    colorCombinations = [];
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "COLOR COMBINATIONS PARSE ERROR:",
+                    error
+                );
+
+                colorCombinations = [];
+            }
+        }
+
+
+
+        // ==========================================
+        // GENERIC PACK-WISE IMAGES
+        // ==========================================
+
+        // ==========================================
+        // GENERIC PACK-WISE IMAGES
+        // ==========================================
+
+        let packImageIndex = 0;
+
+        packs = packs.map(pack => {
+
+            const imageCount =
+                Number(pack.imageCount) || 0;
+
+            const newImages =
+                newPackImages.slice(
+                    packImageIndex,
+                    packImageIndex + imageCount
+                );
+
+            packImageIndex += imageCount;
+
+            // Existing images from frontend
+            const existingPackImages =
+                Array.isArray(pack.images)
+                    ? pack.images
+                    : pack.image
+                        ? [pack.image]
+                        : [];
+
+            // Images removed while editing
+            const removedPackImages =
+                Array.isArray(pack.removedImages)
+                    ? pack.removedImages
+                    : [];
+
+            // Keep only images that were NOT removed
+            const filteredExistingPackImages =
+                existingPackImages.filter(
+                    image =>
+                        !removedPackImages.includes(image)
+                );
+
+            // Existing + newly uploaded images
+            const finalPackImages = [
+                ...filteredExistingPackImages,
+                ...newImages
+            ];
+
+            return {
+                ...pack,
+
+                image:
+                    finalPackImages[0] || "",
+
+                images:
+                    finalPackImages
+            };
+
+        });
         // ==============================
         // CREATE PRODUCT
         // ==============================
@@ -113,7 +256,7 @@ const createProduct = asyncHandler(async (req, res) => {
             colors,
             sizes,
             packs,
-
+            colorCombinations,
             sku,
 
             image: imageUrls[0],
@@ -220,10 +363,40 @@ const updateProduct = asyncHandler(async (req, res) => {
         // 2. NEW IMAGES
         // ==========================================
 
-        const newImages = req.files
-            ? req.files.map(file => file.path)
-            : [];
+        // ==========================================
+        // 2. NEW PRODUCT IMAGES
+        // ==========================================
 
+        const productFiles = req.files?.images || [];
+
+        const newImages = productFiles.map(file => file.path);
+
+
+        // ==========================================
+        // GENERIC PACK-WISE IMAGES
+        // ==========================================
+
+        const packFiles = req.files?.packImages || [];
+
+        const newPackImages = packFiles.map(file => file.path);
+
+
+        // ==========================================
+        // GENERIC COLOR COMBINATION IMAGES
+        // ==========================================
+
+        const combinationFiles =
+            req.files?.combinationImages || [];
+
+        const newCombinationImages =
+            combinationFiles.map(file => file.path);
+
+        console.log(
+            "NEW COMBINATION IMAGES:",
+            newCombinationImages
+        );
+
+        console.log("NEW PACK IMAGES:", newPackImages);
 
         console.log("EXISTING IMAGES:", existingImages);
         console.log("NEW IMAGES:", newImages);
@@ -303,6 +476,57 @@ const updateProduct = asyncHandler(async (req, res) => {
         }
 
         console.log("FINAL PACKS:", packs);
+        // ==========================================
+        // GENERIC PACK-WISE IMAGES
+        // ==========================================
+
+        let packImageIndex = 0;
+
+        packs = packs.map(pack => {
+
+            const imageCount = Number(pack.imageCount) || 0;
+
+            const newImages = newPackImages.slice(
+                packImageIndex,
+                packImageIndex + imageCount
+            );
+
+            packImageIndex += imageCount;
+
+            const existingPackImages = Array.isArray(pack.images)
+                ? pack.images
+                : pack.image
+                    ? [pack.image]
+                    : [];
+
+
+            // ==========================================
+            // REMOVE PACK IMAGES
+            // ==========================================
+
+            const removedPackImages =
+                Array.isArray(pack.removedImages)
+                    ? pack.removedImages
+                    : [];
+
+            const filteredExistingPackImages =
+                existingPackImages.filter(
+                    image => !removedPackImages.includes(image)
+                );
+
+            const finalPackImages = [
+                ...existingPackImages,
+                ...newImages
+            ];
+
+            return {
+                ...pack,
+                image: finalPackImages[0] || "",
+                images: finalPackImages
+            };
+
+        });
+
 
 
         // ==========================================
@@ -374,6 +598,45 @@ const updateProduct = asyncHandler(async (req, res) => {
         console.log("FINAL SIZES:", sizes);
 
 
+        
+
+
+        // ==========================================
+        // COLOR COMBINATIONS
+        // ==========================================
+
+        let colorCombinations = product.colorCombinations || [];
+
+        if (req.body.colorCombinations !== undefined) {
+
+            try {
+
+                colorCombinations = JSON.parse(
+                    req.body.colorCombinations
+                );
+
+                if (!Array.isArray(colorCombinations)) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Color combinations must be an array"
+                    });
+                }
+
+            } catch (error) {
+
+                console.error(
+                    "COLOR COMBINATIONS PARSE ERROR:",
+                    error
+                );
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid color combinations format"
+                });
+            }
+        }
+
+
         // ==========================================
         // 6. UPDATE NORMAL FIELDS
         // ==========================================
@@ -386,7 +649,8 @@ const updateProduct = asyncHandler(async (req, res) => {
                 key !== "existingImages" &&
                 key !== "sizes" &&
                 key !== "colors" &&
-                key !== "packs"
+                key !== "packs" &&
+                key !== "colorCombinations"
             ) {
                 product[key] = req.body[key];
             }
@@ -395,6 +659,7 @@ const updateProduct = asyncHandler(async (req, res) => {
         product.sizes = sizes;
         product.colors = colors;
         product.packs = packs;
+        product.colorCombinations = colorCombinations;
 
 
         // ==========================================

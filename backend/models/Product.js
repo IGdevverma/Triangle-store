@@ -128,9 +128,16 @@ const productSchema = new mongoose.Schema(
           default: 0
         },
 
+        // Main image for this pack
         image: {
           type: String,
           default: ''
+        },
+
+        // Multiple images for this pack
+        images: {
+          type: [String],
+          default: []
         }
       }
     ],

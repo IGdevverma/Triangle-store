@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Product } from '../models/product';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, shareReplay } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -13,8 +13,19 @@ export class ProductService {
 
   constructor(private http: HttpClient) { }
 
+  private products$?: Observable<any>;
+
   getProducts(): Observable<any> {
-    return this.http.get<any>(this.apiUrl);
+
+    if (!this.products$) {
+      this.products$ = this.http
+        .get<any>(this.apiUrl)
+        .pipe(
+          shareReplay(1)
+        );
+    }
+
+    return this.products$;
   }
   getProductById(id: string): Observable<any> {
 

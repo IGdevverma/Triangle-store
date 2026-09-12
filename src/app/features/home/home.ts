@@ -31,9 +31,9 @@ export class Home implements OnInit {
 
   /* Hero Slider */
   sliderImages = [
-    'https://images.unsplash.com/photo-1517649763962-0c623066013b?w=1600',
-    'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=1600',
-    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=1600'
+    'https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=max&w=1600&q=75',
+    'https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=max&w=1600&q=75',
+    'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=max&w=1200&q=65'
   ];
 
   currentSlide = 0;

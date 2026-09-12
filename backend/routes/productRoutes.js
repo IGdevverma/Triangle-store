@@ -24,7 +24,11 @@ router.post(
     "/",
     isAuthenticatedUser,
     authorizeRoles("admin"),
-    upload.array("images", 5),
+    upload.fields([
+        { name: "images", maxCount: 5 },
+        { name: "packImages", maxCount: 50 },
+        { name: "combinationImages", maxCount: 100 }
+    ]),
     createProduct
 );
 
@@ -46,7 +50,11 @@ router.put(
     "/:id",
     isAuthenticatedUser,
     authorizeRoles("admin"),
-    upload.array("images", 5),
+    upload.fields([
+        { name: "images", maxCount: 5 },
+        { name: "packImages", maxCount: 50 },
+        { name: "combinationImages", maxCount: 100 }
+    ]),
     updateProduct
 );
 

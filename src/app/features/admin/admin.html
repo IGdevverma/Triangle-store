@@ -794,468 +794,210 @@
             </div>
 
         </div>
+        <!-- ================= PRODUCT MODAL ================= -->
         <div class="modal-overlay" *ngIf="showModal">
+            <div class="product-modal" (click)="$event.stopPropagation()">
 
-            <div class="modal" (click)="$event.stopPropagation()">
-
-                <div class="modal-header">
-
+                <!-- ================= HEADER ================= -->
+                <div class="product-modal-header">
                     <div>
-
-                        <h2>{{ editing ? 'Edit Product' : 'Add Product' }}</h2>
-
-                        <p>Add a new product to your store</p>
-
+                        <span class="modal-step">PRODUCT MANAGEMENT</span>
+                        <h2>{{ editing ? 'Edit Product' : 'Add New Product' }}</h2>
+                        <p>Create a complete product with packs, variants and images.</p>
                     </div>
 
-                    <button class="close-btn" (click)="closeModal()">
+                    <button type="button" class="close-btn" (click)="closeModal()">
                         ✕
                     </button>
-
                 </div>
 
-                <div class="product-form">
 
-                    <!-- =========================
-       LEFT: PRODUCT IMAGES
-       ========================= -->
-                    <div class="left-section">
+                <!-- ================= BODY ================= -->
+                <div class="product-modal-body">
 
-                        <div class="product-images-section">
+                    <!-- ================= 01 BASIC PRODUCT ================= -->
+                    <section class="product-section">
 
-                            <!-- HEADER -->
-                            <div class="image-section-header">
+                        <div class="section-heading">
+                            <div class="section-number">01</div>
+                            <div>
+                                <h3>Basic Product</h3>
+                                <p>Enter the basic information about your product.</p>
+                            </div>
+                        </div>
 
-                                <div>
-                                    <h3>Product Images</h3>
+                        <div class="form-grid">
 
-                                    <p>
-                                        Add up to 5 images.
-                                        The first image will be your main product image.
-                                    </p>
+                            <!-- Product Name -->
+                            <div class="form-group full-width">
+                                <label>Product Name *</label>
+                                <input type="text" [(ngModel)]="newProduct.name"
+                                    placeholder="e.g. TriCore Performance Vest">
+                            </div>
+
+                            <!-- Category -->
+                            <div class="form-group">
+                                <label>Category *</label>
+
+                                <input type="text" [(ngModel)]="newProduct.category" placeholder="e.g. Vest">
+                            </div>
+
+                            <!-- Brand -->
+                            <div class="form-group">
+                                <label>Brand</label>
+
+                                <input type="text" [(ngModel)]="newProduct.brand" placeholder="Triangle Sports">
+                            </div>
+
+                            <!-- Product Type -->
+                            <div class="form-group">
+                                <label>Product Type</label>
+
+                                <input type="text" [(ngModel)]="newProduct.type" placeholder="Vest / T-Shirt / Socks">
+                            </div>
+
+                            <!-- Fabric -->
+                            <div class="form-group">
+                                <label>Fabric</label>
+
+                                <input type="text" [(ngModel)]="newProduct.fabric" placeholder="Polyester / Cotton">
+                            </div>
+
+                            <!-- SKU -->
+                            <div class="form-group">
+                                <label>SKU</label>
+
+                                <input type="text" [(ngModel)]="newProduct.sku" placeholder="TS-VEST-001">
+                            </div>
+
+                            <!-- Description -->
+                            <div class="form-group full-width">
+                                <label>Description</label>
+
+                                <textarea [(ngModel)]="newProduct.description" rows="4"
+                                    placeholder="Write product description...">
+            </textarea>
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ================= 02 PRODUCT IMAGES ================= -->
+                    <section class="product-section">
+
+                        <div class="section-heading">
+                            <div class="section-number">02</div>
+
+                            <div>
+                                <h3>Product Images</h3>
+                                <p>Add the main product image and additional images.</p>
+                            </div>
+                        </div>
+
+                        <div class="image-upload-layout">
+
+                            <!-- Main Image -->
+                            <div class="main-image-box">
+
+                                <label>Main Product Image</label>
+
+                                <div class="main-image-upload">
+
+                                    <img *ngIf="imagePreviews.length > 0" [src]="imagePreviews[0]" alt="Product Image">
+
+                                    <div *ngIf="imagePreviews.length === 0" class="upload-placeholder">
+
+                                        <span>＋</span>
+                                        <strong>Upload Main Image</strong>
+                                        <small>PNG, JPG, WEBP</small>
+                                    </div>
+
+                                    <input type="file" accept="image/*" (change)="onProductImagesSelected($event)"
+                                        class="file-input">
                                 </div>
-
-                                <span class="image-count">
-                                    {{ imagePreviews.length }}/5
-                                </span>
 
                             </div>
 
 
+                            <!-- Additional Images -->
+                            <div class="additional-image-box">
 
+                                <div class="upload-title-row">
+                                    <label>Additional Images</label>
 
-
-
-                            <div class="main-image-upload">
-
-                                <!-- MAIN IMAGE PREVIEW -->
-                                <div class="main-image-preview" *ngIf="imagePreviews.length > 0">
-
-                                    <img [src]="imagePreviews[0]" alt="Main product image" />
-
-                                    <span class="main-image-badge">
-                                        MAIN IMAGE
+                                    <span>
+                                        {{ imagePreviews.length }}/5
                                     </span>
-
-                                    <button type="button" class="image-remove-btn" (click)="removeImage(0)">
-                                        ×
-                                    </button>
-
                                 </div>
-
-                                <!-- MAIN IMAGE UPLOAD -->
-                                <div class="main-upload-placeholder" *ngIf="imagePreviews.length === 0"
-                                    (click)="fileInput.click()">
-
-                                    <div class="upload-icon">
-                                        +
-                                    </div>
-
-                                    <h4>Upload Main Product Image</h4>
-
-                                    <p>Click to select your main product image</p>
-
-                                    <span>PNG, JPG or WEBP</span>
-
-                                </div>
-
-
-
-
 
                                 <div class="additional-images">
 
-                                    <div class="additional-header">
+                                    <div class="image-thumb" *ngFor="let image of imagePreviews; let i = index">
 
-                                        <h4>
-                                            Additional Images
-                                        </h4>
+                                        <img [src]="image" alt="Product Image">
 
-                                        <span>
-                                            {{ imagePreviews.length > 0
-                                            ? imagePreviews.length - 1
-                                            : 0
-                                            }}/4
-                                        </span>
+                                        <button type="button" (click)="removeImage(i)">
+                                            ✕
+                                        </button>
 
                                     </div>
 
+                                    <label class="add-image-box" *ngIf="imagePreviews.length < 5">
 
-                                    <div class="image-grid">
+                                        <span>＋</span>
+                                        <small>Add Image</small>
 
-                                        <!-- EXISTING ADDITIONAL IMAGES -->
-                                        <div class="gallery-card" *ngFor="
-    let image of imagePreviews.slice(1);
-    let i = index
-  ">
-                                            <img [src]="image" [alt]="'Product image ' + (i + 2)" />
-
-                                            <button type="button" class="image-remove-btn" (click)="removeImage(i + 1)">
-                                                ×
-                                            </button>
-                                        </div>
-
-                                        <!-- ADD IMAGE BUTTON -->
-                                        <div class="add-image-card" *ngIf="imagePreviews.length < 5"
-                                            (click)="fileInput.click()">
-                                            <div class="add-image-icon">
-                                                +
-                                            </div>
-
-                                            <span>
-                                                Add Image
-                                            </span>
-                                        </div>
-
-                                        <!-- ONE FILE INPUT ONLY -->
-                                        <input #fileInput type="file" accept="image/png,image/jpeg,image/webp" multiple
-                                            hidden (change)="onGalleryImagesSelected($event)" />
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- =========================
-       RIGHT: PRODUCT INFORMATION
-       ========================= -->
-
-                                <div class="right-section">
-
-                                    <!-- NAME + PRICE -->
-
-                                    <div class="row">
-
-                                        <div>
-                                            <label>Product Name</label>
-
-                                            <input type="text" [(ngModel)]="newProduct.name"
-                                                placeholder="Enter product name">
-                                        </div>
-
-
-                                        <div>
-                                            <label>Price</label>
-
-                                            <input type="number" [(ngModel)]="newProduct.price"
-                                                placeholder="Enter price">
-                                        </div>
-
-                                    </div>
-
-
-                                    <!-- CATEGORY + STOCK -->
-
-                                    <div class="row">
-
-                                        <div>
-
-                                            <label>Category</label>
-
-                                            <select [(ngModel)]="newProduct.category">
-
-                                                <option value="">
-                                                    Select Category
-                                                </option>
-
-                                                <option>
-                                                    T-Shirts
-                                                </option>
-
-                                                <option>
-                                                    TrackPant
-                                                </option>
-
-                                                <option>
-                                                    Vest
-                                                </option>
-
-                                                <option>
-                                                    Vests 3 pack
-                                                </option>
-
-                                                <option>
-                                                    Shorts
-                                                </option>
-
-                                                <option>
-                                                    Tracksuits
-                                                </option>
-
-                                                <option>
-                                                    Sleeves
-                                                </option>
-
-                                                <option>
-                                                    Accessories
-                                                </option>
-
-                                            </select>
-
-                                        </div>
-
-
-                                        <div>
-
-                                            <label>Stock</label>
-
-                                            <input type="number" [(ngModel)]="newProduct.stock"
-                                                placeholder="Enter stock">
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <!-- DESCRIPTION -->
-
-                                    <div class="full-width">
-
-                                        <label>
-                                            Description
-                                        </label>
-
-                                        <textarea rows="5" [(ngModel)]="newProduct.description"
-                                            placeholder="Enter product description"></textarea>
-
-                                    </div>
-
-
-                                    <!-- DISCOUNT + SKU -->
-
-                                    <div class="row">
-
-                                        <div>
-
-                                            <label>
-                                                Discount (%)
-                                            </label>
-
-                                            <input type="number" [(ngModel)]="newProduct.discount" placeholder="10">
-
-                                        </div>
-
-
-                                        <div>
-
-                                            <label>
-                                                SKU
-                                            </label>
-
-                                            <input type="text" value="Auto Generated" readonly>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <!-- FABRIC + TYPE -->
-
-                                    <div class="row">
-
-                                        <div>
-
-                                            <label>
-                                                Fabric
-                                            </label>
-
-                                            <input type="text" [(ngModel)]="newProduct.fabric"
-                                                placeholder="e.g. Cotton">
-
-                                        </div>
-
-
-                                        <div>
-
-                                            <label>
-                                                Type
-                                            </label>
-
-                                            <input type="text" [(ngModel)]="newProduct.type"
-                                                placeholder="e.g. Oversized">
-
-                                        </div>
-
-                                    </div>
-
-                                    <div class="full-width">
-
-
-                                        <!-- Selected Sizes -->
-
-                                        <div class="selected-options" *ngIf="newProduct.sizes?.length">
-
-                                            <span class="option-tag"
-                                                *ngFor="let size of newProduct.sizes; let i = index">
-
-                                                {{ size }}
-
-                                                <button type="button" (click)="removeSize(i)">
-
-                                                    ×
-
-                                                </button>
-
-                                            </span>
-
-                                        </div>
-
-                                    </div>
-                                    <!-- AVAILABLE COLORS -->
-
-                                    <div class="full-width">
-                                        <label>Available Colors</label>
-
-                                        <input type="text" [(ngModel)]="newProduct.availableColors"
-                                            placeholder="Black, White, Grey" />
-
-                                        <small class="input-hint">
-                                            Enter colors separated by commas
-                                        </small>
-                                    </div>
-
-                                    <!-- =========================
-     AVAILABLE SIZES
-========================= -->
-
-                                    <div class="full-width">
-
-                                        <label>
-                                            Available Sizes
-                                        </label>
-
-                                        <div class="size-input-row">
-
-                                            <input type="text" [(ngModel)]="newSize"
-                                                placeholder="Enter size e.g. S, M, L, XL" (keyup.enter)="addSize()" />
-
-                                            <button type="button" class="add-option-btn" (click)="addSize()">
-                                                + Add
-                                            </button>
-
-                                        </div>
-
-                                        <small class="input-hint">
-                                            Add sizes one by one. Example: S, M, L, XL
-                                        </small>
-
-
-
-
-                                    </div>
-
-                                    <!-- =========================
-     PRODUCT PACK OPTIONS
-========================= -->
-
-                                    <div class="full-width pack-section">
-
-                                        <label>Pack Options</label>
-
-                                        <div class="pack-options">
-
-                                            <!-- ========================= -->
-                                            <!-- 1 VEST -->
-                                            <!-- ========================= -->
-
-                                            <div class="pack-card">
-
-                                                <h4>1 Vest</h4>
-
-                                                <input type="number" placeholder="Selling Price"
-                                                    [(ngModel)]="packOnePrice">
-
-                                                <input type="number" placeholder="Original Price"
-                                                    [(ngModel)]="packOneOriginalPrice">
-
-                                                <input type="number" placeholder="Discount %"
-                                                    [(ngModel)]="packOneDiscount">
-
-                                            </div>
-
-
-                                            <!-- ========================= -->
-                                            <!-- 3 PACK -->
-                                            <!-- ========================= -->
-
-                                            <div class="pack-card">
-
-                                                <h4>3 Pack</h4>
-
-                                                <input type="number" placeholder="Selling Price"
-                                                    [(ngModel)]="packThreePrice">
-
-                                                <input type="number" placeholder="Original Price"
-                                                    [(ngModel)]="packThreeOriginalPrice">
-
-                                                <input type="number" placeholder="Discount %"
-                                                    [(ngModel)]="packThreeDiscount">
-
-                                            </div>
-
-                                        </div>
-
-                                    </div>
-
-                                    <!-- SHOW ON HOME -->
-
-                                    <div class="switch-row">
-
-                                        <label>
-                                            Show on Home Page
-                                        </label>
-
-                                        <label class="switch">
-
-                                            <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
-
-                                            <span class="slider"></span>
-
-                                        </label>
-
-                                    </div>
+                                        <input type="file" accept="image/*" multiple
+                                            (change)="onProductImagesSelected($event)">
+                                    </label>
 
                                 </div>
 
                             </div>
 
-                            <div class="modal-footer">
+                        </div>
 
-                                <button class="cancel-btn" (click)="closeModal()">
+                    </section>
 
-                                    Cancel
 
-                                </button>
+                    <!-- ================= 03 PRODUCT OPTIONS ================= -->
+                    <section class="product-section">
 
-                                <button *ngIf="!editing" class="save-btn" (click)="addProduct()">
+                        <div class="section-heading">
+                            <div class="section-number">03</div>
 
-                                    + Add Product
+                            <div>
+                                <h3>Product Options</h3>
+                                <p>Define the available colours, sizes and stock.</p>
+                            </div>
+                        </div>
 
-                                </button>
 
-                                <button *ngIf="editing" class="save-btn" (click)="updateProduct()">
+                        <!-- COLORS -->
+                        <div class="option-block">
 
-                                    Update Product
+                            <div class="option-header">
+                                <div>
+                                    <label>Available Colors</label>
+                                    <small>Select all colours available for this product.</small>
+                                </div>
+                            </div>
+
+                            <div class="color-selection">
+
+                                <button type="button" class="color-option" *ngFor="let color of availableColors"
+                                    [class.selected]="newProduct.colors?.includes(color)" (click)="toggleColor(color)">
+
+                                    <span class="color-dot" [style.background]="getColorValue(color)">
+                                    </span>
+
+                                    {{ color }}
+
+                                    <span class="check" *ngIf="newProduct.colors?.includes(color)">
+                                        ✓
+                                    </span>
 
                                 </button>
 
@@ -1263,7 +1005,573 @@
 
                         </div>
 
-                    </div>
 
+                        <!-- SIZES -->
+                        <div class="option-block">
+
+                            <div class="option-header">
+                                <div>
+                                    <label>Available Sizes</label>
+                                    <small>Select all sizes available for this product.</small>
+                                </div>
+                            </div>
+
+                            <div class="size-selection">
+
+                                <button type="button" class="size-option" *ngFor="let size of availableSizes"
+                                    [class.selected]="newProduct.sizes?.includes(size)" (click)="toggleSize(size)">
+
+                                    {{ size }}
+
+                                    <span class="check" *ngIf="newProduct.sizes?.includes(size)">
+                                        ✓
+                                    </span>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- STOCK -->
+                        <div class="form-grid">
+
+                            <div class="form-group">
+                                <label>Total Stock</label>
+
+                                <input type="number" min="0" [(ngModel)]="newProduct.stock" placeholder="0">
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ================= 04 PACK BUILDER ================= -->
+                    <section class="product-section">
+
+                        <div class="section-heading">
+
+                            <div class="section-number">04</div>
+
+                            <div>
+                                <h3>Pack Builder</h3>
+                                <p>
+                                    Create any number of packs for this product.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="builder-toolbar">
+
+                            <div>
+                                <strong>Product Packs</strong>
+                                <span>
+                                    {{ productPacks.length }} pack(s)
+                                </span>
+                            </div>
+
+                            <button type="button" class="primary-small-btn" (click)="addPack()">
+
+                                ＋ Add Pack
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- PACK LIST -->
+                        <div class="pack-builder">
+
+                            <div class="pack-card" *ngFor="let pack of productPacks; let packIndex = index">
+
+                                <!-- PACK HEADER -->
+                                <div class="pack-card-header">
+
+                                    <div class="pack-title">
+
+                                        <span class="pack-badge">
+                                            PACK {{ packIndex + 1 }}
+                                        </span>
+
+                                        <strong>
+                                            {{ pack.name || 'New Pack' }}
+                                        </strong>
+
+                                    </div>
+
+                                    <button type="button" class="danger-icon-btn" (click)="removePack(packIndex)">
+
+                                        🗑
+
+                                    </button>
+
+                                </div>
+
+
+                                <!-- PACK BASIC INFO -->
+                                <div class="form-grid">
+
+                                    <div class="form-group">
+                                        <label>Pack Name *</label>
+
+                                        <input type="text" [(ngModel)]="pack.name" placeholder="e.g. 3 Pack">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>Quantity *</label>
+
+                                        <input type="number" min="1" [(ngModel)]="pack.quantity" placeholder="3">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>Selling Price *</label>
+
+                                        <input type="number" min="0" [(ngModel)]="pack.price" placeholder="1799">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>Original Price</label>
+
+                                        <input type="number" min="0" [(ngModel)]="pack.originalPrice"
+                                            placeholder="2499">
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label>Discount (%)</label>
+
+                                        <input type="number" min="0" max="100" [(ngModel)]="pack.discount"
+                                            placeholder="20">
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PACK COLORS -->
+                                <div class="pack-subsection">
+
+                                    <div class="pack-subsection-title">
+                                        <strong>Pack Colors</strong>
+                                        <small>
+                                            Select colours available in this pack.
+                                        </small>
+                                    </div>
+
+                                    <div class="pack-selection-list">
+
+                                        <button type="button" class="pack-color-option"
+                                            *ngFor="let color of availableColors"
+                                            [class.selected]="pack.colors?.includes(color)"
+                                            (click)="togglePackColor(pack, color)">
+
+                                            <span class="color-dot" [style.background]="getColorValue(color)">
+                                            </span>
+
+                                            {{ color }}
+
+                                            <span *ngIf="pack.colors?.includes(color)">
+                                                ✓
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PACK SIZES -->
+                                <div class="pack-subsection">
+
+                                    <div class="pack-subsection-title">
+                                        <strong>Pack Sizes</strong>
+                                        <small>
+                                            Select sizes available in this pack.
+                                        </small>
+                                    </div>
+
+                                    <div class="pack-selection-list size-list">
+
+                                        <button type="button" class="pack-size-option"
+                                            *ngFor="let size of availableSizes"
+                                            [class.selected]="pack.sizes?.includes(size)"
+                                            (click)="togglePackSize(pack, size)">
+
+                                            {{ size }}
+
+                                            <span *ngIf="pack.sizes?.includes(size)">
+                                                ✓
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- PACK PHOTOS -->
+                                <div class="pack-subsection">
+
+                                    <div class="pack-subsection-title">
+
+                                        <div>
+                                            <strong>Pack Photos</strong>
+                                            <small>
+                                                Add photos specifically for this pack.
+                                            </small>
+                                        </div>
+
+                                        <span class="photo-count">
+                                            {{ pack.previews?.length || 0 }}/5
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="pack-photo-grid">
+
+                                        <!-- Existing / New Images -->
+                                        <div class="pack-photo"
+                                            *ngFor="let image of pack.previews; let imageIndex = index">
+
+                                            <img [src]="image" alt="Pack Image">
+
+                                            <button type="button" (click)="removePackImage(packIndex, imageIndex)">
+
+                                                ✕
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <!-- Upload -->
+                                        <label class="pack-photo-upload" *ngIf="(pack.previews?.length || 0) < 5">
+
+                                            <span>＋</span>
+                                            <strong>Add Photo</strong>
+                                            <small>JPG / PNG / WEBP</small>
+
+                                            <input type="file" accept="image/*" multiple
+                                                (change)="onPackImagesSelected($event, packIndex)">
+
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- EMPTY PACK -->
+                            <div class="empty-builder" *ngIf="productPacks.length === 0">
+
+                                <div class="empty-icon">
+                                    📦
+                                </div>
+
+                                <h4>No Packs Added</h4>
+
+                                <p>
+                                    Add your first pack to define pack-wise pricing,
+                                    sizes, colours and photos.
+                                </p>
+
+                                <button type="button" class="primary-small-btn" (click)="addPack()">
+
+                                    ＋ Add First Pack
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ================= 05 COLOR COMBINATIONS ================= -->
+                    <section class="product-section">
+
+                        <div class="section-heading">
+
+                            <div class="section-number">05</div>
+
+                            <div>
+                                <h3>Color Combinations</h3>
+
+                                <p>
+                                    Create predefined colour combinations with their own photos.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="builder-toolbar">
+
+                            <div>
+                                <strong>Color Combination Builder</strong>
+
+                                <span>
+                                    {{ colorCombinations.length }} combination(s)
+                                </span>
+                            </div>
+
+
+                            <button type="button" class="primary-small-btn" (click)="addColorCombination()">
+
+                                ＋ Add Combination
+
+                            </button>
+
+                        </div>
+
+
+                        <div class="combination-list">
+
+                            <div class="combination-card"
+                                *ngFor="let combination of colorCombinations; let combinationIndex = index">
+
+                                <!-- COMBINATION HEADER -->
+                                <div class="combination-header">
+
+                                    <div>
+
+                                        <span class="combination-number">
+                                            COMBINATION {{ combinationIndex + 1 }}
+                                        </span>
+
+                                        <strong>
+                                            {{ combination.name || 'New Combination' }}
+                                        </strong>
+
+                                    </div>
+
+
+                                    <button type="button" class="danger-icon-btn"
+                                        (click)="removeColorCombination(combinationIndex)">
+
+                                        🗑
+
+                                    </button>
+
+                                </div>
+
+
+                                <!-- NAME -->
+                                <div class="form-group">
+
+                                    <label>Combination Name</label>
+
+                                    <input type="text" [(ngModel)]="combination.name"
+                                        placeholder="e.g. Black + Grey + White">
+
+                                </div>
+
+
+                                <!-- COLORS -->
+                                <div class="pack-subsection">
+
+                                    <div class="pack-subsection-title">
+
+                                        <strong>Select Colors</strong>
+
+                                        <small>
+                                            Choose colours for this combination.
+                                        </small>
+
+                                    </div>
+
+
+                                    <div class="pack-selection-list">
+
+                                        <button type="button" class="pack-color-option"
+                                            *ngFor="let color of availableColors"
+                                            [class.selected]="combination.colors?.includes(color)"
+                                            (click)="toggleCombinationColor(combination, color)">
+
+                                            <span class="color-dot" [style.background]="getColorValue(color)">
+                                            </span>
+
+                                            {{ color }}
+
+                                            <span *ngIf="combination.colors?.includes(color)">
+                                                ✓
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- COMBINATION PHOTOS -->
+                                <div class="pack-subsection">
+
+                                    <div class="pack-subsection-title">
+
+                                        <div>
+                                            <strong>Combination Photos</strong>
+
+                                            <small>
+                                                Add photos showing this colour combination.
+                                            </small>
+                                        </div>
+
+                                        <span class="photo-count">
+                                            {{ combination.previews?.length || 0 }}/5
+                                        </span>
+
+                                    </div>
+
+
+                                    <div class="pack-photo-grid">
+
+                                        <div class="pack-photo"
+                                            *ngFor="let image of combination.previews; let imageIndex = index">
+
+                                            <img [src]="image" alt="Color Combination">
+
+                                            <button type="button"
+                                                (click)="removeCombinationImage(combinationIndex, imageIndex)">
+
+                                                ✕
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <label class="pack-photo-upload"
+                                            *ngIf="(combination.previews?.length || 0) < 5">
+
+                                            <span>＋</span>
+
+                                            <strong>Add Photo</strong>
+
+                                            <small>JPG / PNG / WEBP</small>
+
+                                            <input type="file" accept="image/*" multiple
+                                                (change)="onCombinationImagesSelected($event, combinationIndex)">
+
+                                        </label>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- EMPTY -->
+                            <div class="empty-builder" *ngIf="colorCombinations.length === 0">
+
+                                <div class="empty-icon">
+                                    🎨
+                                </div>
+
+                                <h4>No Color Combinations</h4>
+
+                                <p>
+                                    Add combinations such as Black + Grey,
+                                    Black + White or any other predefined combination.
+                                </p>
+
+                                <button type="button" class="primary-small-btn" (click)="addColorCombination()">
+
+                                    ＋ Add Combination
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+
+                    <!-- ================= 06 STORE SETTINGS ================= -->
+                    <section class="product-section">
+
+                        <div class="section-heading">
+
+                            <div class="section-number">06</div>
+
+                            <div>
+                                <h3>Store Settings</h3>
+
+                                <p>
+                                    Control product visibility and homepage placement.
+                                </p>
+                            </div>
+
+                        </div>
+
+
+                        <div class="store-settings">
+
+                            <!-- SHOW ON HOME -->
+                            <div class="store-setting">
+
+                                <div>
+
+                                    <strong>Show on Home</strong>
+
+                                    <small>
+                                        Display this product in the homepage featured products.
+                                    </small>
+
+                                </div>
+
+
+                                <label class="switch">
+
+                                    <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
+
+                                    <span class="slider"></span>
+
+                                </label>
+
+                            </div>
+
+
+
+                        </div>
+
+                    </section>
 
                 </div>
+
+
+                <!-- ================= FOOTER ================= -->
+                <div class="product-modal-footer">
+
+                    <button type="button" class="cancel-btn" (click)="closeModal()">
+
+                        Cancel
+
+                    </button>
+
+
+                    <button type="button" class="save-product-btn" (click)="editing ? updateProduct() : addProduct()">
+
+                        {{ editing ? 'Update Product' : 'Save Product' }}
+
+                    </button>
+
+                </div>
+
+            </div>
+        </div>
+        <!-- ================= END PRODUCT MODAL ================= -->
