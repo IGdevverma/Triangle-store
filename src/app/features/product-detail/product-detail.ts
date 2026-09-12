@@ -455,10 +455,43 @@ export class ProductDetail implements OnInit {
 
     this.selectedPackData = pack;
 
+    // Reset color combination when pack changes
     this.selectedCombination = '';
-
     this.selectedCombinationData = undefined;
 
+    // Load selected pack images
+    if (pack.images?.length) {
+
+      this.productImages = [...pack.images];
+
+      this.selectedImage =
+        this.productImages[0] ?? '';
+
+    } else if (pack.image) {
+
+      this.productImages = [pack.image];
+
+      this.selectedImage = pack.image;
+
+    } else {
+
+      // Fallback to normal product images
+      this.productImages =
+        this.product?.images?.length
+          ? [...this.product.images]
+          : this.product?.image
+            ? [this.product.image]
+            : [];
+
+      this.selectedImage =
+        this.productImages[0] ?? '';
+
+    }
+
+    this.resetZoom();
+
+    console.log('Selected Pack:', pack);
+    console.log('Pack Images:', this.productImages);
   }
 
 

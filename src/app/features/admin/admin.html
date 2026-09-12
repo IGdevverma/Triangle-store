@@ -864,10 +864,14 @@
                             </div>
 
                             <!-- SKU -->
-                            <div class="form-group">
+                            <div class="form-field">
                                 <label>SKU</label>
 
-                                <input type="text" [(ngModel)]="newProduct.sku" placeholder="TS-VEST-001">
+                                <input type="text" [value]="newProduct.sku || 'Auto generated on save'" readonly>
+
+                                <small>
+                                    SKU will be generated automatically.
+                                </small>
                             </div>
 
                             <!-- Description -->

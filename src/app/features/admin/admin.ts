@@ -1607,19 +1607,53 @@ export class Admin implements OnInit, AfterViewInit {
   }
   isFormValid(): boolean {
 
-    const basicFieldsValid =
-      !!this.newProduct.name?.trim() &&
-      this.newProduct.price > 0 &&
-      !!this.newProduct.category?.trim();
-
-    if (this.editing) {
-      return basicFieldsValid;
+    // Product Name
+    if (!this.newProduct.name?.trim()) {
+      alert('Please enter Product Name.');
+      return false;
     }
 
-    return (
-      basicFieldsValid &&
-      this.selectedFiles.length > 0
-    );
+    // Price
+    if (!this.newProduct.price || this.newProduct.price <= 0) {
+      alert('Please enter a valid Product Price.');
+      return false;
+    }
+
+    // Category
+    if (!this.newProduct.category?.trim()) {
+      alert('Please enter Product Category.');
+      return false;
+    }
+
+    // Main Image - only required for new product
+    if (!this.editing && this.selectedFiles.length === 0) {
+      alert('Please upload a Main Product Image.');
+      return false;
+    }
+
+    // Colors
+    if (!this.newProduct.colors?.length) {
+      alert('Please select at least one Available Color.');
+      return false;
+    }
+
+    // Sizes
+    if (!this.newProduct.sizes?.length) {
+      alert('Please select at least one Available Size.');
+      return false;
+    }
+
+    // Stock
+    if (
+      this.newProduct.stock === undefined ||
+      this.newProduct.stock === null ||
+      Number(this.newProduct.stock) < 0
+    ) {
+      alert('Please enter a valid Stock quantity.');
+      return false;
+    }
+
+    return true;
   }
   openAddModal() {
 

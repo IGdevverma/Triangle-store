@@ -22,21 +22,24 @@ export interface ProductColor {
 // PRODUCT PACK
 // =====================================================
 
+// =====================================================
+// PRODUCT PACK
+// =====================================================
+
 export interface ProductPack {
-image: any;
 
   // Unique pack ID
   // Example: single, pack-3
   id: string;
 
   // Display name
-  // Example: 1 Piece, 3 Pack
+  // Example: Single Vest, Pack of 3
   name: string;
 
-  // Number of products in this pack
+  // Number of physical products in this pack
   quantity: number;
 
-  // Selling price
+  // Selling price of this pack
   price: number;
 
   // MRP / original price
@@ -45,6 +48,17 @@ image: any;
   // Discount percentage
   discount?: number;
 
+  // Main image of this pack
+  image?: string;
+
+  // Additional images of this pack
+  images?: string[];
+
+  // Colors available for this pack
+  colors?: string[];
+
+  // Sizes available for this pack
+  sizes?: string[];
 }
 
 
