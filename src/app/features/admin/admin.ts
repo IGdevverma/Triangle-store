@@ -287,7 +287,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     private invoiceService: InvoiceService,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService
-  ) {}
+  ) { }
 
   /* ==========================================================
      LIFECYCLE
@@ -611,7 +611,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
           this.toastr.success(
             response?.message ||
-              'Order status updated successfully.',
+            'Order status updated successfully.',
             'Updated'
           );
         },
@@ -625,7 +625,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
           this.toastr.error(
             error?.error?.message ||
-              'Failed to update order status.',
+            'Failed to update order status.',
             'Error'
           );
         }
@@ -900,7 +900,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           (product as EditableProduct).colorCombinations
         )
           ? (product as EditableProduct)
-              .colorCombinations!
+            .colorCombinations!
           : []
       );
 
@@ -909,7 +909,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     this.existingImages =
       Array.isArray((product as any).images) &&
-      (product as any).images.length
+        (product as any).images.length
         ? [...(product as any).images]
         : product.image
           ? [product.image]
@@ -1055,12 +1055,14 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
           this.toastr.error(
             error?.error?.message ||
-              'Failed to add product.',
+            'Failed to add product.',
             'Error'
           );
         }
       });
   }
+
+
 
   updateProduct(): void {
     if (!this.newProduct._id) {
@@ -1076,7 +1078,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const formData = this.buildProductFormData(true);
+    console.log('PRICE SENT:', formData.get('price'));
+    console.log('ORIGINAL PRICE SENT:', formData.get('originalPrice'));
+    console.log('DISCOUNT SENT:', formData.get('discount'));
 
+    this.productService.updateProduct(this.newProduct._id, formData)
     this.productService
       .updateProduct(
         this.newProduct._id,
@@ -1121,7 +1127,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
           this.toastr.error(
             error?.error?.message ||
-              'Failed to update product.',
+            'Failed to update product.',
             'Error'
           );
         }
@@ -1146,37 +1152,37 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const packs = isPackProduct
       ? this.productPacks.map(pack => ({
-          id: pack.id,
-          name: pack.name.trim() || 'Pack',
-          quantity: Math.max(
-            1,
-            this.toNumber(pack.quantity)
-          ),
-          price: this.toNumber(pack.price),
-          originalPrice: this.toNumber(
-            pack.originalPrice
-          ),
-          discount: this.calculateDiscountValue(
-            pack.price,
-            pack.originalPrice
-          ),
-          colors: this.normalizeStringArray(
-            pack.colors
-          ),
-          sizes: this.normalizeStringArray(
-            pack.sizes
-          ),
-          images: isUpdate
-            ? [...pack.existingImages]
-            : [],
-          image: isUpdate
-            ? pack.existingImages[0] || ''
-            : '',
-          imageCount: pack.files.length,
-          removedImages: isUpdate
-            ? [...pack.removedImages]
-            : []
-        }))
+        id: pack.id,
+        name: pack.name.trim() || 'Pack',
+        quantity: Math.max(
+          1,
+          this.toNumber(pack.quantity)
+        ),
+        price: this.toNumber(pack.price),
+        originalPrice: this.toNumber(
+          pack.originalPrice
+        ),
+        discount: this.calculateDiscountValue(
+          pack.price,
+          pack.originalPrice
+        ),
+        colors: this.normalizeStringArray(
+          pack.colors
+        ),
+        sizes: this.normalizeStringArray(
+          pack.sizes
+        ),
+        images: isUpdate
+          ? [...pack.existingImages]
+          : [],
+        image: isUpdate
+          ? pack.existingImages[0] || ''
+          : '',
+        imageCount: pack.files.length,
+        removedImages: isUpdate
+          ? [...pack.removedImages]
+          : []
+      }))
       : [];
 
     const combinations =
@@ -1542,7 +1548,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         if (
           this.toNumber(pack.originalPrice) > 0 &&
           this.toNumber(pack.originalPrice) <
-            this.toNumber(pack.price)
+          this.toNumber(pack.price)
         ) {
           this.showValidation(
             `Original Price must be greater than or equal to Selling Price for Pack ${index + 1}.`
@@ -1993,7 +1999,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const combination =
       this.colorCombinations[
-        combinationIndex
+      combinationIndex
       ];
 
     if (
@@ -2009,7 +2015,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     if (
       combination.previews.length +
-        files.length >
+      files.length >
       5
     ) {
       this.toastr.warning(
@@ -2045,7 +2051,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   ): void {
     const combination =
       this.colorCombinations[
-        combinationIndex
+      combinationIndex
       ];
 
     if (!combination) {
@@ -2078,7 +2084,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       if (
         newFileIndex >= 0 &&
         newFileIndex <
-          combination.files.length
+        combination.files.length
       ) {
         combination.files.splice(
           newFileIndex,
@@ -2162,7 +2168,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     if (
       this.imagePreviews.length +
-        files.length >
+      files.length >
       5
     ) {
       this.toastr.warning(
@@ -2224,7 +2230,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       if (
         localFileIndex >= 0 &&
         localFileIndex <
-          this.selectedFiles.length
+        this.selectedFiles.length
       ) {
         this.selectedFiles.splice(
           localFileIndex,
@@ -2280,7 +2286,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       if (
         localFileIndex >= 0 &&
         localFileIndex <
-          this.selectedFiles.length
+        this.selectedFiles.length
       ) {
         const [
           selectedFile
@@ -2460,7 +2466,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     if (
       filesCollection.length +
-        files.length >
+      files.length >
       5
     ) {
       this.toastr.warning(
@@ -2554,7 +2560,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
             this.toastr.error(
               error?.error?.message ||
-                'Failed to delete product.',
+              'Failed to delete product.',
               'Error'
             );
           }
@@ -2675,7 +2681,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             item =>
               item &&
               item.toLowerCase() !==
-                'undefined'
+              'undefined'
           );
       }
 
@@ -2691,7 +2697,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         item =>
           item &&
           item.toLowerCase() !==
-            'undefined'
+          'undefined'
       )
       .filter(
         (item, index, array) =>
