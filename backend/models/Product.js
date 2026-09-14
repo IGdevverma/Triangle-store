@@ -8,6 +8,15 @@ const productSchema = new mongoose.Schema(
       trim: true,
     },
 
+
+
+    productGroup: {
+      type: String,
+      trim: true,
+      index: true,
+      default: "",
+    },
+
     description: {
       type: String,
       required: [true, "Description is required"],

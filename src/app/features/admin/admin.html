@@ -11,44 +11,37 @@
 
         <ul class="menu">
 
-            <li [class.active]="activeMenu==='dashboard'"
-                (click)="activeMenu='dashboard'">
+            <li [class.active]="activeMenu==='dashboard'" (click)="activeMenu='dashboard'">
                 <i class="fa-solid fa-chart-line"></i>
                 Dashboard
             </li>
 
-            <li [class.active]="activeMenu==='products'"
-                (click)="activeMenu='products'">
+            <li [class.active]="activeMenu==='products'" (click)="activeMenu='products'">
                 <i class="fa-solid fa-box"></i>
                 Products
             </li>
 
-            <li [class.active]="activeMenu==='categories'"
-                (click)="activeMenu='categories'">
+            <li [class.active]="activeMenu==='categories'" (click)="activeMenu='categories'">
                 <i class="fa-solid fa-layer-group"></i>
                 Categories
             </li>
 
-            <li [class.active]="activeMenu==='orders'"
-                (click)="activeMenu='orders'">
+            <li [class.active]="activeMenu==='orders'" (click)="activeMenu='orders'">
                 <i class="fa-solid fa-cart-shopping"></i>
                 Orders
             </li>
 
-            <li [class.active]="activeMenu==='customers'"
-                (click)="activeMenu='customers'">
+            <li [class.active]="activeMenu==='customers'" (click)="activeMenu='customers'">
                 <i class="fa-solid fa-users"></i>
                 Customers
             </li>
 
-            <li [class.active]="activeMenu==='quotes'"
-                (click)="activeMenu='quotes'">
+            <li [class.active]="activeMenu==='quotes'" (click)="activeMenu='quotes'">
                 <i class="fa-solid fa-file-signature"></i>
                 Quotes
             </li>
 
-            <li [class.active]="activeMenu==='settings'"
-                (click)="activeMenu='settings'">
+            <li [class.active]="activeMenu==='settings'" (click)="activeMenu='settings'">
                 <i class="fa-solid fa-gear"></i>
                 Settings
             </li>
@@ -288,9 +281,7 @@
                     </div>
 
 
-                    <div
-                        class="recent-order"
-                        *ngFor="let order of orders.slice(0,5)">
+                    <div class="recent-order" *ngFor="let order of orders.slice(0,5)">
 
                         <div>
 
@@ -335,9 +326,7 @@
                     </div>
 
 
-                    <div
-                        class="low-stock-item"
-                        *ngFor="let product of lowStockProducts">
+                    <div class="low-stock-item" *ngFor="let product of lowStockProducts">
 
                         <div>
 
@@ -359,9 +348,7 @@
                     </div>
 
 
-                    <p
-                        *ngIf="lowStockProducts.length===0"
-                        class="empty">
+                    <p *ngIf="lowStockProducts.length===0" class="empty">
 
                         🎉 All products have sufficient stock
 
@@ -399,10 +386,7 @@
                         {{ filteredProducts.length }} of {{ products.length }} Products
                     </div>
 
-                    <button
-                        type="button"
-                        class="add-btn"
-                        (click)="openAddModal()">
+                    <button type="button" class="add-btn" (click)="openAddModal()">
 
                         <i class="fa-solid fa-plus"></i>
                         Add Product
@@ -420,10 +404,7 @@
 
                     <i class="fa-solid fa-magnifying-glass"></i>
 
-                    <input
-                        type="text"
-                        placeholder="Search products..."
-                        [(ngModel)]="searchTerm"
+                    <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm"
                         (ngModelChange)="onProductFilterChange()">
 
                 </div>
@@ -431,9 +412,7 @@
 
                 <div class="filters">
 
-                    <select
-                        [(ngModel)]="selectedStock"
-                        (ngModelChange)="onProductFilterChange()">
+                    <select [(ngModel)]="selectedStock" (ngModelChange)="onProductFilterChange()">
 
                         <option value="All">All stock</option>
                         <option value="In Stock">In Stock</option>
@@ -443,9 +422,7 @@
                     </select>
 
 
-                    <select
-                        [(ngModel)]="selectedSort"
-                        (ngModelChange)="onProductFilterChange()">
+                    <select [(ngModel)]="selectedSort" (ngModelChange)="onProductFilterChange()">
 
                         <option value="Newest">Newest</option>
                         <option value="Price Low → High">Price Low → High</option>
@@ -503,17 +480,13 @@
                         </tr>
 
 
-                        <tr
-                            *ngFor="let product of filteredProducts">
+                        <tr *ngFor="let product of filteredProducts">
 
                             <td>
 
                                 <div class="product-info">
 
-                                    <img
-                                        class="product-image"
-                                        [src]="product.image"
-                                        [alt]="product.name">
+                                    <img class="product-image" [src]="product.image" [alt]="product.name">
 
                                     <div>
 
@@ -544,9 +517,7 @@
 
                             <td>
 
-                                <span
-                                    class="stock-badge"
-                                    [class.in-stock]="product.stock > 10"
+                                <span class="stock-badge" [class.in-stock]="product.stock > 10"
                                     [class.low-stock]="product.stock > 0 && product.stock <= 10"
                                     [class.out-stock]="product.stock == 0">
 
@@ -559,19 +530,18 @@
 
                             <td>
 
-                                <span
-                                    class="status-badge"
+                                <span class="status-badge"
                                     [class.active-status]="product.status === 'Active' && product.stock > 0"
                                     [class.inactive-status]="product.status === 'Hidden' || product.stock === 0">
 
                                     {{
-                                        product.status === 'Hidden'
-                                        ? 'Hidden'
-                                        : product.status === 'Draft'
-                                        ? 'Draft'
-                                        : product.stock > 0
-                                        ? 'Active'
-                                        : 'Out of Stock'
+                                    product.status === 'Hidden'
+                                    ? 'Hidden'
+                                    : product.status === 'Draft'
+                                    ? 'Draft'
+                                    : product.stock > 0
+                                    ? 'Active'
+                                    : 'Out of Stock'
                                     }}
 
                                 </span>
@@ -583,18 +553,14 @@
 
                                 <div class="action-buttons">
 
-                                    <button
-                                        class="edit"
-                                        (click)="editProduct(product)">
+                                    <button class="edit" (click)="editProduct(product)">
 
                                         <i class="fa-solid fa-pen"></i>
 
                                     </button>
 
 
-                                    <button
-                                        class="delete"
-                                        (click)="deleteProduct(product._id!)">
+                                    <button class="delete" (click)="deleteProduct(product._id!)">
 
                                         <i class="fa-solid fa-trash"></i>
 
@@ -616,20 +582,14 @@
             <!-- Pagination -->
             <div class="pagination" *ngIf="totalPages > 0">
 
-                <button
-                    class="page-btn"
-                    (click)="previousPage()"
-                    [disabled]="currentPage === 1">
+                <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
 
                     <i class="fa-solid fa-chevron-left"></i>
 
                 </button>
 
 
-                <button
-                    *ngFor="let page of pages"
-                    class="page-number"
-                    [class.active]="page === currentPage"
+                <button *ngFor="let page of pages" class="page-number" [class.active]="page === currentPage"
                     (click)="goToPage(page)">
 
                     {{ page }}
@@ -637,10 +597,7 @@
                 </button>
 
 
-                <button
-                    class="page-btn"
-                    (click)="nextPage()"
-                    [disabled]="currentPage === totalPages">
+                <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
 
                     <i class="fa-solid fa-chevron-right"></i>
 
@@ -685,9 +642,7 @@
         <!-- =====================================================
              ORDERS
         ====================================================== -->
-        <div
-            *ngIf="activeMenu === 'orders'"
-            class="table-card">
+        <div *ngIf="activeMenu === 'orders'" class="table-card">
 
             <h2>Orders</h2>
 
@@ -728,9 +683,7 @@
 
                         <td>
 
-                            <span
-                                class="payment-badge"
-                                [class.paid]="order.paymentStatus==='Paid'"
+                            <span class="payment-badge" [class.paid]="order.paymentStatus==='Paid'"
                                 [class.pending]="order.paymentStatus==='Pending'">
 
                                 {{ order.paymentStatus }}
@@ -742,9 +695,7 @@
 
                         <td>
 
-                            <select
-                                class="status-select"
-                                [ngModel]="order.orderStatus"
+                            <select class="status-select" [ngModel]="order.orderStatus"
                                 (ngModelChange)="changeOrderStatus(order, $event)">
 
                                 <option value="Processing">
@@ -774,9 +725,7 @@
 
                         <td>
 
-                            <button
-                                class="invoice-btn"
-                                (click)="downloadInvoice(order)">
+                            <button class="invoice-btn" (click)="downloadInvoice(order)">
 
                                 <i class="fa-solid fa-file-pdf"></i>
                                 Invoice
@@ -809,10 +758,7 @@
 
                 <div class="search-bar">
 
-                    <input
-                        type="text"
-                        placeholder="Search customer..."
-                        [(ngModel)]="customerSearch"
+                    <input type="text" placeholder="Search customer..." [(ngModel)]="customerSearch"
                         (input)="filterCustomers()">
 
                 </div>
@@ -856,9 +802,7 @@
 
                             <td>
 
-                                <span
-                                    class="role-badge"
-                                    [class.admin]="user.role==='admin'"
+                                <span class="role-badge" [class.admin]="user.role==='admin'"
                                     [class.user]="user.role==='user'">
 
                                     {{ user.role }}
@@ -875,9 +819,7 @@
 
                             <td>
 
-                                <select
-                                    [ngModel]="user.role"
-                                    (ngModelChange)="changeRole(user,$event)">
+                                <select [ngModel]="user.role" (ngModelChange)="changeRole(user,$event)">
 
                                     <option value="user">
                                         User
@@ -894,9 +836,7 @@
 
                             <td>
 
-                                <button
-                                    class="delete-btn"
-                                    (click)="deleteCustomer(user._id)">
+                                <button class="delete-btn" (click)="deleteCustomer(user._id)">
 
                                     <i class="fa-solid fa-trash"></i>
 
@@ -957,28 +897,19 @@
 
                     <label>Store Name</label>
 
-                    <input
-                        type="text"
-                        value="Triangle Sports"
-                        class="form-control">
+                    <input type="text" value="Triangle Sports" class="form-control">
 
                     <br><br>
 
                     <label>Support Email</label>
 
-                    <input
-                        type="email"
-                        value="support@trianglesports.com"
-                        class="form-control">
+                    <input type="email" value="support@trianglesports.com" class="form-control">
 
                     <br><br>
 
                     <label>Phone Number</label>
 
-                    <input
-                        type="text"
-                        value="+91 9990180409"
-                        class="form-control">
+                    <input type="text" value="+91 9990180409" class="form-control">
 
                     <br><br>
 
@@ -997,14 +928,10 @@
         <!-- =====================================================
              PRODUCT EDITOR
         ====================================================== -->
-        <div
-            class="product-page-overlay"
-            *ngIf="showModal">
+        <div class="product-page-overlay" *ngIf="showModal">
 
 
-            <div
-                class="shopify-product-page"
-                (click)="$event.stopPropagation()">
+            <div class="shopify-product-page" (click)="$event.stopPropagation()">
 
 
                 <!-- =================================================
@@ -1014,10 +941,7 @@
 
                     <div class="product-header-left">
 
-                        <button
-                            type="button"
-                            class="back-product-btn"
-                            (click)="closeModal()">
+                        <button type="button" class="back-product-btn" (click)="closeModal()">
 
                             <i class="fa-solid fa-arrow-left"></i>
 
@@ -1041,20 +965,14 @@
 
                     <div class="product-header-actions">
 
-                        <button
-                            type="button"
-                            class="discard-btn"
-                            (click)="closeModal()">
+                        <button type="button" class="discard-btn" (click)="closeModal()">
 
                             Discard
 
                         </button>
 
 
-                        <button
-                            type="button"
-                            class="top-save-btn"
-                            (click)="editing ? updateProduct() : addProduct()">
+                        <button type="button" class="top-save-btn" (click)="editing ? updateProduct() : addProduct()">
 
                             {{ editing ? 'Update' : 'Save' }}
 
@@ -1101,9 +1019,7 @@
 
                                     <label>Title *</label>
 
-                                    <input
-                                        type="text"
-                                        [(ngModel)]="newProduct.name"
+                                    <input type="text" [(ngModel)]="newProduct.name"
                                         placeholder="e.g. TriCore Performance T-Shirt">
 
                                 </div>
@@ -1113,9 +1029,7 @@
 
                                     <label>Description</label>
 
-                                    <textarea
-                                        [(ngModel)]="newProduct.description"
-                                        rows="6"
+                                    <textarea [(ngModel)]="newProduct.description" rows="6"
                                         placeholder="Describe your product..."></textarea>
 
                                 </div>
@@ -1128,10 +1042,7 @@
 
                                         <label>Category *</label>
 
-                                        <input
-                                            type="text"
-                                            [(ngModel)]="newProduct.category"
-                                            placeholder="e.g. T-Shirt">
+                                        <input type="text" [(ngModel)]="newProduct.category" placeholder="e.g. T-Shirt">
 
                                     </div>
 
@@ -1140,10 +1051,7 @@
 
                                         <label>Brand</label>
 
-                                        <input
-                                            type="text"
-                                            [(ngModel)]="newProduct.brand"
-                                            placeholder="Triangle Sports">
+                                        <input type="text" [(ngModel)]="newProduct.brand" placeholder="Triangle Sports">
 
                                     </div>
 
@@ -1152,9 +1060,7 @@
 
                                         <label>Product Type</label>
 
-                                        <input
-                                            type="text"
-                                            [(ngModel)]="newProduct.type"
+                                        <input type="text" [(ngModel)]="newProduct.type"
                                             placeholder="T-Shirt / Jersey / Shorts">
 
                                     </div>
@@ -1164,9 +1070,7 @@
 
                                         <label>Fabric</label>
 
-                                        <input
-                                            type="text"
-                                            [(ngModel)]="newProduct.fabric"
+                                        <input type="text" [(ngModel)]="newProduct.fabric"
                                             placeholder="Polyester / Cotton">
 
                                     </div>
@@ -1176,13 +1080,24 @@
 
                                         <label>SKU</label>
 
-                                        <input
-                                            type="text"
-                                            [value]="newProduct.sku || 'Auto generated on save'"
+                                        <input type="text" [value]="newProduct.sku || 'Auto generated on save'"
                                             readonly>
 
                                         <small>
                                             SKU will be generated automatically.
+                                        </small>
+
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label>Product Group *</label>
+
+                                        <input type="text" [(ngModel)]="newProduct.productGroup"
+                                            placeholder="e.g. fitted-tank">
+
+                                        <small>
+                                            Use the same group for different color variants of the same product.
                                         </small>
 
                                     </div>
@@ -1223,15 +1138,11 @@
 
                                         <div class="main-image-upload">
 
-                                            <img
-                                                *ngIf="imagePreviews.length > 0"
-                                                [src]="imagePreviews[0]"
+                                            <img *ngIf="imagePreviews.length > 0" [src]="imagePreviews[0]"
                                                 alt="Product Image">
 
 
-                                            <div
-                                                *ngIf="imagePreviews.length === 0"
-                                                class="upload-placeholder">
+                                            <div *ngIf="imagePreviews.length === 0" class="upload-placeholder">
 
                                                 <span>＋</span>
 
@@ -1246,10 +1157,7 @@
                                             </div>
 
 
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                (change)="onMainImageSelected($event)"
+                                            <input type="file" accept="image/*" (change)="onMainImageSelected($event)"
                                                 class="file-input">
 
                                         </div>
@@ -1276,18 +1184,12 @@
                                         <div class="additional-images">
 
 
-                                            <div
-                                                class="image-thumb"
-                                                *ngFor="let image of imagePreviews; let i = index">
+                                            <div class="image-thumb" *ngFor="let image of imagePreviews; let i = index">
 
-                                                <img
-                                                    [src]="image"
-                                                    alt="Product Image">
+                                                <img [src]="image" alt="Product Image">
 
 
-                                                <button
-                                                    type="button"
-                                                    (click)="removeImage(i)">
+                                                <button type="button" (click)="removeImage(i)">
 
                                                     ✕
 
@@ -1296,9 +1198,7 @@
                                             </div>
 
 
-                                            <label
-                                                class="add-image-box"
-                                                *ngIf="imagePreviews.length < 5">
+                                            <label class="add-image-box" *ngIf="imagePreviews.length < 5">
 
                                                 <span>＋</span>
 
@@ -1306,10 +1206,7 @@
                                                     Add Image
                                                 </small>
 
-                                                <input
-                                                    type="file"
-                                                    accept="image/*"
-                                                    multiple
+                                                <input type="file" accept="image/*" multiple
                                                     (change)="onProductImagesSelected($event)">
 
                                             </label>
@@ -1355,12 +1252,8 @@
 
                                             <span>₹</span>
 
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                [(ngModel)]="newProduct.price"
-                                                (ngModelChange)="calculateProductDiscount()"
-                                                placeholder="799">
+                                            <input type="number" min="0" [(ngModel)]="newProduct.price"
+                                                (ngModelChange)="calculateProductDiscount()" placeholder="799">
 
                                         </div>
 
@@ -1375,12 +1268,8 @@
 
                                             <span>₹</span>
 
-                                            <input
-                                                type="number"
-                                                min="0"
-                                                [(ngModel)]="newProduct.originalPrice"
-                                                (ngModelChange)="calculateProductDiscount()"
-                                                placeholder="999">
+                                            <input type="number" min="0" [(ngModel)]="newProduct.originalPrice"
+                                                (ngModelChange)="calculateProductDiscount()" placeholder="999">
 
                                         </div>
 
@@ -1393,10 +1282,7 @@
 
                                         <div class="input-with-suffix">
 
-                                            <input
-                                                type="number"
-                                                [(ngModel)]="newProduct.discount"
-                                                readonly
+                                            <input type="number" [(ngModel)]="newProduct.discount" readonly
                                                 placeholder="0">
 
                                             <span>%</span>
@@ -1442,11 +1328,7 @@
 
                                         <label>Stock Quantity</label>
 
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            [(ngModel)]="newProduct.stock"
-                                            placeholder="0">
+                                        <input type="number" min="0" [(ngModel)]="newProduct.stock" placeholder="0">
 
                                     </div>
 
@@ -1501,23 +1383,16 @@
 
                                     <div class="color-selection">
 
-                                        <button
-                                            type="button"
-                                            class="color-option"
-                                            *ngFor="let color of availableColors"
+                                        <button type="button" class="color-option" *ngFor="let color of availableColors"
                                             [class.selected]="newProduct.colors?.includes(color)"
                                             (click)="toggleColor(color)">
 
-                                            <span
-                                                class="color-dot"
-                                                [style.background]="getColorValue(color)">
+                                            <span class="color-dot" [style.background]="getColorValue(color)">
                                             </span>
 
                                             {{ color }}
 
-                                            <span
-                                                class="check"
-                                                *ngIf="newProduct.colors?.includes(color)">
+                                            <span class="check" *ngIf="newProduct.colors?.includes(color)">
 
                                                 ✓
 
@@ -1552,18 +1427,13 @@
 
                                     <div class="size-selection">
 
-                                        <button
-                                            type="button"
-                                            class="size-option"
-                                            *ngFor="let size of availableSizes"
+                                        <button type="button" class="size-option" *ngFor="let size of availableSizes"
                                             [class.selected]="newProduct.sizes?.includes(size)"
                                             (click)="toggleSize(size)">
 
                                             {{ size }}
 
-                                            <span
-                                                class="check"
-                                                *ngIf="newProduct.sizes?.includes(size)">
+                                            <span class="check" *ngIf="newProduct.sizes?.includes(size)">
 
                                                 ✓
 
@@ -1584,9 +1454,7 @@
                         <!-- =============================================
                              PACK BUILDER
                         ============================================== -->
-                        <section
-                            class="shopify-card"
-                            *ngIf="newProduct.productMode === 'pack'">
+                        <section class="shopify-card" *ngIf="newProduct.productMode === 'pack'">
 
 
                             <div class="shopify-card-header">
@@ -1620,10 +1488,7 @@
                                     </div>
 
 
-                                    <button
-                                        type="button"
-                                        class="primary-small-btn"
-                                        (click)="addPack()">
+                                    <button type="button" class="primary-small-btn" (click)="addPack()">
 
                                         ＋ Add Pack
 
@@ -1636,9 +1501,7 @@
                                 <div class="pack-builder">
 
 
-                                    <div
-                                        class="pack-card"
-                                        *ngFor="let pack of productPacks; let packIndex = index">
+                                    <div class="pack-card" *ngFor="let pack of productPacks; let packIndex = index">
 
 
                                         <!-- Pack Header -->
@@ -1657,9 +1520,7 @@
                                             </div>
 
 
-                                            <button
-                                                type="button"
-                                                class="danger-icon-btn"
+                                            <button type="button" class="danger-icon-btn"
                                                 (click)="removePack(packIndex)">
 
                                                 🗑
@@ -1679,10 +1540,7 @@
                                                     Pack Name *
                                                 </label>
 
-                                                <input
-                                                    type="text"
-                                                    [(ngModel)]="pack.name"
-                                                    placeholder="e.g. 3 Pack">
+                                                <input type="text" [(ngModel)]="pack.name" placeholder="e.g. 3 Pack">
 
                                             </div>
 
@@ -1693,10 +1551,7 @@
                                                     Quantity *
                                                 </label>
 
-                                                <input
-                                                    type="number"
-                                                    min="1"
-                                                    [(ngModel)]="pack.quantity"
+                                                <input type="number" min="1" [(ngModel)]="pack.quantity"
                                                     placeholder="3">
 
                                             </div>
@@ -1708,12 +1563,8 @@
                                                     Selling Price *
                                                 </label>
 
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    [(ngModel)]="pack.price"
-                                                    (ngModelChange)="calculatePackDiscount(pack)"
-                                                    placeholder="1799">
+                                                <input type="number" min="0" [(ngModel)]="pack.price"
+                                                    (ngModelChange)="calculatePackDiscount(pack)" placeholder="1799">
 
                                             </div>
 
@@ -1724,12 +1575,8 @@
                                                     Original Price
                                                 </label>
 
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    [(ngModel)]="pack.originalPrice"
-                                                    (ngModelChange)="calculatePackDiscount(pack)"
-                                                    placeholder="2499">
+                                                <input type="number" min="0" [(ngModel)]="pack.originalPrice"
+                                                    (ngModelChange)="calculatePackDiscount(pack)" placeholder="2499">
 
                                             </div>
 
@@ -1740,14 +1587,8 @@
                                                     Discount
                                                 </label>
 
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    max="100"
-                                                    [(ngModel)]="pack.discount"
-                                                    [ngModelOptions]="{standalone: true}"
-                                                    readonly
-                                                    placeholder="0">
+                                                <input type="number" min="0" max="100" [(ngModel)]="pack.discount"
+                                                    [ngModelOptions]="{standalone: true}" readonly placeholder="0">
 
                                                 <small>
                                                     Automatically calculated.
@@ -1774,22 +1615,18 @@
 
                                                 <div class="pack-selection-list">
 
-                                                    <button
-                                                        type="button"
-                                                        class="pack-color-option"
+                                                    <button type="button" class="pack-color-option"
                                                         *ngFor="let color of availableColors"
                                                         [class.selected]="pack.colors?.includes(color)"
                                                         (click)="togglePackColor(pack, color)">
 
-                                                        <span
-                                                            class="color-dot"
+                                                        <span class="color-dot"
                                                             [style.background]="getColorValue(color)">
                                                         </span>
 
                                                         {{ color }}
 
-                                                        <span
-                                                            *ngIf="pack.colors?.includes(color)">
+                                                        <span *ngIf="pack.colors?.includes(color)">
 
                                                             ✓
 
@@ -1820,17 +1657,14 @@
 
                                                 <div class="pack-selection-list size-list">
 
-                                                    <button
-                                                        type="button"
-                                                        class="pack-size-option"
+                                                    <button type="button" class="pack-size-option"
                                                         *ngFor="let size of availableSizes"
                                                         [class.selected]="pack.sizes?.includes(size)"
                                                         (click)="togglePackSize(pack, size)">
 
                                                         {{ size }}
 
-                                                        <span
-                                                            *ngIf="pack.sizes?.includes(size)">
+                                                        <span *ngIf="pack.sizes?.includes(size)">
 
                                                             ✓
 
@@ -1873,17 +1707,13 @@
                                                 <div class="pack-photo-grid">
 
 
-                                                    <div
-                                                        class="pack-photo"
+                                                    <div class="pack-photo"
                                                         *ngFor="let image of pack.previews; let imageIndex = index">
 
-                                                        <img
-                                                            [src]="image"
-                                                            alt="Pack Image">
+                                                        <img [src]="image" alt="Pack Image">
 
 
-                                                        <button
-                                                            type="button"
+                                                        <button type="button"
                                                             (click)="removePackImage(packIndex, imageIndex)">
 
                                                             ✕
@@ -1893,8 +1723,7 @@
                                                     </div>
 
 
-                                                    <label
-                                                        class="pack-photo-upload"
+                                                    <label class="pack-photo-upload"
                                                         *ngIf="(pack.previews.length || 0) < 5">
 
                                                         <span>＋</span>
@@ -1907,10 +1736,7 @@
                                                             JPG / PNG / WEBP
                                                         </small>
 
-                                                        <input
-                                                            type="file"
-                                                            accept="image/*"
-                                                            multiple
+                                                        <input type="file" accept="image/*" multiple
                                                             (change)="onPackImagesSelected($event, packIndex)">
 
                                                     </label>
@@ -1925,9 +1751,7 @@
 
 
                                     <!-- Empty -->
-                                    <div
-                                        class="empty-builder"
-                                        *ngIf="productPacks.length === 0">
+                                    <div class="empty-builder" *ngIf="productPacks.length === 0">
 
                                         <div class="empty-icon">
                                             📦
@@ -1943,10 +1767,7 @@
                                             colours and photos.
                                         </p>
 
-                                        <button
-                                            type="button"
-                                            class="primary-small-btn"
-                                            (click)="addPack()">
+                                        <button type="button" class="primary-small-btn" (click)="addPack()">
 
                                             ＋ Add First Pack
 
@@ -1998,10 +1819,7 @@
                                     </div>
 
 
-                                    <button
-                                        type="button"
-                                        class="primary-small-btn"
-                                        (click)="addColorCombination()">
+                                    <button type="button" class="primary-small-btn" (click)="addColorCombination()">
 
                                         ＋ Add Combination
 
@@ -2013,8 +1831,7 @@
                                 <div class="combination-list">
 
 
-                                    <div
-                                        class="combination-card"
+                                    <div class="combination-card"
                                         *ngFor="let combination of colorCombinations; let combinationIndex = index">
 
 
@@ -2034,9 +1851,7 @@
                                             </div>
 
 
-                                            <button
-                                                type="button"
-                                                class="danger-icon-btn"
+                                            <button type="button" class="danger-icon-btn"
                                                 (click)="removeColorCombination(combinationIndex)">
 
                                                 🗑
@@ -2052,9 +1867,7 @@
                                                 Combination Name
                                             </label>
 
-                                            <input
-                                                type="text"
-                                                [(ngModel)]="combination.name"
+                                            <input type="text" [(ngModel)]="combination.name"
                                                 placeholder="e.g. Black + Grey + White">
 
                                         </div>
@@ -2077,22 +1890,17 @@
 
                                             <div class="pack-selection-list">
 
-                                                <button
-                                                    type="button"
-                                                    class="pack-color-option"
+                                                <button type="button" class="pack-color-option"
                                                     *ngFor="let color of availableColors"
                                                     [class.selected]="combination.colors?.includes(color)"
                                                     (click)="toggleCombinationColor(combination, color)">
 
-                                                    <span
-                                                        class="color-dot"
-                                                        [style.background]="getColorValue(color)">
+                                                    <span class="color-dot" [style.background]="getColorValue(color)">
                                                     </span>
 
                                                     {{ color }}
 
-                                                    <span
-                                                        *ngIf="combination.colors.includes(color)">
+                                                    <span *ngIf="combination.colors.includes(color)">
 
                                                         ✓
 
@@ -2132,17 +1940,13 @@
                                             <div class="pack-photo-grid">
 
 
-                                                <div
-                                                    class="pack-photo"
+                                                <div class="pack-photo"
                                                     *ngFor="let image of combination.previews; let imageIndex = index">
 
-                                                    <img
-                                                        [src]="image"
-                                                        alt="Color Combination">
+                                                    <img [src]="image" alt="Color Combination">
 
 
-                                                    <button
-                                                        type="button"
+                                                    <button type="button"
                                                         (click)="removeCombinationImage(combinationIndex, imageIndex)">
 
                                                         ✕
@@ -2152,8 +1956,7 @@
                                                 </div>
 
 
-                                                <label
-                                                    class="pack-photo-upload"
+                                                <label class="pack-photo-upload"
                                                     *ngIf="(combination.previews.length || 0) < 5">
 
                                                     <span>＋</span>
@@ -2166,10 +1969,7 @@
                                                         JPG / PNG / WEBP
                                                     </small>
 
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*"
-                                                        multiple
+                                                    <input type="file" accept="image/*" multiple
                                                         (change)="onCombinationImagesSelected($event, combinationIndex)">
 
                                                 </label>
@@ -2182,9 +1982,7 @@
 
 
                                     <!-- Empty -->
-                                    <div
-                                        class="empty-builder"
-                                        *ngIf="colorCombinations.length === 0">
+                                    <div class="empty-builder" *ngIf="colorCombinations.length === 0">
 
                                         <div class="empty-icon">
                                             🎨
@@ -2199,10 +1997,7 @@
                                             Black + Grey or Black + White.
                                         </p>
 
-                                        <button
-                                            type="button"
-                                            class="primary-small-btn"
-                                            (click)="addColorCombination()">
+                                        <button type="button" class="primary-small-btn" (click)="addColorCombination()">
 
                                             ＋ Add Combination
 
@@ -2255,9 +2050,7 @@
 
                                     <label class="switch">
 
-                                        <input
-                                            type="checkbox"
-                                            [(ngModel)]="newProduct.showOnHome">
+                                        <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
 
                                         <span class="slider"></span>
 
@@ -2304,11 +2097,11 @@
 
                             <small>
                                 {{
-                                    newProduct.status === 'Hidden'
-                                    ? 'This product will remain hidden from the store.'
-                                    : newProduct.status === 'Draft'
-                                    ? 'This product is saved as a draft and is not published.'
-                                    : 'Product will be visible in your store after saving.'
+                                newProduct.status === 'Hidden'
+                                ? 'This product will remain hidden from the store.'
+                                : newProduct.status === 'Draft'
+                                ? 'This product is saved as a draft and is not published.'
+                                : 'Product will be visible in your store after saving.'
                                 }}
                             </small>
 
@@ -2334,10 +2127,7 @@
                                     Category
                                 </label>
 
-                                <input
-                                    type="text"
-                                    [(ngModel)]="newProduct.category"
-                                    placeholder="T-Shirts">
+                                <input type="text" [(ngModel)]="newProduct.category" placeholder="T-Shirts">
 
                             </div>
 
@@ -2348,10 +2138,7 @@
                                     Brand
                                 </label>
 
-                                <input
-                                    type="text"
-                                    [(ngModel)]="newProduct.brand"
-                                    placeholder="Triangle Sports">
+                                <input type="text" [(ngModel)]="newProduct.brand" placeholder="Triangle Sports">
 
                             </div>
 
@@ -2362,10 +2149,7 @@
                                     Product Type
                                 </label>
 
-                                <input
-                                    type="text"
-                                    [(ngModel)]="newProduct.type"
-                                    placeholder="T-Shirt">
+                                <input type="text" [(ngModel)]="newProduct.type" placeholder="T-Shirt">
 
                             </div>
 
@@ -2392,16 +2176,10 @@
                             <div class="product-mode-options">
 
 
-                                <label
-                                    class="mode-option"
-                                    [class.selected]="newProduct.productMode === 'single'">
+                                <label class="mode-option" [class.selected]="newProduct.productMode === 'single'">
 
-                                    <input
-                                        type="radio"
-                                        name="productMode"
-                                        value="single"
-                                        [(ngModel)]="newProduct.productMode"
-                                        (ngModelChange)="onProductModeChange()">
+                                    <input type="radio" name="productMode" value="single"
+                                        [(ngModel)]="newProduct.productMode" (ngModelChange)="onProductModeChange()">
 
                                     <span>
 
@@ -2418,16 +2196,10 @@
                                 </label>
 
 
-                                <label
-                                    class="mode-option"
-                                    [class.selected]="newProduct.productMode === 'pack'">
+                                <label class="mode-option" [class.selected]="newProduct.productMode === 'pack'">
 
-                                    <input
-                                        type="radio"
-                                        name="productMode"
-                                        value="pack"
-                                        [(ngModel)]="newProduct.productMode"
-                                        (ngModelChange)="onProductModeChange()">
+                                    <input type="radio" name="productMode" value="pack"
+                                        [(ngModel)]="newProduct.productMode" (ngModelChange)="onProductModeChange()">
 
                                     <span>
 

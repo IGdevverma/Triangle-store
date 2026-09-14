@@ -179,7 +179,7 @@ export class ProductDetail implements OnInit {
 
   relatedProducts: Product[] = [];
 
-  bestSellerProducts: Product[] = [];
+
 
 
   // =====================================================
@@ -832,41 +832,41 @@ export class ProductDetail implements OnInit {
   }
 
 
-selectImage(image: string): void {
+  selectImage(image: string): void {
 
-  this.setProductImage(image);
+    this.setProductImage(image);
 
-  const colorData = this.colorsData.find(
-    item => item.image === image
-  );
+    const colorData = this.colorsData.find(
+      item => item.image === image
+    );
 
-  if (colorData) {
-    this.selectedColor = colorData.name;
-    this.selectedColorData = colorData;
-    return;
-  }
+    if (colorData) {
+      this.selectedColor = colorData.name;
+      this.selectedColorData = colorData;
+      return;
+    }
 
-  // Individual colour images:
-  if (this.product?.images) {
+    // Individual colour images:
+    if (this.product?.images) {
 
-    const imageIndex =
-      this.product.images.indexOf(image);
+      const imageIndex =
+        this.product.images.indexOf(image);
 
-    // index 0 = combined image
-    if (imageIndex > 0) {
+      // index 0 = combined image
+      if (imageIndex > 0) {
 
-      const color =
-        this.product.colors?.[imageIndex - 1];
+        const color =
+          this.product.colors?.[imageIndex - 1];
 
-      if (color) {
-        this.selectedColor = color;
+        if (color) {
+          this.selectedColor = color;
+        }
       }
     }
-  }
 
-  this.selectedCombination = '';
-  this.selectedCombinationData = undefined;
-}
+    this.selectedCombination = '';
+    this.selectedCombinationData = undefined;
+  }
 
 
   // =====================================================
@@ -1954,85 +1954,61 @@ selectImage(image: string): void {
   // LOAD RELATED PRODUCTS
   // =====================================================
 
-  private loadRelatedProducts(
-    product: Product
-  ): void {
+  // =====================================================
+  // LOAD RELATED PRODUCTS
+  // =====================================================
 
-    this.productService
-      .getProducts()
-      .subscribe({
+  private loadRelatedProducts(product: Product): void {
+    this.productService.getProducts().subscribe({
+      next: (response: any) => {
+        const products = (response?.products ?? []) as Product[];
 
-        next: (response: any) => {
+        const productId = product._id ?? product.id;
+        const group = product.productGroup?.trim().toLowerCase();
 
-          const products =
-            (response?.products ?? []) as Product[];
-
-          const productId =
-            product._id ??
-            product.id;
-
-
-          // ------------------------------------------------
-          // RELATED
-          // ------------------------------------------------
-
-          this.relatedProducts =
-            products
-              .filter(item => {
-
-                const itemId =
-                  item._id ??
-                  item.id;
-
-                return (
-                  item.category ===
-                  product.category &&
-                  itemId !== productId
-                );
-
-              })
-              .slice(0, 4);
-
-
-          // ------------------------------------------------
-          // BEST SELLERS
-          // ------------------------------------------------
-
-          this.bestSellerProducts =
-            products
-              .filter(item => {
-
-                const itemId =
-                  item._id ??
-                  item.id;
-
-                return itemId !== productId;
-
-              })
-              .slice(0, 3);
-
-
-          this.loadingService.hide();
-
-        },
-
-        error: error => {
-
-          console.error(
-            'Error loading related products:',
-            error
-          );
-
+        // Product group nahi hai to recommendations mat dikhao
+        if (!group) {
           this.relatedProducts = [];
-
-          this.bestSellerProducts = [];
-
+          
           this.loadingService.hide();
-
+          return;
         }
 
-      });
+        // Same product group ke sirf variants
+        this.relatedProducts = products
+          .filter(item => {
+            const itemId = item._id ?? item.id;
+            const itemGroup = item.productGroup?.trim().toLowerCase();
 
+            return (
+              itemGroup === group &&
+              itemId !== productId &&
+              item.status !== 'Hidden'
+            );
+          })
+          .filter(
+            (item, index, array) =>
+              array.findIndex(
+                x => (x._id ?? x.id) === (item._id ?? item.id)
+              ) === index
+          )
+          .slice(0, 4);
+
+        // BEST SELLERS section remove kar diya hai
+        
+
+        this.loadingService.hide();
+      },
+
+      error: error => {
+        console.error('Error loading related products:', error);
+
+        this.relatedProducts = [];
+        
+
+        this.loadingService.hide();
+      }
+    });
   }
   previousImage(): void {
     if (!this.productImages.length) {

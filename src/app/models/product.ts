@@ -118,6 +118,15 @@ export interface Product {
   fabric?: string;
 
   sku?: string;
+    // Product family / colour variant group
+  // Example:
+  // "premium-fitted-tank"
+  //
+  // Black, White and Grey variants
+  // of the same product will use
+  // the same productGroup.
+
+  productGroup?: string;
 
   tags?: string[];
 

@@ -260,7 +260,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       type: '',
       productMode: 'single',
       sku: '',
+      productGroup: '',
       discount: 0,
+
       colors: [],
       sizes: [],
       status: 'Active',
@@ -1271,6 +1273,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     formData.append(
       'sku',
       this.newProduct.sku?.trim() || ''
+    );
+    formData.append(
+      'productGroup',
+      this.newProduct.productGroup?.trim() || ''
     );
 
     formData.append(

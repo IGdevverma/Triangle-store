@@ -438,6 +438,13 @@ const createProduct = asyncHandler(async (req, res) => {
             originalPrice,
             discount,
 
+
+
+            productGroup:
+                typeof req.body.productGroup === "string"
+                    ? req.body.productGroup.trim()
+                    : "",
+
             // ARRAYS
             colors,
             sizes,
@@ -1405,6 +1412,16 @@ const updateProduct = asyncHandler(
                 }
             );
 
+
+
+            // =================================================
+            // PRODUCT GROUP
+            // =================================================
+
+            if (req.body.productGroup !== undefined) {
+                product.productGroup =
+                    String(req.body.productGroup).trim();
+            }
 
 
             // =================================================
