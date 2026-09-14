@@ -423,27 +423,85 @@ export class ProductDetail implements OnInit {
     this.selectedColor = color;
 
     this.selectedCombination = '';
-
     this.selectedCombinationData = undefined;
 
     const colorData = this.colorsData.find(
       item =>
-        item.name.toLowerCase() ===
-        color.toLowerCase()
+        item.name?.toLowerCase() ===
+        color?.toLowerCase()
     );
 
     this.selectedColorData = colorData;
 
+    // Selected colour ki main image
     if (colorData?.image) {
-
-      this.setProductImage(
-        colorData.image
-      );
-
+      this.setProductImage(colorData.image);
     }
 
   }
 
+  getSelectedColorImage(): string {
+
+    if (!this.product) {
+      return '';
+    }
+
+    const color = this.selectedColor?.toLowerCase();
+
+    if (!color) {
+      return '';
+    }
+
+    // First image is the combined image.
+    // Following images are individual colour images
+    // in the same order as product.colors.
+    const colorIndex =
+      this.product.colors?.findIndex(
+        c => c.toLowerCase() === color
+      ) ?? -1;
+
+    if (
+      colorIndex >= 0 &&
+      this.product.images &&
+      this.product.images[colorIndex + 1]
+    ) {
+      return this.product.images[colorIndex + 1];
+    }
+
+    return '';
+  }
+
+  getPackDisplayImage(pack: ProductPack): string {
+
+    // ==============================
+    // 1 VEST
+    // ==============================
+    if (pack.quantity === 1) {
+
+      const colorImage =
+        this.getSelectedColorImage();
+
+      if (colorImage) {
+        return colorImage;
+      }
+
+      // Existing colorsData fallback
+      if (this.selectedColorData?.image) {
+        return this.selectedColorData.image;
+      }
+    }
+
+    // ==============================
+    // 3 PACK / OTHER PACKS
+    // ==============================
+    return (
+      pack.images?.[0] ||
+      pack.image ||
+      this.product?.images?.[0] ||
+      this.product?.image ||
+      ''
+    );
+  }
 
   // =====================================================
   // PACK
@@ -460,22 +518,40 @@ export class ProductDetail implements OnInit {
     this.selectedCombinationData = undefined;
 
     // Load selected pack images
-    if (pack.images?.length) {
+    if (pack.quantity === 1 && this.selectedColorData?.image) {
 
-      this.productImages = [...pack.images];
+      // 1 Vest → selected colour ki image
+      this.productImages = [
+        this.selectedColorData.image
+      ];
+
+      this.selectedImage =
+        this.selectedColorData.image;
+
+    }
+    else if (pack.images?.length) {
+
+      // 3 Pack → pack images
+      this.productImages = [
+        ...pack.images
+      ];
 
       this.selectedImage =
         this.productImages[0] ?? '';
 
-    } else if (pack.image) {
+    }
+    else if (pack.image) {
 
-      this.productImages = [pack.image];
+      this.productImages = [
+        pack.image
+      ];
 
-      this.selectedImage = pack.image;
+      this.selectedImage =
+        pack.image;
 
-    } else {
+    }
+    else {
 
-      // Fallback to normal product images
       this.productImages =
         this.product?.images?.length
           ? [...this.product.images]
@@ -485,6 +561,8 @@ export class ProductDetail implements OnInit {
 
       this.selectedImage =
         this.productImages[0] ?? '';
+
+
 
     }
 
@@ -754,11 +832,41 @@ export class ProductDetail implements OnInit {
   }
 
 
-  selectImage(image: string): void {
+selectImage(image: string): void {
 
-    this.setProductImage(image);
+  this.setProductImage(image);
 
+  const colorData = this.colorsData.find(
+    item => item.image === image
+  );
+
+  if (colorData) {
+    this.selectedColor = colorData.name;
+    this.selectedColorData = colorData;
+    return;
   }
+
+  // Individual colour images:
+  if (this.product?.images) {
+
+    const imageIndex =
+      this.product.images.indexOf(image);
+
+    // index 0 = combined image
+    if (imageIndex > 0) {
+
+      const color =
+        this.product.colors?.[imageIndex - 1];
+
+      if (color) {
+        this.selectedColor = color;
+      }
+    }
+  }
+
+  this.selectedCombination = '';
+  this.selectedCombinationData = undefined;
+}
 
 
   // =====================================================
