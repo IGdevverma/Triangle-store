@@ -1,23 +1,102 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Chart } from 'chart.js/auto';
+
 import { ProductService } from '../../services/product';
 import { Product } from '../../models/product';
-import { ViewChild, ElementRef } from '@angular/core';
 import { OrderService } from '../../services/order';
 import { OrderStatus } from '../../models/orders';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { AdminService } from '../../services/admin';
 import { UserService } from '../../services/user';
 import { QuoteService } from '../../services/quote';
 import { Quotes } from '../quotes/quotes';
 import { InvoiceService } from '../../services/invoice.service';
+
 import { ToastrService } from 'ngx-toastr';
 import Swal from 'sweetalert2';
 import { NgxSpinnerService } from 'ngx-spinner';
 
+/* ============================================================
+   LOCAL TYPES
+   ============================================================ */
+
+type ProductMode = 'single' | 'pack';
+
+interface ProductPackEditor {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  originalPrice: number;
+  discount: number;
+  colors: string[];
+  sizes: string[];
+
+  /** New files selected from the computer */
+  files: File[];
+
+  /** Existing + new image previews */
+  previews: string[];
+
+  /** Existing Cloudinary images */
+  existingImages: string[];
+
+  /** Existing images removed by the user */
+  removedImages: string[];
+}
+
+interface ColorCombinationEditor {
+  id: string;
+  name: string;
+  colors: string[];
+
+  files: File[];
+  previews: string[];
+  existingImages: string[];
+  removedImages: string[];
+}
+
+interface EditableProduct extends Product {
+  productMode: ProductMode;
+  availableColors?: string;
+  packs?: ProductPackEditor[];
+  colorCombinations?: ColorCombinationEditor[];
+}
+
+interface DashboardData {
+  totalProducts: number;
+  totalOrders: number;
+  totalUsers: number;
+  totalRevenue: number;
+  totalCategories: number;
+  totalStock: number;
+  inventoryValue: number;
+  lowStockProducts: number;
+  processingOrders: number;
+  packedOrders: number;
+  shippedOrders: number;
+  deliveredOrders: number;
+  cancelledOrders: number;
+  monthlySales: Array<{
+    _id?: {
+      month?: number;
+      year?: number;
+    };
+    revenue?: number;
+  }>;
+}
+
+/* ============================================================
+   COMPONENT
+   ============================================================ */
 
 @Component({
   selector: 'app-admin',
@@ -26,74 +105,38 @@ import { NgxSpinnerService } from 'ngx-spinner';
   templateUrl: './admin.html',
   styleUrl: './admin.css'
 })
+export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
+  /* ==========================================================
+     VIEW / NAVIGATION STATE
+     ========================================================== */
 
-export class Admin implements OnInit, AfterViewInit {
+  activeMenu = 'dashboard';
+  showModal = false;
+  editing = false;
 
-  packOnePrice: number = 0;
-  packOneOriginalPrice: number = 0;
-  packOneDiscount: number = 0;
+  currentPage = 1;
+  readonly itemsPerPage = 5;
 
-  packThreePrice: number = 0;
-  packThreeOriginalPrice: number = 0;
-  packThreeDiscount: number = 0;
+  searchTerm = '';
+  selectedStock = 'All';
+  selectedSort = 'Newest';
 
+  customerSearch = '';
+  quoteSearch = '';
 
-  // ==========================================
-  // GENERIC PACK BUILDER
-  // ==========================================
+  today = new Date();
 
-  productPacks: any[] = [];
-
-  colorCombinations: any[] = [];
-
-
-
-  // ==========================================
-  // PACK-WISE IMAGES
-  // ==========================================
-
-  singleVestFiles: File[] = [];
-  singleVestPreviews: string[] = [];
-
-  threePackFiles: File[] = [];
-  threePackPreviews: string[] = [];
-  i: any;
-  changeRole(user: any, role: string) {
-
-    this.userService.updateRole(user._id, role).subscribe({
-
-      next: (response: any) => {
-
-        this.toastr.success(
-          response.message,
-          'Success'
-        );
-
-        user.role = role;
-
-      },
-
-      error: (err) => {
-
-        console.error(err);
-
-
-        this.toastr.error(
-          err.error?.message || 'Failed to update role',
-          'Error'
-        );
-
-
-      }
-
-    });
-
-  }
+  /* ==========================================================
+     DASHBOARD
+     ========================================================== */
 
   @ViewChild('salesCanvas')
-  salesCanvas!: ElementRef<HTMLCanvasElement>;
-  dashboardData = {
+  salesCanvas?: ElementRef<HTMLCanvasElement>;
+
+  salesChart?: Chart;
+
+  dashboardData: DashboardData = {
     totalProducts: 0,
     totalOrders: 0,
     totalUsers: 0,
@@ -107,54 +150,44 @@ export class Admin implements OnInit, AfterViewInit {
     shippedOrders: 0,
     deliveredOrders: 0,
     cancelledOrders: 0,
-    monthlySales: [] as any[]
+    monthlySales: []
   };
-  customers: any[] = [];
-  today = new Date();
-  filteredCustomers: any[] = [];
 
-  selectedQuote: any = null;
+  /* ==========================================================
+     PRODUCTS
+     ========================================================== */
 
-  showQuoteModal = false;
+  products: Product[] = [];
+  lowStockProducts: Product[] = [];
 
-  loadingQuote = false;
-  galleryFiles: File[] = [];
-  galleryPreviews: string[] = [];
-  customerSearch = '';
-  salesChart: any;
-  searchTerm = '';
-  newSize: string = '';
-
-  currentPage = 1;
-  showModal = false;
-  activeMenu: string = 'dashboard';
-  itemsPerPage = 5;
-  selectedStock = 'All';
-  selectedSort = 'Newest';
-  inventoryValue = 0;
   totalProducts = 0;
   totalStock = 0;
   totalCategories = 0;
+  inventoryValue = 0;
   mostExpensiveProduct = '';
-  selectedFiles: File[] = [];
-  imagePreviews: string[] = [];
-  // Existing images already saved in Cloudinary
-  existingImages: string[] = [];
-  removedImages: string[] = [];
 
+  /* ==========================================================
+     ORDERS / CUSTOMERS / QUOTES
+     ========================================================== */
 
-  // Existing images that user wants to delete
-
-  lowStockProducts: Product[] = [];
   orders: any[] = [];
+  customers: any[] = [];
+  filteredCustomers: any[] = [];
+
   quotes: any[] = [];
-
-
   filteredQuotes: any[] = [];
 
-  quoteSearch = '';
+  selectedQuote: any = null;
+  showQuoteModal = false;
+  loadingQuote = false;
+
+  /* ==========================================================
+     PRODUCT EDITOR
+     ========================================================== */
+
   availableSizes: string[] = ['S', 'M', 'L', 'XL'];
-  availableColors = [
+
+  availableColors: string[] = [
     'Black',
     'White',
     'Red',
@@ -163,71 +196,89 @@ export class Admin implements OnInit, AfterViewInit {
     'Grey',
     'Navy'
   ];
+
   selectedSizes: string[] = [];
   selectedColors: string[] = [];
+  newSize = '';
 
+  productPacks: ProductPackEditor[] = [];
+  colorCombinations: ColorCombinationEditor[] = [];
 
+  /* ==========================================================
+     PRODUCT IMAGE STATE
+     ========================================================== */
 
+  /**
+   * selectedFiles contains only NEW files selected from the
+   * computer. Their order matches the NEW/local previews.
+   */
+  selectedFiles: File[] = [];
 
+  /**
+   * imagePreviews contains both existing Cloudinary URLs and
+   * local data URLs. The first item is treated as the main image.
+   */
+  imagePreviews: string[] = [];
 
+  /** Existing Cloudinary images currently kept by the user. */
+  existingImages: string[] = [];
 
-  products: Product[] = [];
-  newProduct: Product = {
-    name: '',
-    price: 0,
-    image: '',
-    category: '',
-    brand: '',
-    originalPrice: 0,
-    description: '',
-    fabric: '',
-    type: '',
-    sku: '',
-    discount: 0,
-    colors: [],
-    sizes: [],
-    status: 'Active',
-    stock: 0,
-    showOnHome: true,
-    availableColors: '',
-    packs: [],
-    colorCombinations: [],
+  /** Existing Cloudinary images the user removed. */
+  removedImages: string[] = [];
 
-  };
-  get totalPages(): number {
+  /* ==========================================================
+     LEGACY COMPATIBILITY STATE
+     ----------------------------------------------------------
+     These are retained only because older templates/code may
+     still reference them. They are NOT used by the new product
+     editor flow.
+     ========================================================== */
 
-    let filtered = this.products.filter(product =>
-      product.name
-        .toLowerCase()
-        .includes(this.searchTerm.toLowerCase())
-    );
+  galleryFiles: File[] = [];
+  galleryPreviews: string[] = [];
 
-    if (this.selectedStock === 'In Stock') {
-      filtered = filtered.filter(
-        product => (product.stock ?? 0) > 0
-      );
-    }
+  singleVestFiles: File[] = [];
+  singleVestPreviews: string[] = [];
 
-    if (this.selectedStock === 'Out of Stock') {
-      filtered = filtered.filter(
-        product => (product.stock ?? 0) === 0
-      );
-    }
+  threePackFiles: File[] = [];
+  threePackPreviews: string[] = [];
 
-    if (this.selectedStock === 'Low Stock') {
-      filtered = filtered.filter(
-        product => (product.stock ?? 0) <= 5
-      );
-    }
+  /* ==========================================================
+     EMPTY PRODUCT FACTORY
+     ========================================================== */
 
-    return Math.max(
-      1,
-      Math.ceil(filtered.length / this.itemsPerPage)
-    );
+  private createEmptyProduct(): EditableProduct {
+    return {
+      name: '',
+      price: 0,
+      image: '',
+      category: '',
+      brand: '',
+      originalPrice: 0,
+      description: '',
+      fabric: '',
+      type: '',
+      productMode: 'single',
+      sku: '',
+      discount: 0,
+      colors: [],
+      sizes: [],
+      status: 'Active',
+      stock: 0,
+      showOnHome: true,
+      availableColors: '',
+      packs: [],
+      colorCombinations: []
+    } as EditableProduct;
   }
 
-  constructor(
+  newProduct: EditableProduct = this.createEmptyProduct();
 
+  /* ==========================================================
+     CONSTRUCTOR
+     ========================================================== */
+
+  constructor(
     private productService: ProductService,
     private orderService: OrderService,
     private adminService: AdminService,
@@ -236,274 +287,309 @@ export class Admin implements OnInit, AfterViewInit {
     private invoiceService: InvoiceService,
     private toastr: ToastrService,
     private spinner: NgxSpinnerService
+  ) {}
 
-  ) { }
+  /* ==========================================================
+     LIFECYCLE
+     ========================================================== */
+
   ngOnInit(): void {
-
     this.loadProducts();
     this.loadOrders();
     this.loadDashboard();
     this.loadCustomers();
     this.loadQuotes();
-
   }
 
   ngAfterViewInit(): void {
-
     this.createSalesChart();
-
-
-
   }
-  loadProducts() {
 
-    this.productService.getProducts().subscribe({
+  ngOnDestroy(): void {
+    this.salesChart?.destroy();
+  }
 
+  /* ==========================================================
+     API LOADERS
+     ========================================================== */
+
+  loadProducts(): void {
+    this.productService.getProducts(true).subscribe({
       next: (response: any) => {
-
-        console.log('PRODUCTS FROM API:', response);
-        console.log('FIRST PRODUCT:', response.products?.[0]);
-        console.log('FIRST PRODUCT PACKS:', response.products?.[0]?.packs);
-
-        const data: Product[] = response.products;
+        const data: Product[] = Array.isArray(response?.products)
+          ? response.products
+          : [];
 
         this.products = data;
-
-        // Total Products
-        this.totalProducts = data.length;
-
-        // Total Stock
-        this.totalStock = data.reduce(
-          (sum, product) => sum + (product.stock ?? 0),
-          0
+        this.calculateProductMetrics();
+        this.ensureValidCurrentPage();
+      },
+      error: (error) => {
+        console.error('Failed to load products:', error);
+        this.toastr.error(
+          error?.error?.message || 'Failed to load products.',
+          'Products'
         );
-
-        // Low Stock Products
-        this.lowStockProducts = data.filter(
-          product => (product.stock ?? 0) <= 5
-        );
-
-        // Total Categories
-        this.totalCategories = new Set(
-          data.map((product: Product) => product.category)
-        ).size;
-
-        // Inventory Value
-        this.inventoryValue = data.reduce(
-          (sum: number, product: Product) =>
-            sum + (product.price * (product.stock ?? 0)),
-          0
-        );
-
-        // Most Expensive Product
-        if (data.length > 0) {
-
-          const expensive = data.reduce(
-            (prev: Product, current: Product) =>
-              prev.price > current.price ? prev : current
-          );
-
-          this.mostExpensiveProduct = expensive.name;
-
-        } else {
-
-          this.mostExpensiveProduct = '';
-
-        }
-
-      },
-
-      error: (err) => {
-
-        console.error('Failed to load products:', err);
-
       }
-
     });
-
   }
 
-  onMainImageSelected(event: Event): void {
+  private calculateProductMetrics(): void {
+    this.totalProducts = this.products.length;
 
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    const file = input.files[0];
-
-    if (!file.type.startsWith('image/')) {
-      alert('Please select an image.');
-      return;
-    }
-
-    // Main image first
-    this.selectedFiles.unshift(file);
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-
-      this.imagePreviews.unshift(
-        reader.result as string
-      );
-
-    };
-
-    reader.readAsDataURL(file);
-  }
-  loadOrders() {
-
-    this.orderService.getOrders().subscribe({
-
-      next: (response: any) => {
-
-        this.orders = response.orders;
-
-
-
-      },
-
-      error: (err) => {
-
-        console.error(err);
-
-      }
-
-    });
-
-  }
-
-  loadDashboard() {
-
-    this.adminService.getDashboard().subscribe({
-
-      next: (response: any) => {
-
-        this.dashboardData = response.dashboard;
-
-        console.log(this.dashboardData);
-        this.createSalesChart();
-
-      },
-
-      error: (err) => {
-
-        console.error(err);
-
-      }
-
-    });
-
-  }
-  loadCustomers() {
-
-    this.userService.getUsers().subscribe({
-
-      next: (response: any) => {
-
-        this.customers = response.users;
-
-        this.filteredCustomers = response.users;
-
-
-
-      },
-
-      error: (err) => {
-
-        console.error(err);
-
-      }
-
-    });
-
-  }
-
-
-  loadQuotes() {
-
-    this.quoteService.getQuotes().subscribe({
-
-      next: (response: any) => {
-
-        this.quotes = response.quotes;
-
-        this.filteredQuotes = response.quotes;
-
-      },
-
-      error: (err) => {
-
-        console.error(err);
-
-      }
-
-    });
-
-  }
-
-  filterCustomers() {
-
-    const search = this.customerSearch.toLowerCase();
-
-    this.filteredCustomers = this.customers.filter((user: any) =>
-
-      user.name.toLowerCase().includes(search) ||
-
-      user.email.toLowerCase().includes(search) ||
-
-      (user.phone || '').toLowerCase().includes(search)
-
+    this.totalStock = this.products.reduce(
+      (sum, product) => sum + this.toNumber(product.stock),
+      0
     );
 
+    this.lowStockProducts = this.products.filter(
+      product => this.toNumber(product.stock) <= 5
+    );
+
+    this.totalCategories = new Set(
+      this.products
+        .map(product => product.category?.trim())
+        .filter(Boolean)
+    ).size;
+
+    this.inventoryValue = this.products.reduce(
+      (sum, product) =>
+        sum +
+        this.toNumber(product.price) *
+        this.toNumber(product.stock),
+      0
+    );
+
+    const expensive = this.products.reduce<Product | null>(
+      (current, product) => {
+        if (!current) {
+          return product;
+        }
+
+        return this.toNumber(product.price) >
+          this.toNumber(current.price)
+          ? product
+          : current;
+      },
+      null
+    );
+
+    this.mostExpensiveProduct = expensive?.name || '';
   }
 
-  deleteCustomer(id: string) {
+  loadOrders(): void {
+    this.orderService.getOrders().subscribe({
+      next: (response: any) => {
+        this.orders = Array.isArray(response?.orders)
+          ? response.orders
+          : [];
+      },
+      error: (error) => {
+        console.error('Failed to load orders:', error);
+        this.toastr.error(
+          error?.error?.message || 'Failed to load orders.',
+          'Orders'
+        );
+      }
+    });
+  }
 
-    if (!confirm('Are you sure you want to delete this customer?')) {
+  loadDashboard(): void {
+    this.adminService.getDashboard().subscribe({
+      next: (response: any) => {
+        this.dashboardData = {
+          ...this.dashboardData,
+          ...(response?.dashboard || {}),
+          monthlySales: Array.isArray(response?.dashboard?.monthlySales)
+            ? response.dashboard.monthlySales
+            : []
+        };
+
+        this.createSalesChart();
+      },
+      error: (error) => {
+        console.error('Failed to load dashboard:', error);
+        this.toastr.error(
+          error?.error?.message || 'Failed to load dashboard.',
+          'Dashboard'
+        );
+      }
+    });
+  }
+
+  loadCustomers(): void {
+    this.userService.getUsers().subscribe({
+      next: (response: any) => {
+        this.customers = Array.isArray(response?.users)
+          ? response.users
+          : [];
+
+        this.filterCustomers();
+      },
+      error: (error) => {
+        console.error('Failed to load customers:', error);
+        this.toastr.error(
+          error?.error?.message || 'Failed to load customers.',
+          'Customers'
+        );
+      }
+    });
+  }
+
+  loadQuotes(): void {
+    this.quoteService.getQuotes().subscribe({
+      next: (response: any) => {
+        this.quotes = Array.isArray(response?.quotes)
+          ? response.quotes
+          : [];
+
+        this.filterQuotes();
+      },
+      error: (error) => {
+        console.error('Failed to load quotes:', error);
+        this.toastr.error(
+          error?.error?.message || 'Failed to load quotes.',
+          'Quotes'
+        );
+      }
+    });
+  }
+
+  /* ==========================================================
+     CUSTOMER MANAGEMENT
+     ========================================================== */
+
+  filterCustomers(): void {
+    const search = this.customerSearch.trim().toLowerCase();
+
+    if (!search) {
+      this.filteredCustomers = [...this.customers];
       return;
     }
 
-    this.userService.deleteUser(id).subscribe({
+    this.filteredCustomers = this.customers.filter(user => {
+      const name = String(user?.name || '').toLowerCase();
+      const email = String(user?.email || '').toLowerCase();
+      const phone = String(user?.phone || '').toLowerCase();
 
-      next: (response: any) => {
-
-        this.toastr.success(
-          'Customer deleted successfully.',
-          'Deleted'
-        );
-        this.loadCustomers();
-
-      },
-
-      error: (err) => {
-
-        console.error(err);
-
-        this.toastr.error(
-          err.error?.message || 'Failed to delete customer',
-          'Error'
-        );
-
-      }
-
+      return (
+        name.includes(search) ||
+        email.includes(search) ||
+        phone.includes(search)
+      );
     });
-
   }
 
+  changeRole(user: any, role: string): void {
+    if (!user?._id || !role) {
+      return;
+    }
+
+    const previousRole = user.role;
+
+    this.userService.updateRole(user._id, role).subscribe({
+      next: (response: any) => {
+        user.role = role;
+
+        this.toastr.success(
+          response?.message || 'Role updated successfully.',
+          'Success'
+        );
+      },
+      error: (error) => {
+        user.role = previousRole;
+
+        console.error('Role update failed:', error);
+
+        this.toastr.error(
+          error?.error?.message || 'Failed to update role.',
+          'Error'
+        );
+      }
+    });
+  }
+
+  deleteCustomer(id: string): void {
+    if (!id) {
+      return;
+    }
+
+    Swal.fire({
+      title: 'Delete Customer?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#DC2626',
+      cancelButtonColor: '#6B7280'
+    }).then(result => {
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      this.spinner.show();
+
+      this.userService.deleteUser(id).subscribe({
+        next: () => {
+          this.spinner.hide();
+
+          this.toastr.success(
+            'Customer deleted successfully.',
+            'Deleted'
+          );
+
+          this.loadCustomers();
+        },
+        error: (error) => {
+          this.spinner.hide();
+
+          console.error('Customer delete failed:', error);
+
+          this.toastr.error(
+            error?.error?.message || 'Failed to delete customer.',
+            'Error'
+          );
+        }
+      });
+    });
+  }
+
+  /* ==========================================================
+     QUOTE SEARCH
+     ========================================================== */
+
+  filterQuotes(): void {
+    const search = this.quoteSearch.trim().toLowerCase();
+
+    if (!search) {
+      this.filteredQuotes = [...this.quotes];
+      return;
+    }
+
+    this.filteredQuotes = this.quotes.filter(quote => {
+      const name = String(quote?.name || quote?.customerName || '').toLowerCase();
+      const email = String(quote?.email || '').toLowerCase();
+      const phone = String(quote?.phone || '').toLowerCase();
+
+      return (
+        name.includes(search) ||
+        email.includes(search) ||
+        phone.includes(search)
+      );
+    });
+  }
+
+  /* ==========================================================
+     ORDER MANAGEMENT
+     ========================================================== */
 
   changeOrderStatus(
     order: any,
     status: OrderStatus
   ): void {
-
     if (!order?._id) {
-      this.toastr.error(
-        'Invalid order.',
-        'Error'
-      );
+      this.toastr.error('Invalid order.', 'Error');
       return;
     }
 
@@ -515,35 +601,22 @@ export class Admin implements OnInit, AfterViewInit {
       return;
     }
 
-    const previousStatus =
-      order.orderStatus;
+    const previousStatus = order.orderStatus;
 
-    // Optimistic UI update avoid karna hai.
-    // Backend successful hone ke baad hi status change hoga.
     this.orderService
-      .updateOrderStatus(
-        order._id,
-        status
-      )
+      .updateOrderStatus(order._id, status)
       .subscribe({
-
-        next: (response) => {
-
+        next: (response: any) => {
           order.orderStatus = status;
 
           this.toastr.success(
             response?.message ||
-            'Order status updated successfully.',
+              'Order status updated successfully.',
             'Updated'
           );
-
         },
-
         error: (error) => {
-
-          // Restore previous status
-          order.orderStatus =
-            previousStatus;
+          order.orderStatus = previousStatus;
 
           console.error(
             'Order status update failed:',
@@ -552,1755 +625,1096 @@ export class Admin implements OnInit, AfterViewInit {
 
           this.toastr.error(
             error?.error?.message ||
-            'Failed to update order status.',
+              'Failed to update order status.',
             'Error'
           );
-
         }
-
       });
-
   }
 
-  get filteredProducts() {
-
-    let filtered = this.products.filter(product =>
-      product.name
-        .toLowerCase()
-        .includes(this.searchTerm.toLowerCase())
-    );
-
-    // Stock Filter
-    if (this.selectedStock === 'In Stock') {
-      filtered = filtered.filter(product => (product.stock ?? 0) > 0);
+  downloadInvoice(order: any): void {
+    if (!order) {
+      return;
     }
 
-    if (this.selectedStock === 'Out of Stock') {
-      filtered = filtered.filter(product => (product.stock ?? 0) === 0);
+    this.invoiceService.generateInvoice(order);
+  }
+
+  /* ==========================================================
+     PRODUCT FILTERING / PAGINATION
+     ========================================================== */
+
+  get filteredProducts(): Product[] {
+    let filtered = [...this.products];
+
+    const search = this.searchTerm.trim().toLowerCase();
+
+    if (search) {
+      filtered = filtered.filter(product =>
+        String(product?.name || '')
+          .toLowerCase()
+          .includes(search)
+      );
     }
 
-    if (this.selectedStock === 'Low Stock') {
-      filtered = filtered.filter(product => (product.stock ?? 0) <= 5);
+    switch (this.selectedStock) {
+      case 'In Stock':
+        filtered = filtered.filter(
+          product => this.toNumber(product.stock) > 0
+        );
+        break;
+
+      case 'Out of Stock':
+        filtered = filtered.filter(
+          product => this.toNumber(product.stock) === 0
+        );
+        break;
+
+      case 'Low Stock':
+        filtered = filtered.filter(
+          product => this.toNumber(product.stock) <= 5
+        );
+        break;
     }
 
-    // Sorting
     switch (this.selectedSort) {
-
       case 'Price Low → High':
-        filtered.sort((a, b) => a.price - b.price);
+        filtered.sort(
+          (a, b) =>
+            this.toNumber(a.price) -
+            this.toNumber(b.price)
+        );
         break;
 
       case 'Price High → Low':
-        filtered.sort((a, b) => b.price - a.price);
+        filtered.sort(
+          (a, b) =>
+            this.toNumber(b.price) -
+            this.toNumber(a.price)
+        );
         break;
 
       case 'Name A → Z':
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
+        filtered.sort((a, b) =>
+          String(a.name || '').localeCompare(
+            String(b.name || '')
+          )
+        );
         break;
 
       case 'Stock Highest':
-        filtered.sort((a, b) => (b.stock ?? 0) - (a.stock ?? 0));
+        filtered.sort(
+          (a, b) =>
+            this.toNumber(b.stock) -
+            this.toNumber(a.stock)
+        );
         break;
 
+      case 'Newest':
+      default:
+        break;
     }
 
-    const start = (this.currentPage - 1) * this.itemsPerPage;
+    const start =
+      (this.currentPage - 1) *
+      this.itemsPerPage;
 
     return filtered.slice(
       start,
       start + this.itemsPerPage
     );
-
   }
 
+  get totalPages(): number {
+    const count = this.getFilteredProductCount();
 
+    return Math.max(
+      1,
+      Math.ceil(count / this.itemsPerPage)
+    );
+  }
 
+  private getFilteredProductCount(): number {
+    let filtered = [...this.products];
 
-  editing = false;
+    const search = this.searchTerm.trim().toLowerCase();
 
-  onProductImagesSelected(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    const files = Array.from(input.files);
-
-    // Maximum 5 images
-    if (this.selectedFiles.length + files.length > 5) {
-      this.toastr.warning(
-        'You can upload maximum 5 images.',
-        'Image Limit'
+    if (search) {
+      filtered = filtered.filter(product =>
+        String(product?.name || '')
+          .toLowerCase()
+          .includes(search)
       );
-      return;
     }
 
-    files.forEach((file) => {
-
-      // Validate image
-      if (!file.type.startsWith('image/')) {
-        this.toastr.warning(
-          `${file.name} is not a valid image.`,
-          'Invalid File'
+    switch (this.selectedStock) {
+      case 'In Stock':
+        filtered = filtered.filter(
+          product => this.toNumber(product.stock) > 0
         );
-        return;
-      }
+        break;
 
-      // Maximum 5MB
-      if (file.size > 5 * 1024 * 1024) {
-        this.toastr.warning(
-          `${file.name} is larger than 5MB.`,
-          'File Too Large'
+      case 'Out of Stock':
+        filtered = filtered.filter(
+          product => this.toNumber(product.stock) === 0
         );
-        return;
-      }
+        break;
 
-      // Store file
-      this.selectedFiles.push(file);
-
-      // Create preview
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        this.imagePreviews.push(
-          reader.result as string
+      case 'Low Stock':
+        filtered = filtered.filter(
+          product => this.toNumber(product.stock) <= 5
         );
+        break;
+    }
 
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-    // Reset input so same file can be selected again
-    input.value = '';
-
+    return filtered.length;
   }
 
+  get pages(): number[] {
+    return Array.from(
+      { length: this.totalPages },
+      (_, index) => index + 1
+    );
+  }
 
   onProductFilterChange(): void {
     this.currentPage = 1;
+    this.ensureValidCurrentPage();
   }
 
-  removeProductImage(index: number): void {
-
-    this.selectedFiles.splice(index, 1);
-
-    this.imagePreviews.splice(index, 1);
-
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+    }
   }
 
-  addProduct() {
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
 
-
-
-
-    if (!this.isFormValid()) {
-
-      alert('Please fill all fields correctly.');
-
+  goToPage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
       return;
-
     }
 
-
-
-    const formData = new FormData();
-
-    // ==========================================
-    // PACK OPTIONS
-    // ==========================================
-    // ==========================================
-    // GENERIC PACK OPTIONS
-    // ==========================================
-    const packs = this.productPacks.map((pack: any) => ({
-      id: pack.id,
-      name: pack.name,
-      quantity: Number(pack.quantity) || 1,
-      price: Number(pack.price) || 0,
-      originalPrice: Number(pack.originalPrice) || 0,
-      discount: Number(pack.discount) || 0,
-      colors: pack.colors || [],
-      sizes: pack.sizes || [],
-
-      // Number of photos selected for this pack
-      imageCount: Array.isArray(pack.files)
-        ? pack.files.length
-        : 0
-    }));
-
-
-    // ==========================================
-    // COLOR COMBINATIONS
-    // ==========================================
-
-    const combinations = this.colorCombinations.map(
-      (combination: any) => {
-
-        return {
-          id: combination.id,
-
-          name:
-            combination.name?.trim() ||
-            'Color Combination',
-
-          colors:
-            Array.isArray(combination.colors)
-              ? combination.colors
-              : [],
-
-          // Number of photos selected
-          imageCount:
-            Array.isArray(combination.files)
-              ? combination.files.length
-              : 0
-        };
-
-      }
-    );
-
-    formData.append(
-      'colorCombinations',
-      JSON.stringify(combinations)
-    );
-
-    console.log(
-      'COLOR COMBINATIONS BEING SENT:',
-      combinations
-    );
-
-    formData.append(
-      'packs',
-      JSON.stringify(packs)
-    );
-    formData.append('name', this.newProduct.name);
-
-    formData.append('price', this.newProduct.price.toString());
-
-    formData.append('category', this.newProduct.category);
-
-    formData.append('description', this.newProduct.description || '');
-
-    formData.append('fabric', this.newProduct.fabric || '');
-
-    formData.append('type', this.newProduct.type || '');
-    formData.append(
-      'availableColors',
-      this.newProduct.availableColors || ''
-    );
-
-    // ==========================================
-    // COLORS
-    // ==========================================
-
-    const colors = (this.newProduct.availableColors || '')
-      .split(',')
-      .map((color: string) => color.trim())
-      .filter((color: string) =>
-        color && color.toLowerCase() !== 'undefined'
-      );
-
-
-
-
-
-
-    // ==========================================
-    // SIZES
-    // ==========================================
-
-    const sizes = (this.newProduct.sizes || [])
-      .flatMap((size: string) => size.split(','))
-      .map((size: string) => size.trim())
-      .filter((size: string) => size);
-
-
-    console.log('SIZES BEING SENT:', sizes);
-    console.log('COLORS BEING SENT:', colors);
-
-
-    // ==========================================
-    // SEND COLORS + SIZES
-    // ==========================================
-
-    formData.append(
-      'colors',
-      JSON.stringify(colors)
-    );
-
-    formData.append(
-      'sizes',
-      JSON.stringify(sizes)
-    );
-
-    formData.append('stock', String(this.newProduct.stock));
-
-    formData.append('showOnHome', String(this.newProduct.showOnHome));
-
-    this.selectedFiles.forEach((file) => {
-
-      formData.append('images', file);
-
-    });
-
-
-    // ==========================================
-    // PACK IMAGES
-    // ==========================================
-
-    this.productPacks.forEach((pack: any) => {
-
-      if (Array.isArray(pack.files)) {
-
-        pack.files.forEach((file: File) => {
-
-          formData.append('packImages', file);
-
-        });
-
-      }
-
-    });
-
-
-    // ==========================================
-    // COLOR COMBINATION IMAGES
-    // ==========================================
-
-    this.colorCombinations.forEach((combination: any) => {
-
-      if (Array.isArray(combination.files)) {
-
-        combination.files.forEach((file: File) => {
-
-          formData.append('combinationImages', file);
-
-        });
-
-      }
-
-    });
-
-
-
-
-
-    formData.append(
-      'removedImages',
-      JSON.stringify(this.removedImages)
-    );
-
-
-
-
-
-
-    this.productService.addProduct(formData).subscribe({
-
-
-      next: (res) => {
-
-
-
-        this.toastr.success(
-          'Product added successfully.',
-          'Success'
-        );
-        this.currentPage = 1;
-
-        this.closeModal();
-
-        this.loadProducts();
-
-      },
-
-      error: (err) => {
-
-        this.toastr.error(
-          err.error?.message || 'Something went wrong.',
-          'Error'
-        );
-      }
-
-    });
-
-
-
+    this.currentPage = page;
   }
 
+  private ensureValidCurrentPage(): void {
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
 
-  editProduct(product: Product): void {
+    if (this.currentPage < 1) {
+      this.currentPage = 1;
+    }
+  }
 
-    console.log('========== EDIT PRODUCT ==========');
-    console.log('PRODUCT:', product);
-    console.log('PACKS:', product.packs);
-    console.log('COLOR COMBINATIONS:', product.colorCombinations);
+  /* ==========================================================
+     PRODUCT MODAL
+     ========================================================== */
 
-    this.editing = true;
+  openAddModal(): void {
+    this.editing = false;
     this.showModal = true;
+    this.resetProductEditor();
+  }
 
-    // ==========================================
-    // COLORS
-    // ==========================================
+  closeModal(): void {
+    this.showModal = false;
+    this.editing = false;
+    this.resetProductEditor();
+  }
 
-    const colors = Array.isArray(product.colors)
-      ? product.colors
-        .flatMap((color: string) => color.split(','))
-        .map((color: string) => color.trim())
-        .filter(
-          (color: string) =>
-            color &&
-            color.toLowerCase() !== 'undefined'
-        )
-      : [];
+  private resetProductEditor(): void {
+    this.newProduct = this.createEmptyProduct();
 
-    // ==========================================
-    // SIZES
-    // ==========================================
-
-    const sizes = Array.isArray(product.sizes)
-      ? product.sizes
-        .flatMap((size: string) => size.split(','))
-        .map((size: string) => size.trim())
-        .filter((size: string) => size)
-      : [];
-
-    // ==========================================
-    // PRODUCT DATA
-    // ==========================================
-
-    this.newProduct = {
-      ...product,
-
-      colors: colors,
-      sizes: sizes,
-
-      availableColors: colors.join(', ')
-    };
-
-    // ==========================================
-    // GENERIC PACK BUILDER
-    // ==========================================
-
-    const packs = Array.isArray(product.packs)
-      ? product.packs
-      : [];
-
-    this.productPacks = packs.map((pack: any) => {
-
-      return {
-
-        id:
-          pack.id ||
-          'pack-' + Date.now() + Math.random(),
-
-        name:
-          pack.name || '',
-
-        quantity:
-          Number(pack.quantity) || 1,
-
-        price:
-          Number(pack.price) || 0,
-
-        originalPrice:
-          Number(pack.originalPrice) || 0,
-
-        discount:
-          Number(pack.discount) || 0,
-
-        colors:
-          Array.isArray(pack.colors)
-            ? [...pack.colors]
-            : [],
-
-        sizes:
-          Array.isArray(pack.sizes)
-            ? [...pack.sizes]
-            : [],
-
-        // Existing pack images
-        existingImages:
-          Array.isArray(pack.images)
-            ? [...pack.images]
-            : pack.image
-              ? [pack.image]
-              : [],
-
-        // New files selected during editing
-        files: [] as File[],
-
-        // Preview existing images
-        previews:
-          Array.isArray(pack.images)
-            ? [...pack.images]
-            : pack.image
-              ? [pack.image]
-              : [],
-
-        // Existing images removed during editing
-        removedImages: [] as string[]
-
-      };
-
-    });
-
-    // ==========================================
-    // COLOR COMBINATIONS
-    // ==========================================
-
-    const combinations =
-      Array.isArray(product.colorCombinations)
-        ? product.colorCombinations
-        : [];
-
-    this.colorCombinations =
-      combinations.map((combination: any) => {
-
-        return {
-
-          id:
-            combination.id ||
-            'combination-' +
-            Date.now() +
-            Math.random(),
-
-          name:
-            combination.name || '',
-
-          colors:
-            Array.isArray(combination.colors)
-              ? [...combination.colors]
-              : [],
-
-          // Existing combination images
-          existingImages:
-            Array.isArray(combination.images)
-              ? [...combination.images]
-              : [],
-
-          // New files selected during editing
-          files: [] as File[],
-
-          // Existing images as preview
-          previews:
-            Array.isArray(combination.images)
-              ? [...combination.images]
-              : [],
-
-          // Existing images removed during editing
-          removedImages: [] as string[]
-
-        };
-
-      });
-
-    // ==========================================
-    // PRODUCT IMAGES
-    // ==========================================
+    this.productPacks = [];
+    this.colorCombinations = [];
 
     this.selectedFiles = [];
+    this.imagePreviews = [];
+    this.existingImages = [];
     this.removedImages = [];
 
-    this.existingImages = product.images?.length
-      ? [...product.images]
-      : product.image
-        ? [product.image]
-        : [];
+    this.selectedSizes = [];
+    this.selectedColors = [];
+    this.newSize = '';
 
-    this.imagePreviews = [
-      ...this.existingImages
-    ];
-
-    // ==========================================
-    // RESET OLD VEST-SPECIFIC DATA
-    // ==========================================
+    this.galleryFiles = [];
+    this.galleryPreviews = [];
 
     this.singleVestFiles = [];
     this.singleVestPreviews = [];
 
     this.threePackFiles = [];
     this.threePackPreviews = [];
-
-    // ==========================================
-    // RESET OLD PACK PRICE VARIABLES
-    // ==========================================
-
-    this.packOnePrice = 0;
-    this.packOneOriginalPrice = 0;
-    this.packOneDiscount = 0;
-
-    this.packThreePrice = 0;
-    this.packThreeOriginalPrice = 0;
-    this.packThreeDiscount = 0;
-
-    // ==========================================
-    // LOG EDIT DATA
-    // ==========================================
-
-    console.log(
-      'EDIT PRODUCT PACKS:',
-      this.productPacks
-    );
-
-    console.log(
-      'EDIT COLOR COMBINATIONS:',
-      this.colorCombinations
-    );
-
-    console.log(
-      'EDIT PRODUCT IMAGES:',
-      this.imagePreviews
-    );
-
   }
-  updateProduct() {
 
-    if (!this.isFormValid()) {
+  /* ==========================================================
+     EDIT PRODUCT
+     ========================================================== */
 
-      this.toastr.warning(
-        'Please fill all fields correctly.',
-        'Validation'
-      );
-
+  editProduct(product: Product): void {
+    if (!product) {
       return;
     }
 
-    const formData = new FormData();
+    this.editing = true;
+    this.showModal = true;
 
+    const colors = this.normalizeStringArray(product.colors);
 
-    // ==========================================
-    // GENERIC PACK OPTIONS
-    // ==========================================
-    const packs = this.productPacks.map((pack: any) => {
+    const sizes = this.normalizeStringArray(product.sizes);
 
-      const existingImages =
-        Array.isArray(pack.existingImages)
-          ? pack.existingImages
-          : [];
+    const productMode = this.resolveProductMode(product);
 
-      const newImageCount =
-        Array.isArray(pack.files)
-          ? pack.files.length
-          : 0;
+    this.newProduct = {
+      ...product,
+      productMode,
+      price: this.toNumber(product.price),
+      originalPrice: this.toNumber(product.originalPrice),
+      discount: this.toNumber(product.discount),
+      stock: this.toNumber(product.stock),
+      colors,
+      sizes,
+      availableColors: colors.join(', ')
+    } as EditableProduct;
 
-      return {
-        id: pack.id,
+    this.selectedColors = [...colors];
+    this.selectedSizes = [...sizes];
 
-        name:
-          pack.name?.trim() || 'Pack',
+    this.calculateDiscount();
 
-        quantity:
-          Number(pack.quantity) || 1,
-
-        price:
-          Number(pack.price) || 0,
-
-        originalPrice:
-          Number(pack.originalPrice) || 0,
-
-        discount:
-          Number(pack.discount) || 0,
-
-        colors:
-          Array.isArray(pack.colors)
-            ? pack.colors
-            : [],
-
-        sizes:
-          Array.isArray(pack.sizes)
-            ? pack.sizes
-            : [],
-
-        // Existing pack images
-        images: existingImages,
-
-        image:
-          existingImages[0] || '',
-
-        // New images
-        imageCount: newImageCount,
-
-        // Images removed while editing
-        removedImages:
-          Array.isArray(pack.removedImages)
-            ? pack.removedImages
-            : []
-      };
-
-
-
-    });
-
-    formData.append(
-      'packs',
-      JSON.stringify(packs)
+    this.productPacks = this.mapExistingPacks(
+      Array.isArray((product as EditableProduct).packs)
+        ? (product as EditableProduct).packs!
+        : []
     );
 
-    // ==========================================
-    // COLOR COMBINATIONS
-    // ==========================================
+    this.colorCombinations =
+      this.mapExistingCombinations(
+        Array.isArray(
+          (product as EditableProduct).colorCombinations
+        )
+          ? (product as EditableProduct)
+              .colorCombinations!
+          : []
+      );
 
-    // ==========================================
-    // COLOR COMBINATIONS
-    // ==========================================
+    this.selectedFiles = [];
+    this.removedImages = [];
+
+    this.existingImages =
+      Array.isArray((product as any).images) &&
+      (product as any).images.length
+        ? [...(product as any).images]
+        : product.image
+          ? [product.image]
+          : [];
+
+    this.imagePreviews = [...this.existingImages];
+
+    this.clearLegacyImageState();
+  }
+
+  private resolveProductMode(product: Product): ProductMode {
+    const persistedMode = (product as any)?.productMode;
+
+    if (
+      persistedMode === 'single' ||
+      persistedMode === 'pack'
+    ) {
+      return persistedMode;
+    }
+
+    return Array.isArray((product as any)?.packs) &&
+      (product as any).packs.length > 0
+      ? 'pack'
+      : 'single';
+  }
+
+  private mapExistingPacks(
+    packs: any[]
+  ): ProductPackEditor[] {
+    return packs.map((pack: any, index: number) => {
+      const existingImages =
+        Array.isArray(pack?.images)
+          ? [...pack.images]
+          : pack?.image
+            ? [pack.image]
+            : [];
+
+      return {
+        id:
+          String(pack?.id || '') ||
+          `pack-${Date.now()}-${index}`,
+
+        name: String(pack?.name || ''),
+
+        quantity: Math.max(
+          1,
+          this.toNumber(pack?.quantity) || 1
+        ),
+
+        price: this.toNumber(pack?.price),
+
+        originalPrice: this.toNumber(
+          pack?.originalPrice
+        ),
+
+        discount: this.toNumber(pack?.discount),
+
+        colors: this.normalizeStringArray(
+          pack?.colors
+        ),
+
+        sizes: this.normalizeStringArray(
+          pack?.sizes
+        ),
+
+        files: [],
+
+        previews: [...existingImages],
+
+        existingImages: [...existingImages],
+
+        removedImages: []
+      };
+    });
+  }
+
+  private mapExistingCombinations(
+    combinations: any[]
+  ): ColorCombinationEditor[] {
+    return combinations.map(
+      (combination: any, index: number) => {
+        const existingImages =
+          Array.isArray(combination?.images)
+            ? [...combination.images]
+            : combination?.image
+              ? [combination.image]
+              : [];
+
+        return {
+          id:
+            String(combination?.id || '') ||
+            `combination-${Date.now()}-${index}`,
+
+          name: String(
+            combination?.name || ''
+          ),
+
+          colors: this.normalizeStringArray(
+            combination?.colors
+          ),
+
+          files: [],
+
+          previews: [...existingImages],
+
+          existingImages: [...existingImages],
+
+          removedImages: []
+        };
+      }
+    );
+  }
+
+  /* ==========================================================
+     PRODUCT CREATE / UPDATE
+     ========================================================== */
+
+  addProduct(): void {
+    if (!this.validateProductForm()) {
+      return;
+    }
+
+    const formData = this.buildProductFormData(false);
+
+    this.productService
+      .addProduct(formData)
+      .subscribe({
+        next: () => {
+          this.toastr.success(
+            'Product added successfully.',
+            'Success'
+          );
+
+          this.currentPage = 1;
+          this.closeModal();
+          this.loadProducts();
+        },
+        error: (error) => {
+          console.error(
+            'Add product failed:',
+            error
+          );
+
+          this.toastr.error(
+            error?.error?.message ||
+              'Failed to add product.',
+            'Error'
+          );
+        }
+      });
+  }
+
+  updateProduct(): void {
+    if (!this.newProduct._id) {
+      this.toastr.error(
+        'Product ID is missing.',
+        'Error'
+      );
+      return;
+    }
+
+    if (!this.validateProductForm()) {
+      return;
+    }
+
+    const formData = this.buildProductFormData(true);
+
+    this.productService
+      .updateProduct(
+        this.newProduct._id,
+        formData
+      )
+      .subscribe({
+        next: (response: any) => {
+          const updatedProduct =
+            response?.product;
+
+          if (updatedProduct) {
+            const index =
+              this.products.findIndex(
+                product =>
+                  (product._id || product.id) ===
+                  (updatedProduct._id ||
+                    updatedProduct.id)
+              );
+
+            if (index !== -1) {
+              this.products[index] = {
+                ...this.products[index],
+                ...updatedProduct
+              };
+            }
+          }
+
+          this.toastr.success(
+            'Product updated successfully.',
+            'Success'
+          );
+
+          this.currentPage = 1;
+          this.closeModal();
+          this.loadProducts();
+        },
+        error: (error) => {
+          console.error(
+            'Update product failed:',
+            error
+          );
+
+          this.toastr.error(
+            error?.error?.message ||
+              'Failed to update product.',
+            'Error'
+          );
+        }
+      });
+  }
+
+  private buildProductFormData(
+    isUpdate: boolean
+  ): FormData {
+    const formData = new FormData();
+
+    const isPackProduct =
+      this.newProduct.productMode === 'pack';
+
+    const colors = this.normalizeStringArray(
+      this.newProduct.colors
+    );
+
+    const sizes = this.normalizeStringArray(
+      this.newProduct.sizes
+    );
+
+    const packs = isPackProduct
+      ? this.productPacks.map(pack => ({
+          id: pack.id,
+          name: pack.name.trim() || 'Pack',
+          quantity: Math.max(
+            1,
+            this.toNumber(pack.quantity)
+          ),
+          price: this.toNumber(pack.price),
+          originalPrice: this.toNumber(
+            pack.originalPrice
+          ),
+          discount: this.calculateDiscountValue(
+            pack.price,
+            pack.originalPrice
+          ),
+          colors: this.normalizeStringArray(
+            pack.colors
+          ),
+          sizes: this.normalizeStringArray(
+            pack.sizes
+          ),
+          images: isUpdate
+            ? [...pack.existingImages]
+            : [],
+          image: isUpdate
+            ? pack.existingImages[0] || ''
+            : '',
+          imageCount: pack.files.length,
+          removedImages: isUpdate
+            ? [...pack.removedImages]
+            : []
+        }))
+      : [];
 
     const combinations =
       this.colorCombinations.map(
-        (combination: any) => {
-
-          const existingImages =
-            Array.isArray(combination.existingImages)
-              ? combination.existingImages
-              : [];
-
-          const newImageCount =
-            Array.isArray(combination.files)
-              ? combination.files.length
-              : 0;
-
-          return {
-
-            id: combination.id,
-
-            name:
-              combination.name?.trim() ||
-              'Color Combination',
-
-            colors:
-              Array.isArray(combination.colors)
-                ? combination.colors
-                : [],
-
-            // Existing combination images
-            images: existingImages,
-
-            image:
-              existingImages[0] || '',
-
-            // New images selected during edit
-            imageCount: newImageCount,
-
-            // Existing images removed during edit
-            removedImages:
-              Array.isArray(combination.removedImages)
-                ? combination.removedImages
-                : []
-          };
-
-        }
+        combination => ({
+          id: combination.id,
+          name:
+            combination.name.trim() ||
+            'Color Combination',
+          colors:
+            this.normalizeStringArray(
+              combination.colors
+            ),
+          images: isUpdate
+            ? [...combination.existingImages]
+            : [],
+          image: isUpdate
+            ? combination.existingImages[0] || ''
+            : '',
+          imageCount: combination.files.length,
+          removedImages: isUpdate
+            ? [...combination.removedImages]
+            : []
+        })
       );
 
     formData.append(
-      'colorCombinations',
-      JSON.stringify(combinations)
+      'name',
+      this.newProduct.name?.trim() || ''
     );
 
-    console.log(
-      'COLOR COMBINATIONS BEING SENT:',
-      combinations
+    formData.append(
+      'productMode',
+      this.newProduct.productMode
     );
 
-    console.log(
-      'GENERIC PACKS BEING SENT:',
-      packs
+    formData.append(
+      'price',
+      String(this.toNumber(this.newProduct.price))
     );
 
-    formData.append('name', this.newProduct.name || '');
-    formData.append('price', String(this.newProduct.price || 0));
-    formData.append('category', this.newProduct.category || '');
-    formData.append('stock', String(this.newProduct.stock || 0));
-    formData.append('description', this.newProduct.description || '');
-    formData.append('fabric', this.newProduct.fabric || '');
-    formData.append('type', this.newProduct.type || '');
+    formData.append(
+      'originalPrice',
+      String(
+        this.toNumber(
+          this.newProduct.originalPrice
+        )
+      )
+    );
 
+    formData.append(
+      'discount',
+      String(
+        this.calculateDiscountValue(
+          this.newProduct.price,
+          this.newProduct.originalPrice
+        )
+      )
+    );
 
+    formData.append(
+      'category',
+      this.newProduct.category?.trim() || ''
+    );
 
-    const colors = (this.newProduct.availableColors || '')
-      .split(',')
-      .map((color: string) => color.trim())
-      .filter((color: string) =>
-        color && color.toLowerCase() !== 'undefined'
-      );
+    formData.append(
+      'brand',
+      this.newProduct.brand?.trim() || ''
+    );
 
-    console.log('COLORS BEING SENT:', colors);
+    formData.append(
+      'description',
+      this.newProduct.description?.trim() || ''
+    );
 
+    formData.append(
+      'fabric',
+      this.newProduct.fabric?.trim() || ''
+    );
+
+    formData.append(
+      'type',
+      this.newProduct.type?.trim() || ''
+    );
+
+    formData.append(
+      'sku',
+      this.newProduct.sku?.trim() || ''
+    );
+
+    formData.append(
+      'stock',
+      String(
+        Math.max(
+          0,
+          this.toNumber(this.newProduct.stock)
+        )
+      )
+    );
+
+    formData.append(
+      'showOnHome',
+      String(
+        this.newProduct.showOnHome ?? true
+      )
+    );
+
+    /*
+     * `colors` is the source of truth.
+     *
+     * `availableColors` is also sent for backward
+     * compatibility with the current backend.
+     */
     formData.append(
       'colors',
       JSON.stringify(colors)
     );
 
-    const sizes = (this.newProduct.sizes || [])
-      .flatMap((size: string) => size.split(','))
-      .map((size: string) => size.trim())
-      .filter((size: string) => size);
-    console.log('SIZES BEING SENT:', sizes);
-
+    formData.append(
+      'availableColors',
+      colors.join(', ')
+    );
 
     formData.append(
       'sizes',
       JSON.stringify(sizes)
     );
 
-
     formData.append(
-      'showOnHome',
-      String(this.newProduct.showOnHome ?? true)
+      'packs',
+      JSON.stringify(packs)
     );
 
     formData.append(
-      'discount',
-      String(this.newProduct.discount || 0)
+      'colorCombinations',
+      JSON.stringify(combinations)
     );
 
-    formData.append(
-      'sku',
-      this.newProduct.sku || ''
-    );
-    formData.append(
-      'existingImages',
-      JSON.stringify(
-        this.imagePreviews.filter(image =>
-          image.startsWith('http')
+    /* ========================================================
+       MAIN PRODUCT IMAGES
+       ======================================================== */
+
+    if (isUpdate) {
+      formData.append(
+        'existingImages',
+        JSON.stringify(
+          this.existingImages.filter(
+            image =>
+              !this.removedImages.includes(image)
+          )
         )
-      )
-    );
+      );
 
+      formData.append(
+        'removedImages',
+        JSON.stringify(this.removedImages)
+      );
 
-    // Main image
-    if (this.imagePreviews.length > 0) {
+      const mainImage =
+        this.imagePreviews[0];
 
-      const mainImage = this.imagePreviews[0];
-
-      if (mainImage.startsWith('http')) {
-
+      /*
+       * If the main image is an existing Cloudinary image,
+       * explicitly tell the backend which image is primary.
+       */
+      if (
+        mainImage &&
+        this.isRemoteImage(mainImage)
+      ) {
         formData.append(
           'mainImage',
           mainImage
         );
-
       }
-
+    } else {
+      formData.append(
+        'removedImages',
+        JSON.stringify([])
+      );
     }
-    // IMPORTANT: only append image when user selected a new file
-    if (this.selectedFiles.length > 0) {
 
-      this.selectedFiles.forEach((file) => {
-
-        formData.append('images', file);
-
-      });
-
-    }
-    // ==========================================
-    // GENERIC PACK-WISE IMAGES
-    // ==========================================
-
-    this.productPacks.forEach((pack: any) => {
-
-      if (Array.isArray(pack.files)) {
-
-        pack.files.forEach((file: File) => {
-
-          formData.append('packImages', file);
-
-        });
-
-      }
-
+    /*
+     * New files are appended in the same logical order as
+     * their local previews.
+     */
+    this.selectedFiles.forEach(file => {
+      formData.append('images', file);
     });
 
-    // ==========================================
-    // COLOR COMBINATION IMAGES
-    // ==========================================
+    /* ========================================================
+       PACK IMAGES
+       ======================================================== */
+
+    if (isPackProduct) {
+      this.productPacks.forEach(pack => {
+        pack.files.forEach(file => {
+          formData.append(
+            'packImages',
+            file
+          );
+        });
+      });
+    }
+
+    /* ========================================================
+       COLOR COMBINATION IMAGES
+       ======================================================== */
 
     this.colorCombinations.forEach(
-      (combination: any) => {
-
-        if (Array.isArray(combination.files)) {
-
-          combination.files.forEach(
-            (file: File) => {
-
-              formData.append(
-                'combinationImages',
-                file
-              );
-
-            }
+      combination => {
+        combination.files.forEach(file => {
+          formData.append(
+            'combinationImages',
+            file
           );
+        });
+      }
+    );
 
+    return formData;
+  }
+
+  /* ==========================================================
+     PRODUCT VALIDATION
+     ========================================================== */
+
+  isFormValid(): boolean {
+    return this.validateProductForm();
+  }
+
+  private validateProductForm(): boolean {
+    const name =
+      this.newProduct.name?.trim() || '';
+
+    if (!name) {
+      this.showValidation(
+        'Please enter Product Name.'
+      );
+      return false;
+    }
+
+    const price =
+      this.toNumber(this.newProduct.price);
+
+    if (price <= 0) {
+      this.showValidation(
+        'Please enter a valid Product Price.'
+      );
+      return false;
+    }
+
+    const category =
+      this.newProduct.category?.trim() || '';
+
+    if (!category) {
+      this.showValidation(
+        'Please enter Product Category.'
+      );
+      return false;
+    }
+
+    if (
+      !this.editing &&
+      this.selectedFiles.length === 0
+    ) {
+      this.showValidation(
+        'Please upload a Main Product Image.'
+      );
+      return false;
+    }
+
+    const colors =
+      this.normalizeStringArray(
+        this.newProduct.colors
+      );
+
+    if (colors.length === 0) {
+      this.showValidation(
+        'Please select at least one Available Color.'
+      );
+      return false;
+    }
+
+    const sizes =
+      this.normalizeStringArray(
+        this.newProduct.sizes
+      );
+
+    if (sizes.length === 0) {
+      this.showValidation(
+        'Please select at least one Available Size.'
+      );
+      return false;
+    }
+
+    const originalPrice =
+      this.toNumber(
+        this.newProduct.originalPrice
+      );
+
+    if (
+      originalPrice > 0 &&
+      originalPrice < price
+    ) {
+      this.showValidation(
+        'Original Price must be greater than or equal to Product Price.'
+      );
+      return false;
+    }
+
+    if (
+      this.toNumber(this.newProduct.stock) < 0
+    ) {
+      this.showValidation(
+        'Please enter a valid Stock quantity.'
+      );
+      return false;
+    }
+
+    if (
+      this.newProduct.productMode === 'pack'
+    ) {
+      if (this.productPacks.length === 0) {
+        this.showValidation(
+          'Please add at least one pack for a Pack Product.'
+        );
+        return false;
+      }
+
+      for (
+        let index = 0;
+        index < this.productPacks.length;
+        index++
+      ) {
+        const pack =
+          this.productPacks[index];
+
+        if (!pack.name.trim()) {
+          this.showValidation(
+            `Please enter a name for Pack ${index + 1}.`
+          );
+          return false;
         }
 
+        if (
+          this.toNumber(pack.quantity) <= 0
+        ) {
+          this.showValidation(
+            `Please enter a valid quantity for Pack ${index + 1}.`
+          );
+          return false;
+        }
+
+        if (
+          this.toNumber(pack.price) <= 0
+        ) {
+          this.showValidation(
+            `Please enter a valid selling price for Pack ${index + 1}.`
+          );
+          return false;
+        }
+
+        if (
+          this.toNumber(pack.originalPrice) > 0 &&
+          this.toNumber(pack.originalPrice) <
+            this.toNumber(pack.price)
+        ) {
+          this.showValidation(
+            `Original Price must be greater than or equal to Selling Price for Pack ${index + 1}.`
+          );
+          return false;
+        }
       }
-    );
-
-    this.productService.updateProduct(
-      this.newProduct._id!,
-      formData
-    ).subscribe({
-
-      next: () => {
-
-        this.showModal = false;
-
-        this.loadProducts();
-
-        this.editing = false;
-
-        this.selectedFiles = [];
-
-        this.imagePreviews = [];
-
-        this.newProduct = {
-          name: '',
-          price: 0,
-          image: '',
-          category: '',
-          brand: '',
-          originalPrice: 0,
-          description: '',
-          fabric: '',
-          type: '',
-          sku: '',
-          discount: 0,
-          colors: [],
-          sizes: [],
-          status: 'Active',
-          stock: 0,
-          showOnHome: true,
-          availableColors: ''
-        };
-
-        this.toastr.success(
-          'Product updated successfully.',
-          'Success'
-        );
-
-      },
-
-      error: (err) => {
-
-        console.error(
-          'Update product error:',
-          err
-        );
-
-        this.toastr.error(
-          'Failed to update product.',
-          'Error'
-        );
-
-      }
-
-    });
-
-  }
-
-
-  deleteProduct(id: string) {
-
-    Swal.fire({
-
-      title: 'Delete Product?',
-
-      text: 'This action cannot be undone.',
-
-      icon: 'warning',
-
-      showCancelButton: true,
-
-      confirmButtonColor: '#DC2626',
-
-      cancelButtonColor: '#6B7280',
-
-      confirmButtonText: 'Delete',
-
-      cancelButtonText: 'Cancel'
-
-    }).then((result) => {
-
-      if (result.isConfirmed) {
-
-        this.spinner.show();
-
-        this.productService.deleteProduct(id).subscribe({
-
-          next: () => {
-
-            this.spinner.hide();
-
-            this.loadProducts();
-
-            this.toastr.success(
-
-              'Product deleted successfully.',
-
-              'Deleted'
-
-            );
-
-          },
-
-          error: () => {
-
-            this.spinner.hide();
-
-            this.toastr.error(
-
-
-
-              'Failed to delete product.',
-
-              'Error'
-
-            );
-
-          }
-
-        });
-
-      }
-
-    });
-
-  }
-
-  previousPage() {
-
-    if (this.currentPage > 1) {
-
-      this.currentPage--;
-
-    }
-
-  }
-  nextPage() {
-
-    if (this.currentPage < this.totalPages) {
-
-      this.currentPage++;
-
-    }
-
-  }
-
-  get pages(): number[] {
-
-    return Array.from(
-
-      { length: this.totalPages },
-
-      (_, i) => i + 1
-
-    );
-
-  }
-
-  goToPage(page: number) {
-
-    this.currentPage = page;
-
-  }
-  isFormValid(): boolean {
-
-    // Product Name
-    if (!this.newProduct.name?.trim()) {
-      alert('Please enter Product Name.');
-      return false;
-    }
-
-    // Price
-    if (!this.newProduct.price || this.newProduct.price <= 0) {
-      alert('Please enter a valid Product Price.');
-      return false;
-    }
-
-    // Category
-    if (!this.newProduct.category?.trim()) {
-      alert('Please enter Product Category.');
-      return false;
-    }
-
-    // Main Image - only required for new product
-    if (!this.editing && this.selectedFiles.length === 0) {
-      alert('Please upload a Main Product Image.');
-      return false;
-    }
-
-    // Colors
-    if (!this.newProduct.colors?.length) {
-      alert('Please select at least one Available Color.');
-      return false;
-    }
-
-    // Sizes
-    if (!this.newProduct.sizes?.length) {
-      alert('Please select at least one Available Size.');
-      return false;
-    }
-
-    // Stock
-    if (
-      this.newProduct.stock === undefined ||
-      this.newProduct.stock === null ||
-      Number(this.newProduct.stock) < 0
-    ) {
-      alert('Please enter a valid Stock quantity.');
-      return false;
     }
 
     return true;
   }
-  openAddModal() {
 
-    this.editing = false;
-    this.showModal = true;
-    this.packOnePrice = 0;
-    this.packOneOriginalPrice = 0;
-    this.packOneDiscount = 0;
-
-    this.packThreePrice = 0;
-    this.packThreeOriginalPrice = 0;
-    this.packThreeDiscount = 0;
-
-    this.selectedFiles = [];
-    this.imagePreviews = [];
-    this.existingImages = [];
-    this.removedImages = [];
-    this.newSize = '';
-
-
-    this.newProduct = {
-
-      name: '',
-
-      price: 0,
-
-      image: '',
-
-      category: '',
-
-      brand: '',
-
-      originalPrice: 0,
-
-      description: '',
-
-      fabric: '',
-
-      type: '',
-
-      sku: '',
-
-      discount: 0,
-
-      colors: [],
-
-      sizes: [],
-
-      status: 'Active',
-
-      stock: 0,
-
-      showOnHome: true,
-
-      availableColors: ''
-
-    };
-
-    this.productPacks = [];
-    this.colorCombinations = [];
-
-  }
-
-
-  closeModal() {
-
-    this.productPacks = [];
-    this.colorCombinations = [];
-    this.showModal = false;
-
-    this.packOnePrice = 0;
-    this.packOneOriginalPrice = 0;
-    this.packOneDiscount = 0;
-
-    this.packThreePrice = 0;
-    this.packThreeOriginalPrice = 0;
-    this.packThreeDiscount = 0;
-
-    this.selectedFiles = [];
-    this.imagePreviews = [];
-
-    this.existingImages = [];
-    this.removedImages = [];
-
-    this.newSize = '';
-
-    this.newProduct = {
-      name: '',
-      price: 0,
-      originalPrice: 0,
-      image: '',
-      category: '',
-      brand: '',
-      description: '',
-      fabric: '',
-      type: '',
-      sku: '',
-      discount: 0,
-      colors: [],
-      sizes: [],
-      status: 'Active',
-      stock: 0,
-      showOnHome: true,
-      availableColors: ''
-    };
-
-  }
-
-  toggleColor(color: string) {
-
-    if (!this.newProduct.colors) {
-      this.newProduct.colors = [];
-    }
-
-    const index = this.newProduct.colors.indexOf(color);
-
-    if (index > -1) {
-
-      this.newProduct.colors.splice(index, 1);
-
-    } else {
-
-      this.newProduct.colors.push(color);
-
-    }
-
-  }
-
-  onFilesSelected(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    const files = Array.from(input.files);
-
-    // Maximum 5 images
-    if (files.length > 5) {
-
-      this.toastr.warning(
-        'You can upload maximum 5 images.',
-        'Image Limit'
-      );
-
-      return;
-    }
-
-    // Reset previous selection
-    this.selectedFiles = [];
-    this.imagePreviews = [];
-
-    files.forEach((file) => {
-
-      // 5MB validation
-      if (file.size > 5 * 1024 * 1024) {
-
-        this.toastr.warning(
-          `${file.name} is larger than 5MB.`,
-          'File Too Large'
-        );
-
-        return;
-      }
-
-      this.selectedFiles.push(file);
-
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        this.imagePreviews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-  }
-
-
-
-  createSalesChart(): void {
-
-    if (!this.salesCanvas?.nativeElement) {
-      return;
-    }
-
-    if (this.salesChart) {
-      this.salesChart.destroy();
-    }
-
-    const months = [
-      'Jan', 'Feb', 'Mar', 'Apr',
-      'May', 'Jun', 'Jul', 'Aug',
-      'Sep', 'Oct', 'Nov', 'Dec'
-    ];
-
-    const labels =
-      (this.dashboardData.monthlySales || []).map(
-        (item: any) =>
-          months[(item?._id?.month ?? 1) - 1]
-      );
-
-    const revenue =
-      (this.dashboardData.monthlySales || []).map(
-        (item: any) => item?.revenue ?? 0
-      );
-
-    this.salesChart = new Chart(
-      this.salesCanvas.nativeElement,
-      {
-        type: 'line',
-
-        data: {
-          labels,
-
-          datasets: [
-            {
-              label: 'Monthly Revenue',
-              data: revenue,
-
-              borderColor: '#7C3AED',
-
-              backgroundColor:
-                'rgba(124,58,237,0.15)',
-
-              fill: true,
-
-              tension: 0.4
-            }
-          ]
-        },
-
-        options: {
-          responsive: true,
-          maintainAspectRatio: false
-        }
-      }
+  private showValidation(message: string): void {
+    this.toastr.warning(
+      message,
+      'Validation'
     );
   }
 
-  downloadInvoice(order: any): void {
-    this.invoiceService.generateInvoice(order);
-  }
+  /* ==========================================================
+     PRICING
+     ========================================================== */
 
-  onGalleryFilesSelected(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    const selectedFiles = Array.from(input.files);
-
-    // Maximum 5 images
-    if (selectedFiles.length > 5) {
-
-      alert('You can upload maximum 5 images.');
-
-      return;
-    }
-
-    // Validate files
-    const invalidFile = selectedFiles.find(file =>
-      !file.type.startsWith('image/')
-    );
-
-    if (invalidFile) {
-
-      alert('Please select only image files.');
-
-      return;
-    }
-
-    // Validate size - 5MB each
-    const largeFile = selectedFiles.find(file =>
-      file.size > 5 * 1024 * 1024
-    );
-
-    if (largeFile) {
-
-      alert('Each image must be less than 5MB.');
-
-      return;
-    }
-
-
-
-
-
-    this.imagePreviews = [];
-
-    selectedFiles.forEach(file => {
-
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        this.imagePreviews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-  }
-
-
-  // ==========================================
-  // SINGLE VEST PACK IMAGES
-  // ==========================================
-
-  onSingleVestImagesSelected(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    const files = Array.from(input.files);
-
-    // Maximum 5 images
-    if (this.singleVestFiles.length + files.length > 5) {
-
-      this.toastr.warning(
-        'You can upload maximum 5 Single Vest photos.',
-        'Image Limit'
+  calculateDiscount(): void {
+    this.newProduct.discount =
+      this.calculateDiscountValue(
+        this.newProduct.price,
+        this.newProduct.originalPrice
       );
+  }
 
-      input.value = '';
+  calculateProductDiscount(): void {
+    this.calculateDiscount();
+  }
+
+  calculatePackDiscount(
+    pack: ProductPackEditor
+  ): void {
+    if (!pack) {
       return;
     }
 
-    files.forEach((file) => {
-
-      // Image validation
-      if (!file.type.startsWith('image/')) {
-
-        this.toastr.warning(
-          `${file.name} is not a valid image.`,
-          'Invalid File'
-        );
-
-        return;
-      }
-
-      // 5MB validation
-      if (file.size > 5 * 1024 * 1024) {
-
-        this.toastr.warning(
-          `${file.name} is larger than 5MB.`,
-          'File Too Large'
-        );
-
-        return;
-      }
-
-      // Save actual file
-      this.singleVestFiles.push(file);
-
-      // Create preview
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        this.singleVestPreviews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-    // Allow same file to be selected again
-    input.value = '';
-
+    pack.discount =
+      this.calculateDiscountValue(
+        pack.price,
+        pack.originalPrice
+      );
   }
 
+  private calculateDiscountValue(
+    price: unknown,
+    originalPrice: unknown
+  ): number {
+    const sellingPrice =
+      this.toNumber(price);
 
-  removeSingleVestImage(index: number): void {
+    const mrp =
+      this.toNumber(originalPrice);
 
     if (
-      index < 0 ||
-      index >= this.singleVestPreviews.length
+      sellingPrice > 0 &&
+      mrp > sellingPrice
     ) {
-      return;
+      return Math.round(
+        ((mrp - sellingPrice) / mrp) * 100
+      );
     }
 
-    this.singleVestFiles.splice(index, 1);
-
-    this.singleVestPreviews.splice(index, 1);
-
+    return 0;
   }
 
+  /* ==========================================================
+     COLORS / SIZES
+     ========================================================== */
 
-
-  // ==========================================
-  // 3 VEST PACK IMAGES
-  // ==========================================
-
-  onThreePackImagesSelected(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
+  toggleColor(color: string): void {
+    if (!color) {
       return;
     }
 
-    const files = Array.from(input.files);
-
-    // Maximum 5 images
-    if (this.threePackFiles.length + files.length > 5) {
-
-      this.toastr.warning(
-        'You can upload maximum 5 Three Pack photos.',
-        'Image Limit'
+    const colors =
+      this.normalizeStringArray(
+        this.newProduct.colors
       );
 
-      input.value = '';
-      return;
-    }
+    const index =
+      colors.indexOf(color);
 
-    files.forEach((file) => {
-
-      // Image validation
-      if (!file.type.startsWith('image/')) {
-
-        this.toastr.warning(
-          `${file.name} is not a valid image.`,
-          'Invalid File'
-        );
-
-        return;
-      }
-
-      // 5MB validation
-      if (file.size > 5 * 1024 * 1024) {
-
-        this.toastr.warning(
-          `${file.name} is larger than 5MB.`,
-          'File Too Large'
-        );
-
-        return;
-      }
-
-      // Save actual file
-      this.threePackFiles.push(file);
-
-      // Create preview
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        this.threePackPreviews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-    // Allow same file to be selected again
-    input.value = '';
-
-  }
-
-
-  removeThreePackImage(index: number): void {
-
-    if (
-      index < 0 ||
-      index >= this.threePackPreviews.length
-    ) {
-      return;
-    }
-
-    this.threePackFiles.splice(index, 1);
-
-    this.threePackPreviews.splice(index, 1);
-
-  }
-
-  removeGalleryImage(index: number): void {
-
-    const image = this.imagePreviews[index];
-
-    if (!image) {
-      return;
-    }
-
-    // Check if this image already exists in Cloudinary
-    const isExistingImage =
-      this.existingImages.includes(image);
-
-    if (isExistingImage) {
-
-      // Existing image ko delete list mein daalo
-      this.removedImages.push(image);
-
-      // Existing images list se hatao
-      this.existingImages =
-        this.existingImages.filter(
-          img => img !== image
-        );
-
+    if (index >= 0) {
+      colors.splice(index, 1);
     } else {
-
-      // Ye NEW image hai jo abhi computer se select hui hai
-
-      const newFileIndex =
-        this.imagePreviews
-          .slice(0, index)
-          .filter(
-            img => !this.existingImages.includes(img)
-          )
-          .length;
-
-      this.selectedFiles.splice(
-        newFileIndex,
-        1
-      );
+      colors.push(color);
     }
 
-    // Screen se image remove karo
-    this.imagePreviews.splice(index, 1);
+    this.newProduct.colors = colors;
+    this.selectedColors = [...colors];
 
-  }
-
-  onGalleryImagesSelected(event: Event): void {
-
-    const input = event.target as HTMLInputElement;
-
-    if (!input.files || input.files.length === 0) {
-      return;
-    }
-
-    const files = Array.from(input.files);
-
-    // Maximum 5 total images
-    if (this.imagePreviews.length + files.length > 5) {
-      alert('You can upload maximum 5 product images.');
-      input.value = '';
-      return;
-    }
-
-    files.forEach((file) => {
-
-      if (!file.type.startsWith('image/')) {
-        return;
-      }
-
-      // IMPORTANT
-      // Actual file ko save karo
-      this.selectedFiles.push(file);
-
-      const reader = new FileReader();
-
-      reader.onload = () => {
-
-        this.imagePreviews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-    input.value = '';
-  }
-
-
-  removeImage(index: number): void {
-
-    const image = this.imagePreviews[index];
-
-    if (!image) {
-      return;
-    }
-
-    // Existing Cloudinary image
-    if (image.startsWith('http')) {
-
-      this.removedImages.push(image);
-
-    }
-    // Newly selected local image
-    else {
-
-      const localFileIndex = this.imagePreviews
-        .slice(0, index)
-        .filter(img => !img.startsWith('http'))
-        .length;
-
-      this.selectedFiles.splice(localFileIndex, 1);
-    }
-
-    // Remove from UI
-    this.imagePreviews.splice(index, 1);
-
+    /*
+     * Keep the legacy backend field synchronized.
+     */
+    this.newProduct.availableColors =
+      colors.join(', ');
   }
 
   toggleSize(size: string): void {
-
-    const currentSizes = Array.isArray(this.newProduct.sizes)
-      ? [...this.newProduct.sizes]
-      : [];
-
-    if (currentSizes.includes(size)) {
-
-      this.newProduct.sizes =
-        currentSizes.filter(s => s !== size);
-
-    } else {
-
-      this.newProduct.sizes = [
-        ...currentSizes,
-        size
-      ];
+    if (!size) {
+      return;
     }
 
-    // Keep selectedSizes in sync
-    this.selectedSizes = [...this.newProduct.sizes];
+    const sizes =
+      this.normalizeStringArray(
+        this.newProduct.sizes
+      );
 
-    console.log('Selected Sizes:', this.newProduct.sizes);
+    const index =
+      sizes.indexOf(size);
+
+    if (index >= 0) {
+      sizes.splice(index, 1);
+    } else {
+      sizes.push(size);
+    }
+
+    this.newProduct.sizes = sizes;
+    this.selectedSizes = [...sizes];
+  }
+
+  addSize(): void {
+    const size =
+      this.newSize
+        .trim()
+        .toUpperCase();
+
+    if (!size) {
+      return;
+    }
+
+    const sizes =
+      this.normalizeStringArray(
+        this.newProduct.sizes
+      );
+
+    if (!sizes.includes(size)) {
+      sizes.push(size);
+    }
+
+    this.newProduct.sizes = sizes;
+    this.selectedSizes = [...sizes];
+    this.newSize = '';
+  }
+
+  removeSize(index: number): void {
+    const sizes =
+      this.normalizeStringArray(
+        this.newProduct.sizes
+      );
+
+    if (
+      index < 0 ||
+      index >= sizes.length
+    ) {
+      return;
+    }
+
+    sizes.splice(index, 1);
+
+    this.newProduct.sizes = sizes;
+    this.selectedSizes = [...sizes];
   }
 
   getColorValue(color: string): string {
-
-    const colorMap: { [key: string]: string } = {
-
+    const colorMap: Record<string, string> = {
       Black: '#000000',
       White: '#ffffff',
       Grey: '#808080',
@@ -2309,51 +1723,59 @@ export class Admin implements OnInit, AfterViewInit {
       Green: '#16a34a',
       Navy: '#0f172a',
       Beige: '#d6c3a5'
-
     };
 
     return colorMap[color] || '#e5e7eb';
   }
 
+  /* ==========================================================
+     PRODUCT MODE
+     ========================================================== */
 
-  // ==========================================
-  // GENERIC PACK BUILDER METHODS
-  // ==========================================
-
-  addPack(): void {
-
-    const pack = {
-      id: 'pack-' + Date.now(),
-
-      name: '',
-
-      quantity: 1,
-
-      price: 0,
-
-      originalPrice: 0,
-
-      discount: 0,
-
-      colors: [],
-
-      sizes: [],
-
-      files: [] as File[],
-
-      previews: [] as string[]
-    };
-
-    this.productPacks.push(pack);
+  onProductModeChange(): void {
+    if (
+      this.newProduct.productMode === 'single'
+    ) {
+      /*
+       * Single products must never retain stale pack
+       * configuration.
+       */
+      this.productPacks = [];
+    }
   }
 
+  /* ==========================================================
+     PRODUCT PACK BUILDER
+     ========================================================== */
 
-  // ==========================================
-  // REMOVE PACK
-  // ==========================================
+  addPack(): void {
+    if (
+      this.newProduct.productMode !== 'pack'
+    ) {
+      this.toastr.info(
+        'Switch Product Mode to "Pack Product" before adding a pack.',
+        'Pack Builder'
+      );
+      return;
+    }
+
+    this.productPacks.push({
+      id: this.createEditorId('pack'),
+      name: '',
+      quantity: 1,
+      price: 0,
+      originalPrice: 0,
+      discount: 0,
+      colors: [],
+      sizes: [],
+      files: [],
+      previews: [],
+      existingImages: [],
+      removedImages: []
+    });
+  }
 
   removePack(index: number): void {
-
     if (
       index < 0 ||
       index >= this.productPacks.length
@@ -2364,166 +1786,95 @@ export class Admin implements OnInit, AfterViewInit {
     this.productPacks.splice(index, 1);
   }
 
-
-  // ==========================================
-  // PACK COLOR
-  // ==========================================
-
   togglePackColor(
-    pack: any,
+    pack: ProductPackEditor,
     color: string
   ): void {
-
-    if (!pack.colors) {
-      pack.colors = [];
+    if (!pack || !color) {
+      return;
     }
 
-    const index = pack.colors.indexOf(color);
+    const index =
+      pack.colors.indexOf(color);
 
-    if (index > -1) {
-
+    if (index >= 0) {
       pack.colors.splice(index, 1);
-
     } else {
-
       pack.colors.push(color);
-
     }
   }
-
-
-  // ==========================================
-  // PACK SIZE
-  // ==========================================
 
   togglePackSize(
-    pack: any,
+    pack: ProductPackEditor,
     size: string
   ): void {
-
-    if (!pack.sizes) {
-      pack.sizes = [];
+    if (!pack || !size) {
+      return;
     }
 
-    const index = pack.sizes.indexOf(size);
+    const index =
+      pack.sizes.indexOf(size);
 
-    if (index > -1) {
-
+    if (index >= 0) {
       pack.sizes.splice(index, 1);
-
     } else {
-
       pack.sizes.push(size);
-
     }
   }
 
-
-  // ==========================================
-  // PACK IMAGES
-  // ==========================================
+  /* ==========================================================
+     PACK IMAGE MANAGEMENT
+     ========================================================== */
 
   onPackImagesSelected(
     event: Event,
     packIndex: number
   ): void {
-
     const input =
       event.target as HTMLInputElement;
-
-    if (
-      !input.files ||
-      input.files.length === 0
-    ) {
-      return;
-    }
 
     const pack =
       this.productPacks[packIndex];
 
-    if (!pack) {
+    if (
+      !input?.files ||
+      input.files.length === 0 ||
+      !pack
+    ) {
       return;
     }
-
-    if (!pack.files) {
-      pack.files = [];
-    }
-
-    if (!pack.previews) {
-      pack.previews = [];
-    }
-
 
     const files =
       Array.from(input.files);
 
+    const currentCount =
+      pack.previews.length;
 
-    // Maximum 5 photos per pack
     if (
-      pack.files.length + files.length > 5
+      currentCount + files.length > 5
     ) {
-
       this.toastr.warning(
         'Maximum 5 photos allowed per pack.',
         'Image Limit'
       );
-
       input.value = '';
-
       return;
     }
 
-
-    files.forEach((file: File) => {
-
-      // Image validation
-      if (!file.type.startsWith('image/')) {
-
-        this.toastr.warning(
-          `${file.name} is not a valid image.`,
-          'Invalid File'
-        );
-
+    files.forEach(file => {
+      if (!this.validateImageFile(file)) {
         return;
       }
 
-
-      // 5MB validation
-      if (
-        file.size > 5 * 1024 * 1024
-      ) {
-
-        this.toastr.warning(
-          `${file.name} is larger than 5MB.`,
-          'File Too Large'
-        );
-
-        return;
-      }
-
-
-      // Save actual file
       pack.files.push(file);
 
-
-      // Create preview
-      const reader =
-        new FileReader();
-
-      reader.onload = () => {
-
-        pack.previews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
+      this.readFileAsDataUrl(file).then(
+        preview => {
+          pack.previews.push(preview);
+        }
+      );
     });
 
-
-    // Allow same file again
     input.value = '';
   }
 
@@ -2531,114 +1882,74 @@ export class Admin implements OnInit, AfterViewInit {
     packIndex: number,
     imageIndex: number
   ): void {
-
-    const pack = this.productPacks[packIndex];
+    const pack =
+      this.productPacks[packIndex];
 
     if (!pack) {
       return;
     }
 
-    const image = pack.previews?.[imageIndex];
+    const image =
+      pack.previews[imageIndex];
 
     if (!image) {
       return;
     }
 
-    // ==========================================
-    // EXISTING IMAGE
-    // ==========================================
-
     if (
-      image.startsWith('http') &&
-      Array.isArray(pack.existingImages)
+      this.isRemoteImage(image)
     ) {
-
-      pack.existingImages =
-        pack.existingImages.filter(
-          (existingImage: string) =>
-            existingImage !== image
+      this.removeExistingImage(
+        image,
+        pack.existingImages,
+        pack.removedImages
+      );
+    } else {
+      const newFileIndex =
+        this.getLocalFileIndex(
+          pack.previews,
+          pack.existingImages,
+          imageIndex
         );
 
-      if (!Array.isArray(pack.removedImages)) {
-        pack.removedImages = [];
-      }
-
-      pack.removedImages.push(image);
-    }
-
-    // ==========================================
-    // REMOVE FROM PREVIEW
-    // ==========================================
-
-    pack.previews =
-      pack.previews.filter(
-        (_: string, index: number) =>
-          index !== imageIndex
-      );
-
-    // ==========================================
-    // NEWLY SELECTED FILE
-    // ==========================================
-
-    if (
-      Array.isArray(pack.files) &&
-      !image.startsWith('http')
-    ) {
-
-      const fileIndex =
-        imageIndex - pack.existingImages.length;
-
       if (
-        fileIndex >= 0 &&
-        fileIndex < pack.files.length
+        newFileIndex >= 0 &&
+        newFileIndex < pack.files.length
       ) {
-        pack.files.splice(fileIndex, 1);
+        pack.files.splice(
+          newFileIndex,
+          1
+        );
       }
     }
 
-    console.log(
-      'PACK AFTER IMAGE REMOVE:',
-      pack
+    pack.previews.splice(
+      imageIndex,
+      1
     );
   }
 
-
-  // ==========================================
-  // COLOR COMBINATION
-  // ==========================================
+  /* ==========================================================
+     COLOR COMBINATIONS
+     ========================================================== */
 
   addColorCombination(): void {
-
-    const combination = {
-
-      id:
-        'combination-' +
-        Date.now(),
-
+    this.colorCombinations.push({
+      id: this.createEditorId(
+        'combination'
+      ),
       name: '',
-
       colors: [],
-
-      files: [] as File[],
-
-      previews: [] as string[]
-
-    };
-
-    this.colorCombinations.push(
-      combination
-    );
+      files: [],
+      previews: [],
+      existingImages: [],
+      removedImages: []
+    });
   }
-
-
-  // ==========================================
-  // REMOVE COLOR COMBINATION
-  // ==========================================
 
   removeColorCombination(
     index: number
   ): void {
-
     if (
       index < 0 ||
       index >= this.colorCombinations.length
@@ -2652,279 +1963,880 @@ export class Admin implements OnInit, AfterViewInit {
     );
   }
 
-
-  // ==========================================
-  // COMBINATION COLOR
-  // ==========================================
-
   toggleCombinationColor(
-    combination: any,
+    combination: ColorCombinationEditor,
     color: string
   ): void {
-
-    if (!combination.colors) {
-      combination.colors = [];
+    if (!combination || !color) {
+      return;
     }
 
     const index =
       combination.colors.indexOf(color);
 
-    if (index > -1) {
-
+    if (index >= 0) {
       combination.colors.splice(
         index,
         1
       );
-
     } else {
-
-      combination.colors.push(
-        color
-      );
-
+      combination.colors.push(color);
     }
   }
-
-
-  // ==========================================
-  // COMBINATION IMAGES
-  // ==========================================
 
   onCombinationImagesSelected(
     event: Event,
     combinationIndex: number
   ): void {
-
     const input =
       event.target as HTMLInputElement;
 
+    const combination =
+      this.colorCombinations[
+        combinationIndex
+      ];
+
     if (
-      !input.files ||
-      input.files.length === 0
+      !input?.files ||
+      input.files.length === 0 ||
+      !combination
     ) {
       return;
     }
 
+    const files =
+      Array.from(input.files);
+
+    if (
+      combination.previews.length +
+        files.length >
+      5
+    ) {
+      this.toastr.warning(
+        'Maximum 5 photos allowed per combination.',
+        'Image Limit'
+      );
+      input.value = '';
+      return;
+    }
+
+    files.forEach(file => {
+      if (!this.validateImageFile(file)) {
+        return;
+      }
+
+      combination.files.push(file);
+
+      this.readFileAsDataUrl(file).then(
+        preview => {
+          combination.previews.push(
+            preview
+          );
+        }
+      );
+    });
+
+    input.value = '';
+  }
+
+  removeCombinationImage(
+    combinationIndex: number,
+    imageIndex: number
+  ): void {
     const combination =
       this.colorCombinations[
-      combinationIndex
+        combinationIndex
       ];
 
     if (!combination) {
       return;
     }
 
-    if (!combination.files) {
-      combination.files = [];
-    }
-
-    if (!combination.previews) {
-      combination.previews = [];
-    }
-
-
-    const files =
-      Array.from(input.files);
-
-
-    // Maximum 5 photos
-    if (
-      combination.files.length +
-      files.length > 5
-    ) {
-
-      this.toastr.warning(
-        'Maximum 5 photos allowed per combination.',
-        'Image Limit'
-      );
-
-      input.value = '';
-
-      return;
-    }
-
-
-    files.forEach((file: File) => {
-
-      if (!file.type.startsWith('image/')) {
-
-        this.toastr.warning(
-          `${file.name} is not a valid image.`,
-          'Invalid File'
-        );
-
-        return;
-      }
-
-
-      if (
-        file.size > 5 * 1024 * 1024
-      ) {
-
-        this.toastr.warning(
-          `${file.name} is larger than 5MB.`,
-          'File Too Large'
-        );
-
-        return;
-      }
-
-
-      combination.files.push(file);
-
-
-      const reader =
-        new FileReader();
-
-      reader.onload = () => {
-
-        combination.previews.push(
-          reader.result as string
-        );
-
-      };
-
-      reader.readAsDataURL(file);
-
-    });
-
-
-    input.value = '';
-  }
-
-
-  // ==========================================
-  // REMOVE COMBINATION IMAGE
-  // ==========================================
-
-  removeCombinationImage(
-    combinationIndex: number,
-    imageIndex: number
-  ): void {
-
-    const combination =
-      this.colorCombinations[combinationIndex];
-
-    if (!combination) {
-      return;
-    }
-
     const image =
-      combination.previews?.[imageIndex];
+      combination.previews[imageIndex];
 
     if (!image) {
       return;
     }
 
-    // ==========================================
-    // EXISTING IMAGE
-    // ==========================================
-
     if (
-      image.startsWith('http') &&
-      Array.isArray(combination.existingImages)
+      this.isRemoteImage(image)
     ) {
-
-      combination.existingImages =
-        combination.existingImages.filter(
-          (existingImage: string) =>
-            existingImage !== image
+      this.removeExistingImage(
+        image,
+        combination.existingImages,
+        combination.removedImages
+      );
+    } else {
+      const newFileIndex =
+        this.getLocalFileIndex(
+          combination.previews,
+          combination.existingImages,
+          imageIndex
         );
 
       if (
-        !Array.isArray(
-          combination.removedImages
-        )
-      ) {
-        combination.removedImages = [];
-      }
-
-      combination.removedImages.push(image);
-    }
-
-    // ==========================================
-    // REMOVE PREVIEW
-    // ==========================================
-
-    combination.previews =
-      combination.previews.filter(
-        (_: string, index: number) =>
-          index !== imageIndex
-      );
-
-    // ==========================================
-    // NEWLY SELECTED FILE
-    // ==========================================
-
-    if (
-      Array.isArray(combination.files) &&
-      !image.startsWith('http')
-    ) {
-
-      const fileIndex =
-        imageIndex -
-        combination.existingImages.length;
-
-      if (
-        fileIndex >= 0 &&
-        fileIndex < combination.files.length
+        newFileIndex >= 0 &&
+        newFileIndex <
+          combination.files.length
       ) {
         combination.files.splice(
-          fileIndex,
+          newFileIndex,
           1
         );
       }
     }
 
-    console.log(
-      'COMBINATION AFTER IMAGE REMOVE:',
-      combination
+    combination.previews.splice(
+      imageIndex,
+      1
     );
   }
 
-  addSize(): void {
+  /* ==========================================================
+     MAIN PRODUCT IMAGE MANAGEMENT
+     ========================================================== */
 
-    const size = this.newSize.trim().toUpperCase();
+  /**
+   * Used by the Main Product Image input.
+   * The selected image is always placed first.
+   */
+  onMainImageSelected(
+    event: Event
+  ): void {
+    const input =
+      event.target as HTMLInputElement;
 
-    if (!size) {
+    if (
+      !input?.files ||
+      input.files.length === 0
+    ) {
       return;
     }
 
-    if (!this.newProduct.sizes) {
-      this.newProduct.sizes = [];
-    }
+    const file =
+      input.files[0];
 
-    if (this.newProduct.sizes.includes(size)) {
+    if (!this.validateImageFile(file)) {
+      input.value = '';
       return;
     }
 
-    this.newProduct.sizes.push(size);
+    /*
+     * New main image:
+     * - becomes first preview
+     * - becomes first new file
+     */
+    this.selectedFiles.unshift(file);
 
-    this.newSize = '';
+    this.readFileAsDataUrl(file).then(
+      preview => {
+        this.imagePreviews.unshift(
+          preview
+        );
+      }
+    );
+
+    input.value = '';
   }
 
-  removeSize(index: number): void {
+  /**
+   * Used by the Additional Images input.
+   * It appends images and never changes the main image.
+   */
+  onProductImagesSelected(
+    event: Event
+  ): void {
+    const input =
+      event.target as HTMLInputElement;
 
-    if (!this.newProduct.sizes) {
+    if (
+      !input?.files ||
+      input.files.length === 0
+    ) {
       return;
     }
 
-    this.newProduct.sizes.splice(index, 1);
+    const files =
+      Array.from(input.files);
+
+    if (
+      this.imagePreviews.length +
+        files.length >
+      5
+    ) {
+      this.toastr.warning(
+        'You can upload maximum 5 images.',
+        'Image Limit'
+      );
+      input.value = '';
+      return;
+    }
+
+    files.forEach(file => {
+      if (!this.validateImageFile(file)) {
+        return;
+      }
+
+      this.selectedFiles.push(file);
+
+      this.readFileAsDataUrl(file).then(
+        preview => {
+          this.imagePreviews.push(
+            preview
+          );
+        }
+      );
+    });
+
+    input.value = '';
   }
 
+  /**
+   * Remove product image safely while keeping existing
+   * Cloudinary images and new local files separate.
+   */
+  removeImage(index: number): void {
+    if (
+      index < 0 ||
+      index >= this.imagePreviews.length
+    ) {
+      return;
+    }
 
+    const image =
+      this.imagePreviews[index];
+
+    if (this.isRemoteImage(image)) {
+      this.removeExistingImage(
+        image,
+        this.existingImages,
+        this.removedImages
+      );
+    } else {
+      const localFileIndex =
+        this.getLocalFileIndex(
+          this.imagePreviews,
+          this.existingImages,
+          index
+        );
+
+      if (
+        localFileIndex >= 0 &&
+        localFileIndex <
+          this.selectedFiles.length
+      ) {
+        this.selectedFiles.splice(
+          localFileIndex,
+          1
+        );
+      }
+    }
+
+    this.imagePreviews.splice(
+      index,
+      1
+    );
+  }
+
+  /**
+   * Backward-compatible method used by older HTML.
+   */
+  removeProductImage(index: number): void {
+    this.removeImage(index);
+  }
+
+  /**
+   * Set any existing/local preview as the main image.
+   *
+   * If the image is a new local file, the matching file is
+   * moved to the beginning of selectedFiles too.
+   */
   setMainImage(index: number): void {
+    if (
+      index < 0 ||
+      index >= this.imagePreviews.length
+    ) {
+      return;
+    }
 
-    if (index < 0 || index >= this.imagePreviews.length) {
+    if (index === 0) {
       return;
     }
 
     const selectedImage =
       this.imagePreviews[index];
 
-    this.imagePreviews.splice(index, 1);
+    if (
+      !this.isRemoteImage(selectedImage)
+    ) {
+      const localFileIndex =
+        this.getLocalFileIndex(
+          this.imagePreviews,
+          this.existingImages,
+          index
+        );
 
-    this.imagePreviews.unshift(selectedImage);
+      if (
+        localFileIndex >= 0 &&
+        localFileIndex <
+          this.selectedFiles.length
+      ) {
+        const [
+          selectedFile
+        ] =
+          this.selectedFiles.splice(
+            localFileIndex,
+            1
+          );
 
+        this.selectedFiles.unshift(
+          selectedFile
+        );
+      }
+    }
+
+    this.imagePreviews.splice(
+      index,
+      1
+    );
+
+    this.imagePreviews.unshift(
+      selectedImage
+    );
+  }
+
+  /* ==========================================================
+     LEGACY PRODUCT IMAGE METHODS
+     ----------------------------------------------------------
+     Kept as safe aliases so an older template does not break.
+     ========================================================== */
+
+  onFilesSelected(event: Event): void {
+    this.replaceProductImages(event);
+  }
+
+  onGalleryFilesSelected(
+    event: Event
+  ): void {
+    this.replaceProductImages(event);
+  }
+
+  onGalleryImagesSelected(
+    event: Event
+  ): void {
+    this.appendProductImages(event);
+  }
+
+  removeGalleryImage(index: number): void {
+    this.removeImage(index);
+  }
+
+  private replaceProductImages(
+    event: Event
+  ): void {
+    const input =
+      event.target as HTMLInputElement;
+
+    if (
+      !input?.files ||
+      input.files.length === 0
+    ) {
+      return;
+    }
+
+    const files =
+      Array.from(input.files);
+
+    if (files.length > 5) {
+      this.toastr.warning(
+        'You can upload maximum 5 images.',
+        'Image Limit'
+      );
+      input.value = '';
+      return;
+    }
+
+    const validFiles =
+      files.filter(file =>
+        this.validateImageFile(
+          file,
+          false
+        )
+      );
+
+    this.selectedFiles = [];
+    this.imagePreviews = [];
+
+    validFiles.forEach(file => {
+      this.selectedFiles.push(file);
+
+      this.readFileAsDataUrl(file).then(
+        preview => {
+          this.imagePreviews.push(
+            preview
+          );
+        }
+      );
+    });
+
+    input.value = '';
+  }
+
+  private appendProductImages(
+    event: Event
+  ): void {
+    this.onProductImagesSelected(
+      event
+    );
+  }
+
+  /* ==========================================================
+     LEGACY VEST IMAGE METHODS
+     ----------------------------------------------------------
+     These remain only for backwards compatibility.
+     ========================================================== */
+
+  onSingleVestImagesSelected(
+    event: Event
+  ): void {
+    this.handleLegacyImageCollection(
+      event,
+      this.singleVestFiles,
+      this.singleVestPreviews,
+      'Single Vest'
+    );
+  }
+
+  removeSingleVestImage(
+    index: number
+  ): void {
+    this.removeLegacyImage(
+      index,
+      this.singleVestFiles,
+      this.singleVestPreviews
+    );
+  }
+
+  onThreePackImagesSelected(
+    event: Event
+  ): void {
+    this.handleLegacyImageCollection(
+      event,
+      this.threePackFiles,
+      this.threePackPreviews,
+      'Three Pack'
+    );
+  }
+
+  removeThreePackImage(
+    index: number
+  ): void {
+    this.removeLegacyImage(
+      index,
+      this.threePackFiles,
+      this.threePackPreviews
+    );
+  }
+
+  private handleLegacyImageCollection(
+    event: Event,
+    filesCollection: File[],
+    previewCollection: string[],
+    label: string
+  ): void {
+    const input =
+      event.target as HTMLInputElement;
+
+    if (
+      !input?.files ||
+      input.files.length === 0
+    ) {
+      return;
+    }
+
+    const files =
+      Array.from(input.files);
+
+    if (
+      filesCollection.length +
+        files.length >
+      5
+    ) {
+      this.toastr.warning(
+        `Maximum 5 ${label} photos allowed.`,
+        'Image Limit'
+      );
+      input.value = '';
+      return;
+    }
+
+    files.forEach(file => {
+      if (!this.validateImageFile(file)) {
+        return;
+      }
+
+      filesCollection.push(file);
+
+      this.readFileAsDataUrl(file).then(
+        preview => {
+          previewCollection.push(
+            preview
+          );
+        }
+      );
+    });
+
+    input.value = '';
+  }
+
+  private removeLegacyImage(
+    index: number,
+    files: File[],
+    previews: string[]
+  ): void {
+    if (
+      index < 0 ||
+      index >= previews.length
+    ) {
+      return;
+    }
+
+    files.splice(index, 1);
+    previews.splice(index, 1);
+  }
+
+  /* ==========================================================
+     PRODUCT DELETE
+     ========================================================== */
+
+  deleteProduct(id: string): void {
+    if (!id) {
+      return;
+    }
+
+    Swal.fire({
+      title: 'Delete Product?',
+      text: 'This action cannot be undone.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#DC2626',
+      cancelButtonColor: '#6B7280',
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel'
+    }).then(result => {
+      if (!result.isConfirmed) {
+        return;
+      }
+
+      this.spinner.show();
+
+      this.productService
+        .deleteProduct(id)
+        .subscribe({
+          next: () => {
+            this.spinner.hide();
+
+            this.toastr.success(
+              'Product deleted successfully.',
+              'Deleted'
+            );
+
+            this.loadProducts();
+          },
+          error: (error) => {
+            this.spinner.hide();
+
+            console.error(
+              'Product delete failed:',
+              error
+            );
+
+            this.toastr.error(
+              error?.error?.message ||
+                'Failed to delete product.',
+              'Error'
+            );
+          }
+        });
+    });
+  }
+
+  /* ==========================================================
+     SALES CHART
+     ========================================================== */
+
+  createSalesChart(): void {
+    const canvas =
+      this.salesCanvas?.nativeElement;
+
+    if (!canvas) {
+      return;
+    }
+
+    this.salesChart?.destroy();
+
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+
+    const monthlySales =
+      Array.isArray(
+        this.dashboardData.monthlySales
+      )
+        ? this.dashboardData.monthlySales
+        : [];
+
+    const labels = monthlySales.map(
+      item => {
+        const month =
+          this.toNumber(
+            item?._id?.month
+          );
+
+        return (
+          months[month - 1] ||
+          'Unknown'
+        );
+      }
+    );
+
+    const revenue = monthlySales.map(
+      item =>
+        this.toNumber(
+          item?.revenue
+        )
+    );
+
+    this.salesChart = new Chart(
+      canvas,
+      {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'Monthly Revenue',
+              data: revenue,
+              borderColor: '#7C3AED',
+              backgroundColor:
+                'rgba(124,58,237,0.15)',
+              fill: true,
+              tension: 0.4
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      }
+    );
+  }
+
+  /* ==========================================================
+     HELPERS
+     ========================================================== */
+
+  private toNumber(
+    value: unknown
+  ): number {
+    const numberValue =
+      Number(value);
+
+    return Number.isFinite(numberValue)
+      ? numberValue
+      : 0;
+  }
+
+  private normalizeStringArray(
+    value: unknown
+  ): string[] {
+    if (!Array.isArray(value)) {
+      if (
+        typeof value === 'string' &&
+        value.trim()
+      ) {
+        return value
+          .split(',')
+          .map(item => item.trim())
+          .filter(
+            item =>
+              item &&
+              item.toLowerCase() !==
+                'undefined'
+          );
+      }
+
+      return [];
+    }
+
+    return value
+      .flatMap(item =>
+        String(item).split(',')
+      )
+      .map(item => item.trim())
+      .filter(
+        item =>
+          item &&
+          item.toLowerCase() !==
+            'undefined'
+      )
+      .filter(
+        (item, index, array) =>
+          array.indexOf(item) === index
+      );
+  }
+
+  private validateImageFile(
+    file: File,
+    showToast = true
+  ): boolean {
+    if (
+      !file.type.startsWith('image/')
+    ) {
+      if (showToast) {
+        this.toastr.warning(
+          `${file.name} is not a valid image.`,
+          'Invalid File'
+        );
+      }
+      return false;
+    }
+
+    if (
+      file.size >
+      5 * 1024 * 1024
+    ) {
+      if (showToast) {
+        this.toastr.warning(
+          `${file.name} is larger than 5MB.`,
+          'File Too Large'
+        );
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  private readFileAsDataUrl(
+    file: File
+  ): Promise<string> {
+    return new Promise(
+      (resolve, reject) => {
+        const reader =
+          new FileReader();
+
+        reader.onload = () =>
+          resolve(
+            reader.result as string
+          );
+
+        reader.onerror = () =>
+          reject(
+            new Error(
+              `Failed to read ${file.name}`
+            )
+          );
+
+        reader.readAsDataURL(file);
+      }
+    );
+  }
+
+  private isRemoteImage(
+    image: string
+  ): boolean {
+    return /^https?:\/\//i.test(
+      image
+    );
+  }
+
+  private removeExistingImage(
+    image: string,
+    existingImages: string[],
+    removedImages: string[]
+  ): void {
+    const existingIndex =
+      existingImages.indexOf(image);
+
+    if (existingIndex >= 0) {
+      existingImages.splice(
+        existingIndex,
+        1
+      );
+    }
+
+    if (
+      !removedImages.includes(image)
+    ) {
+      removedImages.push(image);
+    }
+  }
+
+  /**
+   * Returns the index of a local file based on the
+   * preview ordering.
+   */
+  private getLocalFileIndex(
+    previews: string[],
+    existingImages: string[],
+    previewIndex: number
+  ): number {
+    let localIndex = 0;
+
+    for (
+      let index = 0;
+      index < previewIndex;
+      index++
+    ) {
+      const preview =
+        previews[index];
+
+      if (
+        !existingImages.includes(
+          preview
+        )
+      ) {
+        localIndex++;
+      }
+    }
+
+    return existingImages.includes(
+      previews[previewIndex]
+    )
+      ? -1
+      : localIndex;
+  }
+
+  private clearLegacyImageState(): void {
+    this.galleryFiles = [];
+    this.galleryPreviews = [];
+
+    this.singleVestFiles = [];
+    this.singleVestPreviews = [];
+
+    this.threePackFiles = [];
+    this.threePackPreviews = [];
+  }
+
+  private createEditorId(
+    prefix: string
+  ): string {
+    return `${prefix}-${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
   }
 }

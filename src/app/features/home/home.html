@@ -157,8 +157,10 @@
                     ₹{{ product.price }}
                 </span>
 
-                <span class="old-price">
-                    ₹1299
+                <span class="old-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
+
+                    ₹{{ product.originalPrice }}
+
                 </span>
 
             </div>

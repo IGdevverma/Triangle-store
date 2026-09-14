@@ -15,9 +15,9 @@ export class ProductService {
 
   private products$?: Observable<any>;
 
-  getProducts(): Observable<any> {
+  getProducts(forceRefresh: boolean = false): Observable<any> {
 
-    if (!this.products$) {
+    if (forceRefresh || !this.products$) {
       this.products$ = this.http
         .get<any>(this.apiUrl)
         .pipe(
@@ -36,7 +36,7 @@ export class ProductService {
   }
 
   addProduct(product: FormData): Observable<Product> {
-
+    this.products$ = undefined;
     return this.http.post<Product>(
 
       this.apiUrl,
@@ -48,6 +48,7 @@ export class ProductService {
   }
 
   updateProduct(id: string, product: FormData) {
+    this.products$ = undefined;
     return this.http.put(
       `${this.apiUrl}/${id}`,
       product
@@ -55,7 +56,7 @@ export class ProductService {
   }
 
   deleteProduct(id: string): Observable<void> {
-
+    this.products$ = undefined;
     return this.http.delete<void>(
 
       `${this.apiUrl}/${id}`

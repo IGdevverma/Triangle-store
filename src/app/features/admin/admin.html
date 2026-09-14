@@ -1,143 +1,87 @@
 <div class="admin-dashboard">
 
-    <!-- Sidebar -->
+    <!-- =========================================================
+         SIDEBAR
+    ========================================================== -->
     <aside class="sidebar">
 
         <div class="logo">
             <img src="assets/images/trianglepng.png" alt="Triangle Sports">
-
         </div>
 
         <ul class="menu">
-            <li [class.active]="activeMenu==='dashboard'" (click)="activeMenu='dashboard'">
 
+            <li [class.active]="activeMenu==='dashboard'"
+                (click)="activeMenu='dashboard'">
                 <i class="fa-solid fa-chart-line"></i>
-
                 Dashboard
-
             </li>
 
-            <li [class.active]="activeMenu==='products'" (click)="activeMenu='products'">
-
+            <li [class.active]="activeMenu==='products'"
+                (click)="activeMenu='products'">
                 <i class="fa-solid fa-box"></i>
-
                 Products
-
             </li>
 
-            <li [class.active]="activeMenu==='categories'" (click)="activeMenu='categories'">
-
+            <li [class.active]="activeMenu==='categories'"
+                (click)="activeMenu='categories'">
                 <i class="fa-solid fa-layer-group"></i>
-
                 Categories
-
             </li>
 
-
-
-            <li [class.active]="activeMenu==='orders'" (click)="activeMenu='orders'">
-
+            <li [class.active]="activeMenu==='orders'"
+                (click)="activeMenu='orders'">
                 <i class="fa-solid fa-cart-shopping"></i>
-
                 Orders
-
             </li>
 
-            <li [class.active]="activeMenu==='customers'" (click)="activeMenu='customers'">
-
+            <li [class.active]="activeMenu==='customers'"
+                (click)="activeMenu='customers'">
                 <i class="fa-solid fa-users"></i>
-
                 Customers
-
             </li>
 
-            <li [class.active]="activeMenu==='quotes'" (click)="activeMenu='quotes'">
-
+            <li [class.active]="activeMenu==='quotes'"
+                (click)="activeMenu='quotes'">
                 <i class="fa-solid fa-file-signature"></i>
-
                 Quotes
-
             </li>
 
-
-
-            <li [class.active]="activeMenu==='settings'" (click)="activeMenu='settings'">
-
+            <li [class.active]="activeMenu==='settings'"
+                (click)="activeMenu='settings'">
                 <i class="fa-solid fa-gear"></i>
-
                 Settings
-
             </li>
+
         </ul>
 
     </aside>
 
-    <!-- Main -->
 
+    <!-- =========================================================
+         MAIN CONTENT
+    ========================================================== -->
     <main class="main-content">
+
+
+        <!-- =====================================================
+             DASHBOARD
+        ====================================================== -->
         <div *ngIf="activeMenu === 'dashboard'">
 
-            <!-- Top Bar -->
-
-            <div class="dashboard-toolbar">
-
-                <div class="search">
-
-                    <i class="fa-solid fa-magnifying-glass"></i>
-
-                    <input type="text" placeholder="Search Products..." [(ngModel)]="searchTerm"
-                        (ngModelChange)="onProductFilterChange()">
-
-                </div>
-
-                <div class="filters">
-
-                    <select [(ngModel)]="selectedStock" (ngModelChange)="onProductFilterChange()">
-
-                        <option>All</option>
-
-                        <option>In Stock</option>
-
-                        <option>Out of Stock</option>
-
-                        <option>Low Stock</option>
-
-                    </select>
-
-                    <select [(ngModel)]="selectedSort">
-
-                        <option>Newest</option>
-
-                        <option>Price Low → High</option>
-
-                        <option>Price High → Low</option>
-
-                        <option>Name A → Z</option>
-
-                        <option>Stock Highest</option>
-
-                    </select>
-
-                </div>
-
-                <button class="add-btn" (click)="openAddModal()">
-
-                    + Add Product
-
-                </button>
-
-            </div>
-
-
+            <!-- Header -->
             <div class="dashboard-header">
 
                 <div>
 
                     <h1>Welcome Back 👋</h1>
 
-                    <p>Here's what's happening in your store today.</p>
+                    <p>
+                        Here's what's happening in your store today.
+                    </p>
 
                 </div>
+
 
                 <div class="today-date">
 
@@ -147,8 +91,8 @@
 
             </div>
 
-            <!-- Cards -->
 
+            <!-- Stats -->
             <div class="stats">
 
                 <div class="card purple">
@@ -159,7 +103,9 @@
 
                     <div class="card-info">
 
-                        <h3>{{ dashboardData.totalProducts }}</h3>
+                        <h3>
+                            {{ dashboardData.totalProducts }}
+                        </h3>
 
                         <p>Total Products</p>
 
@@ -169,6 +115,7 @@
 
                 </div>
 
+
                 <div class="card green">
 
                     <div class="card-icon">
@@ -177,7 +124,9 @@
 
                     <div class="card-info">
 
-                        <h3>₹{{ dashboardData.totalRevenue | number }}</h3>
+                        <h3>
+                            ₹{{ dashboardData.totalRevenue | number }}
+                        </h3>
 
                         <p>Total Revenue</p>
 
@@ -187,6 +136,7 @@
 
                 </div>
 
+
                 <div class="card blue">
 
                     <div class="card-icon">
@@ -195,7 +145,9 @@
 
                     <div class="card-info">
 
-                        <h3>{{ dashboardData.totalUsers }}</h3>
+                        <h3>
+                            {{ dashboardData.totalUsers }}
+                        </h3>
 
                         <p>Total Customers</p>
 
@@ -205,6 +157,7 @@
 
                 </div>
 
+
                 <div class="card orange">
 
                     <div class="card-icon">
@@ -213,7 +166,9 @@
 
                     <div class="card-info">
 
-                        <h3>{{ dashboardData.totalOrders }}</h3>
+                        <h3>
+                            {{ dashboardData.totalOrders }}
+                        </h3>
 
                         <p>Total Orders</p>
 
@@ -223,6 +178,7 @@
 
                 </div>
 
+
                 <div class="card red">
 
                     <div class="card-icon">
@@ -231,7 +187,9 @@
 
                     <div class="card-info">
 
-                        <h3>{{ dashboardData.lowStockProducts }}</h3>
+                        <h3>
+                            {{ dashboardData.lowStockProducts }}
+                        </h3>
 
                         <p>Low Stock</p>
 
@@ -242,7 +200,11 @@
                 </div>
 
             </div>
+
+
+            <!-- Charts -->
             <div class="chart-section">
+
                 <div class="chart-card">
 
                     <div class="chart-header">
@@ -260,6 +222,8 @@
                     </div>
 
                 </div>
+
+
                 <div class="top-products-card">
 
                     <div class="card-header">
@@ -268,42 +232,36 @@
 
                     </div>
 
+
                     <div class="top-product">
 
                         <div>
-
                             <strong>Triangle T-Shirt</strong>
-
                             <p>254 Sales</p>
-
                         </div>
 
                         <span>🥇</span>
 
                     </div>
 
+
                     <div class="top-product">
 
                         <div>
-
                             <strong>Sports Shorts</strong>
-
                             <p>183 Sales</p>
-
                         </div>
 
                         <span>🥈</span>
 
                     </div>
 
+
                     <div class="top-product">
 
                         <div>
-
                             <strong>Cricket Jersey</strong>
-
                             <p>151 Sales</p>
-
                         </div>
 
                         <span>🥉</span>
@@ -311,12 +269,14 @@
                     </div>
 
                 </div>
+
             </div>
 
 
+            <!-- Orders + Low Stock -->
             <div class="dashboard-grid">
 
-                <!-- Low Stock -->
+
                 <div class="recent-orders-card">
 
                     <div class="section-title">
@@ -327,24 +287,32 @@
 
                     </div>
 
-                    <div class="recent-order" *ngFor="let order of orders.slice(0,5)">
+
+                    <div
+                        class="recent-order"
+                        *ngFor="let order of orders.slice(0,5)">
 
                         <div>
 
-                            <h4>{{ order.customerName }}</h4>
+                            <h4>
+                                {{ order.customerName }}
+                            </h4>
 
-                            <small>{{ order.createdAt | date:'dd MMM yyyy' }}</small>
+                            <small>
+                                {{ order.createdAt | date:'dd MMM yyyy' }}
+                            </small>
 
                         </div>
 
+
                         <div class="order-right">
 
-                            <strong>₹{{ order.total }}</strong>
+                            <strong>
+                                ₹{{ order.total }}
+                            </strong>
 
                             <span class="status">
-
                                 {{ order.orderStatus }}
-
                             </span>
 
                         </div>
@@ -352,39 +320,48 @@
                     </div>
 
                 </div>
+
+
                 <div class="low-stock-card">
 
                     <div class="section-title">
 
                         <h3>⚠ Low Stock Products</h3>
 
-                        <span>{{ lowStockProducts.length }}</span>
-
-                    </div>
-
-                    <div class="low-stock-item" *ngFor="let product of lowStockProducts">
-
-                        <div>
-
-                            <h4 class="product-title">
-
-                                {{ product.name }}
-
-                            </h4>
-
-                            <small>{{ product.category }}</small>
-
-                        </div>
-
-                        <span class="danger-badge">
-
-                            {{ product.stock }} Left
-
+                        <span>
+                            {{ lowStockProducts.length }}
                         </span>
 
                     </div>
 
-                    <p *ngIf="lowStockProducts.length===0" class="empty">
+
+                    <div
+                        class="low-stock-item"
+                        *ngFor="let product of lowStockProducts">
+
+                        <div>
+
+                            <h4 class="product-title">
+                                {{ product.name }}
+                            </h4>
+
+                            <small>
+                                {{ product.category }}
+                            </small>
+
+                        </div>
+
+
+                        <span class="danger-badge">
+                            {{ product.stock }} Left
+                        </span>
+
+                    </div>
+
+
+                    <p
+                        *ngIf="lowStockProducts.length===0"
+                        class="empty">
 
                         🎉 All products have sufficient stock
 
@@ -393,28 +370,96 @@
                 </div>
 
             </div>
+
         </div>
-        <!-- Product Table -->
+
+
+
+        <!-- =====================================================
+             PRODUCTS
+        ====================================================== -->
         <div *ngIf="activeMenu === 'products'">
 
             <div class="products-header">
 
-                <div>
-                    <h2>Products Management</h2>
-                    <p>Manage your inventory and products</p>
+                <div class="products-title">
+
+                    <h2>Products</h2>
+
+                    <p>
+                        Manage your inventory, pricing and product options.
+                    </p>
+
                 </div>
+
 
                 <div class="products-header-actions">
 
                     <div class="products-count">
-                        {{ products.length }} Products
+                        {{ filteredProducts.length }} of {{ products.length }} Products
                     </div>
 
+                    <button
+                        type="button"
+                        class="add-btn"
+                        (click)="openAddModal()">
 
+                        <i class="fa-solid fa-plus"></i>
+                        Add Product
+
+                    </button>
 
                 </div>
 
             </div>
+
+
+            <div class="products-toolbar">
+
+                <div class="search">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    <input
+                        type="text"
+                        placeholder="Search products..."
+                        [(ngModel)]="searchTerm"
+                        (ngModelChange)="onProductFilterChange()">
+
+                </div>
+
+
+                <div class="filters">
+
+                    <select
+                        [(ngModel)]="selectedStock"
+                        (ngModelChange)="onProductFilterChange()">
+
+                        <option value="All">All stock</option>
+                        <option value="In Stock">In Stock</option>
+                        <option value="Out of Stock">Out of Stock</option>
+                        <option value="Low Stock">Low Stock</option>
+
+                    </select>
+
+
+                    <select
+                        [(ngModel)]="selectedSort"
+                        (ngModelChange)="onProductFilterChange()">
+
+                        <option value="Newest">Newest</option>
+                        <option value="Price Low → High">Price Low → High</option>
+                        <option value="Price High → Low">Price High → Low</option>
+                        <option value="Name A → Z">Name A → Z</option>
+                        <option value="Stock Highest">Stock Highest</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
             <div class="table-card">
 
                 <table>
@@ -430,25 +475,55 @@
                             <th>Status</th>
                             <th>Actions</th>
 
-
                         </tr>
 
                     </thead>
 
+
                     <tbody>
 
-                        <tr *ngFor="let product of filteredProducts">
+                        <tr *ngIf="filteredProducts.length === 0">
+
+                            <td colspan="6" class="empty-table-state">
+
+                                <div class="empty-state">
+
+                                    <div class="empty-icon">📦</div>
+
+                                    <h3>No products found</h3>
+
+                                    <p>
+                                        Try changing your search or stock filter.
+                                    </p>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                        <tr
+                            *ngFor="let product of filteredProducts">
 
                             <td>
 
                                 <div class="product-info">
-                                    <img class="product-image" [src]="product.image" [alt]="product.name">
+
+                                    <img
+                                        class="product-image"
+                                        [src]="product.image"
+                                        [alt]="product.name">
 
                                     <div>
 
-                                        <h4>{{ product.name }}</h4>
+                                        <h4>
+                                            {{ product.name }}
+                                        </h4>
 
-                                        <small>{{ product.sku || 'TS-101' }}</small>
+                                        <small>
+                                            {{ product.sku || 'TS-101' }}
+                                        </small>
 
                                     </div>
 
@@ -456,13 +531,22 @@
 
                             </td>
 
-                            <td>{{product.category}}</td>
 
-                            <td>₹{{product.price}}</td>
+                            <td>
+                                {{ product.category }}
+                            </td>
+
+
+                            <td>
+                                ₹{{ product.price }}
+                            </td>
+
 
                             <td>
 
-                                <span class="stock-badge" [class.in-stock]="product.stock > 10"
+                                <span
+                                    class="stock-badge"
+                                    [class.in-stock]="product.stock > 10"
                                     [class.low-stock]="product.stock > 0 && product.stock <= 10"
                                     [class.out-stock]="product.stock == 0">
 
@@ -472,12 +556,23 @@
 
                             </td>
 
+
                             <td>
 
-                                <span class="status-badge" [class.active-status]="product.stock > 0"
-                                    [class.inactive-status]="product.stock == 0">
+                                <span
+                                    class="status-badge"
+                                    [class.active-status]="product.status === 'Active' && product.stock > 0"
+                                    [class.inactive-status]="product.status === 'Hidden' || product.stock === 0">
 
-                                    {{ product.stock > 0 ? 'Active' : 'Out of Stock' }}
+                                    {{
+                                        product.status === 'Hidden'
+                                        ? 'Hidden'
+                                        : product.status === 'Draft'
+                                        ? 'Draft'
+                                        : product.stock > 0
+                                        ? 'Active'
+                                        : 'Out of Stock'
+                                    }}
 
                                 </span>
 
@@ -485,21 +580,27 @@
 
 
                             <td>
+
                                 <div class="action-buttons">
-                                    <button class="edit" (click)="editProduct(product)">
+
+                                    <button
+                                        class="edit"
+                                        (click)="editProduct(product)">
 
                                         <i class="fa-solid fa-pen"></i>
 
                                     </button>
 
-                                    <button class="delete" (click)="deleteProduct(product._id!)">
+
+                                    <button
+                                        class="delete"
+                                        (click)="deleteProduct(product._id!)">
 
                                         <i class="fa-solid fa-trash"></i>
 
                                     </button>
 
                                 </div>
-
 
                             </td>
 
@@ -511,45 +612,65 @@
 
             </div>
 
+
+            <!-- Pagination -->
+            <div class="pagination" *ngIf="totalPages > 0">
+
+                <button
+                    class="page-btn"
+                    (click)="previousPage()"
+                    [disabled]="currentPage === 1">
+
+                    <i class="fa-solid fa-chevron-left"></i>
+
+                </button>
+
+
+                <button
+                    *ngFor="let page of pages"
+                    class="page-number"
+                    [class.active]="page === currentPage"
+                    (click)="goToPage(page)">
+
+                    {{ page }}
+
+                </button>
+
+
+                <button
+                    class="page-btn"
+                    (click)="nextPage()"
+                    [disabled]="currentPage === totalPages">
+
+                    <i class="fa-solid fa-chevron-right"></i>
+
+                </button>
+
+            </div>
+
         </div>
-        <!-- Add / Edit Product Modal -->
 
 
 
-        <div class="pagination">
-
-            <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
-
-                <i class="fa-solid fa-chevron-left"></i>
-
-            </button>
-
-            <button *ngFor="let page of pages" class="page-number" [class.active]="page === currentPage"
-                (click)="goToPage(page)">
-
-                {{ page }}
-
-            </button>
-
-            <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
-
-                <i class="fa-solid fa-chevron-right"></i>
-
-            </button>
-
-        </div>
-
-
+        <!-- =====================================================
+             CATEGORIES
+        ====================================================== -->
         <div *ngIf="activeMenu === 'categories'">
 
             <div class="products-header">
 
                 <div>
+
                     <h2>Categories</h2>
-                    <p>Manage product categories</p>
+
+                    <p>
+                        Manage product categories
+                    </p>
+
                 </div>
 
             </div>
+
 
             <div class="table-card">
 
@@ -559,9 +680,17 @@
 
         </div>
 
-        <div *ngIf="activeMenu === 'orders'" class="table-card">
+
+
+        <!-- =====================================================
+             ORDERS
+        ====================================================== -->
+        <div
+            *ngIf="activeMenu === 'orders'"
+            class="table-card">
 
             <h2>Orders</h2>
+
 
             <table>
 
@@ -570,13 +699,9 @@
                     <tr>
 
                         <th>Order ID</th>
-
                         <th>Customer</th>
-
                         <th>Total</th>
-
                         <th>Payment</th>
-
                         <th>Status</th>
                         <th>Invoice</th>
 
@@ -584,50 +709,78 @@
 
                 </thead>
 
+
                 <tbody>
 
                     <tr *ngFor="let order of orders">
 
-                        <td>{{ order._id | slice:0:10 }}...</td>
+                        <td>
+                            {{ order._id | slice:0:10 }}...
+                        </td>
 
                         <td class="customer-name">
                             {{ order.customerName }}
                         </td>
 
-                        <td>₹{{ order.total }}</td>
+                        <td>
+                            ₹{{ order.total }}
+                        </td>
 
                         <td>
-                            <span class="payment-badge" [class.paid]="order.paymentStatus==='Paid'"
+
+                            <span
+                                class="payment-badge"
+                                [class.paid]="order.paymentStatus==='Paid'"
                                 [class.pending]="order.paymentStatus==='Pending'">
 
                                 {{ order.paymentStatus }}
 
                             </span>
+
                         </td>
+
 
                         <td>
 
-                            <select class="status-select" [ngModel]="order.orderStatus"
+                            <select
+                                class="status-select"
+                                [ngModel]="order.orderStatus"
                                 (ngModelChange)="changeOrderStatus(order, $event)">
 
-                                <option value="Processing">Processing</option>
+                                <option value="Processing">
+                                    Processing
+                                </option>
 
-                                <option value="Packed">Packed</option>
+                                <option value="Packed">
+                                    Packed
+                                </option>
 
-                                <option value="Shipped">Shipped</option>
+                                <option value="Shipped">
+                                    Shipped
+                                </option>
 
-                                <option value="Delivered">Delivered</option>
+                                <option value="Delivered">
+                                    Delivered
+                                </option>
 
-                                <option value="Cancelled">Cancelled</option>
+                                <option value="Cancelled">
+                                    Cancelled
+                                </option>
 
                             </select>
 
                         </td>
+
+
                         <td>
 
-                            <button class="invoice-btn" (click)="downloadInvoice(order)">
+                            <button
+                                class="invoice-btn"
+                                (click)="downloadInvoice(order)">
+
                                 <i class="fa-solid fa-file-pdf"></i>
                                 Invoice
+
                             </button>
 
                         </td>
@@ -640,8 +793,12 @@
 
         </div>
 
-        <div *ngIf="activeMenu === 'customers'">
 
+
+        <!-- =====================================================
+             CUSTOMERS
+        ====================================================== -->
+        <div *ngIf="activeMenu === 'customers'">
 
             <div class="content">
 
@@ -649,12 +806,17 @@
                     <h2>Customers</h2>
                 </div>
 
+
                 <div class="search-bar">
 
-                    <input type="text" placeholder="Search customer..." [(ngModel)]="customerSearch"
+                    <input
+                        type="text"
+                        placeholder="Search customer..."
+                        [(ngModel)]="customerSearch"
                         (input)="filterCustomers()">
 
                 </div>
+
 
                 <table class="customer-table">
 
@@ -674,20 +836,29 @@
 
                     </thead>
 
+
                     <tbody>
 
                         <tr *ngFor="let user of filteredCustomers">
 
-                            <td>{{ user.name }}</td>
+                            <td>
+                                {{ user.name }}
+                            </td>
 
-                            <td>{{ user.email }}</td>
+                            <td>
+                                {{ user.email }}
+                            </td>
 
-                            <td>{{ user.phone || '-' }}</td>
+                            <td>
+                                {{ user.phone || '-' }}
+                            </td>
 
 
                             <td>
 
-                                <span class="role-badge" [class.admin]="user.role==='admin'"
+                                <span
+                                    class="role-badge"
+                                    [class.admin]="user.role==='admin'"
                                     [class.user]="user.role==='user'">
 
                                     {{ user.role }}
@@ -696,34 +867,36 @@
 
                             </td>
 
-                            <td>
 
+                            <td>
                                 {{ user.createdAt | date:'dd MMM yyyy' }}
-
                             </td>
+
+
                             <td>
 
-                                <select [ngModel]="user.role" (ngModelChange)="changeRole(user,$event)">
+                                <select
+                                    [ngModel]="user.role"
+                                    (ngModelChange)="changeRole(user,$event)">
 
                                     <option value="user">
-
                                         User
-
                                     </option>
 
                                     <option value="admin">
-
                                         Admin
-
                                     </option>
 
                                 </select>
+
                             </td>
+
 
                             <td>
 
-
-                                <button class="delete-btn" (click)="deleteCustomer(user._id)">
+                                <button
+                                    class="delete-btn"
+                                    (click)="deleteCustomer(user._id)">
 
                                     <i class="fa-solid fa-trash"></i>
 
@@ -740,9 +913,23 @@
             </div>
 
         </div>
+
+
+
+        <!-- =====================================================
+             QUOTES
+        ====================================================== -->
         <div *ngIf="activeMenu==='quotes'">
+
             <app-quotes></app-quotes>
+
         </div>
+
+
+
+        <!-- =====================================================
+             SETTINGS
+        ====================================================== -->
         <div *ngIf="activeMenu === 'settings'">
 
             <div class="products-header">
@@ -751,11 +938,14 @@
 
                     <h2>Settings</h2>
 
-                    <p>Manage your store settings</p>
+                    <p>
+                        Manage your store settings
+                    </p>
 
                 </div>
 
             </div>
+
 
             <div class="table-card">
 
@@ -767,26 +957,33 @@
 
                     <label>Store Name</label>
 
-                    <input type="text" value="Triangle Sports" class="form-control">
+                    <input
+                        type="text"
+                        value="Triangle Sports"
+                        class="form-control">
 
                     <br><br>
 
                     <label>Support Email</label>
 
-                    <input type="email" value="support@trianglesports.com" class="form-control">
+                    <input
+                        type="email"
+                        value="support@trianglesports.com"
+                        class="form-control">
 
                     <br><br>
 
                     <label>Phone Number</label>
 
-                    <input type="text" value="+91 9990180409" class="form-control">
+                    <input
+                        type="text"
+                        value="+91 9990180409"
+                        class="form-control">
 
                     <br><br>
 
                     <button class="save-btn">
-
                         Save Settings
-
                     </button>
 
                 </div>
@@ -794,788 +991,1560 @@
             </div>
 
         </div>
-        <!-- ================= PRODUCT MODAL ================= -->
-        <div class="modal-overlay" *ngIf="showModal">
-            <div class="product-modal" (click)="$event.stopPropagation()">
 
-                <!-- ================= HEADER ================= -->
-                <div class="product-modal-header">
-                    <div>
-                        <span class="modal-step">PRODUCT MANAGEMENT</span>
-                        <h2>{{ editing ? 'Edit Product' : 'Add New Product' }}</h2>
-                        <p>Create a complete product with packs, variants and images.</p>
+
+
+        <!-- =====================================================
+             PRODUCT EDITOR
+        ====================================================== -->
+        <div
+            class="product-page-overlay"
+            *ngIf="showModal">
+
+
+            <div
+                class="shopify-product-page"
+                (click)="$event.stopPropagation()">
+
+
+                <!-- =================================================
+                     PRODUCT HEADER
+                ================================================== -->
+                <header class="shopify-product-header">
+
+                    <div class="product-header-left">
+
+                        <button
+                            type="button"
+                            class="back-product-btn"
+                            (click)="closeModal()">
+
+                            <i class="fa-solid fa-arrow-left"></i>
+
+                        </button>
+
+
+                        <div>
+
+                            <span class="product-breadcrumb">
+                                Products / {{ editing ? 'Edit' : 'New' }}
+                            </span>
+
+                            <h2>
+                                {{ editing ? 'Edit product' : 'Add product' }}
+                            </h2>
+
+                        </div>
+
                     </div>
 
-                    <button type="button" class="close-btn" (click)="closeModal()">
-                        ✕
-                    </button>
-                </div>
+
+                    <div class="product-header-actions">
+
+                        <button
+                            type="button"
+                            class="discard-btn"
+                            (click)="closeModal()">
+
+                            Discard
+
+                        </button>
 
 
-                <!-- ================= BODY ================= -->
-                <div class="product-modal-body">
+                        <button
+                            type="button"
+                            class="top-save-btn"
+                            (click)="editing ? updateProduct() : addProduct()">
 
-                    <!-- ================= 01 BASIC PRODUCT ================= -->
-                    <section class="product-section">
+                            {{ editing ? 'Update' : 'Save' }}
 
-                        <div class="section-heading">
-                            <div class="section-number">01</div>
-                            <div>
-                                <h3>Basic Product</h3>
-                                <p>Enter the basic information about your product.</p>
-                            </div>
-                        </div>
+                        </button>
 
-                        <div class="form-grid">
+                    </div>
 
-                            <!-- Product Name -->
-                            <div class="form-group full-width">
-                                <label>Product Name *</label>
-                                <input type="text" [(ngModel)]="newProduct.name"
-                                    placeholder="e.g. TriCore Performance Vest">
-                            </div>
+                </header>
 
-                            <!-- Category -->
-                            <div class="form-group">
-                                <label>Category *</label>
 
-                                <input type="text" [(ngModel)]="newProduct.category" placeholder="e.g. Vest">
-                            </div>
 
-                            <!-- Brand -->
-                            <div class="form-group">
-                                <label>Brand</label>
+                <!-- =================================================
+                     PRODUCT BODY
+                ================================================== -->
+                <div class="shopify-product-body">
 
-                                <input type="text" [(ngModel)]="newProduct.brand" placeholder="Triangle Sports">
-                            </div>
 
-                            <!-- Product Type -->
-                            <div class="form-group">
-                                <label>Product Type</label>
+                    <!-- =================================================
+                         LEFT COLUMN
+                    ================================================== -->
+                    <div class="product-main-column">
 
-                                <input type="text" [(ngModel)]="newProduct.type" placeholder="Vest / T-Shirt / Socks">
-                            </div>
 
-                            <!-- Fabric -->
-                            <div class="form-group">
-                                <label>Fabric</label>
+                        <!-- =============================================
+                             PRODUCT INFORMATION
+                        ============================================== -->
+                        <section class="shopify-card">
 
-                                <input type="text" [(ngModel)]="newProduct.fabric" placeholder="Polyester / Cotton">
+                            <div class="shopify-card-header">
+
+                                <h3>Product information</h3>
+
+                                <p>
+                                    Add the basic information for your product.
+                                </p>
+
                             </div>
 
-                            <!-- SKU -->
-                            <div class="form-field">
-                                <label>SKU</label>
 
-                                <input type="text" [value]="newProduct.sku || 'Auto generated on save'" readonly>
-
-                                <small>
-                                    SKU will be generated automatically.
-                                </small>
-                            </div>
-
-                            <!-- Description -->
-                            <div class="form-group full-width">
-                                <label>Description</label>
-
-                                <textarea [(ngModel)]="newProduct.description" rows="4"
-                                    placeholder="Write product description...">
-            </textarea>
-                            </div>
-
-                        </div>
-
-                    </section>
+                            <div class="shopify-card-body">
 
 
-                    <!-- ================= 02 PRODUCT IMAGES ================= -->
-                    <section class="product-section">
+                                <div class="form-group full-width">
 
-                        <div class="section-heading">
-                            <div class="section-number">02</div>
+                                    <label>Title *</label>
 
-                            <div>
-                                <h3>Product Images</h3>
-                                <p>Add the main product image and additional images.</p>
-                            </div>
-                        </div>
+                                    <input
+                                        type="text"
+                                        [(ngModel)]="newProduct.name"
+                                        placeholder="e.g. TriCore Performance T-Shirt">
 
-                        <div class="image-upload-layout">
+                                </div>
 
-                            <!-- Main Image -->
-                            <div class="main-image-box">
 
-                                <label>Main Product Image</label>
+                                <div class="form-group full-width">
 
-                                <div class="main-image-upload">
+                                    <label>Description</label>
 
-                                    <img *ngIf="imagePreviews.length > 0" [src]="imagePreviews[0]" alt="Product Image">
+                                    <textarea
+                                        [(ngModel)]="newProduct.description"
+                                        rows="6"
+                                        placeholder="Describe your product..."></textarea>
 
-                                    <div *ngIf="imagePreviews.length === 0" class="upload-placeholder">
+                                </div>
 
-                                        <span>＋</span>
-                                        <strong>Upload Main Image</strong>
-                                        <small>PNG, JPG, WEBP</small>
+
+                                <div class="form-grid">
+
+
+                                    <div class="form-group">
+
+                                        <label>Category *</label>
+
+                                        <input
+                                            type="text"
+                                            [(ngModel)]="newProduct.category"
+                                            placeholder="e.g. T-Shirt">
+
                                     </div>
 
-                                    <input type="file" accept="image/*" (change)="onProductImagesSelected($event)"
-                                        class="file-input">
+
+                                    <div class="form-group">
+
+                                        <label>Brand</label>
+
+                                        <input
+                                            type="text"
+                                            [(ngModel)]="newProduct.brand"
+                                            placeholder="Triangle Sports">
+
+                                    </div>
+
+
+                                    <div class="form-group">
+
+                                        <label>Product Type</label>
+
+                                        <input
+                                            type="text"
+                                            [(ngModel)]="newProduct.type"
+                                            placeholder="T-Shirt / Jersey / Shorts">
+
+                                    </div>
+
+
+                                    <div class="form-group">
+
+                                        <label>Fabric</label>
+
+                                        <input
+                                            type="text"
+                                            [(ngModel)]="newProduct.fabric"
+                                            placeholder="Polyester / Cotton">
+
+                                    </div>
+
+
+                                    <div class="form-group">
+
+                                        <label>SKU</label>
+
+                                        <input
+                                            type="text"
+                                            [value]="newProduct.sku || 'Auto generated on save'"
+                                            readonly>
+
+                                        <small>
+                                            SKU will be generated automatically.
+                                        </small>
+
+                                    </div>
+
                                 </div>
 
                             </div>
 
+                        </section>
 
-                            <!-- Additional Images -->
-                            <div class="additional-image-box">
 
-                                <div class="upload-title-row">
-                                    <label>Additional Images</label>
 
-                                    <span>
-                                        {{ imagePreviews.length }}/5
-                                    </span>
+                        <!-- =============================================
+                             MEDIA
+                        ============================================== -->
+                        <section class="shopify-card">
+
+                            <div class="shopify-card-header">
+
+                                <h3>Media</h3>
+
+                                <p>
+                                    Add product images. Maximum 5 images.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+                                <div class="image-upload-layout">
+
+
+                                    <!-- Main Image -->
+                                    <div class="main-image-box">
+
+                                        <label>Main Product Image</label>
+
+                                        <div class="main-image-upload">
+
+                                            <img
+                                                *ngIf="imagePreviews.length > 0"
+                                                [src]="imagePreviews[0]"
+                                                alt="Product Image">
+
+
+                                            <div
+                                                *ngIf="imagePreviews.length === 0"
+                                                class="upload-placeholder">
+
+                                                <span>＋</span>
+
+                                                <strong>
+                                                    Upload Main Image
+                                                </strong>
+
+                                                <small>
+                                                    PNG, JPG, WEBP
+                                                </small>
+
+                                            </div>
+
+
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                (change)="onMainImageSelected($event)"
+                                                class="file-input">
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Additional Images -->
+                                    <div class="additional-image-box">
+
+                                        <div class="upload-title-row">
+
+                                            <label>
+                                                Additional Images
+                                            </label>
+
+                                            <span>
+                                                {{ imagePreviews.length }}/5
+                                            </span>
+
+                                        </div>
+
+
+                                        <div class="additional-images">
+
+
+                                            <div
+                                                class="image-thumb"
+                                                *ngFor="let image of imagePreviews; let i = index">
+
+                                                <img
+                                                    [src]="image"
+                                                    alt="Product Image">
+
+
+                                                <button
+                                                    type="button"
+                                                    (click)="removeImage(i)">
+
+                                                    ✕
+
+                                                </button>
+
+                                            </div>
+
+
+                                            <label
+                                                class="add-image-box"
+                                                *ngIf="imagePreviews.length < 5">
+
+                                                <span>＋</span>
+
+                                                <small>
+                                                    Add Image
+                                                </small>
+
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    multiple
+                                                    (change)="onProductImagesSelected($event)">
+
+                                            </label>
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
 
-                                <div class="additional-images">
+                            </div>
 
-                                    <div class="image-thumb" *ngFor="let image of imagePreviews; let i = index">
+                        </section>
 
-                                        <img [src]="image" alt="Product Image">
 
-                                        <button type="button" (click)="removeImage(i)">
-                                            ✕
+
+                        <!-- =============================================
+                             PRICING
+                        ============================================== -->
+                        <section class="shopify-card">
+
+                            <div class="shopify-card-header">
+
+                                <h3>Pricing</h3>
+
+                                <p>
+                                    Set your selling and original price.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+                                <div class="form-grid">
+
+
+                                    <div class="form-group">
+
+                                        <label>Selling Price *</label>
+
+                                        <div class="input-with-prefix">
+
+                                            <span>₹</span>
+
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                [(ngModel)]="newProduct.price"
+                                                (ngModelChange)="calculateProductDiscount()"
+                                                placeholder="799">
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="form-group">
+
+                                        <label>Original Price</label>
+
+                                        <div class="input-with-prefix">
+
+                                            <span>₹</span>
+
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                [(ngModel)]="newProduct.originalPrice"
+                                                (ngModelChange)="calculateProductDiscount()"
+                                                placeholder="999">
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="form-group">
+
+                                        <label>Discount</label>
+
+                                        <div class="input-with-suffix">
+
+                                            <input
+                                                type="number"
+                                                [(ngModel)]="newProduct.discount"
+                                                readonly
+                                                placeholder="0">
+
+                                            <span>%</span>
+
+                                        </div>
+
+                                        <small>
+                                            Automatically calculated.
+                                        </small>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- =============================================
+                             INVENTORY
+                        ============================================== -->
+                        <section class="shopify-card">
+
+                            <div class="shopify-card-header">
+
+                                <h3>Inventory</h3>
+
+                                <p>
+                                    Manage product stock.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+                                <div class="form-grid">
+
+
+                                    <div class="form-group">
+
+                                        <label>Stock Quantity</label>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            [(ngModel)]="newProduct.stock"
+                                            placeholder="0">
+
+                                    </div>
+
+
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- =============================================
+                             PRODUCT OPTIONS
+                        ============================================== -->
+                        <section class="shopify-card">
+
+                            <div class="shopify-card-header">
+
+                                <h3>Product options</h3>
+
+                                <p>
+                                    Select available colours and sizes.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+
+                                <!-- Colors -->
+                                <div class="option-block">
+
+                                    <div class="option-header">
+
+                                        <div>
+
+                                            <label>
+                                                Available Colors
+                                            </label>
+
+                                            <small>
+                                                Select colours available for this product.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="color-selection">
+
+                                        <button
+                                            type="button"
+                                            class="color-option"
+                                            *ngFor="let color of availableColors"
+                                            [class.selected]="newProduct.colors?.includes(color)"
+                                            (click)="toggleColor(color)">
+
+                                            <span
+                                                class="color-dot"
+                                                [style.background]="getColorValue(color)">
+                                            </span>
+
+                                            {{ color }}
+
+                                            <span
+                                                class="check"
+                                                *ngIf="newProduct.colors?.includes(color)">
+
+                                                ✓
+
+                                            </span>
+
                                         </button>
 
                                     </div>
 
-                                    <label class="add-image-box" *ngIf="imagePreviews.length < 5">
+                                </div>
 
-                                        <span>＋</span>
-                                        <small>Add Image</small>
 
-                                        <input type="file" accept="image/*" multiple
-                                            (change)="onProductImagesSelected($event)">
+                                <!-- Sizes -->
+                                <div class="option-block">
+
+                                    <div class="option-header">
+
+                                        <div>
+
+                                            <label>
+                                                Available Sizes
+                                            </label>
+
+                                            <small>
+                                                Select sizes available for this product.
+                                            </small>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <div class="size-selection">
+
+                                        <button
+                                            type="button"
+                                            class="size-option"
+                                            *ngFor="let size of availableSizes"
+                                            [class.selected]="newProduct.sizes?.includes(size)"
+                                            (click)="toggleSize(size)">
+
+                                            {{ size }}
+
+                                            <span
+                                                class="check"
+                                                *ngIf="newProduct.sizes?.includes(size)">
+
+                                                ✓
+
+                                            </span>
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- =============================================
+                             PACK BUILDER
+                        ============================================== -->
+                        <section
+                            class="shopify-card"
+                            *ngIf="newProduct.productMode === 'pack'">
+
+
+                            <div class="shopify-card-header">
+
+                                <h3>Pack Builder</h3>
+
+                                <p>
+                                    Build pack-wise pricing, quantity, colours,
+                                    sizes and photos. This section is only used
+                                    for Pack Product mode.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+
+                                <div class="builder-toolbar">
+
+                                    <div>
+
+                                        <strong>
+                                            Product Packs
+                                        </strong>
+
+                                        <span>
+                                            {{ productPacks.length }} pack(s)
+                                        </span>
+
+                                    </div>
+
+
+                                    <button
+                                        type="button"
+                                        class="primary-small-btn"
+                                        (click)="addPack()">
+
+                                        ＋ Add Pack
+
+                                    </button>
+
+                                </div>
+
+
+                                <!-- Pack List -->
+                                <div class="pack-builder">
+
+
+                                    <div
+                                        class="pack-card"
+                                        *ngFor="let pack of productPacks; let packIndex = index">
+
+
+                                        <!-- Pack Header -->
+                                        <div class="pack-card-header">
+
+                                            <div class="pack-title">
+
+                                                <span class="pack-badge">
+                                                    PACK {{ packIndex + 1 }}
+                                                </span>
+
+                                                <strong>
+                                                    {{ pack.name || 'New Pack' }}
+                                                </strong>
+
+                                            </div>
+
+
+                                            <button
+                                                type="button"
+                                                class="danger-icon-btn"
+                                                (click)="removePack(packIndex)">
+
+                                                🗑
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <!-- Pack Fields -->
+                                        <div class="form-grid">
+
+
+                                            <div class="form-group">
+
+                                                <label>
+                                                    Pack Name *
+                                                </label>
+
+                                                <input
+                                                    type="text"
+                                                    [(ngModel)]="pack.name"
+                                                    placeholder="e.g. 3 Pack">
+
+                                            </div>
+
+
+                                            <div class="form-group">
+
+                                                <label>
+                                                    Quantity *
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    [(ngModel)]="pack.quantity"
+                                                    placeholder="3">
+
+                                            </div>
+
+
+                                            <div class="form-group">
+
+                                                <label>
+                                                    Selling Price *
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    [(ngModel)]="pack.price"
+                                                    (ngModelChange)="calculatePackDiscount(pack)"
+                                                    placeholder="1799">
+
+                                            </div>
+
+
+                                            <div class="form-group">
+
+                                                <label>
+                                                    Original Price
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    [(ngModel)]="pack.originalPrice"
+                                                    (ngModelChange)="calculatePackDiscount(pack)"
+                                                    placeholder="2499">
+
+                                            </div>
+
+
+                                            <div class="form-group">
+
+                                                <label>
+                                                    Discount
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    max="100"
+                                                    [(ngModel)]="pack.discount"
+                                                    [ngModelOptions]="{standalone: true}"
+                                                    readonly
+                                                    placeholder="0">
+
+                                                <small>
+                                                    Automatically calculated.
+                                                </small>
+
+                                            </div>
+
+
+                                            <!-- Pack Colors -->
+                                            <div class="pack-subsection">
+
+                                                <div class="pack-subsection-title">
+
+                                                    <strong>
+                                                        Pack Colors
+                                                    </strong>
+
+                                                    <small>
+                                                        Select colours available in this pack.
+                                                    </small>
+
+                                                </div>
+
+
+                                                <div class="pack-selection-list">
+
+                                                    <button
+                                                        type="button"
+                                                        class="pack-color-option"
+                                                        *ngFor="let color of availableColors"
+                                                        [class.selected]="pack.colors?.includes(color)"
+                                                        (click)="togglePackColor(pack, color)">
+
+                                                        <span
+                                                            class="color-dot"
+                                                            [style.background]="getColorValue(color)">
+                                                        </span>
+
+                                                        {{ color }}
+
+                                                        <span
+                                                            *ngIf="pack.colors?.includes(color)">
+
+                                                            ✓
+
+                                                        </span>
+
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- Pack Sizes -->
+                                            <div class="pack-subsection">
+
+                                                <div class="pack-subsection-title">
+
+                                                    <strong>
+                                                        Pack Sizes
+                                                    </strong>
+
+                                                    <small>
+                                                        Select sizes available in this pack.
+                                                    </small>
+
+                                                </div>
+
+
+                                                <div class="pack-selection-list size-list">
+
+                                                    <button
+                                                        type="button"
+                                                        class="pack-size-option"
+                                                        *ngFor="let size of availableSizes"
+                                                        [class.selected]="pack.sizes?.includes(size)"
+                                                        (click)="togglePackSize(pack, size)">
+
+                                                        {{ size }}
+
+                                                        <span
+                                                            *ngIf="pack.sizes?.includes(size)">
+
+                                                            ✓
+
+                                                        </span>
+
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- Pack Photos -->
+                                            <div class="pack-subsection">
+
+                                                <div class="pack-subsection-title">
+
+                                                    <div>
+
+                                                        <strong>
+                                                            Pack Photos
+                                                        </strong>
+
+                                                        <small>
+                                                            Add photos specifically for this pack.
+                                                        </small>
+
+                                                    </div>
+
+
+                                                    <span class="photo-count">
+
+                                                        {{ pack.previews.length || 0 }}/5
+
+                                                    </span>
+
+                                                </div>
+
+
+                                                <div class="pack-photo-grid">
+
+
+                                                    <div
+                                                        class="pack-photo"
+                                                        *ngFor="let image of pack.previews; let imageIndex = index">
+
+                                                        <img
+                                                            [src]="image"
+                                                            alt="Pack Image">
+
+
+                                                        <button
+                                                            type="button"
+                                                            (click)="removePackImage(packIndex, imageIndex)">
+
+                                                            ✕
+
+                                                        </button>
+
+                                                    </div>
+
+
+                                                    <label
+                                                        class="pack-photo-upload"
+                                                        *ngIf="(pack.previews.length || 0) < 5">
+
+                                                        <span>＋</span>
+
+                                                        <strong>
+                                                            Add Photo
+                                                        </strong>
+
+                                                        <small>
+                                                            JPG / PNG / WEBP
+                                                        </small>
+
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*"
+                                                            multiple
+                                                            (change)="onPackImagesSelected($event, packIndex)">
+
+                                                    </label>
+
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Empty -->
+                                    <div
+                                        class="empty-builder"
+                                        *ngIf="productPacks.length === 0">
+
+                                        <div class="empty-icon">
+                                            📦
+                                        </div>
+
+                                        <h4>
+                                            No Packs Added
+                                        </h4>
+
+                                        <p>
+                                            Add your first pack to define
+                                            pack-wise pricing, sizes,
+                                            colours and photos.
+                                        </p>
+
+                                        <button
+                                            type="button"
+                                            class="primary-small-btn"
+                                            (click)="addPack()">
+
+                                            ＋ Add First Pack
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- =============================================
+                             COLOR COMBINATIONS
+                        ============================================== -->
+                        <section class="shopify-card">
+
+                            <div class="shopify-card-header">
+
+                                <h3>Color combinations</h3>
+
+                                <p>
+                                    Create predefined colour combinations
+                                    with their own photos.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+
+                                <div class="builder-toolbar">
+
+                                    <div>
+
+                                        <strong>
+                                            Combination Builder
+                                        </strong>
+
+                                        <span>
+                                            {{ colorCombinations.length }}
+                                            combination(s)
+                                        </span>
+
+                                    </div>
+
+
+                                    <button
+                                        type="button"
+                                        class="primary-small-btn"
+                                        (click)="addColorCombination()">
+
+                                        ＋ Add Combination
+
+                                    </button>
+
+                                </div>
+
+
+                                <div class="combination-list">
+
+
+                                    <div
+                                        class="combination-card"
+                                        *ngFor="let combination of colorCombinations; let combinationIndex = index">
+
+
+                                        <div class="combination-header">
+
+                                            <div>
+
+                                                <span class="combination-number">
+                                                    COMBINATION
+                                                    {{ combinationIndex + 1 }}
+                                                </span>
+
+                                                <strong>
+                                                    {{ combination.name || 'New Combination' }}
+                                                </strong>
+
+                                            </div>
+
+
+                                            <button
+                                                type="button"
+                                                class="danger-icon-btn"
+                                                (click)="removeColorCombination(combinationIndex)">
+
+                                                🗑
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <div class="form-group">
+
+                                            <label>
+                                                Combination Name
+                                            </label>
+
+                                            <input
+                                                type="text"
+                                                [(ngModel)]="combination.name"
+                                                placeholder="e.g. Black + Grey + White">
+
+                                        </div>
+
+
+                                        <div class="pack-subsection">
+
+                                            <div class="pack-subsection-title">
+
+                                                <strong>
+                                                    Select Colors
+                                                </strong>
+
+                                                <small>
+                                                    Choose colours for this combination.
+                                                </small>
+
+                                            </div>
+
+
+                                            <div class="pack-selection-list">
+
+                                                <button
+                                                    type="button"
+                                                    class="pack-color-option"
+                                                    *ngFor="let color of availableColors"
+                                                    [class.selected]="combination.colors?.includes(color)"
+                                                    (click)="toggleCombinationColor(combination, color)">
+
+                                                    <span
+                                                        class="color-dot"
+                                                        [style.background]="getColorValue(color)">
+                                                    </span>
+
+                                                    {{ color }}
+
+                                                    <span
+                                                        *ngIf="combination.colors.includes(color)">
+
+                                                        ✓
+
+                                                    </span>
+
+                                                </button>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="pack-subsection">
+
+                                            <div class="pack-subsection-title">
+
+                                                <div>
+
+                                                    <strong>
+                                                        Combination Photos
+                                                    </strong>
+
+                                                    <small>
+                                                        Add photos showing this colour combination.
+                                                    </small>
+
+                                                </div>
+
+
+                                                <span class="photo-count">
+                                                    {{ combination.previews.length || 0 }}/5
+                                                </span>
+
+                                            </div>
+
+
+                                            <div class="pack-photo-grid">
+
+
+                                                <div
+                                                    class="pack-photo"
+                                                    *ngFor="let image of combination.previews; let imageIndex = index">
+
+                                                    <img
+                                                        [src]="image"
+                                                        alt="Color Combination">
+
+
+                                                    <button
+                                                        type="button"
+                                                        (click)="removeCombinationImage(combinationIndex, imageIndex)">
+
+                                                        ✕
+
+                                                    </button>
+
+                                                </div>
+
+
+                                                <label
+                                                    class="pack-photo-upload"
+                                                    *ngIf="(combination.previews.length || 0) < 5">
+
+                                                    <span>＋</span>
+
+                                                    <strong>
+                                                        Add Photo
+                                                    </strong>
+
+                                                    <small>
+                                                        JPG / PNG / WEBP
+                                                    </small>
+
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        multiple
+                                                        (change)="onCombinationImagesSelected($event, combinationIndex)">
+
+                                                </label>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Empty -->
+                                    <div
+                                        class="empty-builder"
+                                        *ngIf="colorCombinations.length === 0">
+
+                                        <div class="empty-icon">
+                                            🎨
+                                        </div>
+
+                                        <h4>
+                                            No Color Combinations
+                                        </h4>
+
+                                        <p>
+                                            Add combinations such as
+                                            Black + Grey or Black + White.
+                                        </p>
+
+                                        <button
+                                            type="button"
+                                            class="primary-small-btn"
+                                            (click)="addColorCombination()">
+
+                                            ＋ Add Combination
+
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+
+
+                        <!-- =============================================
+                             STORE SETTINGS
+                        ============================================== -->
+                        <section class="shopify-card">
+
+                            <div class="shopify-card-header">
+
+                                <h3>Store settings</h3>
+
+                                <p>
+                                    Control product visibility.
+                                </p>
+
+                            </div>
+
+
+                            <div class="shopify-card-body">
+
+
+                                <div class="store-setting">
+
+                                    <div>
+
+                                        <strong>
+                                            Show on Home
+                                        </strong>
+
+                                        <small>
+                                            Display this product in
+                                            homepage featured products.
+                                        </small>
+
+                                    </div>
+
+
+                                    <label class="switch">
+
+                                        <input
+                                            type="checkbox"
+                                            [(ngModel)]="newProduct.showOnHome">
+
+                                        <span class="slider"></span>
+
                                     </label>
 
                                 </div>
 
                             </div>
 
-                        </div>
+                        </section>
 
-                    </section>
-
-
-                    <!-- ================= 03 PRODUCT OPTIONS ================= -->
-                    <section class="product-section">
-
-                        <div class="section-heading">
-                            <div class="section-number">03</div>
-
-                            <div>
-                                <h3>Product Options</h3>
-                                <p>Define the available colours, sizes and stock.</p>
-                            </div>
-                        </div>
+                    </div>
 
 
-                        <!-- COLORS -->
-                        <div class="option-block">
 
-                            <div class="option-header">
-                                <div>
-                                    <label>Available Colors</label>
-                                    <small>Select all colours available for this product.</small>
-                                </div>
-                            </div>
+                    <!-- =================================================
+                         RIGHT SIDEBAR
+                    ================================================== -->
+                    <aside class="product-sidebar">
 
-                            <div class="color-selection">
 
-                                <button type="button" class="color-option" *ngFor="let color of availableColors"
-                                    [class.selected]="newProduct.colors?.includes(color)" (click)="toggleColor(color)">
+                        <!-- Product status -->
+                        <div class="shopify-side-card">
 
-                                    <span class="color-dot" [style.background]="getColorValue(color)">
-                                    </span>
+                            <div class="side-card-header">
 
-                                    {{ color }}
-
-                                    <span class="check" *ngIf="newProduct.colors?.includes(color)">
-                                        ✓
-                                    </span>
-
-                                </button>
+                                <h3>
+                                    Product status
+                                </h3>
 
                             </div>
 
-                        </div>
 
+                            <div class="status-preview">
 
-                        <!-- SIZES -->
-                        <div class="option-block">
-
-                            <div class="option-header">
-                                <div>
-                                    <label>Available Sizes</label>
-                                    <small>Select all sizes available for this product.</small>
-                                </div>
-                            </div>
-
-                            <div class="size-selection">
-
-                                <button type="button" class="size-option" *ngFor="let size of availableSizes"
-                                    [class.selected]="newProduct.sizes?.includes(size)" (click)="toggleSize(size)">
-
-                                    {{ size }}
-
-                                    <span class="check" *ngIf="newProduct.sizes?.includes(size)">
-                                        ✓
-                                    </span>
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- STOCK -->
-                        <div class="form-grid">
-
-                            <div class="form-group">
-                                <label>Total Stock</label>
-
-                                <input type="number" min="0" [(ngModel)]="newProduct.stock" placeholder="0">
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- ================= 04 PACK BUILDER ================= -->
-                    <section class="product-section">
-
-                        <div class="section-heading">
-
-                            <div class="section-number">04</div>
-
-                            <div>
-                                <h3>Pack Builder</h3>
-                                <p>
-                                    Create any number of packs for this product.
-                                </p>
-                            </div>
-
-                        </div>
-
-
-                        <div class="builder-toolbar">
-
-                            <div>
-                                <strong>Product Packs</strong>
-                                <span>
-                                    {{ productPacks.length }} pack(s)
-                                </span>
-                            </div>
-
-                            <button type="button" class="primary-small-btn" (click)="addPack()">
-
-                                ＋ Add Pack
-
-                            </button>
-
-                        </div>
-
-
-                        <!-- PACK LIST -->
-                        <div class="pack-builder">
-
-                            <div class="pack-card" *ngFor="let pack of productPacks; let packIndex = index">
-
-                                <!-- PACK HEADER -->
-                                <div class="pack-card-header">
-
-                                    <div class="pack-title">
-
-                                        <span class="pack-badge">
-                                            PACK {{ packIndex + 1 }}
-                                        </span>
-
-                                        <strong>
-                                            {{ pack.name || 'New Pack' }}
-                                        </strong>
-
-                                    </div>
-
-                                    <button type="button" class="danger-icon-btn" (click)="removePack(packIndex)">
-
-                                        🗑
-
-                                    </button>
-
-                                </div>
-
-
-                                <!-- PACK BASIC INFO -->
-                                <div class="form-grid">
-
-                                    <div class="form-group">
-                                        <label>Pack Name *</label>
-
-                                        <input type="text" [(ngModel)]="pack.name" placeholder="e.g. 3 Pack">
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <label>Quantity *</label>
-
-                                        <input type="number" min="1" [(ngModel)]="pack.quantity" placeholder="3">
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <label>Selling Price *</label>
-
-                                        <input type="number" min="0" [(ngModel)]="pack.price" placeholder="1799">
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <label>Original Price</label>
-
-                                        <input type="number" min="0" [(ngModel)]="pack.originalPrice"
-                                            placeholder="2499">
-                                    </div>
-
-
-                                    <div class="form-group">
-                                        <label>Discount (%)</label>
-
-                                        <input type="number" min="0" max="100" [(ngModel)]="pack.discount"
-                                            placeholder="20">
-                                    </div>
-
-                                </div>
-
-
-                                <!-- PACK COLORS -->
-                                <div class="pack-subsection">
-
-                                    <div class="pack-subsection-title">
-                                        <strong>Pack Colors</strong>
-                                        <small>
-                                            Select colours available in this pack.
-                                        </small>
-                                    </div>
-
-                                    <div class="pack-selection-list">
-
-                                        <button type="button" class="pack-color-option"
-                                            *ngFor="let color of availableColors"
-                                            [class.selected]="pack.colors?.includes(color)"
-                                            (click)="togglePackColor(pack, color)">
-
-                                            <span class="color-dot" [style.background]="getColorValue(color)">
-                                            </span>
-
-                                            {{ color }}
-
-                                            <span *ngIf="pack.colors?.includes(color)">
-                                                ✓
-                                            </span>
-
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- PACK SIZES -->
-                                <div class="pack-subsection">
-
-                                    <div class="pack-subsection-title">
-                                        <strong>Pack Sizes</strong>
-                                        <small>
-                                            Select sizes available in this pack.
-                                        </small>
-                                    </div>
-
-                                    <div class="pack-selection-list size-list">
-
-                                        <button type="button" class="pack-size-option"
-                                            *ngFor="let size of availableSizes"
-                                            [class.selected]="pack.sizes?.includes(size)"
-                                            (click)="togglePackSize(pack, size)">
-
-                                            {{ size }}
-
-                                            <span *ngIf="pack.sizes?.includes(size)">
-                                                ✓
-                                            </span>
-
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- PACK PHOTOS -->
-                                <div class="pack-subsection">
-
-                                    <div class="pack-subsection-title">
-
-                                        <div>
-                                            <strong>Pack Photos</strong>
-                                            <small>
-                                                Add photos specifically for this pack.
-                                            </small>
-                                        </div>
-
-                                        <span class="photo-count">
-                                            {{ pack.previews?.length || 0 }}/5
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="pack-photo-grid">
-
-                                        <!-- Existing / New Images -->
-                                        <div class="pack-photo"
-                                            *ngFor="let image of pack.previews; let imageIndex = index">
-
-                                            <img [src]="image" alt="Pack Image">
-
-                                            <button type="button" (click)="removePackImage(packIndex, imageIndex)">
-
-                                                ✕
-
-                                            </button>
-
-                                        </div>
-
-
-                                        <!-- Upload -->
-                                        <label class="pack-photo-upload" *ngIf="(pack.previews?.length || 0) < 5">
-
-                                            <span>＋</span>
-                                            <strong>Add Photo</strong>
-                                            <small>JPG / PNG / WEBP</small>
-
-                                            <input type="file" accept="image/*" multiple
-                                                (change)="onPackImagesSelected($event, packIndex)">
-
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- EMPTY PACK -->
-                            <div class="empty-builder" *ngIf="productPacks.length === 0">
-
-                                <div class="empty-icon">
-                                    📦
-                                </div>
-
-                                <h4>No Packs Added</h4>
-
-                                <p>
-                                    Add your first pack to define pack-wise pricing,
-                                    sizes, colours and photos.
-                                </p>
-
-                                <button type="button" class="primary-small-btn" (click)="addPack()">
-
-                                    ＋ Add First Pack
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- ================= 05 COLOR COMBINATIONS ================= -->
-                    <section class="product-section">
-
-                        <div class="section-heading">
-
-                            <div class="section-number">05</div>
-
-                            <div>
-                                <h3>Color Combinations</h3>
-
-                                <p>
-                                    Create predefined colour combinations with their own photos.
-                                </p>
-                            </div>
-
-                        </div>
-
-
-                        <div class="builder-toolbar">
-
-                            <div>
-                                <strong>Color Combination Builder</strong>
+                                <span class="status-dot"></span>
 
                                 <span>
-                                    {{ colorCombinations.length }} combination(s)
+                                    {{ newProduct.status || 'Active' }}
                                 </span>
+
                             </div>
 
 
-                            <button type="button" class="primary-small-btn" (click)="addColorCombination()">
-
-                                ＋ Add Combination
-
-                            </button>
+                            <small>
+                                {{
+                                    newProduct.status === 'Hidden'
+                                    ? 'This product will remain hidden from the store.'
+                                    : newProduct.status === 'Draft'
+                                    ? 'This product is saved as a draft and is not published.'
+                                    : 'Product will be visible in your store after saving.'
+                                }}
+                            </small>
 
                         </div>
 
 
-                        <div class="combination-list">
 
-                            <div class="combination-card"
-                                *ngFor="let combination of colorCombinations; let combinationIndex = index">
+                        <!-- Product organization -->
+                        <div class="shopify-side-card">
 
-                                <!-- COMBINATION HEADER -->
-                                <div class="combination-header">
+                            <div class="side-card-header">
 
-                                    <div>
+                                <h3>
+                                    Product organization
+                                </h3>
 
-                                        <span class="combination-number">
-                                            COMBINATION {{ combinationIndex + 1 }}
-                                        </span>
+                            </div>
+
+
+                            <div class="side-field">
+
+                                <label>
+                                    Category
+                                </label>
+
+                                <input
+                                    type="text"
+                                    [(ngModel)]="newProduct.category"
+                                    placeholder="T-Shirts">
+
+                            </div>
+
+
+                            <div class="side-field">
+
+                                <label>
+                                    Brand
+                                </label>
+
+                                <input
+                                    type="text"
+                                    [(ngModel)]="newProduct.brand"
+                                    placeholder="Triangle Sports">
+
+                            </div>
+
+
+                            <div class="side-field">
+
+                                <label>
+                                    Product Type
+                                </label>
+
+                                <input
+                                    type="text"
+                                    [(ngModel)]="newProduct.type"
+                                    placeholder="T-Shirt">
+
+                            </div>
+
+                        </div>
+
+
+
+                        <!-- Product mode -->
+                        <div class="shopify-side-card">
+
+                            <div class="side-card-header">
+
+                                <h3>
+                                    Product mode
+                                </h3>
+
+                                <p>
+                                    Choose how this product is sold.
+                                </p>
+
+                            </div>
+
+
+                            <div class="product-mode-options">
+
+
+                                <label
+                                    class="mode-option"
+                                    [class.selected]="newProduct.productMode === 'single'">
+
+                                    <input
+                                        type="radio"
+                                        name="productMode"
+                                        value="single"
+                                        [(ngModel)]="newProduct.productMode"
+                                        (ngModelChange)="onProductModeChange()">
+
+                                    <span>
 
                                         <strong>
-                                            {{ combination.name || 'New Combination' }}
+                                            Single Product
                                         </strong>
 
-                                    </div>
-
-
-                                    <button type="button" class="danger-icon-btn"
-                                        (click)="removeColorCombination(combinationIndex)">
-
-                                        🗑
-
-                                    </button>
-
-                                </div>
-
-
-                                <!-- NAME -->
-                                <div class="form-group">
-
-                                    <label>Combination Name</label>
-
-                                    <input type="text" [(ngModel)]="combination.name"
-                                        placeholder="e.g. Black + Grey + White">
-
-                                </div>
-
-
-                                <!-- COLORS -->
-                                <div class="pack-subsection">
-
-                                    <div class="pack-subsection-title">
-
-                                        <strong>Select Colors</strong>
-
                                         <small>
-                                            Choose colours for this combination.
+                                            One product with one price.
                                         </small>
 
-                                    </div>
+                                    </span>
+
+                                </label>
 
 
-                                    <div class="pack-selection-list">
+                                <label
+                                    class="mode-option"
+                                    [class.selected]="newProduct.productMode === 'pack'">
 
-                                        <button type="button" class="pack-color-option"
-                                            *ngFor="let color of availableColors"
-                                            [class.selected]="combination.colors?.includes(color)"
-                                            (click)="toggleCombinationColor(combination, color)">
+                                    <input
+                                        type="radio"
+                                        name="productMode"
+                                        value="pack"
+                                        [(ngModel)]="newProduct.productMode"
+                                        (ngModelChange)="onProductModeChange()">
 
-                                            <span class="color-dot" [style.background]="getColorValue(color)">
-                                            </span>
+                                    <span>
 
-                                            {{ color }}
+                                        <strong>
+                                            Pack Product
+                                        </strong>
 
-                                            <span *ngIf="combination.colors?.includes(color)">
-                                                ✓
-                                            </span>
+                                        <small>
+                                            Product with multiple packs.
+                                        </small>
 
-                                        </button>
-
-                                    </div>
-
-                                </div>
-
-
-                                <!-- COMBINATION PHOTOS -->
-                                <div class="pack-subsection">
-
-                                    <div class="pack-subsection-title">
-
-                                        <div>
-                                            <strong>Combination Photos</strong>
-
-                                            <small>
-                                                Add photos showing this colour combination.
-                                            </small>
-                                        </div>
-
-                                        <span class="photo-count">
-                                            {{ combination.previews?.length || 0 }}/5
-                                        </span>
-
-                                    </div>
-
-
-                                    <div class="pack-photo-grid">
-
-                                        <div class="pack-photo"
-                                            *ngFor="let image of combination.previews; let imageIndex = index">
-
-                                            <img [src]="image" alt="Color Combination">
-
-                                            <button type="button"
-                                                (click)="removeCombinationImage(combinationIndex, imageIndex)">
-
-                                                ✕
-
-                                            </button>
-
-                                        </div>
-
-
-                                        <label class="pack-photo-upload"
-                                            *ngIf="(combination.previews?.length || 0) < 5">
-
-                                            <span>＋</span>
-
-                                            <strong>Add Photo</strong>
-
-                                            <small>JPG / PNG / WEBP</small>
-
-                                            <input type="file" accept="image/*" multiple
-                                                (change)="onCombinationImagesSelected($event, combinationIndex)">
-
-                                        </label>
-
-                                    </div>
-
-                                </div>
-
-                            </div>
-
-
-                            <!-- EMPTY -->
-                            <div class="empty-builder" *ngIf="colorCombinations.length === 0">
-
-                                <div class="empty-icon">
-                                    🎨
-                                </div>
-
-                                <h4>No Color Combinations</h4>
-
-                                <p>
-                                    Add combinations such as Black + Grey,
-                                    Black + White or any other predefined combination.
-                                </p>
-
-                                <button type="button" class="primary-small-btn" (click)="addColorCombination()">
-
-                                    ＋ Add Combination
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section>
-
-
-                    <!-- ================= 06 STORE SETTINGS ================= -->
-                    <section class="product-section">
-
-                        <div class="section-heading">
-
-                            <div class="section-number">06</div>
-
-                            <div>
-                                <h3>Store Settings</h3>
-
-                                <p>
-                                    Control product visibility and homepage placement.
-                                </p>
-                            </div>
-
-                        </div>
-
-
-                        <div class="store-settings">
-
-                            <!-- SHOW ON HOME -->
-                            <div class="store-setting">
-
-                                <div>
-
-                                    <strong>Show on Home</strong>
-
-                                    <small>
-                                        Display this product in the homepage featured products.
-                                    </small>
-
-                                </div>
-
-
-                                <label class="switch">
-
-                                    <input type="checkbox" [(ngModel)]="newProduct.showOnHome">
-
-                                    <span class="slider"></span>
+                                    </span>
 
                                 </label>
 
                             </div>
 
+                        </div>
 
+
+
+                        <!-- Quick summary -->
+                        <div class="shopify-side-card">
+
+                            <div class="side-card-header">
+
+                                <h3>
+                                    Product summary
+                                </h3>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Selling Price
+                                </span>
+
+                                <strong>
+                                    ₹{{ newProduct.price || 0 }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Stock
+                                </span>
+
+                                <strong>
+                                    {{ newProduct.stock || 0 }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Images
+                                </span>
+
+                                <strong>
+                                    {{ imagePreviews.length }}/5
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Colors
+                                </span>
+
+                                <strong>
+                                    {{ newProduct.colors?.length || 0 }}
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Sizes
+                                </span>
+
+                                <strong>
+                                    {{ newProduct.sizes?.length || 0 }}
+                                </strong>
+
+                            </div>
 
                         </div>
 
-                    </section>
+
+                    </aside>
 
                 </div>
 
 
-                <!-- ================= FOOTER ================= -->
-                <div class="product-modal-footer">
 
-                    <button type="button" class="cancel-btn" (click)="closeModal()">
-
-                        Cancel
-
-                    </button>
-
-
-                    <button type="button" class="save-product-btn" (click)="editing ? updateProduct() : addProduct()">
-
-                        {{ editing ? 'Update Product' : 'Save Product' }}
-
-                    </button>
-
-                </div>
+                <!-- =================================================
+                     BOTTOM SAVE BAR
+                ================================================== -->
+                <footer class="shopify-product-footer">
+                    <!-- Save / Cancel buttons would go here -->
+                </footer>
 
             </div>
+
         </div>
-        <!-- ================= END PRODUCT MODAL ================= -->
+
+    </main>
+
+</div>

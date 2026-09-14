@@ -1,212 +1,354 @@
-const ApiFeatures = require("../utils/apiFeatures");
 const Product = require("../models/Product");
 const asyncHandler = require("../middleware/asyncHandler");
 const ErrorHandler = require("../utils/errorHandler");
 
 
+// ============================================================
+// HELPER FUNCTIONS
+// ============================================================
 
-// Create Product
+/**
+ * Safely parse JSON
+ */
+const parseJSON = (value, fallback = []) => {
+    if (value === undefined || value === null || value === "") {
+        return fallback;
+    }
+
+    if (typeof value !== "string") {
+        return value;
+    }
+
+    try {
+        return JSON.parse(value);
+    } catch (error) {
+        return fallback;
+    }
+};
+
+
+/**
+ * Convert value to Number safely
+ */
+const toNumber = (value, defaultValue = 0) => {
+
+    if (
+        value === undefined ||
+        value === null ||
+        value === ""
+    ) {
+        return defaultValue;
+    }
+
+    const number = Number(value);
+
+    return Number.isFinite(number)
+        ? number
+        : defaultValue;
+};
+
+
+/**
+ * Clean string array
+ */
+const cleanStringArray = (value) => {
+
+    if (!Array.isArray(value)) {
+        return [];
+    }
+
+    return value
+        .map(item => String(item).trim())
+        .filter(item =>
+            item &&
+            item.toLowerCase() !== "undefined" &&
+            item.toLowerCase() !== "null"
+        );
+};
+
+
+/**
+ * Get uploaded files safely
+ */
+const getFiles = (files, fieldName) => {
+
+    if (!files || !files[fieldName]) {
+        return [];
+    }
+
+    return Array.isArray(files[fieldName])
+        ? files[fieldName]
+        : [files[fieldName]];
+};
+
+
+
+// ============================================================
+// CREATE PRODUCT
+// ============================================================
+
 const createProduct = asyncHandler(async (req, res) => {
 
     try {
 
-        console.log("========== CREATE PRODUCT ==========");
-        console.log("FILES:", req.files);
-        console.log("BODY:", req.body);
+        console.log("==========================================");
+        console.log("CREATE PRODUCT");
+        console.log("==========================================");
 
-        if (!req.files || Object.keys(req.files).length === 0) {
+        console.log("BODY:", req.body);
+        console.log("FILES:", req.files);
+
+
+        // =====================================================
+        // PRODUCT IMAGES
+        // =====================================================
+
+        const productFiles = getFiles(req.files, "images");
+
+        const packFiles = getFiles(
+            req.files,
+            "packImages"
+        );
+
+        const combinationFiles = getFiles(
+            req.files,
+            "combinationImages"
+        );
+
+
+        if (productFiles.length === 0) {
+
             return res.status(400).json({
                 success: false,
                 message: "At least one product image is required"
             });
+
         }
 
-        // ==========================================
-        // PRODUCT + PACK IMAGES
-        // ==========================================
 
-        const productFiles = req.files?.images || [];
-        const packFiles = req.files?.packImages || [];
-        const combinationFiles = req.files?.combinationImages || [];
+        const imageUrls = productFiles.map(
+            file => file.path
+        );
 
-        const imageUrls = productFiles.map(file => file.path);
+        const packImageUrls = packFiles.map(
+            file => file.path
+        );
 
-        const packImageUrls = packFiles.map(file => file.path);
-
-        const combinationImageUrls = combinationFiles.map(file => file.path);
-
-
-        const sku = "TS-" + Date.now();
-
-        // ==============================
-        // COLORS
-        // ==============================
-
-
-
-        let colors = [];
-
-        if (req.body.colors !== undefined) {
-            try {
-                colors = JSON.parse(req.body.colors);
-
-                if (!Array.isArray(colors)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Colors must be an array"
-                    });
-                }
-
-            } catch (error) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid colors format"
-                });
-            }
-        }
-
-        colors = colors
-            .map(color => String(color).trim())
-            .filter(color =>
-                color &&
-                color.toLowerCase() !== "undefined"
+        const combinationImageUrls =
+            combinationFiles.map(
+                file => file.path
             );
 
 
+        console.log("PRODUCT IMAGES:", imageUrls);
+        console.log("PACK IMAGES:", packImageUrls);
+        console.log(
+            "COMBINATION IMAGES:",
+            combinationImageUrls
+        );
 
-        // ==============================
+
+        // =====================================================
+        // SKU
+        // =====================================================
+
+        const sku =
+            "TS-" +
+            Date.now();
+
+
+
+        // =====================================================
+        // PRICE
+        // =====================================================
+
+        /*
+         * IMPORTANT:
+         * Frontend FormData sends values as strings.
+         *
+         * Example:
+         * originalPrice = "1299"
+         * price = "999"
+         *
+         * MongoDB should receive:
+         * originalPrice = 1299
+         * price = 999
+         */
+
+        if (req.body.price === undefined || req.body.price === "") {
+            return res.status(400).json({
+                success: false,
+                message: "Price is required"
+            });
+        }
+
+        const price = Number(req.body.price);
+
+        if (isNaN(price) || price <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Price must be greater than 0"
+            });
+        }
+
+        let originalPrice = 0;
+
+        if (req.body.originalPrice !== undefined && req.body.originalPrice !== "") {
+            originalPrice = Number(req.body.originalPrice);
+
+            if (isNaN(originalPrice) || originalPrice < 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Original price must be a valid non-negative number"
+                });
+            }
+
+            if (originalPrice > 0 && originalPrice < price) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Original price must be greater than or equal to price"
+                });
+            }
+        } else {
+            originalPrice = price;
+        }
+
+        let discount = 0;
+
+        if (req.body.discount !== undefined && req.body.discount !== "") {
+            discount = toNumber(req.body.discount, 0);
+        } else if (originalPrice > price && originalPrice > 0) {
+            discount = Math.round(
+                ((originalPrice - price) / originalPrice) * 100
+            );
+        }
+
+
+        console.log("PRICE:", price);
+        console.log(
+            "ORIGINAL PRICE:",
+            originalPrice
+        );
+        console.log(
+            "DISCOUNT:",
+            discount
+        );
+
+
+        // =====================================================
+        // COLORS
+        // =====================================================
+
+        let colors = parseJSON(
+            req.body.colors,
+            []
+        );
+
+        if (!Array.isArray(colors)) {
+
+            return res.status(400).json({
+                success: false,
+                message: "Colors must be an array"
+            });
+
+        }
+
+        colors = cleanStringArray(colors);
+
+
+
+        // =====================================================
         // SIZES
-        // ==============================
+        // =====================================================
 
-        let sizes = [];
+        let sizes = parseJSON(
+            req.body.sizes,
+            []
+        );
 
-        if (req.body.sizes) {
-            try {
-                sizes = JSON.parse(req.body.sizes);
-            } catch (error) {
-                sizes = [];
-            }
+        if (!Array.isArray(sizes)) {
+            sizes = [];
         }
 
-        sizes = sizes
-            .map(size => String(size).trim())
-            .filter(size => size);
+        sizes = cleanStringArray(sizes);
 
-        // ==============================
+
+
+        // =====================================================
         // PACKS
-        // ==============================
+        // =====================================================
 
-        let packs = [];
+        let packs = parseJSON(
+            req.body.packs,
+            []
+        );
 
-        if (req.body.packs) {
-            try {
-
-                packs = JSON.parse(req.body.packs);
-
-                if (!Array.isArray(packs)) {
-                    packs = [];
-                }
-
-            } catch (error) {
-
-                console.error("packs parse error:", error);
-                packs = [];
-
-            }
+        if (!Array.isArray(packs)) {
+            packs = [];
         }
 
 
-        // ==========================================
-        // PREPARE PACK IMAGE COUNTS
-        // ==========================================
+        /*
+         * Normalize pack imageCount
+         */
 
         packs = packs.map(pack => ({
+
             ...pack,
-            imageCount: Number(pack.imageCount) || 0
+
+            imageCount: toNumber(
+                pack.imageCount,
+                0
+            )
+
         }));
 
 
 
-        // ==========================================
-        // GENERIC COLOR COMBINATION IMAGES
-        // ==========================================
-
-        let combinationImageIndex = 0;
-
-        colorCombinations = colorCombinations.map(combination => {
-
-            const imageCount =
-                Number(combination.imageCount) || 0;
-
-            const images = combinationImageUrls.slice(
-                combinationImageIndex,
-                combinationImageIndex + imageCount
-            );
-
-            combinationImageIndex += imageCount;
-
-            return {
-                ...combination,
-                image: images[0] || "",
-                images
-            };
-
-        });
-
-        // ==========================================
+        // =====================================================
         // COLOR COMBINATIONS
-        // ==========================================
+        // =====================================================
 
-        let colorCombinations = [];
+        let colorCombinations = parseJSON(
+            req.body.colorCombinations,
+            []
+        );
 
-        if (req.body.colorCombinations) {
-            try {
-
-                colorCombinations = JSON.parse(
-                    req.body.colorCombinations
-                );
-
-                if (!Array.isArray(colorCombinations)) {
-                    colorCombinations = [];
-                }
-
-            } catch (error) {
-
-                console.error(
-                    "COLOR COMBINATIONS PARSE ERROR:",
-                    error
-                );
-
-                colorCombinations = [];
-            }
+        if (!Array.isArray(colorCombinations)) {
+            colorCombinations = [];
         }
 
 
 
-        // ==========================================
-        // GENERIC PACK-WISE IMAGES
-        // ==========================================
-
-        // ==========================================
-        // GENERIC PACK-WISE IMAGES
-        // ==========================================
+        // =====================================================
+        // PACK-WISE IMAGES
+        // =====================================================
 
         let packImageIndex = 0;
 
+
         packs = packs.map(pack => {
 
-            const imageCount =
-                Number(pack.imageCount) || 0;
+            const imageCount = toNumber(
+                pack.imageCount,
+                0
+            );
+
 
             const newImages =
-                newPackImages.slice(
+                packImageUrls.slice(
                     packImageIndex,
                     packImageIndex + imageCount
                 );
 
+
             packImageIndex += imageCount;
 
-            // Existing images from frontend
+
+            /*
+             * Existing images if frontend sends any
+             */
+
             const existingPackImages =
                 Array.isArray(pack.images)
                     ? pack.images
@@ -214,26 +356,15 @@ const createProduct = asyncHandler(async (req, res) => {
                         ? [pack.image]
                         : [];
 
-            // Images removed while editing
-            const removedPackImages =
-                Array.isArray(pack.removedImages)
-                    ? pack.removedImages
-                    : [];
 
-            // Keep only images that were NOT removed
-            const filteredExistingPackImages =
-                existingPackImages.filter(
-                    image =>
-                        !removedPackImages.includes(image)
-                );
-
-            // Existing + newly uploaded images
             const finalPackImages = [
-                ...filteredExistingPackImages,
+                ...existingPackImages,
                 ...newImages
             ];
 
+
             return {
+
                 ...pack,
 
                 image:
@@ -241,492 +372,1253 @@ const createProduct = asyncHandler(async (req, res) => {
 
                 images:
                     finalPackImages
+
             };
 
         });
-        // ==============================
-        // CREATE PRODUCT
-        // ==============================
-        console.log("FINAL PACKS TO SAVE:", packs);
-        const product = await Product.create({
 
+
+
+        // =====================================================
+        // COLOR COMBINATION IMAGES
+        // =====================================================
+
+        let combinationImageIndex = 0;
+
+
+        colorCombinations =
+            colorCombinations.map(
+                combination => {
+
+                    const imageCount =
+                        toNumber(
+                            combination.imageCount,
+                            0
+                        );
+
+
+                    const images =
+                        combinationImageUrls.slice(
+                            combinationImageIndex,
+                            combinationImageIndex +
+                            imageCount
+                        );
+
+
+                    combinationImageIndex +=
+                        imageCount;
+
+
+                    return {
+
+                        ...combination,
+
+                        image:
+                            images[0] || "",
+
+                        images
+
+                    };
+
+                }
+            );
+
+
+
+        // =====================================================
+        // CREATE PRODUCT DATA
+        // =====================================================
+
+        const productData = {
 
             ...req.body,
 
+            // IMPORTANT NUMERIC FIELDS
+            price,
+            originalPrice,
+            discount,
+
+            // ARRAYS
             colors,
             sizes,
             packs,
             colorCombinations,
+
+            // PRODUCT IDENTIFICATION
             sku,
 
+            // IMAGES
             image: imageUrls[0],
-
             images: imageUrls
 
-        });
-
-        res.status(201).json({
-            success: true,
-            product
-        });
-
-    } catch (err) {
-
-        console.error("CREATE PRODUCT ERROR:", err);
-
-        throw err;
-
-    }
-
-});
+        };
 
 
-// Get All Products
-const getProducts = asyncHandler(async (req, res) => {
+        /*
+         * Remove raw JSON strings because we already
+         * converted them into proper arrays.
+         */
 
-    const products = await Product.find();
-
-    console.log("========== GET PRODUCTS ==========");
-    console.log("PRODUCT COUNT:", products.length);
-    console.log("FIRST PRODUCT ID:", products[0]?._id);
-    console.log("FIRST PRODUCT NAME:", products[0]?.name);
-    console.log("FIRST PRODUCT PACKS:", products[0]?.packs);
-
-    res.status(200).json({
-        success: true,
-        totalProducts: products.length,
-        count: products.length,
-        products
-    });
-
-});
-
-// Get Single Product
-const getProductById = asyncHandler(async (req, res, next) => {
-
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-        return next(new ErrorHandler("Product not found", 404));
-    }
-
-    res.status(200).json({
-        success: true,
-        product
-    });
-
-});
+        delete productData.colors;
+        delete productData.sizes;
+        delete productData.packs;
+        delete productData.colorCombinations;
 
 
-// Update Product
-const updateProduct = asyncHandler(async (req, res) => {
-    try {
-        console.log("========== UPDATE PRODUCT ==========");
-        console.log("BODY:", req.body);
-        console.log("FILES:", req.files);
-        console.log("========== PACK DEBUG ==========");
-        console.log("REQ.BODY.PACKS:", req.body.packs);
-        console.log("PACKS TYPE:", typeof req.body.packs);
-
-        const product = await Product.findById(req.params.id);
-
-        if (!product) {
-            return res.status(404).json({
-                success: false,
-                message: "Product not found"
-            });
-        }
-
-        // ==========================================
-        // 1. EXISTING IMAGES
-        // ==========================================
-
-        let existingImages = [];
-
-        if (req.body.existingImages) {
-            try {
-                existingImages = JSON.parse(req.body.existingImages);
-            } catch (error) {
-                console.error("existingImages parse error:", error);
-
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid existingImages format"
-                });
-            }
-        } else {
-            existingImages = product.images || [];
-        }
+        productData.colors = colors;
+        productData.sizes = sizes;
+        productData.packs = packs;
+        productData.colorCombinations =
+            colorCombinations;
 
 
-        // ==========================================
-        // 2. NEW IMAGES
-        // ==========================================
 
-        // ==========================================
-        // 2. NEW PRODUCT IMAGES
-        // ==========================================
+        // =====================================================
+        // CREATE
+        // =====================================================
 
-        const productFiles = req.files?.images || [];
+        const product =
+            await Product.create(productData);
 
-        const newImages = productFiles.map(file => file.path);
-
-
-        // ==========================================
-        // GENERIC PACK-WISE IMAGES
-        // ==========================================
-
-        const packFiles = req.files?.packImages || [];
-
-        const newPackImages = packFiles.map(file => file.path);
-
-
-        // ==========================================
-        // GENERIC COLOR COMBINATION IMAGES
-        // ==========================================
-
-        const combinationFiles =
-            req.files?.combinationImages || [];
-
-        const newCombinationImages =
-            combinationFiles.map(file => file.path);
 
         console.log(
-            "NEW COMBINATION IMAGES:",
-            newCombinationImages
+            "PRODUCT CREATED:",
+            product._id
         );
 
-        console.log("NEW PACK IMAGES:", newPackImages);
+        console.log(
+            "SAVED PRICE:",
+            product.price
+        );
 
-        console.log("EXISTING IMAGES:", existingImages);
-        console.log("NEW IMAGES:", newImages);
+        console.log(
+            "SAVED ORIGINAL PRICE:",
+            product.originalPrice
+        );
 
 
-        // ==========================================
-        // 3. FINAL IMAGES
-        // ==========================================
+        return res.status(201).json({
 
-        const finalImages = [
-            ...existingImages,
-            ...newImages
-        ];
-
-
-        if (finalImages.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "At least one product image is required"
-            });
-        }
-
-
-        if (finalImages.length > 5) {
-            return res.status(400).json({
-                success: false,
-                message: "Maximum 5 product images are allowed"
-            });
-        }
-
-        // ==========================================
-        // 3.5 MAIN IMAGE
-        // ==========================================
-
-        const mainImage = req.body.mainImage;
-
-        if (mainImage && finalImages.includes(mainImage)) {
-
-            const mainIndex = finalImages.indexOf(mainImage);
-
-            finalImages.splice(mainIndex, 1);
-
-            finalImages.unshift(mainImage);
-
-        }
-
-
-
-
-        // ==========================================
-        // 3.8 PACK OPTIONS
-        // ==========================================
-
-        let packs = product.packs || [];
-
-        if (req.body.packs !== undefined) {
-            try {
-
-                packs = JSON.parse(req.body.packs);
-
-                if (!Array.isArray(packs)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Packs must be an array"
-                    });
-                }
-
-            } catch (error) {
-
-                console.error("PACKS PARSE ERROR:", error);
-
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid packs format"
-                });
-            }
-        }
-
-        console.log("FINAL PACKS:", packs);
-        // ==========================================
-        // GENERIC PACK-WISE IMAGES
-        // ==========================================
-
-        let packImageIndex = 0;
-
-        packs = packs.map(pack => {
-
-            const imageCount = Number(pack.imageCount) || 0;
-
-            const newImages = newPackImages.slice(
-                packImageIndex,
-                packImageIndex + imageCount
-            );
-
-            packImageIndex += imageCount;
-
-            const existingPackImages = Array.isArray(pack.images)
-                ? pack.images
-                : pack.image
-                    ? [pack.image]
-                    : [];
-
-
-            // ==========================================
-            // REMOVE PACK IMAGES
-            // ==========================================
-
-            const removedPackImages =
-                Array.isArray(pack.removedImages)
-                    ? pack.removedImages
-                    : [];
-
-            const filteredExistingPackImages =
-                existingPackImages.filter(
-                    image => !removedPackImages.includes(image)
-                );
-
-            const finalPackImages = [
-                ...existingPackImages,
-                ...newImages
-            ];
-
-            return {
-                ...pack,
-                image: finalPackImages[0] || "",
-                images: finalPackImages
-            };
-
-        });
-
-
-
-        // ==========================================
-        // 4. COLORS
-        // ==========================================
-
-        let colors = product.colors || [];
-
-        if (req.body.colors !== undefined) {
-            try {
-                colors = JSON.parse(req.body.colors);
-
-                if (!Array.isArray(colors)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Colors must be an array"
-                    });
-                }
-
-            } catch (error) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid colors format"
-                });
-            }
-        }
-
-        colors = colors
-            .map(color => String(color).trim())
-            .filter(color =>
-                color &&
-                color.toLowerCase() !== "undefined"
-            );
-
-        // ==============================
-        // SIZES
-        // ==============================
-
-        let sizes = [];
-
-        if (req.body.sizes) {
-            try {
-                sizes = JSON.parse(req.body.sizes);
-
-                if (!Array.isArray(sizes)) {
-                    sizes = [];
-                }
-
-            } catch (error) {
-                console.error("SIZES PARSE ERROR:", error);
-                sizes = [];
-            }
-        }
-
-        sizes = sizes
-            .map(size => String(size).trim())
-            .filter(size => size);
-
-        console.log("FINAL SIZES:", sizes);
-
-
-        // Clean sizes
-        sizes = sizes
-            .map(size => String(size).trim())
-            .filter(size => size);
-
-
-        console.log("FINAL COLORS:", colors);
-        console.log("FINAL SIZES:", sizes);
-
-
-        
-
-
-        // ==========================================
-        // COLOR COMBINATIONS
-        // ==========================================
-
-        let colorCombinations = product.colorCombinations || [];
-
-        if (req.body.colorCombinations !== undefined) {
-
-            try {
-
-                colorCombinations = JSON.parse(
-                    req.body.colorCombinations
-                );
-
-                if (!Array.isArray(colorCombinations)) {
-                    return res.status(400).json({
-                        success: false,
-                        message: "Color combinations must be an array"
-                    });
-                }
-
-            } catch (error) {
-
-                console.error(
-                    "COLOR COMBINATIONS PARSE ERROR:",
-                    error
-                );
-
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid color combinations format"
-                });
-            }
-        }
-
-
-        // ==========================================
-        // 6. UPDATE NORMAL FIELDS
-        // ==========================================
-
-        Object.keys(req.body).forEach((key) => {
-
-            if (
-                key !== "image" &&
-                key !== "images" &&
-                key !== "existingImages" &&
-                key !== "sizes" &&
-                key !== "colors" &&
-                key !== "packs" &&
-                key !== "colorCombinations"
-            ) {
-                product[key] = req.body[key];
-            }
-
-        });
-        product.sizes = sizes;
-        product.colors = colors;
-        product.packs = packs;
-        product.colorCombinations = colorCombinations;
-
-
-        // ==========================================
-        // 7. SAVE COLORS + SIZES
-        // ==========================================
-
-        product.colors = colors;
-
-        product.sizes = sizes;
-
-
-        // ==========================================
-        // 8. SAVE IMAGES
-        // ==========================================
-
-        product.images = finalImages;
-
-        product.image = finalImages[0];
-
-
-        // ==========================================
-        // 9. SAVE PRODUCT
-        // ==========================================
-
-        const updatedProduct = await product.save();
-        console.log("========== AFTER SAVE ==========");
-        console.log("UPDATED PRODUCT ID:", updatedProduct._id);
-        console.log("UPDATED PRODUCT PACKS:", updatedProduct.packs);
-
-
-        console.log("UPDATED PRODUCT:", updatedProduct);
-
-
-        return res.status(200).json({
             success: true,
-            product: updatedProduct
-        });
 
+            product
+
+        });
 
     } catch (error) {
 
-        console.error("UPDATE PRODUCT ERROR:", error);
+        console.error(
+            "CREATE PRODUCT ERROR:",
+            error
+        );
 
         return res.status(500).json({
+
             success: false,
-            message: error.message || "Failed to update product"
+
+            message:
+                error.message ||
+                "Failed to create product"
+
         });
 
     }
+
 });
 
-// Delete Product
-const deleteProduct = asyncHandler(async (req, res) => {
 
-    await Product.findByIdAndDelete(req.params.id);
 
-    res.status(200).json({
+// ============================================================
+// GET ALL PRODUCTS
+// ============================================================
+
+const getProducts = asyncHandler(async (req, res) => {
+
+    const products =
+        await Product.find();
+
+
+    console.log(
+        "========== GET PRODUCTS =========="
+    );
+
+    console.log(
+        "PRODUCT COUNT:",
+        products.length
+    );
+
+
+    if (products.length > 0) {
+
+        console.log(
+            "FIRST PRODUCT ID:",
+            products[0]._id
+        );
+
+        console.log(
+            "FIRST PRODUCT NAME:",
+            products[0].name
+        );
+
+        console.log(
+            "FIRST PRODUCT PRICE:",
+            products[0].price
+        );
+
+        console.log(
+            "FIRST PRODUCT ORIGINAL PRICE:",
+            products[0].originalPrice
+        );
+
+        console.log(
+            "FIRST PRODUCT PACKS:",
+            products[0].packs
+        );
+
+    }
+
+
+    return res.status(200).json({
+
         success: true,
-        message: "Product Deleted Successfully"
+
+        totalProducts:
+            products.length,
+
+        count:
+            products.length,
+
+        products
+
     });
 
 });
 
+
+
+// ============================================================
+// GET SINGLE PRODUCT
+// ============================================================
+
+const getProductById = asyncHandler(
+    async (req, res, next) => {
+
+        const product =
+            await Product.findById(
+                req.params.id
+            );
+
+
+        if (!product) {
+
+            return next(
+                new ErrorHandler(
+                    "Product not found",
+                    404
+                )
+            );
+
+        }
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            product
+
+        });
+
+    }
+);
+
+
+
+// ============================================================
+// UPDATE PRODUCT
+// ============================================================
+
+const updateProduct = asyncHandler(
+    async (req, res) => {
+
+        try {
+
+            console.log("==========================================");
+            console.log("UPDATE PRODUCT");
+            console.log("==========================================");
+
+            console.log(
+                "PRODUCT ID:",
+                req.params.id
+            );
+
+            console.log(
+                "BODY:",
+                req.body
+            );
+
+            console.log(
+                "FILES:",
+                req.files
+            );
+
+
+            // =================================================
+            // FIND PRODUCT
+            // =================================================
+
+            const product =
+                await Product.findById(
+                    req.params.id
+                );
+
+
+            if (!product) {
+
+                return res.status(404).json({
+
+                    success: false,
+
+                    message:
+                        "Product not found"
+
+                });
+
+            }
+
+
+
+            // =================================================
+            // PRODUCT IMAGES
+            // =================================================
+
+            let existingImages = [];
+
+
+            if (
+                req.body.existingImages !==
+                undefined
+            ) {
+
+                existingImages =
+                    parseJSON(
+                        req.body.existingImages,
+                        []
+                    );
+
+
+                if (
+                    !Array.isArray(
+                        existingImages
+                    )
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Invalid existingImages format"
+
+                    });
+
+                }
+
+            } else {
+
+                existingImages =
+                    product.images || [];
+
+            }
+
+
+
+            // =================================================
+            // NEW PRODUCT IMAGES
+            // =================================================
+
+            const productFiles =
+                getFiles(
+                    req.files,
+                    "images"
+                );
+
+
+            const newImages =
+                productFiles.map(
+                    file => file.path
+                );
+
+
+
+            // =================================================
+            // FINAL PRODUCT IMAGES
+            // =================================================
+
+            let finalImages = [
+
+                ...existingImages,
+
+                ...newImages
+
+            ];
+
+
+            if (finalImages.length === 0) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "At least one product image is required"
+
+                });
+
+            }
+
+
+            if (finalImages.length > 5) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Maximum 5 product images are allowed"
+
+                });
+
+            }
+
+
+
+            // =================================================
+            // MAIN IMAGE
+            // =================================================
+
+            const mainImage =
+                req.body.mainImage;
+
+
+            if (
+                mainImage &&
+                finalImages.includes(mainImage)
+            ) {
+
+                const mainIndex =
+                    finalImages.indexOf(
+                        mainImage
+                    );
+
+
+                finalImages.splice(
+                    mainIndex,
+                    1
+                );
+
+
+                finalImages.unshift(
+                    mainImage
+                );
+
+            }
+
+
+
+            // =================================================
+            // PACK IMAGES
+            // =================================================
+
+            const packFiles =
+                getFiles(
+                    req.files,
+                    "packImages"
+                );
+
+
+            const newPackImages =
+                packFiles.map(
+                    file => file.path
+                );
+
+
+            console.log(
+                "NEW PACK IMAGES:",
+                newPackImages
+            );
+
+
+
+            // =================================================
+            // COLOR COMBINATION IMAGES
+            // =================================================
+
+            const combinationFiles =
+                getFiles(
+                    req.files,
+                    "combinationImages"
+                );
+
+
+            const newCombinationImages =
+                combinationFiles.map(
+                    file => file.path
+                );
+
+
+            console.log(
+                "NEW COMBINATION IMAGES:",
+                newCombinationImages
+            );
+
+
+
+            // =================================================
+            // PACK OPTIONS
+            // =================================================
+
+            let packs =
+                product.packs || [];
+
+
+            if (
+                req.body.packs !==
+                undefined
+            ) {
+
+                packs =
+                    parseJSON(
+                        req.body.packs,
+                        []
+                    );
+
+
+                if (!Array.isArray(packs)) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Packs must be an array"
+
+                    });
+
+                }
+
+            }
+
+
+
+            // =================================================
+            // PROCESS PACKS
+            // =================================================
+
+            let packImageIndex = 0;
+
+
+            packs = packs.map(pack => {
+
+                const imageCount =
+                    toNumber(
+                        pack.imageCount,
+                        0
+                    );
+
+
+                /*
+                 * Newly uploaded images
+                 */
+
+                const uploadedImages =
+                    newPackImages.slice(
+                        packImageIndex,
+                        packImageIndex +
+                        imageCount
+                    );
+
+
+                packImageIndex +=
+                    imageCount;
+
+
+
+                /*
+                 * Existing pack images
+                 */
+
+                const existingPackImages =
+                    Array.isArray(
+                        pack.images
+                    )
+                        ? pack.images
+                        : pack.image
+                            ? [pack.image]
+                            : [];
+
+
+
+                /*
+                 * Images removed by frontend
+                 */
+
+                const removedPackImages =
+                    Array.isArray(
+                        pack.removedImages
+                    )
+                        ? pack.removedImages
+                        : [];
+
+
+
+                /*
+                 * Keep existing images that
+                 * were NOT removed
+                 */
+
+                const filteredExistingPackImages =
+                    existingPackImages.filter(
+                        image =>
+                            !removedPackImages.includes(
+                                image
+                            )
+                    );
+
+
+
+                /*
+                 * Existing remaining images
+                 * + newly uploaded images
+                 */
+
+                const finalPackImages = [
+
+                    ...filteredExistingPackImages,
+
+                    ...uploadedImages
+
+                ];
+
+
+
+                return {
+
+                    ...pack,
+
+                    imageCount:
+                        finalPackImages.length,
+
+                    image:
+                        finalPackImages[0] || "",
+
+                    images:
+                        finalPackImages,
+
+                    /*
+                     * Don't save frontend-only
+                     * removedImages field
+                     */
+
+                    removedImages:
+                        undefined
+
+                };
+
+            });
+
+
+
+            // =================================================
+            // COLORS
+            // =================================================
+
+            let colors =
+                product.colors || [];
+
+
+            if (
+                req.body.colors !==
+                undefined
+            ) {
+
+                colors =
+                    parseJSON(
+                        req.body.colors,
+                        []
+                    );
+
+
+                if (!Array.isArray(colors)) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Colors must be an array"
+
+                    });
+
+                }
+
+            }
+
+
+            colors =
+                cleanStringArray(
+                    colors
+                );
+
+
+
+            // =================================================
+            // SIZES
+            // =================================================
+
+            let sizes =
+                product.sizes || [];
+
+
+            if (
+                req.body.sizes !==
+                undefined
+            ) {
+
+                sizes =
+                    parseJSON(
+                        req.body.sizes,
+                        []
+                    );
+
+
+                if (!Array.isArray(sizes)) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Sizes must be an array"
+
+                    });
+
+                }
+
+            }
+
+
+            sizes =
+                cleanStringArray(
+                    sizes
+                );
+
+
+
+            // =================================================
+            // COLOR COMBINATIONS
+            // =================================================
+
+            let colorCombinations =
+                product.colorCombinations || [];
+
+
+            if (
+                req.body.colorCombinations !==
+                undefined
+            ) {
+
+                colorCombinations =
+                    parseJSON(
+                        req.body.colorCombinations,
+                        []
+                    );
+
+
+                if (
+                    !Array.isArray(
+                        colorCombinations
+                    )
+                ) {
+
+                    return res.status(400).json({
+
+                        success: false,
+
+                        message:
+                            "Color combinations must be an array"
+
+                    });
+
+                }
+
+            }
+
+
+
+            // =================================================
+            // PROCESS COLOR COMBINATION IMAGES
+            // =================================================
+
+            let combinationImageIndex = 0;
+
+
+            colorCombinations =
+                colorCombinations.map(
+                    combination => {
+
+                        const imageCount =
+                            toNumber(
+                                combination.imageCount,
+                                0
+                            );
+
+
+                        const uploadedImages =
+                            newCombinationImages.slice(
+                                combinationImageIndex,
+                                combinationImageIndex +
+                                imageCount
+                            );
+
+
+                        combinationImageIndex +=
+                            imageCount;
+
+
+
+                        /*
+                         * Existing images
+                         */
+
+                        const existingCombinationImages =
+                            Array.isArray(
+                                combination.images
+                            )
+                                ? combination.images
+                                : combination.image
+                                    ? [combination.image]
+                                    : [];
+
+
+
+                        /*
+                         * Removed images
+                         */
+
+                        const removedImages =
+                            Array.isArray(
+                                combination.removedImages
+                            )
+                                ? combination.removedImages
+                                : [];
+
+
+
+                        /*
+                         * Filter removed images
+                         */
+
+                        const filteredExistingImages =
+                            existingCombinationImages.filter(
+                                image =>
+                                    !removedImages.includes(
+                                        image
+                                    )
+                            );
+
+
+
+                        /*
+                         * Final combination images
+                         */
+
+                        const finalCombinationImages = [
+
+                            ...filteredExistingImages,
+
+                            ...uploadedImages
+
+                        ];
+
+
+
+                        return {
+
+                            ...combination,
+
+                            image:
+                                finalCombinationImages[0] || "",
+
+                            images:
+                                finalCombinationImages,
+
+                            removedImages:
+                                undefined
+
+                        };
+
+                    }
+                );
+
+
+
+            // =================================================
+            // PRICE & ORIGINAL PRICE
+            // =================================================
+
+            /*
+             * VERY IMPORTANT:
+             *
+             * Only update price / originalPrice if frontend actually sends the field.
+             * This prevents accidental reset or unwanted overrides during partial updates.
+             */
+
+            if (req.body.price !== undefined && req.body.price !== "") {
+                const parsedPrice = Number(req.body.price);
+
+                if (isNaN(parsedPrice) || parsedPrice <= 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Price must be greater than 0"
+                    });
+                }
+
+                product.price = parsedPrice;
+            }
+
+            if (req.body.originalPrice !== undefined && req.body.originalPrice !== "") {
+                const parsedOriginalPrice = Number(req.body.originalPrice);
+
+                if (isNaN(parsedOriginalPrice) || parsedOriginalPrice < 0) {
+                    return res.status(400).json({
+                        success: false,
+                        message: "Original price must be a valid non-negative number"
+                    });
+                }
+
+                product.originalPrice = parsedOriginalPrice;
+            }
+
+            /*
+             * VALIDATION:
+             * If both originalPrice and price are positive,
+             * originalPrice should normally be >= price.
+             */
+            if (
+                product.originalPrice !== undefined &&
+                product.originalPrice > 0 &&
+                product.price !== undefined &&
+                product.price > 0 &&
+                product.originalPrice < product.price
+            ) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Original price must be greater than or equal to price"
+                });
+            }
+
+            // DISCOUNT
+            if (req.body.discount !== undefined && req.body.discount !== "") {
+                product.discount = toNumber(req.body.discount, 0);
+            } else if (product.originalPrice && product.originalPrice > product.price) {
+                product.discount = Math.round(
+                    ((product.originalPrice - product.price) / product.originalPrice) * 100
+                );
+            } else {
+                product.discount = 0;
+            }
+
+
+
+            // =================================================
+            // NORMAL PRODUCT FIELDS
+            // =================================================
+
+            /*
+             * Fields that are handled separately
+             * should NOT be copied from req.body.
+             */
+
+            const excludedFields = new Set([
+
+                "_id",
+
+                "__v",
+
+                "image",
+
+                "images",
+
+                "existingImages",
+
+                "mainImage",
+
+                "price",
+
+                "originalPrice",
+
+                "discount",
+
+                "colors",
+
+                "sizes",
+
+                "packs",
+
+                "colorCombinations",
+
+                "removedImages",
+
+                "packImages",
+
+                "combinationImages"
+
+            ]);
+
+
+
+            Object.keys(req.body).forEach(
+                key => {
+
+                    if (
+                        excludedFields.has(key)
+                    ) {
+                        return;
+                    }
+
+
+                    /*
+                     * Don't save empty undefined values
+                     */
+
+                    if (
+                        req.body[key] !==
+                        undefined
+                    ) {
+
+                        product[key] =
+                            req.body[key];
+
+                    }
+
+                }
+            );
+
+
+
+            // =================================================
+            // SAVE ARRAYS
+            // =================================================
+
+            product.colors =
+                colors;
+
+
+            product.sizes =
+                sizes;
+
+
+            product.packs =
+                packs;
+
+
+            product.colorCombinations =
+                colorCombinations;
+
+
+
+            // =================================================
+            // SAVE PRODUCT IMAGES
+            // =================================================
+
+            product.images =
+                finalImages;
+
+
+            product.image =
+                finalImages[0];
+
+
+
+            // =================================================
+            // DEBUG PRICE
+            // =================================================
+
+            console.log(
+                "========== FINAL VALUES =========="
+            );
+
+            console.log(
+                "PRICE:",
+                product.price
+            );
+
+            console.log(
+                "ORIGINAL PRICE:",
+                product.originalPrice
+            );
+
+            console.log(
+                "DISCOUNT:",
+                product.discount
+            );
+
+            console.log(
+                "COLORS:",
+                product.colors
+            );
+
+            console.log(
+                "SIZES:",
+                product.sizes
+            );
+
+            console.log(
+                "PACKS:",
+                product.packs
+            );
+
+            console.log(
+                "COLOR COMBINATIONS:",
+                product.colorCombinations
+            );
+
+
+
+            // =================================================
+            // SAVE
+            // =================================================
+
+            const updatedProduct =
+                await product.save();
+
+
+
+            // =================================================
+            // AFTER SAVE DEBUG
+            // =================================================
+
+            console.log(
+                "========== AFTER SAVE =========="
+            );
+
+            console.log(
+                "PRODUCT ID:",
+                updatedProduct._id
+            );
+
+            console.log(
+                "PRICE:",
+                updatedProduct.price
+            );
+
+            console.log(
+                "ORIGINAL PRICE:",
+                updatedProduct.originalPrice
+            );
+
+            console.log(
+                "DISCOUNT:",
+                updatedProduct.discount
+            );
+
+
+
+            return res.status(200).json({
+
+                success: true,
+
+                product:
+                    updatedProduct
+
+            });
+
+        } catch (error) {
+
+            console.error(
+                "UPDATE PRODUCT ERROR:",
+                error
+            );
+
+
+            return res.status(500).json({
+
+                success: false,
+
+                message:
+                    error.message ||
+                    "Failed to update product"
+
+            });
+
+        }
+
+    }
+);
+
+
+
+// ============================================================
+// DELETE PRODUCT
+// ============================================================
+
+const deleteProduct = asyncHandler(
+    async (req, res) => {
+
+        const product =
+            await Product.findById(
+                req.params.id
+            );
+
+
+        if (!product) {
+
+            return res.status(404).json({
+
+                success: false,
+
+                message:
+                    "Product not found"
+
+            });
+
+        }
+
+
+        await Product.findByIdAndDelete(
+            req.params.id
+        );
+
+
+        return res.status(200).json({
+
+            success: true,
+
+            message:
+                "Product Deleted Successfully"
+
+        });
+
+    }
+);
+
+
+
+// ============================================================
+// EXPORTS
+// ============================================================
+
 module.exports = {
+
     createProduct,
+
     getProducts,
+
     getProductById,
+
     updateProduct,
-    deleteProduct,
+
+    deleteProduct
+
 };
