@@ -1,6 +1,6 @@
 var configuration = {
-  widgetId: "YOUR_WIDGET_ID",
-  tokenAuth: "YOUR_NEW_TOKEN",
+  widgetId: "366874664d57383734313131",
+  tokenAuth: "562456T0RXrgQVXSg06a86a3f1P1",
   exposeMethods: true,
 
   success: function (data) {
