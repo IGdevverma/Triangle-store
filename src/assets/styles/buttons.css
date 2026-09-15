@@ -1,142 +1,89 @@
 /* ===========================
-   BUTTON BASE
+   BUTTONS
 =========================== */
 
-.btn{
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 
-    display:inline-flex;
+    border: none;
+    outline: none;
+    cursor: pointer;
 
-    align-items:center;
+    padding: 14px 28px;
 
-    justify-content:center;
+    font-size: 16px;
+    font-weight: 600;
 
-    gap:8px;
+    border-radius: var(--radius-md);
+    text-decoration: none;
 
-    padding:14px 28px;
-
-    border:none;
-
-    border-radius:14px;
-
-    cursor:pointer;
-
-    font-size:16px;
-
-    font-weight:600;
-
-    transition:all .3s ease;
-
+    transition: var(--transition);
 }
 
 /* ===========================
    PRIMARY
 =========================== */
 
-.btn-primary{
-
-    background:var(--primary);
-
-    color:white;
-
+.btn-primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-primary:hover{
-
-    background:var(--primary-dark);
-
-    transform:translateY(-3px);
-
-    box-shadow:0 12px 25px rgba(124,58,237,.25);
-
+.btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 /* ===========================
    SECONDARY
 =========================== */
 
-.btn-secondary{
-
-    background:#111827;
-
-    color:white;
-
+.btn-secondary {
+    background: var(--secondary);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary:hover{
-
-    transform:translateY(-3px);
-
+.btn-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 /* ===========================
    OUTLINE
 =========================== */
 
-.btn-outline{
-
-    background:white;
-
-    color:var(--primary);
-
-    border:2px solid var(--primary);
-
+.btn-outline {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
 }
 
-.btn-outline:hover{
-
-    background:var(--primary);
-
-    color:white;
-
-}
-/* ================= BUTTONS ================= */
-
-.btn{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    border:none;
-    outline:none;
-    cursor:pointer;
-    transition:var(--transition);
-    font-weight:600;
-    border-radius:var(--radius-md);
-    text-decoration:none;
+.btn-outline:hover {
+    background: var(--background);
+    color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
-.btn-primary{
-    background:var(--primary);
-    color:#fff;
-    padding:14px 28px;
-    box-shadow:var(--shadow-sm);
+/* ===========================
+   DANGER
+=========================== */
+
+.btn-danger {
+    background: var(--danger);
+    color: #fff;
+    padding: 14px 28px;
 }
 
-.btn-primary:hover{
-    transform:translateY(-3px);
-    background:var(--primary-dark);
-    box-shadow:var(--shadow-md);
-}
-
-.btn-outline{
-    background:white;
-    border:1px solid var(--border);
-    color:var(--text);
-    padding:14px 28px;
-}
-
-.btn-outline:hover{
-    background:var(--background);
-    transform:translateY(-3px);
-}
-
-.btn-danger{
-    background:var(--danger);
-    color:white;
-    padding:14px 28px;
-}
-
-.btn-danger:hover{
-    background:#DC2626;
-    transform:translateY(-3px);
+.btn-danger:hover {
+    background: #dc2626;
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
