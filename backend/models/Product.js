@@ -10,6 +10,14 @@ const productSchema = new mongoose.Schema(
 
 
 
+    productMode: {
+      type: String,
+      enum: ["single", "pack"],
+      default: "single",
+      index: true,
+    },
+
+
     productGroup: {
       type: String,
       trim: true,

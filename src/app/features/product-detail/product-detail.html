@@ -806,7 +806,7 @@
 
 
 
- 
+
 
 
 
@@ -815,6 +815,7 @@
     <!-- =====================================================
          YOU MAY ALSO LIKE
     ====================================================== -->
+
 
     <section class="recommendation-section" *ngIf="relatedProducts.length > 0">
 
@@ -831,17 +832,19 @@
 
       <div class="product-card-grid">
 
-        <article class="recommendation-card" *ngFor="let item of relatedProducts" [routerLink]="[
-            '/product',
-            item._id || item.id
-          ]">
+        <article class="recommendation-card" *ngFor="let item of relatedProducts"
+          [routerLink]="['/product', item._id || item.id]">
+
+          <!-- IMAGE -->
 
           <div class="recommendation-image">
 
-            <img [src]="item.images?.[0] || item.image" [alt]="item.name" loading="lazy">
+            <img [src]="item.images?.[0] || item.image" [alt]="item.name + ' - ' + item.selectedColor" loading="lazy">
 
           </div>
 
+
+          <!-- INFO -->
 
           <div class="recommendation-info">
 
@@ -853,14 +856,48 @@
               ₹{{ item.price | number:'1.0-0' }}
             </strong>
 
+
+            <!-- COLOR -->
+
+            <div class="recommendation-color" *ngIf="item.selectedColor">
+
+              <span class="color-dot" [style.background]="
+              item.selectedColor.toLowerCase() === 'black'
+                ? '#000'
+                : item.selectedColor.toLowerCase() === 'white'
+                  ? '#fff'
+                  : item.selectedColor.toLowerCase() === 'grey'
+                    ? '#999'
+                    : item.selectedColor.toLowerCase() === 'red'
+                      ? '#e53935'
+                      : item.selectedColor.toLowerCase() === 'blue'
+                        ? '#2563eb'
+                        : item.selectedColor.toLowerCase() === 'green'
+                          ? '#16a34a'
+                          : item.selectedColor.toLowerCase() === 'navy'
+                            ? '#111827'
+                            : '#ccc'
+            ">
+              </span>
+
+              <span>
+                {{ item.selectedColor }}
+              </span>
+
+            </div>
+
           </div>
 
 
+          <!-- QUICK ADD -->
+
           <button type="button" class="quick-add" (click)="
-              $event.stopPropagation();
-              addRelatedToCart(item)
-            ">
+          $event.stopPropagation();
+          addRelatedToCart(item)
+        ">
+
             + ADD
+
           </button>
 
         </article>
@@ -868,7 +905,6 @@
       </div>
 
     </section>
-
   </main>
 
 </div>

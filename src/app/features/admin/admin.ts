@@ -1279,6 +1279,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       this.newProduct.productGroup?.trim() || ''
     );
 
+
+    formData.append(
+      'productMode',
+      this.newProduct.productMode || 'single'
+    );
     formData.append(
       'stock',
       String(

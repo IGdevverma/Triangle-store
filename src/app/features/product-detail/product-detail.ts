@@ -1934,17 +1934,19 @@ export class ProductDetail implements OnInit {
   // =====================================================
   // RELATED PRODUCTS
   // =====================================================
-
-  addRelatedToCart(
-    item: Product
-  ): void {
+  addRelatedToCart(item: Product): void {
 
     this.cartService.addToCart(
-      item
+      item,
+      1,
+      item.selectedSize || this.selectedSize,
+      item.selectedColor,
+      'single',
+      ''
     );
 
     this.notificationService.show(
-      `${item.name} added to cart`
+      `${item.name} - ${item.selectedColor} added to cart`
     );
 
   }
@@ -1954,61 +1956,122 @@ export class ProductDetail implements OnInit {
   // LOAD RELATED PRODUCTS
   // =====================================================
 
-  // =====================================================
-  // LOAD RELATED PRODUCTS
-  // =====================================================
-
   private loadRelatedProducts(product: Product): void {
+
     this.productService.getProducts().subscribe({
+
       next: (response: any) => {
-        const products = (response?.products ?? []) as Product[];
 
-        const productId = product._id ?? product.id;
-        const group = product.productGroup?.trim().toLowerCase();
+        const products =
+          (response?.products ?? []) as Product[];
 
-        // Product group nahi hai to recommendations mat dikhao
-        if (!group) {
+        const currentProductId =
+          product._id ?? product.id;
+
+        const currentGroup =
+          product.productGroup
+            ?.trim()
+            .toLowerCase();
+
+        // ---------------------------------------------------
+        // No product group = no recommendations
+        // ---------------------------------------------------
+
+        if (!currentGroup) {
+
           this.relatedProducts = [];
-          
+
           this.loadingService.hide();
+
           return;
         }
 
-        // Same product group ke sirf variants
+
+        // ---------------------------------------------------
+        // FIND SINGLE PRODUCTS FROM SAME PRODUCT FAMILY
+        // ---------------------------------------------------
+
         this.relatedProducts = products
           .filter(item => {
-            const itemId = item._id ?? item.id;
-            const itemGroup = item.productGroup?.trim().toLowerCase();
+
+            const itemId =
+              item._id ?? item.id;
+
+            const itemGroup =
+              item.productGroup
+                ?.trim()
+                .toLowerCase();
+
+            const itemMode =
+              item.productMode
+                ?.trim()
+                .toLowerCase();
 
             return (
-              itemGroup === group &&
-              itemId !== productId &&
+
+              // Same product family
+              itemGroup === currentGroup
+
+              &&
+
+              // Only Single Products
+              itemMode === 'single'
+
+              &&
+
+              // Don't show current product
+              itemId !== currentProductId
+
+              &&
+
+              // Don't show hidden products
               item.status !== 'Hidden'
+
             );
+
           })
+
+          // Remove duplicate products
           .filter(
             (item, index, array) =>
+
               array.findIndex(
-                x => (x._id ?? x.id) === (item._id ?? item.id)
+                x =>
+                  (x._id ?? x.id) ===
+                  (item._id ?? item.id)
               ) === index
+
           )
+
+          // Maximum 4 recommendations
           .slice(0, 4);
 
-        // BEST SELLERS section remove kar diya hai
-        
+
+        console.log(
+          'YOU MAY ALSO LIKE:',
+          this.relatedProducts
+        );
+
 
         this.loadingService.hide();
+
       },
 
       error: error => {
-        console.error('Error loading related products:', error);
+
+        console.error(
+          'Error loading related products:',
+          error
+        );
 
         this.relatedProducts = [];
-        
 
         this.loadingService.hide();
+
       }
+
     });
+
   }
   previousImage(): void {
     if (!this.productImages.length) {

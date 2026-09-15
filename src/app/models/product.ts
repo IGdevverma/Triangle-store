@@ -118,6 +118,7 @@ export interface Product {
   fabric?: string;
 
   sku?: string;
+  productMode?: 'single' | 'pack';
     // Product family / colour variant group
   // Example:
   // "premium-fitted-tank"

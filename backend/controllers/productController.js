@@ -440,6 +440,12 @@ const createProduct = asyncHandler(async (req, res) => {
 
 
 
+            productMode:
+                typeof req.body.productMode === "string"
+                    ? req.body.productMode.trim().toLowerCase()
+                    : "single",
+
+
             productGroup:
                 typeof req.body.productGroup === "string"
                     ? req.body.productGroup.trim()
@@ -1411,6 +1417,11 @@ const updateProduct = asyncHandler(
 
                 }
             );
+
+            if (req.body.productMode !== undefined) {
+                product.productMode =
+                    String(req.body.productMode).trim().toLowerCase();
+            }
 
 
 
