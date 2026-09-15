@@ -1964,6 +1964,15 @@ export class ProductDetail implements OnInit {
 
         const products =
           (response?.products ?? []) as Product[];
+        console.log('CURRENT PRODUCT:', product);
+        console.log(
+          'ALL PRODUCTS:',
+          products.map(p => ({
+            name: p.name,
+            productMode: p.productMode,
+            productGroup: p.productGroup
+          }))
+        );
 
         const currentProductId =
           product._id ?? product.id;
@@ -1971,7 +1980,8 @@ export class ProductDetail implements OnInit {
         const currentGroup =
           product.productGroup
             ?.trim()
-            .toLowerCase();
+            .toLowerCase()
+            .replace(/[\s_]+/g, '-');
 
         // ---------------------------------------------------
         // No product group = no recommendations
@@ -2000,12 +2010,18 @@ export class ProductDetail implements OnInit {
             const itemGroup =
               item.productGroup
                 ?.trim()
-                .toLowerCase();
+                .toLowerCase()
+                .replace(/[\s_]+/g, '-');
 
             const itemMode =
               item.productMode
                 ?.trim()
                 .toLowerCase();
+            console.log('CHECK PRODUCT:', {
+              name: item.name,
+              productGroup: itemGroup,
+              productMode: itemMode
+            });
 
             return (
 
