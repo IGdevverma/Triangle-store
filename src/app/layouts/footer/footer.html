@@ -4,213 +4,179 @@
                         NEWSLETTER
     ==================================================== -->
 
-<section class="newsletter">
+    <section class="newsletter">
 
-    <div class="container newsletter-wrapper">
+        <div class="container newsletter-wrapper">
 
-        <!-- =========================================
+            <!-- =========================================
              NEWSLETTER LEFT
         ========================================== -->
 
-        <div class="newsletter-left">
+            <div class="newsletter-left">
 
-            <span class="footer-tag">
-                JOIN TRIANGLE SPORTS
-            </span>
+                <span class="footer-tag">
+                    JOIN TRIANGLE SPORTS
+                </span>
 
-            <h2>
-                Stay Ahead With
-                <br>
-                Every Drop.
-            </h2>
+                <h2>
+                    Stay Ahead With
+                    <br>
+                    Every Drop.
+                </h2>
 
-            <p>
-                Subscribe to receive exclusive product launches,
-                special offers, manufacturing updates and sportswear
-                insights directly in your inbox.
-            </p>
+                <p>
+                    Subscribe to receive exclusive product launches,
+                    special offers, manufacturing updates and sportswear
+                    insights directly in your inbox.
+                </p>
 
 
-            <!-- =====================================
+                <!-- =====================================
                  SUBSCRIBE FORM
             ====================================== -->
 
-            <form
-                class="subscribe-box"
-                (ngSubmit)="subscribe()"
-                #subscribeForm="ngForm"
-            >
+                <form class="subscribe-box" (ngSubmit)="subscribe()" #subscribeForm="ngForm">
 
-                <input
-                    type="email"
-                    name="subscriberEmail"
-                    [(ngModel)]="subscriberEmail"
-                    placeholder="Enter your email address"
-                    autocomplete="email"
-                    required
-                >
+                    <input type="email" name="subscriberEmail" [(ngModel)]="subscriberEmail"
+                        placeholder="Enter your email address" autocomplete="email" required>
 
-                <button
-                    type="submit"
-                    [disabled]="isSubscribing || subscribeForm.invalid"
-                >
+                    <button type="submit" [disabled]="isSubscribing || subscribeForm.invalid">
 
-                    <span>
-                        {{ isSubscribing ? 'Subscribing...' : 'Subscribe' }}
-                    </span>
+                        <span>
+                            {{ isSubscribing ? 'Subscribing...' : 'Subscribe' }}
+                        </span>
 
-                    <i
-                        *ngIf="!isSubscribing"
-                        class="fa-solid fa-arrow-right"
-                    ></i>
+                        <i *ngIf="!isSubscribing" class="fa-solid fa-arrow-right"></i>
 
-                </button>
+                    </button>
 
-            </form>
+                </form>
 
 
-            <!-- =====================================
+                <!-- =====================================
                  SUCCESS MESSAGE
             ====================================== -->
 
-            <div
-                class="subscribe-message success"
-                *ngIf="subscribeSuccess"
-            >
+                <div class="subscribe-message success" *ngIf="subscribeSuccess">
 
-                <i class="fa-solid fa-circle-check"></i>
+                    <i class="fa-solid fa-circle-check"></i>
 
-                <span>
-                    {{ subscribeSuccess }}
-                </span>
+                    <span>
+                        {{ subscribeSuccess }}
+                    </span>
 
-            </div>
+                </div>
 
 
-            <!-- =====================================
+                <!-- =====================================
                  ERROR MESSAGE
             ====================================== -->
 
-            <div
-                class="subscribe-message error"
-                *ngIf="subscribeError"
-            >
+                <div class="subscribe-message error" *ngIf="subscribeError">
 
-                <i class="fa-solid fa-circle-exclamation"></i>
+                    <i class="fa-solid fa-circle-exclamation"></i>
 
-                <span>
-                    {{ subscribeError }}
-                </span>
+                    <span>
+                        {{ subscribeError }}
+                    </span>
 
-            </div>
+                </div>
 
 
-            <!-- =====================================
+                <!-- =====================================
                  PRIVACY NOTE
             ====================================== -->
 
-            <small class="newsletter-note">
+                <small class="newsletter-note">
 
-                By subscribing you agree to our
+                    By subscribing you agree to our
 
-                <a routerLink="/terms">
-                    Terms & Conditions
-                </a>
+                    <a routerLink="/terms">
+                        Terms & Conditions
+                    </a>
 
-                and
+                    and
 
-                <a routerLink="/privacy-policy">
-                    Privacy Policy.
-                </a>
+                    <a routerLink="/privacy-policy">
+                        Privacy Policy.
+                    </a>
 
-            </small>
+                </small>
 
-        </div>
+            </div>
 
 
-        <!-- =========================================
+            <!-- =========================================
              CUSTOMER SUPPORT
         ========================================== -->
 
-        <div class="newsletter-right">
+            <div class="newsletter-right">
 
-            <span class="support-tag">
-                CUSTOMER SUPPORT
-            </span>
+                <span class="support-tag">
+                    CUSTOMER SUPPORT
+                </span>
 
-            <h2>
-                +91 9990180409
-            </h2>
+                <h2>
+                    +91 9990180409
+                </h2>
 
-            <p>
-                Monday – Saturday
-                <br>
-                10:00 AM – 6:00 PM
-            </p>
+                <p>
+                    Monday – Saturday
+                    <br>
+                    10:00 AM – 6:00 PM
+                </p>
 
 
-            <!-- =====================================
+                <!-- =====================================
                  SOCIAL MEDIA
             ====================================== -->
 
-            <div class="social-icons">
+                <div class="social-icons">
 
-                <a
-                    href="#"
-                    aria-label="Facebook"
-                >
-                    <i class="fab fa-facebook-f"></i>
-                </a>
+                    <a href="#" aria-label="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
 
-                <a
-                    href="#"
-                    aria-label="Instagram"
-                >
-                    <i class="fab fa-instagram"></i>
-                </a>
+                    <a href="#" aria-label="Instagram">
+                        <i class="fab fa-instagram"></i>
+                    </a>
 
-                <a
-                    href="#"
-                    aria-label="YouTube"
-                >
-                    <i class="fab fa-youtube"></i>
-                </a>
+                    <a href="#" aria-label="YouTube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
 
-                <a
-                    href="#"
-                    aria-label="LinkedIn"
-                >
-                    <i class="fab fa-linkedin-in"></i>
-                </a>
+                    <a href="#" aria-label="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
 
-            </div>
+                </div>
 
 
-            <!-- =====================================
+                <!-- =====================================
                  TRUST BADGES
             ====================================== -->
 
-            <div class="trust-badges">
+                <div class="trust-badges">
 
-                <span>
-                    🏭 Own Manufacturing
-                </span>
+                    <span>
+                        🏭 Own Manufacturing
+                    </span>
 
-                <span>
-                    🚚 Pan India Delivery
-                </span>
+                    <span>
+                        🚚 Pan India Delivery
+                    </span>
 
-                <span>
-                    🔒 Secure Payments
-                </span>
+                    <span>
+                        🔒 Secure Payments
+                    </span>
+
+                </div>
 
             </div>
 
         </div>
 
-    </div>
-
-</section>
+    </section>
 
     <!-- ===================================================
                         FOOTER
@@ -224,9 +190,7 @@
 
             <div class="footer-company">
 
-                <img
-                    src="assets/images/trianglepng.png"
-                    alt="Triangle Sports Logo">
+                <img src="assets/images/trianglepng.png" alt="Triangle Sports Logo">
 
                 <p class="company-desc">
 
@@ -269,36 +233,28 @@
 
             <!-- SHOP -->
 
-            <div>
+            <!-- ===================================================
+                    SHOP
+==================================================== -->
 
-                <h4>
+            <div class="footer-column">
 
-                    Shop
+                <h4>Shop</h4>
 
-                </h4>
-
-                <a routerLink="/shop">
-
-                    T-Shirts
-
+                <a routerLink="/shop" [queryParams]="{ category: 'Vest' }">
+                    Vests
                 </a>
 
-                <a routerLink="/shop">
-
+                <a routerLink="/shop" [queryParams]="{ category: 'Track Pant' }">
                     Track Pants
+                </a>
 
+                <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }">
+                    Arm Sleeves
                 </a>
 
                 <a routerLink="/shop">
-
-                    Compression Wear
-
-                </a>
-
-                <a routerLink="/shop">
-
-                    Accessories
-
+                    Shop All
                 </a>
 
             </div>
@@ -441,17 +397,11 @@
 
             <div class="payment-icons">
 
-                <img
-                    src="assets/payments/mastercard.svg"
-                    alt="Mastercard">
+                <img src="assets/payments/mastercard.svg" alt="Mastercard">
 
-                <img
-                    src="assets/payments/visa.svg"
-                    alt="Visa">
+                <img src="assets/payments/visa.svg" alt="Visa">
 
-                <img
-                    src="assets/payments/g-pay.svg"
-                    alt="Google Pay">
+                <img src="assets/payments/g-pay.svg" alt="Google Pay">
 
             </div>
 
@@ -511,6 +461,6 @@
         </div>
 
     </section>
-    
+
 
 </footer>
