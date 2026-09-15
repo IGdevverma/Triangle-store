@@ -28,6 +28,7 @@
 
 
     <!-- ================= MEN ================= -->
+    <!-- ================= MEN ================= -->
 
     <li class="dropdown mega-small">
 
@@ -38,32 +39,38 @@
 
       <div class="mega-menu">
 
+        <!-- TOPWEAR -->
         <div class="mega-column">
 
           <h4>Topwear</h4>
 
-          <a routerLink="/shop">T-Shirts</a>
-          <a routerLink="/shop">Uppers</a>
-          <a routerLink="/shop">Compressions</a>
+          <a routerLink="/shop" [queryParams]="{ category: 'Vest' }">
+            Vests
+          </a>
 
         </div>
 
+
+        <!-- BOTTOMWEAR -->
         <div class="mega-column">
 
           <h4>Bottomwear</h4>
 
-          <a routerLink="/shop">Shorts</a>
-          <a routerLink="/shop">Track Pants</a>
+          <a routerLink="/shop" [queryParams]="{ category: 'Track Pant' }">
+            Track Pants
+          </a>
 
         </div>
 
+
+        <!-- ACCESSORIES -->
         <div class="mega-column">
 
-          <h4>Shop By Sport</h4>
+          <h4>Accessories</h4>
 
-          <a routerLink="/shop">Cricket</a>
-          <a routerLink="/shop">Gym</a>
-          <a routerLink="/shop">Running</a>
+          <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }">
+            Arm Sleeves
+          </a>
 
         </div>
 
@@ -72,106 +79,28 @@
     </li>
 
     <!-- ================= WOMEN ================= -->
-
-    <li class="dropdown mega-small">
+    <li class="coming-soon-menu" (click)="showComingSoon('Women')">
 
       <span class="menu-title">
         WOMEN
         <i class="fa-solid fa-chevron-down arrow"></i>
       </span>
 
-      <div class="mega-menu">
-
-        <div class="mega-column">
-
-          <h4>Topwear</h4>
-
-          <a routerLink="/shop">T-Shirts</a>
-          <a routerLink="/shop">Uppers</a>
-          <a routerLink="/shop">Compressions</a>
-
-        </div>
-
-        <div class="mega-column">
-
-          <h4>Bottomwear</h4>
-
-          <a routerLink="/shop">Shorts</a>
-          <a routerLink="/shop">Track Pants</a>
-
-        </div>
-
-        <div class="mega-column">
-
-          <h4>Shop By Sport</h4>
-
-          <a routerLink="/shop">Cricket</a>
-          <a routerLink="/shop">Gym</a>
-          <a routerLink="/shop">Running</a>
-
-        </div>
-
-      </div>
-
     </li>
 
     <!-- ================= ACCESSORIES ================= -->
 
-    <li class="dropdown mega-large">
+    <li class="coming-soon-menu" (click)="showComingSoon('Accessories')">
 
       <span class="menu-title">
         ACCESSORIES
         <i class="fa-solid fa-chevron-down arrow"></i>
       </span>
 
-      <div class="mega-menu">
-
-        <div class="mega-column">
-
-          <h4>Performance</h4>
-
-          <a routerLink="/shop">Arm Sleeves</a>
-          <a routerLink="/shop">Wrist Bands</a>
-
-        </div>
-
-        <div class="mega-column">
-
-          <h4>Training Gear</h4>
-
-          <a routerLink="/shop">Gym Gloves</a>
-          <a routerLink="/shop">Head Bands</a>
-          <a routerLink="/shop">Sports Socks</a>
-
-        </div>
-
-        <div class="mega-column">
-
-          <h4>Essentials</h4>
-
-          <a routerLink="/shop">Caps</a>
-          <a routerLink="/shop">Water Bottles</a>
-          <a routerLink="/shop">Gym Bags</a>
-
-        </div>
-
-        <div class="mega-column">
-
-          <h4>Custom Orders</h4>
-
-          <a routerLink="/request-quote">Corporate T-Shirts & Caps</a>
-          <a routerLink="/request-quote">Tournament Jerseys</a>
-          <a routerLink="/request-quote">Bulk Orders</a>
-
-        </div>
-
-      </div>
-
     </li>
 
     <!-- ================= DESIGN ================= -->
-
-    <li class="design-link" routerLink="/team-kit-designer">
+    <li class="design-link coming-soon-link" (click)="showComingSoon('Design Your Own')">
 
       DESIGN YOUR OWN
 
@@ -478,6 +407,39 @@
 
       Proceed to Checkout
 
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- ================= COMING SOON MODAL ================= -->
+
+<div class="coming-soon-overlay" *ngIf="showComingSoonModal" (click)="closeComingSoon()">
+
+  <div class="coming-soon-modal" (click)="$event.stopPropagation()">
+
+    <button class="coming-soon-close" type="button" (click)="closeComingSoon()">
+      ×
+    </button>
+
+    <div class="coming-soon-icon">
+      <i class="fa-solid fa-hourglass-half"></i>
+    </div>
+
+    <h2>Coming Soon</h2>
+
+    <p>
+      {{ comingSoonSection }} is coming soon.
+    </p>
+
+    <span>
+      We're working hard to bring you something amazing.
+    </span>
+
+    <button type="button" class="coming-soon-btn" (click)="closeComingSoon()">
+      GOT IT
     </button>
 
   </div>

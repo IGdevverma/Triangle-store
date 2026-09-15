@@ -62,6 +62,9 @@ export class Header implements OnInit {
 
   user: { name: string; role: string } | null = null;
   isUserMenuOpen = false;
+  showComingSoonModal = false;
+  comingSoonSection = '';
+
 
   @HostListener('window:scroll')
   onWindowScroll() {
@@ -157,6 +160,7 @@ export class Header implements OnInit {
     this.user = null;
     this.isUserMenuOpen = false;
 
+
     this.router.navigate(['/']);
 
   }
@@ -221,6 +225,20 @@ export class Header implements OnInit {
 
   toggleMenu() {
     this.isMenuOpen = !this.isMenuOpen;
+  }
+
+  showComingSoon(section: string): void {
+
+    this.comingSoonSection = section;
+    this.showComingSoonModal = true;
+
+  }
+
+  closeComingSoon(): void {
+
+    this.showComingSoonModal = false;
+    this.comingSoonSection = '';
+
   }
 
   toggleUserMenu() {
