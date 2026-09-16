@@ -36,14 +36,14 @@ const registerUser = async (req, res) => {
         }
 
         // Password length validation
-        if (String(password).length < 8) {
+        if (passwordValue.length < 8) {
             return res.status(400).json({
                 success: false,
                 message: "Password must be at least 8 characters long"
             });
         }
 
-        if (String(password).length > 72) {
+        if (passwordValue.length > 72) {
             return res.status(400).json({
                 success: false,
                 message: "Password cannot exceed 72 characters"
@@ -52,7 +52,7 @@ const registerUser = async (req, res) => {
 
         // Normalize email
         const normalizedEmail =
-            String(email).trim().toLowerCase();
+            emailValue.toLowerCase();
 
         // Check existing user
         const existingUser =
@@ -77,21 +77,20 @@ const registerUser = async (req, res) => {
 
         // Normalize phone
         const normalizedPhone =
-            otpService.normalizePhone(phone);
+            otpService.normalizePhone(phoneValue);
 
 
         // Create user
         const user =
             await User.create({
 
-                name,
+                name: nameValue,
 
                 email: normalizedEmail,
 
-                password,
+                password: passwordValue,
 
-                phone:
-                    normalizedPhone,
+                phone: normalizedPhone,
 
                 role: "user",
 
@@ -1245,14 +1244,14 @@ const resetPassword = async (req, res) => {
         }
 
         // Same password rules as signup
-        if (String(password).length < 8) {
+        if (passwordValue.length < 8) {
             return res.status(400).json({
                 success: false,
                 message: "Password must be at least 8 characters long"
             });
         }
 
-        if (String(password).length > 72) {
+        if (passwordValue.length > 72) {
             return res.status(400).json({
                 success: false,
                 message: "Password cannot exceed 72 characters"
