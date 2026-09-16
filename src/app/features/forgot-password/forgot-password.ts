@@ -3,13 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-
+import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
   imports: [
     FormsModule,
-    RouterLink
+    RouterLink,
+    CommonModule
   ],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css'
@@ -17,7 +18,10 @@ import { environment } from '../../../environments/environment';
 export class ForgotPassword {
 
   email = '';
+
   isLoading = false;
+  isSent = false;
+
   message = '';
   errorMessage = '';
 
@@ -33,7 +37,8 @@ export class ForgotPassword {
     const email = this.email.trim().toLowerCase();
 
     if (!email) {
-      this.errorMessage = 'Please enter your email address.';
+      this.errorMessage =
+        'Please enter your email address.';
       return;
     }
 
@@ -44,13 +49,14 @@ export class ForgotPassword {
       { email }
     ).subscribe({
 
-      next: (response) => {
+      next: () => {
 
         this.isLoading = false;
 
+        this.isSent = true;
+
         this.message =
           'If an account exists with this email, a password reset link has been sent.';
-
       },
 
       error: (error) => {
@@ -60,7 +66,6 @@ export class ForgotPassword {
         this.errorMessage =
           error?.error?.message ||
           'Something went wrong. Please try again.';
-
       }
 
     });
