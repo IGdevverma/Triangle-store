@@ -6,9 +6,12 @@ const router = express.Router();
 // ============================================================
 // CONTROLLERS
 // ============================================================
+
 const {
     registerUser,
     loginUser,
+    forgotPassword,
+    resetPassword,
     sendPhoneOtp,
     verifyPhoneOtp,
     resendPhoneOtp,
@@ -27,14 +30,26 @@ const {
 
 
 // ============================================================
+// RATE LIMITERS
+// ============================================================
+
+const {
+    authLimiter,
+    otpLimiter,
+    widgetLimiter
+} = require("../middleware/rateLimiter");
+
+
+// ============================================================
 // TEST
 // ============================================================
 
-router.get("/test", (req, res) => {
-
-    res.send("Auth Route Working");
-
-});
+router.get(
+    "/test",
+    (req, res) => {
+        res.send("Auth Route Working");
+    }
+);
 
 
 // ============================================================
@@ -43,6 +58,7 @@ router.get("/test", (req, res) => {
 
 router.post(
     "/register",
+    authLimiter,
     registerUser
 );
 
@@ -53,8 +69,12 @@ router.post(
 
 router.post(
     "/login",
+    authLimiter,
     loginUser
 );
+
+router.post("/forgot-password", authLimiter, forgotPassword);
+router.put("/reset-password/:token", authLimiter, resetPassword);
 
 
 // ============================================================
@@ -64,6 +84,7 @@ router.post(
 router.post(
     "/send-phone-otp",
     isAuthenticatedUser,
+    otpLimiter,
     sendPhoneOtp
 );
 
@@ -75,6 +96,7 @@ router.post(
 router.post(
     "/verify-phone-otp",
     isAuthenticatedUser,
+    otpLimiter,
     verifyPhoneOtp
 );
 
@@ -86,11 +108,18 @@ router.post(
 router.post(
     "/resend-phone-otp",
     isAuthenticatedUser,
+    otpLimiter,
     resendPhoneOtp
 );
 
+
+// ============================================================
+// VERIFY WIDGET TOKEN
+// ============================================================
+
 router.post(
     "/verify-widget-token",
+    widgetLimiter,
     verifyWidgetToken
 );
 

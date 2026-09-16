@@ -1,6 +1,6 @@
 const User = require("../models/User");
 const otpService = require("../services/otpService");
-
+const EmailService = require("../services/emailService");
 
 // ============================================================
 // REGISTER USER
@@ -10,20 +10,18 @@ const registerUser = async (req, res) => {
 
     try {
 
-        const {
-            name,
-            email,
-            password,
-            phone
-        } = req.body;
+        const nameValue = String(req.body.name || "").trim();
+        const emailValue = String(req.body.email || "").trim();
+        const passwordValue = String(req.body.password || "");
+        const phoneValue = String(req.body.phone || "").trim();
 
 
         // Basic validation
         if (
-            !name ||
-            !email ||
-            !password ||
-            !phone
+            !nameValue ||
+            !emailValue ||
+            !passwordValue ||
+            !phoneValue
         ) {
 
             return res.status(400).json({
@@ -37,10 +35,30 @@ const registerUser = async (req, res) => {
 
         }
 
+        // Password length validation
+        if (String(password).length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 8 characters long"
+            });
+        }
+
+        if (String(password).length > 72) {
+            return res.status(400).json({
+                success: false,
+                message: "Password cannot exceed 72 characters"
+            });
+        }
+
+        // Normalize email
+        const normalizedEmail =
+            String(email).trim().toLowerCase();
 
         // Check existing user
         const existingUser =
-            await User.findOne({ email });
+            await User.findOne({
+                email: normalizedEmail
+            });
 
 
         if (existingUser) {
@@ -68,7 +86,7 @@ const registerUser = async (req, res) => {
 
                 name,
 
-                email,
+                email: normalizedEmail,
 
                 password,
 
@@ -169,9 +187,12 @@ const loginUser = async (req, res) => {
         }
 
 
+        const normalizedEmail =
+            String(email).trim().toLowerCase();
+
         const user =
             await User
-                .findOne({ email })
+                .findOne({ normalizedEmail })
                 .select("+password");
 
 
@@ -390,17 +411,11 @@ const verifyPhoneOtp = async (req, res) => {
         } = req.body;
 
 
-        if (!otp) {
-
+        if (!/^\d{6}$/.test(String(otp))) {
             return res.status(400).json({
-
                 success: false,
-
-                message:
-                    "OTP is required"
-
+                message: "OTP must be a 6-digit number"
             });
-
         }
 
 
@@ -1112,14 +1127,200 @@ const updateProfile = async (req, res) => {
 
 
 
+// ============================================================
+// FORGOT PASSWORD
+// ============================================================
+
+const crypto = require("crypto");
+// ============================================================
+// FORGOT PASSWORD
+// ============================================================
+
+const forgotPassword = async (req, res) => {
+    try {
+
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter your email"
+            });
+        }
+
+        const normalizedEmail =
+            String(email).trim().toLowerCase();
+
+        const user =
+            await User.findOne({
+                email: normalizedEmail
+            });
+
+        // Do not reveal whether the email exists
+        if (!user) {
+            return res.status(200).json({
+                success: true,
+                message:
+                    "If an account exists with this email, a password reset link has been sent."
+            });
+        }
+
+        // Generate secure random token
+        const resetToken =
+            crypto.randomBytes(32).toString("hex");
+
+        // Store only hashed token in database
+        user.resetPasswordToken =
+            crypto
+                .createHash("sha256")
+                .update(resetToken)
+                .digest("hex");
+
+        // Token valid for 15 minutes
+        user.resetPasswordExpire =
+            new Date(Date.now() + 15 * 60 * 1000);
+
+        await user.save({
+            validateBeforeSave: false
+        });
+
+        // Build frontend reset URL
+        const frontendUrl =
+            process.env.FRONTEND_URL ||
+            "http://localhost:4200";
+
+        const resetUrl =
+            `${frontendUrl}/reset-password/${resetToken}`;
+
+        // Send password reset email
+        await EmailService.sendPasswordReset(
+            user.email,
+            resetUrl
+        );
+
+        return res.status(200).json({
+            success: true,
+            message:
+                "If an account exists with this email, a password reset link has been sent."
+        });
+
+    } catch (error) {
+
+        console.error(
+            "FORGOT PASSWORD ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message:
+                "Unable to process password reset request"
+        });
+    }
+};
+
+
+// ============================================================
+// RESET PASSWORD
+// ============================================================
+
+const resetPassword = async (req, res) => {
+    try {
+
+        const { token } = req.params;
+        const { password } = req.body;
+
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid password reset token"
+            });
+        }
+
+        if (!password) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a new password"
+            });
+        }
+
+        // Same password rules as signup
+        if (String(password).length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 8 characters long"
+            });
+        }
+
+        if (String(password).length > 72) {
+            return res.status(400).json({
+                success: false,
+                message: "Password cannot exceed 72 characters"
+            });
+        }
+
+        // Hash the token received from the reset link
+        const hashedToken =
+            crypto
+                .createHash("sha256")
+                .update(token)
+                .digest("hex");
+
+        // Find user with valid, non-expired token
+        const user =
+            await User.findOne({
+                resetPasswordToken: hashedToken,
+                resetPasswordExpire: {
+                    $gt: new Date()
+                }
+            }).select("+resetPasswordToken");
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "Password reset token is invalid or expired"
+            });
+        }
+
+        // Set new password
+        user.password = password;
+
+        // Invalidate reset token immediately
+        user.resetPasswordToken = null;
+        user.resetPasswordExpire = null;
+
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "Password reset successful. Please login with your new password."
+        });
+
+    } catch (error) {
+
+        console.error(
+            "RESET PASSWORD ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: "Unable to reset password"
+        });
+    }
+};
+
+
 module.exports = {
 
-    
+
     registerUser,
 
     loginUser,
 
     sendPhoneOtp,
+    forgotPassword,
+    resetPassword,
 
     verifyPhoneOtp,
 

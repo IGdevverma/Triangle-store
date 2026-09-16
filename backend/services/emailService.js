@@ -1,5 +1,5 @@
 const sendEmail = require("../utils/sendEmail");
-
+const passwordReset = require("../emails/templates/passwordReset");
 const orderPlaced = require("../emails/templates/orderPlaced");
 const orderProcessing = require("../emails/templates/orderProcessing");
 const orderPacked = require("../emails/templates/orderPacked");
@@ -49,6 +49,27 @@ class EmailService {
 
             html:
                 orderPlaced(order)
+
+        });
+
+    }
+
+
+    // ==========================================
+    // PASSWORD RESET
+    // ==========================================
+
+    static async sendPasswordReset(email, resetUrl) {
+
+        return sendEmail({
+
+            to: email,
+
+            subject:
+                "🔐 Reset Your Triangle Sports Password",
+
+            html:
+                passwordReset(resetUrl)
 
         });
 

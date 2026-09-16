@@ -13,8 +13,9 @@ import { DealerRegistration } from './features/dealer-registration/dealer-regist
 import { TeamKitDesigner } from './features/team-kit-designer/team-kit-designer';
 import { KitCategory } from './features/kit-category/kit-category';
 import { TeamKitCustomize } from './features/team-kit-customize/team-kit-customize';
-
+import { ResetPassword } from './features/reset-password/reset-password';
 import { Register } from './features/register/register';
+import { ForgotPassword } from './features/forgot-password/forgot-password';
 import { Profile } from './features/profile/profile';
 import { Dashboard } from './features/dashboard/dashboard';
 import { EditProfile } from './features/edit-profile/edit-profile';
@@ -73,6 +74,17 @@ export const routes: Routes = [
     path: 'login',
     component: Login
 
+  },
+
+
+  {
+    path: 'forgot-password',
+    component: ForgotPassword
+  },
+
+  {
+    path: 'reset-password/:token',
+    component: ResetPassword
   },
   {
 

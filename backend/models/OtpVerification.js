@@ -23,8 +23,7 @@ const otpSchema = new mongoose.Schema(
 
         expiresAt: {
             type: Date,
-            required: true,
-            index: true
+            required: true
         },
 
         attempts: {
@@ -54,7 +53,7 @@ const otpSchema = new mongoose.Schema(
 | TTL INDEX
 |--------------------------------------------------------------------------
 | MongoDB automatically removes the OTP document
-| after expiresAt is reached.
+| when expiresAt is reached.
 |
 */
 
@@ -66,9 +65,10 @@ otpSchema.index(
 
 /*
 |--------------------------------------------------------------------------
-| Compound Index
+| COMPOUND INDEX
 |--------------------------------------------------------------------------
-| Helps us quickly find OTP for a specific user + phone.
+| Helps quickly find OTP records for a specific
+| user + phone combination.
 |
 */
 

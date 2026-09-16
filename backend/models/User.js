@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
-        minlength: 6,
+        minlength: 8,
+        maxlength: 72,
         select: false
     },
 
@@ -57,6 +58,17 @@ const userSchema = new mongoose.Schema({
         select: false
     },
 
+    resetPasswordToken: {
+        type: String,
+        default: null,
+        select: false
+    },
+
+    resetPasswordExpire: {
+        type: Date,
+        default: null,
+        select: false
+    },
     gender: {
         type: String,
         enum: ["Male", "Female", "Other"],

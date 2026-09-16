@@ -3,11 +3,9 @@ const User = require("../models/User");
 const asyncHandler = require("./asyncHandler");
 
 exports.isAuthenticatedUser = asyncHandler(async (req, res, next) => {
-
     const authHeader = req.headers.authorization;
 
-    
-
+    // No Authorization header
     if (!authHeader) {
         return res.status(401).json({
             success: false,
@@ -15,52 +13,66 @@ exports.isAuthenticatedUser = asyncHandler(async (req, res, next) => {
         });
     }
 
-    const [scheme, token] = authHeader.split(" ");
+    // Validate Bearer token format
+    const [scheme, token] = authHeader.trim().split(/\s+/);
 
     if (scheme !== "Bearer" || !token) {
         return res.status(401).json({
             success: false,
-            message: "Please Login First"
+            message: "Invalid authentication format"
         });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-   
+    let decoded;
 
+    try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid or expired token"
+        });
+    }
+
+    // Validate JWT payload
+    if (!decoded || !decoded.id) {
+        return res.status(401).json({
+            success: false,
+            message: "Invalid authentication token"
+        });
+    }
+
+    // Find user
     const user = await User.findById(decoded.id);
-  
 
-    req.user = user;
-
-    if (!req.user) {
+    if (!user) {
         return res.status(401).json({
             success: false,
             message: "User no longer exists"
         });
     }
 
+    req.user = user;
+
     next();
 });
 
 exports.authorizeRoles = (...roles) => {
-
     return (req, res, next) => {
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: "Please Login First"
+            });
+        }
 
         if (!roles.includes(req.user.role)) {
-
             return res.status(403).json({
-
                 success: false,
-
-                message: `Role (${req.user.role}) is not allowed`
-
+                message: "You are not authorized to access this resource"
             });
-
         }
 
         next();
-
     };
-    
-
 };

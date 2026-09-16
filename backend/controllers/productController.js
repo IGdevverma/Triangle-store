@@ -1,7 +1,70 @@
 const Product = require("../models/Product");
 const asyncHandler = require("../middleware/asyncHandler");
 const ErrorHandler = require("../utils/errorHandler");
+const cloudinary = require("../config/cloudinary");
 
+
+// ============================================================
+// CLOUDINARY BUFFER UPLOAD
+// ============================================================
+
+const uploadBufferToCloudinary = (
+    buffer,
+    folder = "triangle-sports"
+) => {
+    return new Promise((resolve, reject) => {
+
+        const uploadStream =
+            cloudinary.uploader.upload_stream(
+                {
+                    folder,
+                    resource_type: "image"
+                },
+                (error, result) => {
+
+                    if (error) {
+                        return reject(error);
+                    }
+
+                    resolve(result);
+                }
+            );
+
+        uploadStream.end(buffer);
+    });
+};
+
+
+// ============================================================
+// UPLOAD ALL MULTER FILES TO CLOUDINARY
+// ============================================================
+
+const uploadFilesToCloudinary = async (files = []) => {
+
+    return Promise.all(
+
+        files.map(async (file) => {
+
+            if (!file.buffer) {
+                throw new Error(
+                    "Uploaded file buffer is missing"
+                );
+            }
+
+            const result =
+                await uploadBufferToCloudinary(
+                    file.buffer,
+                    "triangle-sports"
+                );
+
+            return {
+                ...file,
+                path: result.secure_url,
+                filename: result.public_id
+            };
+        })
+    );
+};
 
 // ============================================================
 // HELPER FUNCTIONS
@@ -103,16 +166,16 @@ const createProduct = asyncHandler(async (req, res) => {
         // PRODUCT IMAGES
         // =====================================================
 
-        const productFiles = getFiles(req.files, "images");
-
-        const packFiles = getFiles(
-            req.files,
-            "packImages"
+        const productFiles = await uploadFilesToCloudinary(
+            getFiles(req.files, "images")
         );
 
-        const combinationFiles = getFiles(
-            req.files,
-            "combinationImages"
+        const packFiles = await uploadFilesToCloudinary(
+            getFiles(req.files, "packImages")
+        );
+
+        const combinationFiles = await uploadFilesToCloudinary(
+            getFiles(req.files, "combinationImages")
         );
 
 
@@ -751,9 +814,8 @@ const updateProduct = asyncHandler(
             // =================================================
 
             const productFiles =
-                getFiles(
-                    req.files,
-                    "images"
+                await uploadFilesToCloudinary(
+                    getFiles(req.files, "images")
                 );
 
 
@@ -842,11 +904,9 @@ const updateProduct = asyncHandler(
             // =================================================
             // PACK IMAGES
             // =================================================
-
             const packFiles =
-                getFiles(
-                    req.files,
-                    "packImages"
+                await uploadFilesToCloudinary(
+                    getFiles(req.files, "packImages")
                 );
 
 
@@ -868,11 +928,9 @@ const updateProduct = asyncHandler(
             // =================================================
 
             const combinationFiles =
-                getFiles(
-                    req.files,
-                    "combinationImages"
+                await uploadFilesToCloudinary(
+                    getFiles(req.files, "combinationImages")
                 );
-
 
             const newCombinationImages =
                 combinationFiles.map(

@@ -1,3 +1,4 @@
+const PaymentVerification = require("../models/PaymentVerification");
 const { calculatePricing } = require("../utils/pricing");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
@@ -74,7 +75,7 @@ exports.createOrder = async (req, res) => {
             // PACK PRICE
             // ------------------------------------------
 
-            
+
 
             const selectedPack =
                 item.selectedPack || "single";
@@ -412,6 +413,31 @@ exports.verifyPayment = async (req, res) => {
                     `Payment is not captured. Current status: ${payment.status}`
             });
         }
+
+
+        // ==========================================
+        // 6. SAVE SERVER-SIDE PAYMENT VERIFICATION
+        // ==========================================
+
+        await PaymentVerification.findOneAndUpdate(
+            {
+                razorpayOrderId: razorpay_order_id
+            },
+            {
+                user: req.user._id,
+                razorpayOrderId: razorpay_order_id,
+                razorpayPaymentId: razorpay_payment_id,
+                amount: Number(razorpayOrder.amount),
+                currency: razorpayOrder.currency,
+                verifiedAt: new Date(),
+                expiresAt: new Date(Date.now() + 15 * 60 * 1000)
+            },
+            {
+                upsert: true,
+                new: true,
+                setDefaultsOnInsert: true
+            }
+        );
 
         // ==========================================
         // 6. Success

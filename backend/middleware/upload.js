@@ -1,35 +1,57 @@
 const multer = require("multer");
-const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const cloudinary = require("../config/cloudinary");
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: async (req, file) => ({
-    folder: "triangle-sports",
-    allowed_formats: ["jpg", "jpeg", "png", "webp"],
-    resource_type: "image",
-  }),
-});
+const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = /jpg|jpeg|png|webp/;
 
-  const extName = allowedTypes.test(
-    file.originalname.split(".").pop().toLowerCase()
-  );
+    const allowedExtensions = new Set([
+        "jpg",
+        "jpeg",
+        "png",
+        "webp"
+    ]);
 
-  const mimeType = file.mimetype.startsWith("image/");
+    const extension = file.originalname
+        .split(".")
+        .pop()
+        .toLowerCase();
 
-  if (extName && mimeType) {
-    return cb(null, true);
-  }
+    const isAllowedExtension =
+        allowedExtensions.has(extension);
 
-  cb(new Error("Only Images are Allowed"));
+    const isAllowedMimeType =
+        [
+            "image/jpeg",
+            "image/png",
+            "image/webp"
+        ].includes(file.mimetype);
+
+    if (
+        isAllowedExtension &&
+        isAllowedMimeType
+    ) {
+        return cb(null, true);
+    }
+
+    return cb(
+        new Error(
+            "Only JPG, JPEG, PNG and WEBP images are allowed"
+        )
+    );
 };
 
 const upload = multer({
-  storage,
-  fileFilter,
+
+    storage,
+
+    fileFilter,
+
+    limits: {
+        fileSize: 5 * 1024 * 1024,
+        files: 155
+    }
+
 });
 
 module.exports = upload;

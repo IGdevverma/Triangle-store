@@ -1,3 +1,5 @@
+const PaymentVerification =
+    require("../models/PaymentVerification");
 const { calculatePricing } = require("../utils/pricing");
 const mongoose = require("mongoose");
 const EmailService = require("../services/emailService");
@@ -101,6 +103,64 @@ const createOrder = async (req, res) => {
         }
 
         // ==========================================
+        // 3.1 VERIFY SERVER-SIDE PAYMENT RECORD
+        // ==========================================
+
+        const verifiedPayment =
+            await PaymentVerification.findOne({
+                razorpayOrderId,
+                razorpayPaymentId,
+                user: req.user._id
+            });
+
+        if (!verifiedPayment) {
+
+            await session.abortTransaction();
+
+            return res.status(400).json({
+                success: false,
+                message: "Payment has not been verified"
+            });
+        }
+
+        // Make sure the verification record has not expired
+        if (new Date() > verifiedPayment.expiresAt) {
+
+            await PaymentVerification.deleteOne({
+                _id: verifiedPayment._id
+            });
+
+            await session.abortTransaction();
+
+            return res.status(400).json({
+                success: false,
+                message: "Payment verification has expired. Please try again."
+            });
+        }
+
+
+
+        // ==========================================
+        // 3.2 PREVENT REUSE OF VERIFIED PAYMENT
+        // ==========================================
+
+        const existingPaidOrder = await Order.findOne({
+            razorpayOrderId,
+            razorpayPaymentId,
+            paymentStatus: "Paid"
+        }).session(session);
+
+        if (existingPaidOrder) {
+
+            await session.abortTransaction();
+
+            return res.status(409).json({
+                success: false,
+                message: "This payment has already been used for an order"
+            });
+        }
+
+        // ==========================================
         // 4. PREVENT DUPLICATE RAZORPAY ORDER
         // ==========================================
 
@@ -165,7 +225,7 @@ const createOrder = async (req, res) => {
                 });
             }
 
-          
+
             // ==========================================
             // PACK INFORMATION
             // ==========================================
@@ -324,6 +384,26 @@ const createOrder = async (req, res) => {
         } = pricing;
 
 
+
+        // ==========================================
+        // 7.1 VERIFY PAYMENT AMOUNT
+        // ==========================================
+
+        const expectedPaymentAmount = Math.round(Number(total) * 100);
+
+        if (
+            verifiedPayment.amount !== expectedPaymentAmount ||
+            verifiedPayment.currency !== "INR"
+        ) {
+
+            await session.abortTransaction();
+
+            return res.status(400).json({
+                success: false,
+                message: "Payment amount does not match order total"
+            });
+        }
+
         // ==========================================
         // 8. ATOMIC STOCK DEDUCTION
         // ==========================================
@@ -376,36 +456,24 @@ const createOrder = async (req, res) => {
             await Order.create(
                 [
                     {
-
-                        user:
-                            req.user._id,
+                        user: req.user._id,
 
                         customerName,
-
                         email,
-
                         phone,
-
                         address,
-
                         city,
-
                         state,
-
                         pincode,
 
                         paymentMethod,
 
-                        // Payment already verified
-                        paymentStatus:
-                            "Paid",
+                        paymentStatus: "Paid",
 
                         razorpayOrderId,
-
                         razorpayPaymentId,
 
-                        paymentVerifiedAt:
-                            new Date(),
+                        paymentVerifiedAt: new Date(),
 
                         items,
                         subtotal,
@@ -416,19 +484,14 @@ const createOrder = async (req, res) => {
 
                         total,
 
-                        orderStatus:
-                            "Processing",
+                        orderStatus: "Processing",
 
                         trackingHistory: [
                             {
-                                status:
-                                    "Processing",
-
-                                date:
-                                    new Date()
+                                status: "Processing",
+                                date: new Date()
                             }
                         ]
-
                     }
                 ],
                 {
@@ -437,10 +500,39 @@ const createOrder = async (req, res) => {
             );
 
         // ==========================================
+        // 9.1 CONSUME VERIFIED PAYMENT ATOMICALLY
+        // ==========================================
+
+        const consumedPayment =
+            await PaymentVerification.findOneAndDelete(
+                {
+                    _id: verifiedPayment._id,
+                    user: req.user._id,
+                    razorpayOrderId,
+                    razorpayPaymentId
+                },
+                {
+                    session
+                }
+            );
+
+        if (!consumedPayment) {
+
+            await session.abortTransaction();
+
+            return res.status(409).json({
+                success: false,
+                message: "Payment verification could not be consumed"
+            });
+        }
+        // ==========================================
         // 10. COMMIT
         // ==========================================
 
         await session.commitTransaction();
+
+
+
 
         // ==========================================
         // 11. SEND EMAIL
@@ -544,6 +636,14 @@ const getOrderById = async (req, res) => {
 
     try {
 
+        // ✅ Validate MongoDB ObjectId before querying
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid order ID"
+            });
+        }
+
         const order = await Order.findById(req.params.id);
 
         if (!order) {
@@ -559,7 +659,10 @@ const getOrderById = async (req, res) => {
         }
 
         if (req.user.role !== "admin" && order.user?.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ success: false, message: "Not allowed to view this order" });
+            return res.status(403).json({
+                success: false,
+                message: "Not allowed to view this order"
+            });
         }
 
         res.status(200).json({
@@ -585,6 +688,8 @@ const getOrderById = async (req, res) => {
     }
 
 };
+
+
 
 // Update Order Status
 
@@ -617,6 +722,19 @@ const updateOrderStatus = async (req, res) => {
 
         }
 
+
+
+
+        // ==========================================
+        // VALIDATE ORDER ID
+        // ==========================================
+
+        if (!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid order ID"
+            });
+        }
         // ==========================================
         // START TRANSACTION
         // ==========================================
@@ -747,8 +865,7 @@ const updateOrderStatus = async (req, res) => {
 
                         {
                             $inc: {
-                                stock:
-                                    item.quantity
+                                stock: item.totalUnits
                             }
                         },
 
