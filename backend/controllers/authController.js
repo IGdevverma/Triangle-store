@@ -192,7 +192,7 @@ const loginUser = async (req, res) => {
 
         const user =
             await User
-                .findOne({ normalizedEmail })
+                .findOne({ email: normalizedEmail })
                 .select("+password");
 
 
