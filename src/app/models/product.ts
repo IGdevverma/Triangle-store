@@ -107,6 +107,9 @@ export interface Product {
 
   name: string;
 
+
+  fit?: string;
+  careInstructions?: string;
   description?: string;
 
   category: string;
@@ -119,7 +122,7 @@ export interface Product {
 
   sku?: string;
   productMode?: 'single' | 'pack';
-    // Product family / colour variant group
+  // Product family / colour variant group
   // Example:
   // "premium-fitted-tank"
   //

@@ -1,26 +1,41 @@
-module.exports = (text, url, color = "#6A11CB") => {
+module.exports = (
+    text,
+    url,
+    color = "#111111"
+) => {
 
     return `
 
-    <div style="text-align:center;margin:35px 0;">
+    <!-- ==========================================
+         PREMIUM EMAIL CTA
+    =========================================== -->
+
+    <div style="
+        text-align:center;
+        margin:34px 0;
+    ">
 
         <a
             href="${url}"
+            target="_blank"
             style="
+                display:inline-block;
                 background:${color};
                 color:#ffffff;
-                padding:14px 34px;
-                border-radius:8px;
+                padding:15px 34px;
+                border-radius:6px;
                 text-decoration:none;
-                display:inline-block;
-                font-size:16px;
-                font-weight:bold;
-                font-family:Arial,sans-serif;
+                font-family:Arial,Helvetica,sans-serif;
+                font-size:13px;
+                font-weight:700;
+                letter-spacing:.8px;
+                text-transform:uppercase;
+                line-height:1;
+                border:1px solid ${color};
+                box-sizing:border-box;
             "
         >
-
             ${text}
-
         </a>
 
     </div>

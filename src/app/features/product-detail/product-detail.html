@@ -722,11 +722,9 @@
 
           <div class="accordion-item">
 
-            <button type="button" (click)="showProductDetails = !showProductDetails">
+            <button type="button" class="accordion-header" (click)="showProductDetails = !showProductDetails">
 
-              <strong>
-                Product Details
-              </strong>
+              <strong>Product Details</strong>
 
               <span>
                 {{ showProductDetails ? '−' : '+' }}
@@ -735,34 +733,115 @@
             </button>
 
 
-            <div class="accordion-content" *ngIf="showProductDetails">
+            <div class="accordion-content product-details-content" *ngIf="showProductDetails">
 
-              <p>
-                {{ p.description }}
-              </p>
+              <!-- =========================
+         DESCRIPTION
+    ========================== -->
 
+              <div class="product-description" *ngIf="p.description">
 
-              <div *ngIf="p.fabric">
-                <span>Fabric</span>
-                <strong>{{ p.fabric }}</strong>
+                <p>
+                  {{ p.description }}
+                </p>
+
               </div>
 
 
-              <div *ngIf="p.type">
-                <span>Type</span>
-                <strong>{{ p.type }}</strong>
+              <!-- =========================
+         FIT
+    ========================== -->
+
+              <div class="detail-block" *ngIf="p.fit">
+
+                <h4>Fit</h4>
+
+                <p>
+                  {{ p.fit }}
+                </p>
+
               </div>
 
 
-              <div *ngIf="p.brand">
-                <span>Brand</span>
-                <strong>{{ p.brand }}</strong>
+              <!-- =========================
+         FABRIC
+    ========================== -->
+
+              <div class="detail-block" *ngIf="p.fabric">
+
+                <h4>Fabric</h4>
+
+                <p>
+                  {{ p.fabric }}
+                </p>
+
               </div>
 
 
-              <div *ngIf="p.category">
-                <span>Category</span>
-                <strong>{{ p.category }}</strong>
+              <!-- =========================
+         CARE
+    ========================== -->
+
+              <div class="detail-block" *ngIf="p.careInstructions">
+
+                <h4>Care Instructions</h4>
+
+                <p>
+                  {{ p.careInstructions }}
+                </p>
+
+              </div>
+
+
+              <!-- =========================
+         PRODUCT SPECS
+    ========================== -->
+
+              <div class="product-specifications">
+
+                <div class="spec-row" *ngIf="p.type">
+
+                  <span>Type</span>
+
+                  <strong>
+                    {{ p.type }}
+                  </strong>
+
+                </div>
+
+
+                <div class="spec-row" *ngIf="p.category">
+
+                  <span>Category</span>
+
+                  <strong>
+                    {{ p.category }}
+                  </strong>
+
+                </div>
+
+
+                <div class="spec-row" *ngIf="p.brand">
+
+                  <span>Brand</span>
+
+                  <strong>
+                    {{ p.brand }}
+                  </strong>
+
+                </div>
+
+
+                <div class="spec-row" *ngIf="p.sku">
+
+                  <span>SKU</span>
+
+                  <strong>
+                    {{ p.sku }}
+                  </strong>
+
+                </div>
+
               </div>
 
             </div>

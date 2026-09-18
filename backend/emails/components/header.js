@@ -1,31 +1,50 @@
 module.exports = (title = "Triangle Sports") => {
 
+    const logoUrl =
+        "https://res.cloudinary.com/kgphuyoj/image/upload/trianglepng_b5zaun.png";
+
     return `
 
+    <!-- ==========================================
+         TRIANGLE SPORTS EMAIL HEADER
+    =========================================== -->
+
     <div style="
-        background: linear-gradient(135deg,#6A11CB,#8E2DE2);
-        padding:40px 20px;
+        background:#111111;
+        padding:30px 20px 26px;
         text-align:center;
+        font-family:Arial,Helvetica,sans-serif;
     ">
 
-        <h1 style="
-            margin:0;
-            color:#ffffff;
-            font-size:34px;
-            font-family:Arial,sans-serif;
-            letter-spacing:1px;
-        ">
-            ▲ Triangle Sports
-        </h1>
+        <!-- LOGO -->
 
-        <p style="
-            margin-top:12px;
+        <img
+            src="${logoUrl}"
+            alt="Triangle Sports"
+            width="150"
+            style="
+                display:block;
+                width:150px;
+                max-width:150px;
+                height:auto;
+                margin:0 auto 20px;
+                border:0;
+                outline:none;
+                text-decoration:none;
+            "
+        >
+
+        <!-- EMAIL TITLE -->
+
+        <div style="
             color:#ffffff;
-            font-size:18px;
-            font-family:Arial,sans-serif;
+            font-size:12px;
+            font-weight:700;
+            letter-spacing:2px;
+            text-transform:uppercase;
         ">
             ${title}
-        </p>
+        </div>
 
     </div>
 

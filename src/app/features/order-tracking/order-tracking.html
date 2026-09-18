@@ -40,6 +40,39 @@
                 </strong>
 
             </div>
+            <!-- REFUND STATUS -->
+
+            <div class="info-item refund-status-item"
+                *ngIf="order.paymentStatus === 'Paid' || order.paymentStatus === 'Refunded'">
+
+                <span>Refund Status</span>
+
+                <strong [class.refund-pending]="order.refundStatus === 'Pending'"
+                    [class.refund-processing]="order.refundStatus === 'Processing'"
+                    [class.refund-completed]="order.refundStatus === 'Completed'"
+                    [class.refund-failed]="order.refundStatus === 'Failed'">
+                   {{ order.refundStatus || (order.paymentStatus === 'Refunded' ? 'Completed' : 'Not Applicable') }}
+                </strong>
+
+            </div>
+
+            <!-- REFUND AMOUNT -->
+
+            <div class="info-item" *ngIf="
+        order.refundStatus === 'Pending' ||
+        order.refundStatus === 'Processing' ||
+        order.refundStatus === 'Completed' ||
+        order.refundStatus === 'Failed'
+    ">
+
+                <span>Refund Amount</span>
+
+                <strong>
+                    ₹{{ order.refundAmount | number:'1.0-0' }}
+                </strong>
+
+            </div>
+
 
             <div class="info-item">
                 <span>Total</span>
@@ -49,7 +82,24 @@
         </div>
 
     </div>
-    <div class="delivery-card">
+
+    <!-- ==========================================
+     CANCEL ORDER
+========================================== -->
+
+    <div class="cancel-order-section" *ngIf="canCancelOrder()">
+
+        <button type="button" class="cancel-order-btn" (click)="openCancellationModal()">
+            <i class="fa-solid fa-ban"></i>
+            Cancel Order
+        </button>
+
+        <p class="cancel-order-note">
+            You can cancel this order before it is shipped.
+        </p>
+
+    </div>
+    <div class="delivery-card" *ngIf="order.orderStatus !== 'Cancelled'">
 
         <h3>Estimated Delivery</h3>
 
@@ -69,7 +119,114 @@
 
     </div>
 
-    <div class="tracking-container">
+
+    <!-- ==========================================
+     REFUND INFORMATION
+========================================== -->
+
+    <div class="refund-card" *ngIf="
+        order.orderStatus === 'Cancelled' &&
+        order.paymentStatus === 'Paid' &&
+        order.refundStatus
+    ">
+
+        <div class="refund-card-icon">
+
+            <i class="fa-solid fa-rotate-left"></i>
+
+        </div>
+
+        <div class="refund-card-content">
+
+            <h3>Refund Information</h3>
+
+            <p *ngIf="order.refundStatus === 'Pending'">
+
+                Your refund of
+                <strong>₹{{ order.refundAmount | number:'1.0-0' }}</strong>
+                is being prepared.
+
+            </p>
+
+            <p *ngIf="order.refundStatus === 'Processing'">
+
+                Your refund of
+                <strong>₹{{ order.refundAmount | number:'1.0-0' }}</strong>
+                has been initiated and is being processed.
+
+            </p>
+
+            <p *ngIf="order.refundStatus === 'Completed'">
+
+                Your refund of
+                <strong>₹{{ order.refundAmount | number:'1.0-0' }}</strong>
+                has been successfully processed.
+
+            </p>
+
+            <p *ngIf="order.refundStatus === 'Failed'">
+
+                We were unable to process your refund automatically.
+                Please contact support.
+
+            </p>
+
+            <div class="refund-meta" *ngIf="order.refundStatus === 'Completed'">
+
+                <span *ngIf="order.refundedAt">
+                    Refunded on:
+                    {{ formatDate(order.refundedAt) }}
+                </span>
+
+                <span *ngIf="order.razorpayRefundId">
+                    Refund ID:
+                    {{ order.razorpayRefundId }}
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==========================================
+     CANCELLED ORDER
+========================================== -->
+
+    <div class="cancelled-order-card" *ngIf="order.orderStatus === 'Cancelled'">
+
+        <div class="cancelled-order-icon">
+            <i class="fa-solid fa-ban"></i>
+        </div>
+
+        <div class="cancelled-order-content">
+
+            <h2>Order Cancelled</h2>
+
+            <p>
+                This order was cancelled successfully.
+            </p>
+
+            <div class="cancelled-order-meta" *ngIf="order.cancelledAt">
+                <span>
+                    Cancelled on:
+                    {{ formatDate(order.cancelledAt) }}
+                </span>
+            </div>
+
+            <div class="cancelled-order-reason" *ngIf="order.cancellationReason">
+                <strong>Reason:</strong>
+                <span>
+                    {{ order.cancellationReason }}
+                </span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="tracking-container" *ngIf="order.orderStatus !== 'Cancelled'">
 
         <div class="timeline-step" [class.completed]="true">
 
@@ -126,9 +283,54 @@
 
                 <h4>{{ item.name }}</h4>
 
-                <p>Qty : {{ item.quantity }}</p>
+                <!-- SIZE -->
 
-                <p>₹{{ item.price }}</p>
+                <p *ngIf="item.selectedSize">
+                    <strong>Size:</strong>
+                    {{ item.selectedSize }}
+                </p>
+
+                <!-- COLOR -->
+
+                <p *ngIf="item.selectedColor">
+                    <strong>Color:</strong>
+                    {{ item.selectedColor }}
+                </p>
+
+                <!-- PACK -->
+
+                <p *ngIf="item.selectedPack && item.selectedPack !== 'single'">
+                    <strong>Pack:</strong>
+                    {{ item.selectedPack }}
+                </p>
+
+                <!-- COMBINATION -->
+
+                <p *ngIf="item.selectedCombination">
+                    <strong>Combination:</strong>
+                    {{ item.selectedCombination }}
+                </p>
+
+                <!-- QUANTITY -->
+
+                <p>
+                    <strong>Qty:</strong>
+                    {{ item.quantity }}
+                </p>
+
+
+
+                <p *ngIf="item.packQuantity && item.packQuantity > 1">
+                    <strong>Pieces:</strong>
+                    {{ item.totalUnits || (item.quantity * item.packQuantity) }}
+                </p>
+
+                <!-- UNIT PRICE -->
+
+                <p>
+                    <strong>Price:</strong>
+                    ₹{{ item.price | number:'1.0-0' }}
+                </p>
 
             </div>
 
@@ -141,6 +343,76 @@
         </div>
 
 
+
+    </div>
+
+
+    <!-- ==========================================
+     ORDER PRICE SUMMARY
+========================================== -->
+
+    <div class="price-summary-card">
+
+        <h2>Price Details</h2>
+
+        <div class="price-row">
+            <span>Subtotal</span>
+            <strong>
+                ₹{{ order.subtotal || 0 | number:'1.0-0' }}
+            </strong>
+        </div>
+
+        <div class="price-row discount-row" *ngIf="order.discountAmount && order.discountAmount > 0">
+            <span>Discount</span>
+            <strong>
+                -₹{{ order.discountAmount | number:'1.0-0' }}
+            </strong>
+        </div>
+
+        <div class="price-row">
+            <span>Shipping</span>
+            <strong *ngIf="(order.shipping || 0) > 0">
+                ₹{{ (order.shipping || 0) | number:'1.0-0' }}
+            </strong>
+
+            <strong *ngIf="(order.shipping || 0) === 0" class="free-shipping">
+                FREE
+            </strong>
+        </div>
+
+        <div class="price-row">
+            <span>GST</span>
+            <strong>
+                ₹{{ order.gst || 0 | number:'1.0-0' }}
+            </strong>
+        </div>
+
+        <div class="price-divider"></div>
+
+        <div class="price-row total-row">
+            <span>Total Amount</span>
+
+            <strong>
+                ₹{{ order.total | number:'1.0-0' }}
+            </strong>
+        </div>
+
+        <div class="payment-summary">
+            <span>Payment Method</span>
+
+            <strong>
+                {{ order.paymentMethod }}
+            </strong>
+        </div>
+
+        <div class="payment-summary">
+            <span>Payment Status</span>
+
+            <strong [class.payment-paid]="order.paymentStatus === 'Paid'"
+                [class.payment-refunded]="order.paymentStatus === 'Refunded'">
+                {{ order.paymentStatus }}
+            </strong>
+        </div>
 
     </div>
     <div class="address-card">
@@ -160,5 +432,155 @@
         </p>
 
         <p>{{ order.pincode }}</p>
+
+    </div>
+
+    <!-- ==========================================
+     CANCELLATION MODAL
+========================================== -->
+
+    <div *ngIf="showCancellationModal" class="customer-cancel-overlay" (click)="closeCancellationModal()">
+
+        <div class="customer-cancel-modal" (click)="$event.stopPropagation()">
+
+            <!-- HEADER -->
+
+            <div class="customer-cancel-header">
+
+                <div class="customer-cancel-icon">
+                    <i class="fa-solid fa-ban"></i>
+                </div>
+
+                <div>
+
+                    <h2>Cancel Order</h2>
+
+                    <p>
+                        Order #{{ (order._id || '') | slice:0:10 }}
+                    </p>
+
+                </div>
+
+                <button type="button" class="customer-cancel-close" [disabled]="isCancelling"
+                    (click)="closeCancellationModal()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+
+            </div>
+
+
+            <!-- BODY -->
+
+            <div class="customer-cancel-body">
+
+                <div class="customer-cancel-warning">
+
+                    <i class="fa-solid fa-circle-exclamation"></i>
+
+                    <div>
+
+                        <strong>
+                            Are you sure you want to cancel this order?
+                        </strong>
+
+                        <p>
+                            This action cannot be undone.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- REFUND MESSAGE -->
+
+                <div class="customer-refund-info" *ngIf="order.paymentStatus === 'Paid'">
+
+                    <i class="fa-solid fa-rotate-left"></i>
+
+                    <div>
+
+                        <strong>
+                            Refund will be initiated
+                        </strong>
+
+                        <p>
+                            Your refund of
+                            <strong>₹{{ order.total }}</strong>
+                            will be initiated to your original payment method.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="customer-cancel-info" *ngIf="order.paymentStatus !== 'Paid'">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+                        No payment refund is required for this order.
+                    </span>
+
+                </div>
+
+
+                <!-- REASON -->
+
+                <label for="customerCancellationReason" class="customer-cancel-label">
+                    Why are you cancelling?
+                </label>
+
+                <select id="customerCancellationReason" class="customer-cancel-select" [(ngModel)]="cancellationReason"
+                    [disabled]="isCancelling">
+
+                    <option value="" disabled>
+                        Select a reason
+                    </option>
+
+                    <option *ngFor="let reason of cancellationReasons" [value]="reason">
+                        {{ reason }}
+                    </option>
+
+                </select>
+
+
+                <!-- ERROR -->
+
+                <p class="customer-cancel-error" *ngIf="errorMessage">
+                    {{ errorMessage }}
+                </p>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="customer-cancel-footer">
+
+                <button type="button" class="customer-cancel-back" [disabled]="isCancelling"
+                    (click)="closeCancellationModal()">
+                    Keep Order
+                </button>
+
+                <button type="button" class="customer-cancel-confirm" [disabled]="
+                    !cancellationReason ||
+                    isCancelling
+                " (click)="confirmCancellation()">
+
+                    <i class="fa-solid" [class.fa-ban]="!isCancelling" [class.fa-spinner]="isCancelling"
+                        [class.fa-spin]="isCancelling"></i>
+
+                    {{ isCancelling
+                    ? 'Cancelling...'
+                    : 'Confirm Cancellation'
+                    }}
+
+                </button>
+
+            </div>
+
+        </div>
 
     </div>

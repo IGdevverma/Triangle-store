@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
 
-  apiUrl: 'https://triangle-store-api.onrender.com/api',
+  apiUrl: 'http://localhost:8000/api',
 
   msg91: {
     widgetId: '366874664d57383734313131',

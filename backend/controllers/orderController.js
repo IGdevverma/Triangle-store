@@ -1,5 +1,10 @@
+const {
+    initiateRefund
+} = require("../services/refundService");
 const PaymentVerification =
     require("../models/PaymentVerification");
+    const RazorpayWebhookEvent =
+    require("../models/RazorpayWebhookEvent");
 const { calculatePricing } = require("../utils/pricing");
 const mongoose = require("mongoose");
 const EmailService = require("../services/emailService");
@@ -431,7 +436,7 @@ const createOrder = async (req, res) => {
                     },
 
                     {
-                        new: true,
+                        returnDocument: "after",
                         session
                     }
                 );
@@ -532,11 +537,77 @@ const createOrder = async (req, res) => {
         await session.commitTransaction();
 
 
+        // ==========================================
+        // 10.1 RECONCILE RAZORPAY WEBHOOK EVENTS
+        // ==========================================
+
+        try {
+
+            const reconciliationResult =
+                await RazorpayWebhookEvent.updateMany(
+                    {
+                        razorpayOrderId: razorpayOrderId,
+                        processed: false
+                    },
+                    {
+                        $set: {
+                            processed: true,
+                            processedAt: new Date()
+                        }
+                    }
+                );
+
+            if (reconciliationResult.modifiedCount > 0) {
+
+                console.log(
+                    "✅ Razorpay webhook event(s) reconciled:",
+                    razorpayOrderId,
+                    reconciliationResult.modifiedCount
+                );
+
+            }
+
+        } catch (webhookReconciliationError) {
+
+            console.error(
+                "⚠️ Webhook reconciliation failed:",
+                webhookReconciliationError.message
+            );
+
+        }
+
 
 
         // ==========================================
-        // 11. SEND EMAIL
+        // 11. SEND ORDER EMAILS
         // ==========================================
+
+        // ------------------------------------------
+        // CUSTOMER ORDER CONFIRMATION
+        // ------------------------------------------
+
+        try {
+
+            await EmailService
+                .sendOrderPlaced(order);
+
+            console.log(
+                "✅ Customer order confirmation email sent."
+            );
+
+        } catch (customerMailError) {
+
+            console.error(
+                "❌ Customer order confirmation email failed:",
+                customerMailError
+            );
+
+        }
+
+
+        // ------------------------------------------
+        // ADMIN NEW ORDER NOTIFICATION
+        // ------------------------------------------
 
         try {
 
@@ -699,7 +770,10 @@ const updateOrderStatus = async (req, res) => {
 
     try {
 
-        const { orderStatus } = req.body;
+        const {
+            orderStatus,
+            cancellationReason
+        } = req.body;
 
         // ==========================================
         // VALID STATUS
@@ -785,6 +859,36 @@ const updateOrderStatus = async (req, res) => {
 
         }
 
+
+        // ==========================================
+        // ORDER STATUS TRANSITION RULES
+        // ==========================================
+
+        const allowedTransitions = {
+            Processing: ["Packed", "Cancelled"],
+            Packed: ["Shipped", "Cancelled"],
+            Shipped: ["Delivered", "Cancelled"],
+            Delivered: [],
+            Cancelled: []
+        };
+
+        const currentStatus = order.orderStatus;
+
+        if (
+            currentStatus !== orderStatus &&
+            !allowedTransitions[currentStatus].includes(orderStatus)
+        ) {
+
+            await session.abortTransaction();
+
+            return res.status(400).json({
+                success: false,
+                message:
+                    `Order cannot be changed from ${currentStatus} to ${orderStatus}`
+            });
+
+        }
+
         // ==========================================
         // ALREADY CANCELLED
         // ==========================================
@@ -845,6 +949,44 @@ const updateOrderStatus = async (req, res) => {
 
         }
 
+
+
+        // ==========================================
+        // CANCELLATION DETAILS
+        // ==========================================
+
+        if (orderStatus === "Cancelled") {
+
+            if (
+                cancellationReason !== undefined &&
+                typeof cancellationReason !== "string"
+            ) {
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid cancellation reason"
+                });
+
+            }
+
+            const reason =
+                String(cancellationReason || "").trim();
+
+            if (reason.length > 250) {
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Cancellation reason cannot exceed 250 characters"
+                });
+
+            }
+
+        }
         // ==========================================
         // STOCK RESTORE ON CANCELLATION
         // ==========================================
@@ -870,7 +1012,7 @@ const updateOrderStatus = async (req, res) => {
                         },
 
                         {
-                            new: true,
+                            returnDocument: "after",
                             session
                         }
 
@@ -896,8 +1038,31 @@ const updateOrderStatus = async (req, res) => {
         // UPDATE ORDER STATUS
         // ==========================================
 
-        order.orderStatus =
-            orderStatus;
+        order.orderStatus = orderStatus;
+
+        // ==========================================
+        // CANCELLATION DETAILS
+        // ==========================================
+
+        if (orderStatus === "Cancelled") {
+
+            order.cancelledAt = new Date();
+
+            order.cancellationReason =
+                String(cancellationReason || "").trim() ||
+                "Order cancelled";
+
+            // Prepaid order:
+            // cancellation does NOT mean refund is completed.
+            if (order.paymentStatus === "Paid") {
+
+                order.refundStatus = "Pending";
+
+                order.refundAmount = order.total;
+
+            }
+
+        }
 
         // ==========================================
         // TRACKING HISTORY
@@ -922,6 +1087,59 @@ const updateOrderStatus = async (req, res) => {
         // ==========================================
 
         await session.commitTransaction();
+
+        // ==========================================
+        // INITIATE REFUND AFTER TRANSACTION COMMIT
+        // ==========================================
+
+        if (
+            orderStatus === "Cancelled" &&
+            order.paymentStatus === "Paid" &&
+            order.refundStatus === "Pending"
+        ) {
+
+            try {
+
+                const refundResult =
+                    await initiateRefund(
+                        order,
+                        order.cancellationReason
+                    );
+
+                order.refundStatus = "Processing";
+
+                order.razorpayRefundId =
+                    refundResult.refundId;
+
+                order.refundInitiatedAt =
+                    new Date();
+
+                await order.save();
+
+                console.log(
+                    "✅ Razorpay refund initiated:",
+                    refundResult.refundId
+                );
+
+            } catch (refundError) {
+
+                console.error(
+                    "❌ REFUND INITIATION FAILED:",
+                    refundError.message
+                );
+
+                order.refundStatus = "Failed";
+
+                order.refundFailureReason =
+                    String(
+                        refundError.message ||
+                        "Unable to initiate refund"
+                    ).slice(0, 250);
+
+                await order.save();
+
+            }
+        }
 
         // ==========================================
         // EMAIL
@@ -1017,7 +1235,9 @@ const updateOrderStatus = async (req, res) => {
 
     } catch (error) {
 
-        await session.abortTransaction();
+        if (session.inTransaction()) {
+            await session.abortTransaction();
+        }
 
         console.error(
             "UPDATE ORDER STATUS ERROR:",
@@ -1025,12 +1245,9 @@ const updateOrderStatus = async (req, res) => {
         );
 
         return res.status(500).json({
-
             success: false,
-
             message:
                 error.message
-
         });
 
     } finally {

@@ -13,7 +13,7 @@ import { Chart } from 'chart.js/auto';
 import { ProductService } from '../../services/product';
 import { Product } from '../../models/product';
 import { OrderService } from '../../services/order';
-import { OrderStatus } from '../../models/orders';
+import { Order, OrderStatus } from '../../models/orders';
 import { AdminService } from '../../services/admin';
 import { UserService } from '../../services/user';
 import { QuoteService } from '../../services/quote';
@@ -170,7 +170,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
      ORDERS / CUSTOMERS / QUOTES
      ========================================================== */
 
-  orders: any[] = [];
+  orders: Order[] = [];
+  selectedOrder: Order | null = null;
+  showCancellationModal = false;
+  cancellationOrder: Order | null = null;
+  cancellationReason = '';
   customers: any[] = [];
   filteredCustomers: any[] = [];
 
@@ -381,15 +385,17 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
   loadOrders(): void {
     this.orderService.getOrders().subscribe({
-      next: (response: any) => {
-        this.orders = Array.isArray(response?.orders)
+      next: (response) => {
+        this.orders = Array.isArray(response.orders)
           ? response.orders
           : [];
       },
       error: (error) => {
         console.error('Failed to load orders:', error);
+
         this.toastr.error(
-          error?.error?.message || 'Failed to load orders.',
+          error?.error?.message ||
+          'Failed to load orders.',
           'Orders'
         );
       }
@@ -582,16 +588,31 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  /* ==========================================================
-     ORDER MANAGEMENT
-     ========================================================== */
 
+  getAllowedOrderStatuses(
+    currentStatus: OrderStatus
+  ): OrderStatus[] {
+
+    const statusFlow: Record<OrderStatus, OrderStatus[]> = {
+      Processing: ['Processing', 'Packed', 'Cancelled'],
+      Packed: ['Packed', 'Shipped', 'Cancelled'],
+      Shipped: ['Shipped', 'Delivered', 'Cancelled'],
+      Delivered: ['Delivered'],
+      Cancelled: ['Cancelled']
+    };
+
+    return statusFlow[currentStatus] || [currentStatus];
+  }
   changeOrderStatus(
-    order: any,
+    order: Order,
     status: OrderStatus
   ): void {
+
     if (!order?._id) {
-      this.toastr.error('Invalid order.', 'Error');
+      this.toastr.error(
+        'Invalid order.',
+        'Error'
+      );
       return;
     }
 
@@ -605,10 +626,63 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const previousStatus = order.orderStatus;
 
+    // Same status selected
+    if (previousStatus === status) {
+      return;
+    }
+
+    // ==========================================
+    // CANCELLATION
+    // ==========================================
+
+    if (status === 'Cancelled') {
+
+      this.cancellationOrder = order;
+      this.cancellationReason = '';
+      this.showCancellationModal = true;
+
+      // Keep original status until cancellation
+      // is actually confirmed.
+      order.orderStatus = previousStatus;
+
+      return;
+    }
+
+    // ==========================================
+    // NORMAL STATUS CHANGE
+    // ==========================================
+
+    let confirmationMessage =
+      `Change order status from "${previousStatus}" to "${status}"?`;
+
+    if (status === 'Shipped') {
+      confirmationMessage =
+        'Are you sure you want to mark this order as Shipped?';
+    }
+
+    if (status === 'Delivered') {
+      confirmationMessage =
+        'Are you sure you want to mark this order as Delivered?';
+    }
+
+    const confirmed = window.confirm(
+      confirmationMessage
+    );
+
+    if (!confirmed) {
+      order.orderStatus = previousStatus;
+      return;
+    }
+
     this.orderService
-      .updateOrderStatus(order._id, status)
+      .updateOrderStatus(
+        order._id,
+        status
+      )
       .subscribe({
-        next: (response: any) => {
+
+        next: (response) => {
+
           order.orderStatus = status;
 
           this.toastr.success(
@@ -616,8 +690,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             'Order status updated successfully.',
             'Updated'
           );
+
         },
+
         error: (error) => {
+
           order.orderStatus = previousStatus;
 
           console.error(
@@ -630,10 +707,102 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             'Failed to update order status.',
             'Error'
           );
+
         }
+
       });
   }
 
+
+  confirmCancellation(): void {
+
+    if (!this.cancellationOrder?._id) {
+      this.toastr.error(
+        'Invalid order.',
+        'Error'
+      );
+      return;
+    }
+
+    const reason =
+      this.cancellationReason.trim();
+
+    if (!reason) {
+      this.toastr.warning(
+        'Please select a cancellation reason.',
+        'Reason Required'
+      );
+      return;
+    }
+
+    const order = this.cancellationOrder;
+    const orderId = order._id;
+
+    if (!orderId) {
+      this.toastr.error(
+        'Invalid order ID.',
+        'Error'
+      );
+      return;
+    }
+
+    this.orderService
+      .updateOrderStatus(
+        orderId,
+        'Cancelled',
+        reason
+      )
+      .subscribe({
+
+        next: (response) => {
+
+          order.orderStatus = 'Cancelled';
+
+          this.showCancellationModal = false;
+          this.cancellationOrder = null;
+          this.cancellationReason = '';
+
+          this.toastr.success(
+            response?.message ||
+            'Order cancelled successfully.',
+            'Order Cancelled'
+          );
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Order cancellation failed:',
+            error
+          );
+
+          this.toastr.error(
+            error?.error?.message ||
+            'Failed to cancel order.',
+            'Cancellation Failed'
+          );
+
+        }
+
+      });
+  }
+
+  closeCancellationModal(): void {
+
+    this.showCancellationModal = false;
+    this.cancellationOrder = null;
+    this.cancellationReason = '';
+
+  }
+
+  viewOrder(order: Order): void {
+    this.selectedOrder = order;
+  }
+
+  closeOrderDetails(): void {
+    this.selectedOrder = null;
+  }
   downloadInvoice(order: any): void {
     if (!order) {
       return;
@@ -1084,7 +1253,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     console.log('ORIGINAL PRICE SENT:', formData.get('originalPrice'));
     console.log('DISCOUNT SENT:', formData.get('discount'));
 
-    this.productService.updateProduct(this.newProduct._id, formData)
+
     this.productService
       .updateProduct(
         this.newProduct._id,
@@ -1216,7 +1385,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       this.newProduct.name?.trim() || ''
     );
 
-   
+
 
     formData.append(
       'price',

@@ -123,7 +123,13 @@ export interface Order {
 
   refundAmount?: number | null;
 
+  razorpayRefundId?: string | null;
+
+  refundInitiatedAt?: string | null;
+
   refundedAt?: string | null;
+
+  refundFailureReason?: string | null;
 
 
   // ==========================================
@@ -137,6 +143,10 @@ export interface Order {
   // TOTAL
   // ==========================================
 
+  subtotal?: number;
+  discountAmount?: number;
+  shipping?: number;
+  gst?: number;
   total: number;
   couponCode?: string;
 

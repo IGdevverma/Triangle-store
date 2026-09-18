@@ -187,7 +187,7 @@ const updateQuoteStatus = async (req, res) => {
                 status: req.body.status
             },
             {
-                new: true,
+                returnDocument: "after",
                 runValidators: true
             }
         );

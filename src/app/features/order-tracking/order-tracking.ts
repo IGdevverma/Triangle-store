@@ -3,18 +3,25 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { Order } from '../../models/orders';
 import { OrderService } from '../../services/order';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-order-tracking',
   imports: [
-    CommonModule
+    CommonModule, FormsModule
   ],
   templateUrl: './order-tracking.html',
   styleUrl: './order-tracking.css',
 })
 
 export class OrderTracking implements OnInit {
-  formatDate(date: string | Date): string {
+  formatDate(
+    date: string | Date | null | undefined
+  ): string {
+
+    if (!date) {
+      return '';
+    }
 
     return new Date(date).toLocaleString('en-IN', {
 
@@ -62,6 +69,22 @@ export class OrderTracking implements OnInit {
 
   order!: Order;
 
+
+  loading = true;
+  errorMessage = '';
+
+  showCancellationModal = false;
+  cancellationReason = '';
+  isCancelling = false;
+
+  readonly cancellationReasons = [
+    'Changed my mind',
+    'Ordered by mistake',
+    'Found a better option',
+    'Delivery taking too long',
+    'Other'
+  ];
+
   constructor(
 
     private route: ActivatedRoute,
@@ -76,7 +99,11 @@ export class OrderTracking implements OnInit {
 
       const id = params.get('id');
 
-      if (!id) return;
+      if (!id) {
+        this.loading = false;
+        this.errorMessage = 'Invalid order ID.';
+        return;
+      }
 
       this.orderService.getOrderById(id).subscribe({
 
@@ -84,13 +111,26 @@ export class OrderTracking implements OnInit {
 
           this.order = response.order;
 
+          this.loading = false;
+
+          this.errorMessage = '';
+
           console.log(this.order);
 
         },
 
         error: (err) => {
 
-          console.error("Failed to load order", err);
+          console.error(
+            'Failed to load order',
+            err
+          );
+
+          this.loading = false;
+
+          this.errorMessage =
+            err?.error?.message ||
+            'Unable to load your order. Please try again.';
 
         }
 
@@ -137,13 +177,15 @@ export class OrderTracking implements OnInit {
       return '';
 
     }
-
-    const history = this.order.trackingHistory.find(
-
-      (item: any) => item.status === status
-
-    );
-
+    const history = this.order.trackingHistory
+      .filter(
+        (item: any) => item.status === status
+      )
+      .sort(
+        (a: any, b: any) =>
+          new Date(b.date).getTime() -
+          new Date(a.date).getTime()
+      )[0];
     return history
 
       ? this.formatDate(history.date)
@@ -174,5 +216,93 @@ export class OrderTracking implements OnInit {
 
     });
 
+  }
+
+  canCancelOrder(): boolean {
+
+    if (!this.order) {
+      return false;
+    }
+
+    return (
+      this.order.orderStatus === 'Processing' ||
+      this.order.orderStatus === 'Packed'
+    );
+  }
+
+
+  openCancellationModal(): void {
+
+    if (!this.canCancelOrder()) {
+      return;
+    }
+
+    this.cancellationReason = '';
+    this.showCancellationModal = true;
+  }
+
+
+  closeCancellationModal(): void {
+
+    if (this.isCancelling) {
+      return;
+    }
+
+    this.showCancellationModal = false;
+    this.cancellationReason = '';
+  }
+
+
+  confirmCancellation(): void {
+
+    if (!this.order?._id) {
+      return;
+    }
+
+    const reason =
+      this.cancellationReason.trim();
+
+    if (!reason) {
+      return;
+    }
+
+    this.isCancelling = true;
+
+    this.orderService
+      .updateOrderStatus(
+        this.order._id,
+        'Cancelled',
+        reason
+      )
+      .subscribe({
+
+        next: (response) => {
+
+          this.order = response.order;
+
+          this.isCancelling = false;
+
+          this.showCancellationModal = false;
+
+          this.cancellationReason = '';
+
+        },
+
+        error: (error) => {
+
+          console.error(
+            'Order cancellation failed:',
+            error
+          );
+
+          this.isCancelling = false;
+
+          this.errorMessage =
+            error?.error?.message ||
+            'Unable to cancel the order. Please try again.';
+
+        }
+
+      });
   }
 }

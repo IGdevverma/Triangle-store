@@ -112,6 +112,52 @@ const orderSchema = new mongoose.Schema(
       default: null
     },
 
+
+    // ==========================================
+    // REFUND
+    // ==========================================
+
+    refundStatus: {
+      type: String,
+      enum: [
+        "Not Applicable",
+        "Pending",
+        "Processing",
+        "Completed",
+        "Failed"
+      ],
+      default: "Not Applicable",
+      index: true
+    },
+
+    refundAmount: {
+      type: Number,
+      default: 0,
+      min: 0
+    },
+
+    razorpayRefundId: {
+      type: String,
+      default: null,
+      index: true
+    },
+
+    refundInitiatedAt: {
+      type: Date,
+      default: null
+    },
+
+    refundedAt: {
+      type: Date,
+      default: null
+    },
+
+    refundFailureReason: {
+      type: String,
+      default: null,
+      trim: true
+    },
+
     // ==========================================
     // RAZORPAY WEBHOOK IDEMPOTENCY
     // ==========================================
@@ -119,6 +165,41 @@ const orderSchema = new mongoose.Schema(
     processedWebhookEvents: {
       type: [String],
       default: []
+    },
+    shiprocketOrderId: {
+      type: String,
+      default: null,
+      index: true
+    },
+
+    shiprocketShipmentId: {
+      type: String,
+      default: null
+    },
+
+    shiprocketAwbCode: {
+      type: String,
+      default: null
+    },
+
+    shiprocketCourierName: {
+      type: String,
+      default: null
+    },
+
+    shiprocketStatus: {
+      type: String,
+      default: null
+    },
+
+    shiprocketTrackingUrl: {
+      type: String,
+      default: null
+    },
+
+    shiprocketCreatedAt: {
+      type: Date,
+      default: null
     },
 
     // ==========================================
@@ -136,6 +217,23 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "Processing",
       index: true
+    },
+
+
+    // ==========================================
+    // CANCELLATION
+    // ==========================================
+
+    cancelledAt: {
+      type: Date,
+      default: null
+    },
+
+    cancellationReason: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 250
     },
 
     // ==========================================

@@ -1,21 +1,17 @@
 const PaymentVerification = require("../models/PaymentVerification");
 const { calculatePricing } = require("../utils/pricing");
-const Razorpay = require("razorpay");
+const RazorpayWebhookEvent =
+    require("../models/RazorpayWebhookEvent");
 const crypto = require("crypto");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
-const razorpay = new Razorpay({
-
-    key_id: process.env.RAZORPAY_KEY_ID,
-
-    key_secret: process.env.RAZORPAY_KEY_SECRET
-
-});
+const razorpay = require("../config/razorpay");
 
 exports.createOrder = async (req, res) => {
 
     try {
 
+        console.log("RAZORPAY KEY:", process.env.RAZORPAY_KEY_ID);
         const { couponCode, items } = req.body;
 
 
@@ -246,6 +242,9 @@ exports.createOrder = async (req, res) => {
     }
 
 };
+
+
+
 exports.verifyPayment = async (req, res) => {
     try {
         const {
@@ -434,7 +433,7 @@ exports.verifyPayment = async (req, res) => {
             },
             {
                 upsert: true,
-                new: true,
+                returnDocument: "after",
                 setDefaultsOnInsert: true
             }
         );
@@ -537,12 +536,11 @@ exports.handleWebhook = async (req, res) => {
         // -----------------------------------------
         // DUPLICATE EVENT PROTECTION
         // -----------------------------------------
-
         if (eventId) {
 
             const alreadyProcessed =
-                await Order.findOne({
-                    processedWebhookEvents: eventId
+                await RazorpayWebhookEvent.findOne({
+                    eventId
                 });
 
             if (alreadyProcessed) {
@@ -570,6 +568,238 @@ exports.handleWebhook = async (req, res) => {
             payment?.order_id ||
             event.payload?.order?.entity?.id;
 
+
+
+        if (eventId) {
+
+            try {
+
+                await RazorpayWebhookEvent.create({
+                    eventId,
+                    event: event.event,
+                    razorpayOrderId,
+                    razorpayPaymentId: payment?.id || null,
+                    payload: event.payload,
+                    processed: false
+                });
+
+                console.log(
+                    "💾 Webhook event stored:",
+                    eventId
+                );
+
+            } catch (error) {
+
+                if (error.code === 11000) {
+
+                    console.log(
+                        "⚠️ Webhook event already stored:",
+                        eventId
+                    );
+
+                } else {
+
+                    throw error;
+
+                }
+            }
+        }
+
+
+        // -----------------------------------------
+        // REFUND WEBHOOKS
+        // -----------------------------------------
+
+        if (
+            event.event === "refund.processed" ||
+            event.event === "refund.failed"
+        ) {
+
+            const refund =
+                event.payload?.refund?.entity;
+
+            if (!refund) {
+
+                console.error(
+                    "❌ Refund webhook payload missing refund entity"
+                );
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid refund webhook payload"
+                });
+
+            }
+
+            const refundId =
+                refund.id;
+
+            const paymentId =
+                refund.payment_id;
+
+            const refundOrderId =
+                refund.order_id;
+
+            // -----------------------------------------
+            // FIND LOCAL ORDER
+            // -----------------------------------------
+
+            let order = null;
+
+            if (refundOrderId) {
+
+                order =
+                    await Order.findOne({
+                        razorpayOrderId: refundOrderId
+                    });
+
+            }
+
+            if (!order && paymentId) {
+
+                order =
+                    await Order.findOne({
+                        razorpayPaymentId: paymentId
+                    });
+
+            }
+
+            if (!order) {
+
+                console.error(
+                    "❌ Local order not found for refund:",
+                    {
+                        refundId,
+                        paymentId,
+                        refundOrderId
+                    }
+                );
+
+                return res.status(200).json({
+                    success: true,
+                    message:
+                        "Refund received, local order not found"
+                });
+
+            }
+
+            // -----------------------------------------
+            // EXTRA REFUND OWNERSHIP CHECK
+            // -----------------------------------------
+
+            if (
+                paymentId &&
+                order.razorpayPaymentId &&
+                paymentId !== order.razorpayPaymentId
+            ) {
+
+                console.error(
+                    "❌ Refund payment does not belong to order"
+                );
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Refund payment does not belong to this order"
+                });
+
+            }
+
+            // -----------------------------------------
+            // REFUND PROCESSED
+            // -----------------------------------------
+
+            if (event.event === "refund.processed") {
+
+                order.refundStatus =
+                    "Completed";
+
+                order.razorpayRefundId =
+                    refundId ||
+                    order.razorpayRefundId;
+
+                order.refundedAt =
+                    new Date();
+
+                order.refundFailureReason =
+                    null;
+
+                // Full refund only in our current flow
+                if (
+                    Number(refund.amount) ===
+                    Math.round(Number(order.total) * 100)
+                ) {
+
+                    order.paymentStatus =
+                        "Refunded";
+
+                }
+
+                if (eventId) {
+
+                    order.processedWebhookEvents.push(
+                        eventId
+                    );
+
+                }
+
+                await order.save();
+
+                console.log(
+                    "✅ Refund completed:",
+                    order._id,
+                    refundId
+                );
+            }
+
+            // -----------------------------------------
+            // REFUND FAILED
+            // -----------------------------------------
+
+            if (event.event === "refund.failed") {
+
+                order.refundStatus =
+                    "Failed";
+
+                order.razorpayRefundId =
+                    refundId ||
+                    order.razorpayRefundId;
+
+                order.refundFailureReason =
+                    String(
+                        refund?.notes?.reason ||
+                        refund?.error_description ||
+                        refund?.error_reason ||
+                        "Razorpay refund failed"
+                    ).slice(0, 250);
+
+                if (eventId) {
+
+                    order.processedWebhookEvents.push(
+                        eventId
+                    );
+
+                }
+
+                await order.save();
+
+                console.error(
+                    "❌ Refund failed:",
+                    order._id,
+                    refundId
+                );
+            }
+
+            return res.status(200).json({
+
+                success: true,
+
+                message:
+                    "Refund webhook processed successfully"
+
+            });
+        }
+
         // -----------------------------------------
         // ORDER ID NOT FOUND
         // -----------------------------------------
@@ -590,7 +820,6 @@ exports.handleWebhook = async (req, res) => {
         // -----------------------------------------
         // PAYMENT CAPTURED
         // -----------------------------------------
-
         if (
             event.event === "payment.captured" ||
             event.event === "order.paid"
@@ -603,16 +832,15 @@ exports.handleWebhook = async (req, res) => {
 
             if (!order) {
 
-                console.error(
-                    "❌ Local order not found:",
+                console.log(
+                    "ℹ️ Webhook stored; local order not created yet:",
                     razorpayOrderId
                 );
 
                 return res.status(200).json({
                     success: true,
-                    message: "Webhook received, order not found"
+                    message: "Webhook stored for reconciliation"
                 });
-
             }
 
             // -------------------------------------
@@ -645,10 +873,10 @@ exports.handleWebhook = async (req, res) => {
                 new Date();
 
             if (eventId) {
-                order.processedWebhookEvents.push(eventId);
+                order.processedWebhookEvents.push(
+                    eventId
+                );
             }
-
-
 
             await order.save();
 
@@ -656,7 +884,6 @@ exports.handleWebhook = async (req, res) => {
                 "✅ Payment marked Paid:",
                 order._id
             );
-
         }
 
         // -----------------------------------------

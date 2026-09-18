@@ -80,6 +80,8 @@ export interface CartItem extends Product {
    */
   packQuantity: number;
 
+  totalUnits?: number;
+
 
   /**
    * Unique identifier for the exact variant.

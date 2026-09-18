@@ -64,6 +64,35 @@ const productSchema = new mongoose.Schema(
       default: 0,
     },
 
+
+    // =====================================================
+    // SHIPPING DETAILS
+    // =====================================================
+
+    weight: {
+      type: Number,
+      required: true,
+      min: 0.001
+    },
+
+    length: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+
+    breadth: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+
+    height: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+
     featured: {
       type: Boolean,
       default: false,

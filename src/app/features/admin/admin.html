@@ -640,105 +640,517 @@
 
 
         <!-- =====================================================
-             ORDERS
-        ====================================================== -->
-        <div *ngIf="activeMenu === 'orders'" class="table-card">
+     ORDERS
+====================================================== -->
+        <div *ngIf="activeMenu === 'orders'" class="table-card orders-card">
 
-            <h2>Orders</h2>
+            <div class="section-header">
+                <div>
+                    <h2>Orders</h2>
+                    <p>Manage and track customer orders</p>
+                </div>
+            </div>
+
+            <div class="orders-table-wrapper">
+                <table class="orders-table">
+
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Payment</th>
+                            <th>Status</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr *ngFor="let order of orders">
+
+                            <!-- ORDER ID -->
+                            <td>
+                                <span class="order-id">
+                                    #{{ (order._id || order.id || '') | slice:0:8 }}
+                                </span>
+                            </td>
+
+                            <!-- CUSTOMER -->
+                            <td>
+                                <div class="order-customer">
+
+                                    <strong>
+                                        {{ order.customerName }}
+                                    </strong>
+
+                                    <span>
+                                        {{ order.email }}
+                                    </span>
+
+                                </div>
+                            </td>
+
+                            <!-- ITEMS -->
+                            <td>
+                                <span class="items-count">
+                                    {{ order.items?.length || 0 }}
+                                    {{ (order.items?.length || 0) === 1 ? 'Item' : 'Items' }}
+                                </span>
+                            </td>
+
+                            <!-- TOTAL -->
+                            <td>
+                                <strong class="order-total">
+                                    ₹{{ order.total | number:'1.0-0' }}
+                                </strong>
+                            </td>
+
+                            <!-- PAYMENT -->
+                            <td>
+
+                                <span class="payment-badge" [class.paid]="order.paymentStatus === 'Paid'"
+                                    [class.pending]="order.paymentStatus === 'Pending'"
+                                    [class.failed]="order.paymentStatus === 'Failed'"
+                                    [class.refunded]="order.paymentStatus === 'Refunded'">
+                                    {{ order.paymentStatus }}
+                                </span>
+
+                            </td>
+
+                            <!-- ORDER STATUS -->
+                            <td>
+
+                                <select class="status-select" [ngModel]="order.orderStatus"
+                                    (ngModelChange)="changeOrderStatus(order, $event)">
+
+                                    <option *ngFor="let status of getAllowedOrderStatuses(order.orderStatus)"
+                                        [value]="status">
+                                        {{ status }}
+                                    </option>
+
+                                </select>
+
+                            </td>
+
+                            <!-- DATE -->
+                            <td>
+
+                                <span class="order-date">
+                                    {{ order.createdAt | date:'dd MMM yyyy' }}
+                                </span>
+
+                            </td>
+
+                            <!-- ACTION -->
+                            <td>
+
+                                <button type="button" class="view-order-btn" (click)="viewOrder(order)">
+                                    <i class="fa-solid fa-eye"></i>
+                                    View
+                                </button>
+
+                            </td>
+
+                        </tr>
+
+                        <!-- EMPTY STATE -->
+                        <tr *ngIf="orders.length === 0">
+
+                            <td colspan="8" class="empty-orders">
+
+                                <div class="empty-orders-content">
+
+                                    <i class="fa-solid fa-box-open"></i>
+
+                                    <strong>
+                                        No orders found
+                                    </strong>
+
+                                    <span>
+                                        Customer orders will appear here.
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+        <!-- =====================================================
+     CANCELLATION MODAL
+====================================================== -->
+
+        <div *ngIf="showCancellationModal && cancellationOrder as order" class="cancellation-overlay"
+            (click)="closeCancellationModal()">
+
+            <div class="cancellation-modal" (click)="$event.stopPropagation()">
+
+                <div class="cancellation-header">
+
+                    <div class="cancellation-icon">
+                        <i class="fa-solid fa-ban"></i>
+                    </div>
+
+                    <div>
+                        <h2>Cancel Order</h2>
+
+                        <p>
+                            Order #{{ (order._id || order.id || '') | slice:0:10 }}
+                        </p>
+                    </div>
+
+                    <button type="button" class="cancellation-close" (click)="closeCancellationModal()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
 
 
-            <table>
+                <div class="cancellation-body">
 
-                <thead>
+                    <div class="cancellation-warning">
 
-                    <tr>
+                        <i class="fa-solid fa-circle-exclamation"></i>
 
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Total</th>
-                        <th>Payment</th>
-                        <th>Status</th>
-                        <th>Invoice</th>
+                        <span>
+                            This action will cancel the order and restore the
+                            product stock.
+                        </span>
 
-                    </tr>
-
-                </thead>
+                    </div>
 
 
-                <tbody>
+                    <label for="cancellationReason">
+                        Cancellation Reason
+                    </label>
 
-                    <tr *ngFor="let order of orders">
+                    <select id="cancellationReason" class="cancellation-select" [(ngModel)]="cancellationReason">
 
-                        <td>
-                            {{ order._id | slice:0:10 }}...
-                        </td>
+                        <option value="" disabled>
+                            Select a reason
+                        </option>
 
-                        <td class="customer-name">
-                            {{ order.customerName }}
-                        </td>
+                        <option value="Customer requested cancellation">
+                            Customer requested cancellation
+                        </option>
 
-                        <td>
-                            ₹{{ order.total }}
-                        </td>
+                        <option value="Product unavailable">
+                            Product unavailable
+                        </option>
 
-                        <td>
+                        <option value="Payment issue">
+                            Payment issue
+                        </option>
 
-                            <span class="payment-badge" [class.paid]="order.paymentStatus==='Paid'"
-                                [class.pending]="order.paymentStatus==='Pending'">
+                        <option value="Delivery issue">
+                            Delivery issue
+                        </option>
 
-                                {{ order.paymentStatus }}
+                        <option value="Duplicate order">
+                            Duplicate order
+                        </option>
 
+                        <option value="Other">
+                            Other
+                        </option>
+
+                    </select>
+
+
+                    <p class="refund-note">
+                        <i class="fa-solid fa-circle-info"></i>
+
+                        For prepaid orders, cancellation does not mean the
+                        refund is completed automatically. The refund will be
+                        handled separately.
+                    </p>
+
+                </div>
+
+
+                <div class="cancellation-footer">
+
+                    <button type="button" class="cancellation-secondary-btn" (click)="closeCancellationModal()">
+                        Keep Order
+                    </button>
+
+                    <button type="button" class="cancellation-danger-btn" [disabled]="!cancellationReason"
+                        (click)="confirmCancellation()">
+                        <i class="fa-solid fa-ban"></i>
+                        Confirm Cancellation
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+        <!-- =====================================================
+     ORDER DETAILS MODAL
+====================================================== -->
+
+        <div *ngIf="selectedOrder as order" class="order-modal-overlay" (click)="closeOrderDetails()">
+
+            <div class="order-modal" (click)="$event.stopPropagation()">
+
+                <!-- HEADER -->
+                <div class="order-modal-header">
+
+                    <div>
+                        <span class="modal-label">ORDER DETAILS</span>
+
+                        <h2>
+                            #{{ (order._id || order.id || '') | slice:0:10 }}
+                        </h2>
+                    </div>
+
+                    <button type="button" class="close-modal-btn" (click)="closeOrderDetails()">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                </div>
+
+
+                <!-- CUSTOMER -->
+                <div class="order-detail-section">
+
+                    <h3>Customer Information</h3>
+
+                    <div class="order-info-grid">
+
+                        <div>
+                            <span>Name</span>
+                            <strong>{{ order.customerName }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Email</span>
+                            <strong>{{ order.email }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Phone</span>
+                            <strong>{{ order.phone }}</strong>
+                        </div>
+
+                        <div>
+                            <span>Payment Method</span>
+                            <strong>{{ order.paymentMethod }}</strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ADDRESS -->
+                <div class="order-detail-section">
+
+                    <h3>Delivery Address</h3>
+
+                    <div class="delivery-address">
+
+                        <i class="fa-solid fa-location-dot"></i>
+
+                        <div>
+                            <strong>{{ order.address }}</strong>
+
+                            <span>
+                                {{ order.city }}, {{ order.state }} -
+                                {{ order.pincode }}
                             </span>
+                        </div>
 
-                        </td>
+                    </div>
 
-
-                        <td>
-
-                            <select class="status-select" [ngModel]="order.orderStatus"
-                                (ngModelChange)="changeOrderStatus(order, $event)">
-
-                                <option value="Processing">
-                                    Processing
-                                </option>
-
-                                <option value="Packed">
-                                    Packed
-                                </option>
-
-                                <option value="Shipped">
-                                    Shipped
-                                </option>
-
-                                <option value="Delivered">
-                                    Delivered
-                                </option>
-
-                                <option value="Cancelled">
-                                    Cancelled
-                                </option>
-
-                            </select>
-
-                        </td>
+                </div>
 
 
-                        <td>
+                <!-- PRODUCTS -->
+                <div class="order-detail-section">
 
-                            <button class="invoice-btn" (click)="downloadInvoice(order)">
+                    <h3>
+                        Products
+                        <span>
+                            ({{ order.items?.length || 0 }})
+                        </span>
+                    </h3>
 
-                                <i class="fa-solid fa-file-pdf"></i>
-                                Invoice
+                    <div class="order-products">
 
-                            </button>
+                        <div class="order-product" *ngFor="let item of order.items">
 
-                        </td>
+                            <img [src]="item.image" [alt]="item.name" />
 
-                    </tr>
+                            <div class="order-product-info">
 
-                </tbody>
+                                <strong>
+                                    {{ item.name }}
+                                </strong>
 
-            </table>
+                                <span>
+                                    Quantity: {{ item.quantity }}
+                                </span>
+
+                                <span *ngIf="item.selectedSize">
+                                    Size: {{ item.selectedSize }}
+                                </span>
+
+                                <span *ngIf="item.selectedColor">
+                                    Color: {{ item.selectedColor }}
+                                </span>
+
+                                <span *ngIf="item.selectedPack">
+                                    Pack: {{ item.selectedPack }}
+                                </span>
+
+                            </div>
+
+                            <strong class="product-price">
+                                ₹{{ item.price | number:'1.0-0' }}
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PRICE SUMMARY -->
+                <div class="order-detail-section">
+
+                    <h3>Price Summary</h3>
+
+                    <div class="price-summary">
+
+                        <div>
+                            <span>Subtotal</span>
+                            <strong>
+                                ₹{{ order.subtotal || 0 | number:'1.0-0' }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Discount</span>
+                            <strong>
+                                - ₹{{ order.discountAmount || 0 | number:'1.0-0' }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Shipping</span>
+                            <strong>
+                                ₹{{ order.shipping || 0 | number:'1.0-0' }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>GST</span>
+                            <strong>
+                                ₹{{ order.gst || 0 | number:'1.0-0' }}
+                            </strong>
+                        </div>
+
+                        <div class="grand-total">
+                            <span>Total</span>
+                            <strong>
+                                ₹{{ order.total | number:'1.0-0' }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- PAYMENT -->
+                <div class="order-detail-section">
+
+                    <h3>Payment</h3>
+
+                    <div class="payment-detail">
+
+                        <div>
+                            <span>Status</span>
+
+                            <strong [class.payment-success]="order.paymentStatus === 'Paid'">
+                                {{ order.paymentStatus }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Method</span>
+                            <strong>{{ order.paymentMethod }}</strong>
+                        </div>
+
+                        <div *ngIf="order.razorpayOrderId">
+                            <span>Razorpay Order ID</span>
+                            <strong class="mono-text">
+                                {{ order.razorpayOrderId }}
+                            </strong>
+                        </div>
+
+                        <div *ngIf="order.razorpayPaymentId">
+                            <span>Payment ID</span>
+                            <strong class="mono-text">
+                                {{ order.razorpayPaymentId }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TRACKING -->
+                <div class="order-detail-section" *ngIf="order.trackingHistory?.length">
+
+                    <h3>Order Timeline</h3>
+
+                    <div class="order-timeline">
+
+                        <div class="timeline-item" *ngFor="let history of order.trackingHistory">
+
+                            <div class="timeline-dot"></div>
+
+                            <div>
+                                <strong>
+                                    {{ history.status }}
+                                </strong>
+
+                                <span>
+                                    {{ history.date | date:'dd MMM yyyy, hh:mm a' }}
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- FOOTER -->
+                <div class="order-modal-footer">
+
+                    <button type="button" class="close-order-btn" (click)="closeOrderDetails()">
+                        Close
+                    </button>
+
+                </div>
+
+            </div>
 
         </div>
 

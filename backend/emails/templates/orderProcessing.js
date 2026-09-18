@@ -4,15 +4,21 @@ const button = require("../components/button");
 
 module.exports = (order) => {
 
-    const orderId = order?._id
-        ? order._id.toString()
-        : "N/A";
-
     const customerName =
         order?.customerName || "Customer";
 
+    const orderId = order?._id
+        ? `TS-${order._id.toString().slice(-8).toUpperCase()}`
+        : "TS-N/A";
+
     const total =
-        Number(order?.total || 0).toLocaleString("en-IN");
+        Number(order?.total || 0).toLocaleString("en-IN", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        });
+
+    const trackingUrl =
+        `https://www.trianglesports.in/track/${order?._id || ""}`;
 
     return `
 
@@ -30,7 +36,7 @@ module.exports = (order) => {
     >
 
     <title>
-        Order Processing - Triangle Sports
+        Order Processing | Triangle Sports
     </title>
 
 </head>
@@ -39,36 +45,30 @@ module.exports = (order) => {
 <body style="
     margin:0;
     padding:0;
-    background:#f5f5f7;
+    background:#f3f3f3;
     font-family:Arial,Helvetica,sans-serif;
-    color:#1e1e2f;
+    color:#151827;
 ">
 
 
-    <!-- ============================= -->
-    <!-- EMAIL WRAPPER -->
-    <!-- ============================= -->
+    <!-- EMAIL CONTAINER -->
 
     <div style="
-        max-width:680px;
+        max-width:700px;
         margin:0 auto;
         background:#ffffff;
     ">
 
 
-        <!-- ============================= -->
         <!-- HEADER -->
-        <!-- ============================= -->
 
         ${header("Your Order Is Being Processed")}
 
 
-        <!-- ============================= -->
         <!-- MAIN CONTENT -->
-        <!-- ============================= -->
 
         <div style="
-            padding:45px 35px;
+            padding:42px 35px;
         ">
 
 
@@ -76,23 +76,21 @@ module.exports = (order) => {
 
             <div style="
                 text-align:center;
-                margin-bottom:25px;
+                margin-bottom:22px;
             ">
 
                 <div style="
-                    width:72px;
-                    height:72px;
-                    line-height:72px;
+                    width:68px;
+                    height:68px;
+                    line-height:68px;
                     margin:0 auto;
                     border-radius:50%;
-                    background:#f3e8ff;
+                    background:#f1e8ff;
                     color:#6A11CB;
-                    font-size:34px;
-                    font-weight:bold;
+                    font-size:30px;
+                    font-weight:700;
                 ">
-
-                    ⚙
-
+                    ✓
                 </div>
 
             </div>
@@ -100,232 +98,437 @@ module.exports = (order) => {
 
             <!-- TITLE -->
 
-            <h2 style="
+            <h1 style="
                 margin:0;
                 text-align:center;
+                color:#151827;
                 font-size:28px;
                 line-height:36px;
-                color:#1e1e2f;
+                font-weight:700;
             ">
-
                 Your order is being processed
+            </h1>
 
-            </h2>
 
-
-            <!-- GREETING -->
-
-            <p style="
-                margin:25px 0 10px;
-                font-size:16px;
-                line-height:26px;
-            ">
-
-                Hi
-                <strong>
-                    ${customerName}
-                </strong>,
-
-            </p>
-
+            <!-- INTRO -->
 
             <p style="
-                margin:0 0 25px;
+                margin:20px auto 0;
+                max-width:540px;
+                text-align:center;
                 color:#666666;
                 font-size:15px;
-                line-height:25px;
+                line-height:24px;
             ">
-
-                Great news! We've received your order and
-                our team has started preparing it.
-
-                We'll keep you updated as your order moves
-                through each stage.
-
+                Hi
+                <strong style="color:#151827;">
+                    ${customerName}
+                </strong>,
+                we've started preparing your order.
+                We'll keep you updated as it moves through
+                each stage.
             </p>
 
 
-            <!-- ============================= -->
-            <!-- ORDER INFORMATION -->
-            <!-- ============================= -->
-
-            <div style="
-                background:#fafafa;
-                border:1px solid #e8e8ed;
-                border-radius:12px;
-                padding:22px;
-                margin:25px 0;
-            ">
-
-
-                <div style="
-                    margin-bottom:18px;
-                ">
-
-                    <p style="
-                        margin:0 0 6px;
-                        color:#888888;
-                        font-size:12px;
-                        font-weight:bold;
-                        text-transform:uppercase;
-                        letter-spacing:.8px;
-                    ">
-
-                        Order ID
-
-                    </p>
-
-                    <p style="
-                        margin:0;
-                        color:#6A11CB;
-                        font-size:17px;
-                        font-weight:bold;
-                        word-break:break-all;
-                    ">
-
-                        #${orderId}
-
-                    </p>
-
-                </div>
-
-
-                <div>
-
-                    <p style="
-                        margin:0 0 6px;
-                        color:#888888;
-                        font-size:12px;
-                        font-weight:bold;
-                        text-transform:uppercase;
-                        letter-spacing:.8px;
-                    ">
-
-                        Order Total
-
-                    </p>
-
-                    <p style="
-                        margin:0;
-                        color:#1e1e2f;
-                        font-size:20px;
-                        font-weight:bold;
-                    ">
-
-                        ₹${total}
-
-                    </p>
-
-                </div>
-
-            </div>
-
-
-            <!-- ============================= -->
-            <!-- ORDER JOURNEY -->
-            <!-- ============================= -->
+            <!-- ORDER SUMMARY -->
 
             <div style="
                 margin:30px 0;
-                padding:22px;
-                background:#f9f7ff;
-                border-radius:12px;
-                border:1px solid #eee7ff;
+                padding:24px;
+                background:#fafafa;
+                border:1px solid #e5e5e5;
+                border-radius:10px;
             ">
 
-                <p style="
-                    margin:0 0 18px;
-                    color:#6A11CB;
-                    font-size:12px;
-                    font-weight:bold;
-                    text-transform:uppercase;
-                    letter-spacing:1px;
-                ">
-
-                    Order Journey
-
-                </p>
-
-
                 <div style="
-                    font-size:14px;
-                    line-height:30px;
+                    margin-bottom:20px;
+                    text-align:center;
+                    color:#737783;
+                    font-size:11px;
+                    font-weight:700;
+                    letter-spacing:1px;
+                    text-transform:uppercase;
                 ">
-
-                    <div>
-                        <strong style="color:#6A11CB;">
-                            ✓
-                        </strong>
-                        Order Placed
-                    </div>
-
-                    <div>
-                        <strong style="color:#6A11CB;">
-                            ⚙
-                        </strong>
-                        <strong>
-                            Processing
-                        </strong>
-                    </div>
-
-                    <div style="color:#999999;">
-                        ○ Packed
-                    </div>
-
-                    <div style="color:#999999;">
-                        ○ Shipped
-                    </div>
-
-                    <div style="color:#999999;">
-                        ○ Delivered
-                    </div>
-
+                    Order Summary
                 </div>
+
+
+                <table
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                >
+
+                    <tr>
+
+                        <td style="
+                            padding:8px 0;
+                            color:#737783;
+                            font-size:13px;
+                        ">
+                            Order ID
+                        </td>
+
+                        <td align="right" style="
+                            padding:8px 0;
+                            color:#151827;
+                            font-size:13px;
+                            font-weight:700;
+                        ">
+                            #${orderId}
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td style="
+                            padding:8px 0;
+                            color:#737783;
+                            font-size:13px;
+                        ">
+                            Status
+                        </td>
+
+                        <td align="right" style="
+                            padding:8px 0;
+                            color:#6A11CB;
+                            font-size:13px;
+                            font-weight:700;
+                        ">
+                            Processing
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td style="
+                            padding:8px 0;
+                            color:#737783;
+                            font-size:13px;
+                        ">
+                            Order Total
+                        </td>
+
+                        <td align="right" style="
+                            padding:8px 0;
+                            color:#151827;
+                            font-size:16px;
+                            font-weight:700;
+                        ">
+                            ₹${total}
+                        </td>
+
+                    </tr>
+
+                </table>
 
             </div>
 
 
-            <!-- ============================= -->
+            <!-- ORDER JOURNEY -->
+
+            <div style="
+                margin:28px 0;
+                padding:24px;
+                border:1px solid #e5e5e5;
+                border-radius:10px;
+                background:#ffffff;
+            ">
+
+                <div style="
+                    margin-bottom:20px;
+                    color:#151827;
+                    font-size:12px;
+                    font-weight:700;
+                    letter-spacing:1px;
+                    text-transform:uppercase;
+                ">
+                    Your Order Journey
+                </div>
+
+
+                <!-- STEP 1 -->
+
+                <table
+                    width="100%"
+                    cellpadding="0"
+                    cellspacing="0"
+                    border="0"
+                >
+
+                    <tr>
+
+                        <td
+                            width="34"
+                            valign="top"
+                        >
+
+                            <div style="
+                                width:24px;
+                                height:24px;
+                                line-height:24px;
+                                border-radius:50%;
+                                background:#111111;
+                                color:#ffffff;
+                                text-align:center;
+                                font-size:12px;
+                                font-weight:700;
+                            ">
+                                ✓
+                            </div>
+
+                        </td>
+
+                        <td valign="top">
+
+                            <div style="
+                                color:#151827;
+                                font-size:14px;
+                                font-weight:700;
+                            ">
+                                Order Placed
+                            </div>
+
+                            <div style="
+                                margin-top:3px;
+                                color:#888888;
+                                font-size:12px;
+                            ">
+                                Your order has been confirmed.
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td
+                            width="34"
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                width:24px;
+                                height:24px;
+                                line-height:24px;
+                                border-radius:50%;
+                                background:#6A11CB;
+                                color:#ffffff;
+                                text-align:center;
+                                font-size:12px;
+                                font-weight:700;
+                            ">
+                                2
+                            </div>
+
+                        </td>
+
+                        <td
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                color:#151827;
+                                font-size:14px;
+                                font-weight:700;
+                            ">
+                                Processing
+                            </div>
+
+                            <div style="
+                                margin-top:3px;
+                                color:#6A11CB;
+                                font-size:12px;
+                            ">
+                                Your order is being prepared.
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td
+                            width="34"
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                width:24px;
+                                height:24px;
+                                line-height:24px;
+                                border-radius:50%;
+                                background:#eeeeee;
+                                color:#999999;
+                                text-align:center;
+                                font-size:12px;
+                            ">
+                                3
+                            </div>
+
+                        </td>
+
+                        <td
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                color:#999999;
+                                font-size:14px;
+                            ">
+                                Packed
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td
+                            width="34"
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                width:24px;
+                                height:24px;
+                                line-height:24px;
+                                border-radius:50%;
+                                background:#eeeeee;
+                                color:#999999;
+                                text-align:center;
+                                font-size:12px;
+                            ">
+                                4
+                            </div>
+
+                        </td>
+
+                        <td
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                color:#999999;
+                                font-size:14px;
+                            ">
+                                Shipped
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr>
+
+                        <td
+                            width="34"
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                width:24px;
+                                height:24px;
+                                line-height:24px;
+                                border-radius:50%;
+                                background:#eeeeee;
+                                color:#999999;
+                                text-align:center;
+                                font-size:12px;
+                            ">
+                                5
+                            </div>
+
+                        </td>
+
+                        <td
+                            valign="top"
+                            style="
+                                padding-top:12px;
+                            "
+                        >
+
+                            <div style="
+                                color:#999999;
+                                font-size:14px;
+                            ">
+                                Delivered
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+
+            </div>
+
+
             <!-- CTA -->
-            <!-- ============================= -->
 
             ${button(
-                "View My Orders",
-                "http://localhost:4200/orders",
-                "#6A11CB"
+                "Track Your Order",
+                trackingUrl,
+                "#111111"
             )}
 
 
-            <!-- ============================= -->
             <!-- NOTE -->
-            <!-- ============================= -->
 
             <p style="
-                margin:30px 0 0;
+                margin:25px 0 0;
                 text-align:center;
                 color:#888888;
-                font-size:13px;
-                line-height:22px;
+                font-size:12px;
+                line-height:20px;
             ">
-
-                We'll send you another email when your
-                order has been packed and shipped.
-
+                We'll email you again when your order
+                is packed and shipped.
             </p>
 
 
         </div>
 
 
-        <!-- ============================= -->
         <!-- FOOTER -->
-        <!-- ============================= -->
 
         ${footer()}
 
 
     </div>
-
 
 </body>
 
