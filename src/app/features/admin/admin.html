@@ -1140,6 +1140,114 @@
 
                 </div>
 
+                <!-- =====================================================
+     SHIPROCKET SHIPPING
+====================================================== -->
+
+                <div class="order-detail-section">
+
+                    <h3>
+                        <i class="fa-solid fa-truck"></i>
+                        Shipping
+                    </h3>
+
+                    <!-- SHIPROCKET STATUS -->
+
+                    <div class="payment-detail">
+
+                        <div>
+                            <span>Shipment</span>
+
+                            <strong>
+                                {{ order.shiprocketOrderId ? 'Created' : 'Not Created' }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>AWB</span>
+
+                            <strong class="mono-text">
+                                {{ order.shiprocketAwbCode || 'Not Assigned' }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Courier</span>
+
+                            <strong>
+                                {{ order.shiprocketCourierName || 'Not Assigned' }}
+                            </strong>
+                        </div>
+
+                        <div>
+                            <span>Shiprocket Status</span>
+
+                            <strong>
+                                {{ order.shiprocketStatus || 'Not Created' }}
+                            </strong>
+                        </div>
+
+                    </div>
+
+
+                    <!-- SHIPROCKET ACTIONS -->
+
+                    <div style="
+            display:flex;
+            flex-wrap:wrap;
+            gap:10px;
+            margin-top:20px;
+        ">
+
+                        <!-- CREATE SHIPMENT -->
+
+                        <button type="button" class="view-order-btn" *ngIf="!order.shiprocketOrderId"
+                            [disabled]="order.paymentStatus !== 'Paid'" (click)="createShiprocketShipment(order)">
+
+                            <i class="fa-solid fa-box"></i>
+
+                            Create Shipment
+
+                        </button>
+
+
+                        <!-- ASSIGN AWB -->
+
+                        <button type="button" class="view-order-btn" *ngIf="
+                order.shiprocketShipmentId &&
+                !order.shiprocketAwbCode
+            " (click)="assignShiprocketAwb(order)">
+
+                            <i class="fa-solid fa-barcode"></i>
+
+                            Assign AWB
+
+                        </button>
+
+
+                        <!-- GENERATE PICKUP -->
+                        <button type="button" class="view-order-btn" *ngIf="
+        order.shiprocketShipmentId &&
+        order.shiprocketAwbCode &&
+        order.shiprocketStatus !== 'Pickup Requested'
+    " (click)="generateShiprocketPickup(order)">
+                            <i class="fa-solid fa-truck"></i>
+                            Generate Pickup
+                        </button>
+
+
+                        <!-- REFRESH TRACKING -->
+
+                        <button type="button" class="view-order-btn" *ngIf="order.shiprocketAwbCode"
+                            (click)="trackShiprocketShipment(order)">
+                            <i class="fa-solid fa-rotate"></i>
+                            Refresh Tracking
+                        </button>
+
+                    </div>
+
+                </div>
+
 
                 <!-- FOOTER -->
                 <div class="order-modal-footer">
@@ -1508,18 +1616,9 @@
                                         <input type="text" [(ngModel)]="newProduct.productGroup"
                                             placeholder="e.g. fitted-tank">
 
-                                        <div class="form-group">
-
-                                            <label>Product Group</label>
-
-                                            <input type="text" [(ngModel)]="newProduct.productGroup"
-                                                placeholder="e.g. fitted-tank">
-
-                                            <small>
-                                                Use the same group for products that belong to the same product family.
-                                            </small>
-
-                                        </div>
+                                        <small>
+                                            Use the same group for products that belong to the same product family.
+                                        </small>
 
                                     </div>
 
@@ -1734,7 +1833,7 @@
                                 <h3>Inventory</h3>
 
                                 <p>
-                                    Manage product stock.
+                                    Manage product stock and inventory quantity.
                                 </p>
 
                             </div>
@@ -1760,7 +1859,155 @@
                             </div>
 
                         </section>
+                        <!-- =============================================
+                             SHIPPING DETAILS
+                        ============================================== -->
+                        <section class="shopify-card">
 
+                            <div class="shopify-card-header">
+
+                                <h3>Shipping details</h3>
+
+                                <p>
+                                    Enter the packed product weight and package dimensions used by Shiprocket.
+                                </p>
+
+                            </div>
+
+                            <div class="shopify-card-body">
+
+                                <div class="form-grid">
+
+                                    <!-- Package Weight -->
+                                    <div class="form-group">
+
+                                        <label>
+                                            Package Weight *
+                                        </label>
+
+                                        <div class="input-with-suffix">
+
+                                            <input type="number" min="0.001" step="0.001"
+                                                [(ngModel)]="newProduct.weight" placeholder="0.500" inputmode="decimal">
+
+                                            <span>kg</span>
+
+                                        </div>
+
+                                        <small>
+                                            Enter the final packed weight of the product.
+                                        </small>
+
+                                    </div>
+
+
+                                    <!-- Package Length -->
+                                    <div class="form-group">
+
+                                        <label>
+                                            Package Length *
+                                        </label>
+
+                                        <div class="input-with-suffix">
+
+                                            <input type="number" min="1" step="0.1" [(ngModel)]="newProduct.length"
+                                                placeholder="25" inputmode="decimal">
+
+                                            <span>cm</span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Package Breadth -->
+                                    <div class="form-group">
+
+                                        <label>
+                                            Package Breadth *
+                                        </label>
+
+                                        <div class="input-with-suffix">
+
+                                            <input type="number" min="1" step="0.1" [(ngModel)]="newProduct.breadth"
+                                                placeholder="20" inputmode="decimal">
+
+                                            <span>cm</span>
+
+                                        </div>
+
+                                    </div>
+
+
+                                    <!-- Package Height -->
+                                    <div class="form-group">
+
+                                        <label>
+                                            Package Height *
+                                        </label>
+
+                                        <div class="input-with-suffix">
+
+                                            <input type="number" min="1" step="0.1" [(ngModel)]="newProduct.height"
+                                                placeholder="3" inputmode="decimal">
+
+                                            <span>cm</span>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Shipping Preview -->
+                                <div class="shipping-info-box">
+
+                                    <div>
+
+                                        <strong>
+                                            <i class="fa-solid fa-truck"></i>
+                                            Shipping package
+                                        </strong>
+
+                                        <span>
+                                            {{ newProduct.weight || 0 }} kg
+                                            &nbsp;·&nbsp;
+                                            {{ newProduct.length || 0 }}
+                                            ×
+                                            {{ newProduct.breadth || 0 }}
+                                            ×
+                                            {{ newProduct.height || 0 }}
+                                            cm
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+
+                                <!-- Shipping Information -->
+                                <div class="shipping-info-box" style="margin-top:12px;">
+
+                                    <div>
+
+                                        <strong>
+                                            <i class="fa-solid fa-circle-info"></i>
+                                            Shipping information
+                                        </strong>
+
+                                        <span>
+                                            These values are stored with the product and will be
+                                            used when creating Shiprocket shipments.
+                                        </span>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </section>
 
 
                         <!-- =============================================
@@ -2609,7 +2856,7 @@
                                         </strong>
 
                                         <small>
-                                            One product with one price.
+                                            One product with one price. No pack builder.
                                         </small>
 
                                     </span>
@@ -2629,7 +2876,7 @@
                                         </strong>
 
                                         <small>
-                                            Product with multiple packs.
+                                            Product with multiple packs and pack-wise pricing.
                                         </small>
 
                                     </span>
@@ -2714,6 +2961,36 @@
 
                                 <strong>
                                     {{ newProduct.sizes?.length || 0 }}
+                                </strong>
+
+                            </div>
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Weight
+                                </span>
+
+                                <strong>
+                                    {{ newProduct.weight || 0 }} kg
+                                </strong>
+
+                            </div>
+
+
+                            <div class="summary-row">
+
+                                <span>
+                                    Package
+                                </span>
+
+                                <strong>
+                                    {{ newProduct.length || 0 }}
+                                    ×
+                                    {{ newProduct.breadth || 0 }}
+                                    ×
+                                    {{ newProduct.height || 0 }}
+                                    cm
                                 </strong>
 
                             </div>

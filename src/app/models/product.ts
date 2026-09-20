@@ -164,6 +164,10 @@ export interface Product {
   // ===================================================
 
   stock: number;
+  weight: number;
+  length: number;
+  breadth: number;
+  height: number;
 
 
   // ===================================================

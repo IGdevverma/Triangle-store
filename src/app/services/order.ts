@@ -23,11 +23,11 @@ export interface OrderResponse {
 
 export interface UpdateOrderStatusRequest {
   orderStatus:
-    | 'Processing'
-    | 'Packed'
-    | 'Shipped'
-    | 'Delivered'
-    | 'Cancelled';
+  | 'Processing'
+  | 'Packed'
+  | 'Shipped'
+  | 'Delivered'
+  | 'Cancelled';
 
   cancellationReason?: string;
 }
@@ -48,7 +48,7 @@ export class OrderService {
 
   constructor(
     private readonly http: HttpClient
-  ) {}
+  ) { }
 
 
   // ====================================================
@@ -136,5 +136,62 @@ export class OrderService {
     );
 
   }
+
+
+
+
+  // ====================================================
+  // SHIPROCKET — CREATE SHIPMENT
+  // ====================================================
+
+  createShipment(
+    orderId: string
+  ): Observable<any> {
+
+    return this.http.post<any>(
+      `${this.apiUrl}/${orderId}/shiprocket/create`,
+      {}
+    );
+
+  }
+
+
+  // ====================================================
+  // SHIPROCKET — ASSIGN AWB
+  // ====================================================
+
+  assignAwb(
+    orderId: string
+  ): Observable<any> {
+
+    return this.http.post<any>(
+      `${this.apiUrl}/${orderId}/shiprocket/awb`,
+      {}
+    );
+
+  }
+
+
+  // ====================================================
+  // SHIPROCKET — GENERATE PICKUP
+  // ====================================================
+
+  generatePickup(
+    orderId: string
+  ): Observable<any> {
+
+    return this.http.post<any>(
+      `${this.apiUrl}/${orderId}/shiprocket/pickup`,
+      {}
+    );
+
+  }
+
+
+  trackShipment(orderId: string): Observable<any> {
+  return this.http.get<any>(
+    `${this.apiUrl}/${orderId}/shiprocket/tracking`
+  );
+}
 
 }

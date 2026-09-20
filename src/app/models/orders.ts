@@ -170,6 +170,18 @@ export interface Order {
 
 
   // ==========================================
+  // SHIPROCKET
+  // ==========================================
+
+  shiprocketOrderId?: string | null;
+  shiprocketShipmentId?: string | null;
+  shiprocketAwbCode?: string | null;
+  shiprocketCourierName?: string | null;
+  shiprocketStatus?: string | null;
+  shiprocketTrackingUrl?: string | null;
+  shiprocketCreatedAt?: string | null;
+
+  // ==========================================
   // TRACKING HISTORY
   // ==========================================
 

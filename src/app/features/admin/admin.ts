@@ -69,6 +69,12 @@ interface EditableProduct extends Product {
   availableColors?: string;
   packs?: ProductPackEditor[];
   colorCombinations?: ColorCombinationEditor[];
+
+  // Shiprocket package details
+  weight: number;
+  length: number;
+  breadth: number;
+  height: number;
 }
 
 interface DashboardData {
@@ -266,12 +272,19 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       sku: '',
       productGroup: '',
       discount: 0,
+      stock: 0,
 
+      weight: 0.5,
+      length: 25,
+      breadth: 20,
+      height: 3,
+
+      showOnHome: true,
       colors: [],
       sizes: [],
       status: 'Active',
-      stock: 0,
-      showOnHome: true,
+
+
       availableColors: '',
       packs: [],
       colorCombinations: []
@@ -714,6 +727,262 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
+
+
+
+  // ==========================================================
+  // SHIPROCKET — CREATE SHIPMENT
+  // ==========================================================
+
+  createShiprocketShipment(order: Order): void {
+
+    if (!order?._id) {
+      this.toastr.error(
+        'Invalid order.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    this.spinner.show();
+
+    this.orderService
+      .createShipment(order._id)
+      .subscribe({
+
+        next: (response) => {
+
+          this.spinner.hide();
+
+          if (response?.order) {
+            Object.assign(order, response.order);
+          }
+
+          this.toastr.success(
+            response?.message ||
+            'Shiprocket shipment created successfully.',
+            'Shiprocket'
+          );
+
+          this.loadOrders();
+        },
+
+        error: (error) => {
+
+          this.spinner.hide();
+
+          console.error(
+            'Shiprocket shipment creation failed:',
+            error
+          );
+
+          this.toastr.error(
+            error?.error?.message ||
+            'Failed to create Shiprocket shipment.',
+            'Shiprocket'
+          );
+
+        }
+
+      });
+  }
+
+
+  // ==========================================================
+  // SHIPROCKET — ASSIGN AWB
+  // ==========================================================
+
+  assignShiprocketAwb(order: Order): void {
+
+    if (!order?._id) {
+      this.toastr.error(
+        'Invalid order.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    if (!(order as any).shiprocketShipmentId) {
+      this.toastr.warning(
+        'Create Shiprocket shipment first.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    if ((order as any).shiprocketAwbCode) {
+      this.toastr.info(
+        'AWB is already assigned to this order.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    this.spinner.show();
+
+    this.orderService
+      .assignAwb(order._id)
+      .subscribe({
+
+        next: (response) => {
+
+          this.spinner.hide();
+
+          if (response?.order) {
+            Object.assign(order, response.order);
+          }
+
+          this.toastr.success(
+            response?.message ||
+            'Shiprocket AWB assigned successfully.',
+            'Shiprocket'
+          );
+
+          this.loadOrders();
+        },
+
+        error: (error) => {
+
+          this.spinner.hide();
+
+          console.error(
+            'Shiprocket AWB assignment failed:',
+            error
+          );
+
+          this.toastr.error(
+            error?.error?.message ||
+            'Failed to assign Shiprocket AWB.',
+            'Shiprocket'
+          );
+
+        }
+
+      });
+  }
+
+  // ==========================================================
+  // SHIPROCKET — GENERATE PICKUP
+  // ==========================================================
+
+  generateShiprocketPickup(order: Order): void {
+
+    if (!order?._id) {
+      this.toastr.error(
+        'Invalid order.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    if (!(order as any).shiprocketShipmentId) {
+      this.toastr.warning(
+        'Create Shiprocket shipment first.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    if (!(order as any).shiprocketAwbCode) {
+      this.toastr.warning(
+        'Assign AWB before generating pickup.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    this.spinner.show();
+
+    this.orderService
+      .generatePickup(order._id)
+      .subscribe({
+
+        next: (response) => {
+
+          this.spinner.hide();
+
+          if (response?.order) {
+            Object.assign(order, response.order);
+          }
+
+          this.toastr.success(
+            response?.message ||
+            'Shiprocket pickup requested successfully.',
+            'Shiprocket'
+          );
+
+          this.loadOrders();
+        },
+
+        error: (error) => {
+
+          this.spinner.hide();
+
+          console.error(
+            'Shiprocket pickup request failed:',
+            error
+          );
+
+          this.toastr.error(
+            error?.error?.message ||
+            'Failed to generate Shiprocket pickup.',
+            'Shiprocket'
+          );
+
+        }
+
+      });
+  }
+
+  trackShiprocketShipment(order: Order): void {
+    if (!order?._id) {
+      this.toastr.error('Invalid order.', 'Shiprocket');
+      return;
+    }
+
+    if (!order.shiprocketAwbCode) {
+      this.toastr.warning(
+        'AWB must be assigned before tracking shipment.',
+        'Shiprocket'
+      );
+      return;
+    }
+
+    this.spinner.show();
+
+    this.orderService.trackShipment(order._id).subscribe({
+      next: (response) => {
+        this.spinner.hide();
+
+        console.log(
+          'SHIPROCKET TRACKING RESPONSE:',
+          response
+        );
+
+        this.toastr.success(
+          response?.message || 'Tracking fetched successfully.',
+          'Shiprocket'
+        );
+      },
+
+      error: (error) => {
+        this.spinner.hide();
+
+        console.error(
+          'Shiprocket tracking failed:',
+          error
+        );
+
+        this.toastr.error(
+          error?.error?.message ||
+          'Failed to fetch shipment tracking.',
+          'Shiprocket'
+        );
+      }
+    });
+  }
+
+
   confirmCancellation(): void {
 
     if (!this.cancellationOrder?._id) {
@@ -1049,6 +1318,13 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       originalPrice: this.toNumber(product.originalPrice),
       discount: this.toNumber(product.discount),
       stock: this.toNumber(product.stock),
+
+      // Shiprocket package details
+      weight: this.toNumber((product as any).weight) || 0.5,
+      length: this.toNumber((product as any).length) || 25,
+      breadth: this.toNumber((product as any).breadth) || 20,
+      height: this.toNumber((product as any).height) || 3,
+
       colors,
       sizes,
       availableColors: colors.join(', ')
@@ -1064,6 +1340,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         ? (product as EditableProduct).packs!
         : []
     );
+
+    this.newProduct.packs = this.productPacks;
 
     this.colorCombinations =
       this.mapExistingCombinations(
@@ -1249,10 +1527,6 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const formData = this.buildProductFormData(true);
-    console.log('PRICE SENT:', formData.get('price'));
-    console.log('ORIGINAL PRICE SENT:', formData.get('originalPrice'));
-    console.log('DISCOUNT SENT:', formData.get('discount'));
-
 
     this.productService
       .updateProduct(
@@ -1457,6 +1731,39 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           0,
           this.toNumber(this.newProduct.stock)
         )
+      )
+    );
+
+
+    // ========================================================
+    // SHIPPING DETAILS
+    // ========================================================
+
+    formData.append(
+      'weight',
+      String(
+        this.toNumber(this.newProduct.weight)
+      )
+    );
+
+    formData.append(
+      'length',
+      String(
+        this.toNumber(this.newProduct.length)
+      )
+    );
+
+    formData.append(
+      'breadth',
+      String(
+        this.toNumber(this.newProduct.breadth)
+      )
+    );
+
+    formData.append(
+      'height',
+      String(
+        this.toNumber(this.newProduct.height)
       )
     );
 
@@ -1666,6 +1973,49 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     ) {
       this.showValidation(
         'Original Price must be greater than or equal to Product Price.'
+      );
+      return false;
+    }
+
+    // ========================================================
+    // SHIPPING DETAILS
+    // ========================================================
+
+    const weight = this.toNumber(this.newProduct.weight);
+    const length = this.toNumber(this.newProduct.length);
+    const breadth = this.toNumber(this.newProduct.breadth);
+    const height = this.toNumber(this.newProduct.height);
+
+    if (weight <= 0) {
+      this.showValidation(
+        'Please enter a valid package weight greater than 0 kg.'
+      );
+      return false;
+    }
+
+    if (length <= 0 || breadth <= 0 || height <= 0) {
+      this.showValidation(
+        'Please enter valid package dimensions greater than 0 cm.'
+      );
+      return false;
+    }
+
+    if (
+      weight > 50
+    ) {
+      this.showValidation(
+        'Package weight cannot exceed 50 kg.'
+      );
+      return false;
+    }
+
+    if (
+      length > 200 ||
+      breadth > 200 ||
+      height > 200
+    ) {
+      this.showValidation(
+        'Package dimensions cannot exceed 200 cm.'
       );
       return false;
     }
@@ -1916,14 +2266,15 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
      ========================================================== */
 
   onProductModeChange(): void {
-    if (
-      this.newProduct.productMode === 'single'
-    ) {
+    if (this.newProduct.productMode === 'single') {
       /*
        * Single products must never retain stale pack
        * configuration.
        */
       this.productPacks = [];
+      this.newProduct.packs = [];
+    } else {
+      this.newProduct.packs = this.productPacks;
     }
   }
 
@@ -1956,6 +2307,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       existingImages: [],
       removedImages: []
     });
+
+    this.newProduct.packs = this.productPacks;
   }
 
   removePack(index: number): void {
@@ -1967,6 +2320,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.productPacks.splice(index, 1);
+    this.newProduct.packs = this.productPacks;
   }
 
   togglePackColor(
