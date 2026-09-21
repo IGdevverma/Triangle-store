@@ -2,6 +2,48 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
+interface OrderItem {
+  productId?: string;
+  name: string;
+  image?: string;
+  price: number;
+  quantity: number;
+  selectedSize?: string;
+  selectedColor?: string;
+  selectedPack?: string;
+  selectedCombination?: string;
+  packQuantity?: number;
+  totalUnits?: number;
+}
+
+interface OrderData {
+  orderNumber?: string;
+
+  customerName?: string;
+  email?: string;
+  phone?: string;
+
+  address?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+
+  paymentMethod?: string;
+  paymentStatus?: string;
+
+  items?: OrderItem[];
+
+  subtotal?: number;
+  discountAmount?: number;
+  shipping?: number;
+  gst?: number;
+  total?: number;
+
+  couponCode?: string;
+
+  orderStatus?: string;
+}
+
 @Component({
   selector: 'app-order-success',
   standalone: true,
@@ -21,6 +63,9 @@ export class OrderSuccess implements OnInit {
   orderId = '';
 
   deliveryDate = '';
+
+  order: OrderData | null = null;
+
 
   // =========================================
   // UI STATE
@@ -48,8 +93,12 @@ export class OrderSuccess implements OnInit {
 
     const navigationState = history.state;
 
+    this.order =
+      navigationState?.order || null;
+
     this.orderId =
       navigationState?.orderId ||
+      this.order?.orderNumber ||
       'N/A';
 
     this.deliveryDate =
@@ -66,7 +115,6 @@ export class OrderSuccess implements OnInit {
 
     const date = new Date();
 
-    // Estimated delivery = 5 days
     date.setDate(
       date.getDate() + 5
     );
@@ -119,6 +167,17 @@ export class OrderSuccess implements OnInit {
         );
 
       });
+
+  }
+
+
+  // =========================================
+  // PRICE FORMAT
+  // =========================================
+
+  formatPrice(value: number | undefined): string {
+
+    return `₹${(value || 0).toLocaleString('en-IN')}`;
 
   }
 

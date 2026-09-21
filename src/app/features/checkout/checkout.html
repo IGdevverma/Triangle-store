@@ -1,957 +1,1331 @@
 <div class="checkout-page">
 
-    <!-- =====================================================
-         CHECKOUT HEADER
-    ====================================================== -->
+  <!-- =====================================================
+       CHECKOUT HEADER
+  ====================================================== -->
 
-    <header class="checkout-header">
-
-        <div class="checkout-title">
-
-            <span class="checkout-eyebrow">
-                TRIANGLE SPORTS
-            </span>
-
-            <h1>
-                Checkout
-            </h1>
-
-            <p>
-                Complete your order securely and safely.
-            </p>
-
-        </div>
+ 
 
 
-        <div class="secure-checkout">
-
-            <span class="secure-icon">
-                🔒
-            </span>
-
-            <div>
-                <strong>Secure Checkout</strong>
-                <small>100% secure payment</small>
-            </div>
-
-        </div>
-
-    </header>
 
 
-    <!-- =====================================================
-         CHECKOUT PROGRESS
-    ====================================================== -->
+  <!-- =====================================================
+       MAIN CHECKOUT CONTAINER
+  ====================================================== -->
+
+  <div class="checkout-container">
+
+
+    <!-- ===================================================
+         PROGRESS
+    ==================================================== -->
 
     <div class="checkout-progress">
 
-        <div class="progress-step" [class.active]="checkoutStep === 'details'"
-            [class.completed]="checkoutStep === 'payment'">
+      <!-- STEP 1 -->
 
-            <span class="progress-number">
+      <div
+        class="progress-step"
+        [class.active]="checkoutStep === 'details'"
+        [class.completed]="checkoutStep === 'payment'"
+      >
 
-                <ng-container *ngIf="checkoutStep === 'payment'; else detailsNumber">
-                    ✓
-                </ng-container>
+        <span class="progress-circle">
 
-                <ng-template #detailsNumber>
-                    01
-                </ng-template>
+          <ng-container *ngIf="checkoutStep === 'payment'; else deliveryNumber">
+            <i class="fa-solid fa-check"></i>
+          </ng-container>
 
-            </span>
+          <ng-template #deliveryNumber>
+            1
+          </ng-template>
 
-            <div>
-                <strong>Delivery</strong>
-                <small>Address & contact</small>
-            </div>
+        </span>
+
+        <div class="progress-content">
+
+          <strong>Delivery</strong>
+
+          <span>
+            Address & contact
+          </span>
+
+        </div>
+
+      </div>
+
+
+      <div class="progress-line"></div>
+
+
+      <!-- STEP 2 -->
+
+      <div
+        class="progress-step"
+        [class.active]="checkoutStep === 'payment'"
+      >
+
+        <span class="progress-circle">
+          2
+        </span>
+
+        <div class="progress-content">
+
+          <strong>Payment</strong>
+
+          <span>
+            Secure payment
+          </span>
 
         </div>
 
+      </div>
 
-        <div class="progress-line"></div>
+
+      <div class="progress-line"></div>
 
 
-        <div class="progress-step" [class.active]="checkoutStep === 'payment'">
+      <!-- STEP 3 -->
 
-            <span class="progress-number">
-                02
-            </span>
+      <div class="progress-step review-step">
 
-            <div>
-                <strong>Payment</strong>
-                <small>Secure payment</small>
-            </div>
+        <span class="progress-circle">
+          3
+        </span>
+
+        <div class="progress-content">
+
+          <strong>Complete</strong>
+
+          <span>
+            Order confirmation
+          </span>
 
         </div>
+
+      </div>
 
     </div>
 
 
-    <!-- =====================================================
-         MAIN CHECKOUT
-    ====================================================== -->
 
-    <form [formGroup]="checkoutForm" class="checkout-layout">
+    <!-- ===================================================
+         CHECKOUT GRID
+    ==================================================== -->
+
+    <form
+      [formGroup]="checkoutForm"
+      class="checkout-layout"
+    >
+
+
+      <!-- =================================================
+           LEFT — CHECKOUT FORM
+      ================================================== -->
+
+      <main class="checkout-main">
 
 
         <!-- =================================================
-             LEFT COLUMN
+             DELIVERY STEP
         ================================================== -->
 
-        <main class="checkout-main">
+        <section
+          class="checkout-card"
+          *ngIf="checkoutStep === 'details'"
+        >
 
+          <!-- CARD HEADER -->
 
-            <!-- =============================================
-                 STEP 1 — DELIVERY DETAILS
-            ============================================== -->
+          <div class="card-header">
 
-            <section class="checkout-card" *ngIf="checkoutStep === 'details'">
+            <div class="card-icon">
+              <i class="fa-solid fa-location-dot"></i>
+            </div>
 
-                <div class="card-heading">
+            <div>
 
-                    <div class="heading-icon">
-                        📦
-                    </div>
+              <span class="card-eyebrow">
+                STEP 01
+              </span>
 
-                    <div>
+              <h1>
+                Shipping Address
+              </h1>
 
-                        <span class="section-label">
-                            STEP 01
-                        </span>
+              <p>
+                Enter your details to receive your order.
+              </p>
 
-                        <h2>
-                            Delivery Details
-                        </h2>
+            </div>
 
-                        <p>
-                            Where should we deliver your order?
-                        </p>
+          </div>
 
-                    </div>
 
-                </div>
+          <!-- =================================================
+               PERSONAL INFORMATION
+          ================================================== -->
 
+          <div class="form-section">
 
-                <!-- =========================
-                     FULL NAME
-                ========================== -->
+            <div class="section-heading">
 
-                <div class="form-group">
+              <h2>
+                Contact Information
+              </h2>
 
-                    <label for="checkout-name">
-                        Full Name
-                        <span>*</span>
-                    </label>
-
-                    <input id="checkout-name" type="text" formControlName="name" placeholder="Enter your full name"
-                        autocomplete="name">
-
-                    <small class="error" *ngIf="
-                            checkoutForm.get('name')?.touched &&
-                            checkoutForm.get('name')?.invalid
-                        ">
-                        Please enter your full name.
-                    </small>
-
-                </div>
-
-
-                <!-- =========================
-                     MOBILE
-                ========================== -->
-
-                <div class="form-group">
-
-                    <label for="checkout-phone">
-                        Mobile Number
-                        <span>*</span>
-                    </label>
-
-                    <div class="phone-row">
-
-                        <div class="phone-input-wrapper">
-
-                            <span class="country-code">
-                                +91
-                            </span>
-
-                            <input id="checkout-phone" type="tel" inputmode="numeric" maxlength="10"
-                                formControlName="phone" placeholder="10 digit mobile number" autocomplete="tel"
-                                [readonly]="otpVerified">
-
-                        </div>
-
-
-                        <button type="button" class="verify-btn" *ngIf="!otpVerified" (click)="openPhoneVerification()">
-                            Verify
-                        </button>
-
-
-                        <div class="verified" *ngIf="otpVerified">
-                            <span>✓</span>
-                            Verified
-                        </div>
-
-                    </div>
-
-
-                    <small class="error" *ngIf="
-                            checkoutForm.get('phone')?.touched &&
-                            checkoutForm.get('phone')?.invalid
-                        ">
-                        Enter a valid 10 digit mobile number.
-                    </small>
-
-                </div>
-
-
-                <!-- =========================
-                     EMAIL
-                ========================== -->
-
-                <div class="form-group">
-
-                    <label for="checkout-email">
-                        Email Address
-                        <span>*</span>
-                    </label>
-
-                    <input id="checkout-email" type="email" formControlName="email" placeholder="you@example.com"
-                        autocomplete="email">
-
-                    <small class="error" *ngIf="
-                            checkoutForm.get('email')?.touched &&
-                            checkoutForm.get('email')?.errors?.['required']
-                        ">
-                        Email address is required.
-                    </small>
-
-                    <small class="error" *ngIf="
-                            checkoutForm.get('email')?.touched &&
-                            checkoutForm.get('email')?.errors?.['email']
-                        ">
-                        Please enter a valid email address.
-                    </small>
-
-                </div>
-
-
-                <!-- =========================
-                     ADDRESS
-                ========================== -->
-
-                <div class="form-group">
-
-                    <label for="checkout-address">
-                        Delivery Address
-                        <span>*</span>
-                    </label>
-
-                    <textarea id="checkout-address" rows="4" formControlName="address"
-                        placeholder="House / flat number, street, area, landmark"
-                        autocomplete="street-address"></textarea>
-
-                    <small class="error" *ngIf="
-                            checkoutForm.get('address')?.touched &&
-                            checkoutForm.get('address')?.invalid
-                        ">
-                        Delivery address is required.
-                    </small>
-
-                </div>
-
-
-                <!-- =========================
-                     CITY + STATE
-                ========================== -->
-
-                <div class="form-row">
-
-                    <div class="form-group">
-
-                        <label for="checkout-city">
-                            City
-                            <span>*</span>
-                        </label>
-
-                        <input id="checkout-city" type="text" formControlName="city" placeholder="Enter city"
-                            autocomplete="address-level2">
-
-                        <small class="error" *ngIf="
-                                checkoutForm.get('city')?.touched &&
-                                checkoutForm.get('city')?.invalid
-                            ">
-                            City is required.
-                        </small>
-
-                    </div>
-
-
-                    <div class="form-group">
-
-                        <label for="checkout-state">
-                            State
-                            <span>*</span>
-                        </label>
-
-                        <input id="checkout-state" type="text" formControlName="state" placeholder="Enter state"
-                            autocomplete="address-level1">
-
-                        <small class="error" *ngIf="
-                                checkoutForm.get('state')?.touched &&
-                                checkoutForm.get('state')?.invalid
-                            ">
-                            State is required.
-                        </small>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================
-                     PINCODE
-                ========================== -->
-
-                <div class="form-group">
-
-                    <label for="checkout-pincode">
-                        Pincode
-                        <span>*</span>
-                    </label>
-
-                    <input id="checkout-pincode" type="text" inputmode="numeric" maxlength="6" formControlName="pincode"
-                        placeholder="6 digit pincode" autocomplete="postal-code">
-
-                    <small class="error" *ngIf="
-                            checkoutForm.get('pincode')?.touched &&
-                            checkoutForm.get('pincode')?.invalid
-                        ">
-                        Enter a valid 6 digit pincode.
-                    </small>
-
-                </div>
-
-
-                <!-- =========================
-                     CONTINUE
-                ========================== -->
-
-                <button type="button" class="primary-action" (click)="continueToPayment()">
-
-                    <span>
-                        Continue to Payment
-                    </span>
-
-                    <span class="action-arrow">
-                        →
-                    </span>
-
-                </button>
-
-
-                <div class="secure-note">
-
-                    <span>🔒</span>
-
-                    Your personal information is encrypted
-                    and securely protected.
-
-                </div>
-
-            </section>
-
-
-
-            <!-- =============================================
-                 STEP 2 — PAYMENT
-            ============================================== -->
-
-            <section class="checkout-card payment-card" *ngIf="checkoutStep === 'payment'">
-
-                <div class="card-heading">
-
-                    <div class="heading-icon payment-icon">
-                        💳
-                    </div>
-
-                    <div>
-
-                        <span class="section-label">
-                            STEP 02
-                        </span>
-
-                        <h2>
-                            Payment Method
-                        </h2>
-
-                        <p>
-                            Choose your preferred payment option.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <!-- =========================
-                     BACK
-                ========================== -->
-
-                <button type="button" class="back-button" (click)="backToDetails()">
-
-                    <span>
-                        ←
-                    </span>
-
-                    Back to Delivery Details
-
-                </button>
-
-
-                <!-- =========================
-                     PAYMENT SECURITY
-                ========================== -->
-
-                <div class="payment-security-banner">
-
-                    <div class="payment-security-icon">
-                        🔐
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            Secure payment
-                        </strong>
-
-                        <p>
-                            Your payment is processed securely
-                            through Razorpay.
-                        </p>
-
-                    </div>
-
-                    <span class="razorpay-label">
-                        RAZORPAY
-                    </span>
-
-                </div>
-
-
-                <!-- =========================
-                     PAYMENT METHODS
-                ========================== -->
-
-                <div class="payment-method-list">
-
-
-                    <!-- UPI -->
-
-                    <label class="payment-method" [class.selected]="
-                            checkoutForm.get('paymentMethod')?.value === 'UPI'
-                        ">
-
-                        <input type="radio" value="UPI" formControlName="paymentMethod">
-
-                        <div class="payment-method-icon upi-icon">
-                            UPI
-                        </div>
-
-                        <div class="payment-method-info">
-
-                            <div class="payment-method-title">
-
-                                <strong>
-                                    UPI Payment
-                                </strong>
-
-                                <span class="recommended-badge">
-                                    Recommended
-                                </span>
-
-                            </div>
-
-                            <small>
-                                Google Pay, PhonePe, Paytm & other UPI apps
-                            </small>
-
-                        </div>
-
-                        <span class="payment-check">
-                            ✓
-                        </span>
-
-                    </label>
-
-
-
-                    <!-- CARD -->
-
-                    <label class="payment-method" [class.selected]="
-                            checkoutForm.get('paymentMethod')?.value === 'CARD'
-                        ">
-
-                        <input type="radio" value="CARD" formControlName="paymentMethod">
-
-                        <div class="payment-method-icon card-icon">
-                            💳
-                        </div>
-
-                        <div class="payment-method-info">
-
-                            <div class="payment-method-title">
-
-                                <strong>
-                                    Credit / Debit Card
-                                </strong>
-
-                            </div>
-
-                            <small>
-                                Visa, Mastercard, RuPay & more
-                            </small>
-
-                        </div>
-
-                        <span class="payment-check">
-                            ✓
-                        </span>
-
-                    </label>
-
-
-
-                    <!-- NET BANKING -->
-
-                    <label class="payment-method" [class.selected]="
-                            checkoutForm.get('paymentMethod')?.value === 'NETBANKING'
-                        ">
-
-                        <input type="radio" value="NETBANKING" formControlName="paymentMethod">
-
-                        <div class="payment-method-icon bank-icon">
-                            🏦
-                        </div>
-
-                        <div class="payment-method-info">
-
-                            <div class="payment-method-title">
-
-                                <strong>
-                                    Net Banking
-                                </strong>
-
-                            </div>
-
-                            <small>
-                                Pay securely using your bank account
-                            </small>
-
-                        </div>
-
-                        <span class="payment-check">
-                            ✓
-                        </span>
-
-                    </label>
-
-
-
-                    <!-- WALLET -->
-
-                    <label class="payment-method" [class.selected]="
-                            checkoutForm.get('paymentMethod')?.value === 'WALLET'
-                        ">
-
-                        <input type="radio" value="WALLET" formControlName="paymentMethod">
-
-                        <div class="payment-method-icon wallet-icon">
-                            👛
-                        </div>
-
-                        <div class="payment-method-info">
-
-                            <div class="payment-method-title">
-
-                                <strong>
-                                    Wallets
-                                </strong>
-
-                            </div>
-
-                            <small>
-                                Pay using supported digital wallets
-                            </small>
-
-                        </div>
-
-                        <span class="payment-check">
-                            ✓
-                        </span>
-
-                    </label>
-
-                </div>
-
-
-                <!-- =========================
-                     PAY BUTTON
-                ========================== -->
-
-                <button type="button" class="primary-action pay-action" (click)="placeOrder()"
-                    [disabled]="isPlacingOrder">
-
-                    <span>
-
-                        {{
-                        isPlacingOrder
-                        ? 'Processing Payment...'
-                        : 'Pay ₹' + (grandTotal | number)
-                        }}
-
-                    </span>
-
-                    <span class="action-arrow">
-                        →
-                    </span>
-
-                </button>
-
-
-                <div class="secure-note">
-
-                    <span>🔒</span>
-
-                    Secure payment powered by Razorpay
-
-                </div>
-
-            </section>
-
-        </main>
-
-
-
-        <!-- =================================================
-             RIGHT COLUMN — ORDER SUMMARY
-        ================================================== -->
-
-        <aside class="summary-card">
-
-            <div class="summary-header">
-
-                <div>
-
-                    <span class="section-label">
-                        YOUR ORDER
-                    </span>
-
-                    <h2>
-                        Order Summary
-                    </h2>
-
-                </div>
-
-                <span class="item-count">
-                    {{ cartItems.length }}
-                    {{ cartItems.length === 1 ? 'item' : 'items' }}
-                </span>
+              <span>
+                Required fields *
+              </span>
 
             </div>
 
 
-            <!-- =========================
-                 PRODUCTS
-            ========================== -->
+            <!-- NAME -->
 
-            <div class="summary-products">
+            <div class="form-group">
 
-                <div class="summary-item" *ngFor="let item of cartItems">
+              <label for="checkout-name">
+                Full Name
+                <span>*</span>
+              </label>
 
-                    <div class="product-image">
+              <div class="input-wrapper">
 
-                        <img [src]="item.image" [alt]="item.name">
+                <i class="fa-regular fa-user"></i>
 
-                        <span class="quantity-badge">
-                            {{ item.quantity }}
-                        </span>
+                <input
+                  id="checkout-name"
+                  type="text"
+                  formControlName="name"
+                  placeholder="Enter your full name"
+                  autocomplete="name"
+                >
 
-                    </div>
+              </div>
 
-
-                    <div class="product-info">
-
-                        <h4>
-                            {{ item.name }}
-                        </h4>
-
-                        <small *ngIf="item.selectedSize">
-                            Size: {{ item.selectedSize }}
-                        </small>
-
-                        <small *ngIf="item.selectedColor && !item.selectedCombination">
-                            Color: {{ item.selectedColor }}
-                        </small>
-
-                        <small *ngIf="item.selectedCombination">
-                            {{ item.selectedCombination }}
-                        </small>
-
-                        <small *ngIf="item.selectedPack">
-                            {{ item.packQuantity === 1 ? '1 Piece' : item.packQuantity + ' Pack' }}
-                        </small>
-
-                        <p>
-                            ₹{{ (item.cartPrice ?? item.price) | number }}
-                        </p>
-
-                    </div>
-
-
-                    <strong class="item-total">
-                        ₹{{ ((item.cartPrice ?? item.price) * item.quantity) | number }}
-                    </strong>
-
-                </div>
+              <small
+                class="field-error"
+                *ngIf="
+                  checkoutForm.get('name')?.touched &&
+                  checkoutForm.get('name')?.invalid
+                "
+              >
+                Please enter your full name.
+              </small>
 
             </div>
 
 
-            <!-- =========================
-                 COUPON
-            ========================== -->
+            <!-- PHONE -->
 
-            <div class="coupon-box">
+            <div class="form-group">
 
-                <div class="coupon-input">
+              <label for="checkout-phone">
+                Mobile Number
+                <span>*</span>
+              </label>
 
-                    <span>
-                        %
-                    </span>
+              <div class="phone-field">
 
-                    <input type="text" placeholder="Coupon code" [(ngModel)]="couponCode"
-                        [ngModelOptions]="{standalone: true}">
+                <div class="phone-input">
+
+                  <span class="country-code">
+                    +91
+                  </span>
+
+                  <input
+                    id="checkout-phone"
+                    type="tel"
+                    inputmode="numeric"
+                    maxlength="10"
+                    formControlName="phone"
+                    placeholder="10 digit mobile number"
+                    autocomplete="tel"
+                    [readonly]="otpVerified"
+                  >
+
+                  <span
+                    class="verified-status"
+                    *ngIf="otpVerified"
+                  >
+                    <i class="fa-solid fa-circle-check"></i>
+                    Verified
+                  </span>
 
                 </div>
 
-                <button type="button" (click)="applyCoupon()">
-                    Apply
+
+                <button
+                  type="button"
+                  class="verify-button"
+                  *ngIf="!otpVerified"
+                  (click)="openPhoneVerification()"
+                >
+                  Verify
                 </button>
 
-            </div>
+              </div>
 
-
-            <!-- =========================
-                 PRICE BREAKDOWN
-            ========================== -->
-
-            <div class="price-section">
-
-                <div class="price-row">
-
-                    <span>
-                        Subtotal
-                    </span>
-
-                    <strong>
-                        ₹{{ subtotal | number }}
-                    </strong>
-
-                </div>
-
-
-                <div class="price-row">
-
-                    <span>
-                        Shipping
-                    </span>
-
-                    <strong [class.free]="shipping === 0">
-                        {{
-                        shipping === 0
-                        ? 'FREE'
-                        : '₹' + (shipping | number)
-                        }}
-                    </strong>
-
-                </div>
-
-
-                <div class="price-row">
-
-                    <span>
-                        GST (5%)
-                    </span>
-
-                    <strong>
-                        ₹{{ gst | number }}
-                    </strong>
-
-                </div>
-
-
-                <div class="price-row discount" *ngIf="discount > 0">
-
-                    <span>
-                        Discount ({{ discount }}%)
-                    </span>
-
-                    <strong>
-                        -₹{{ discountAmount | number }}
-                    </strong>
-
-                </div>
+              <small
+                class="field-error"
+                *ngIf="
+                  checkoutForm.get('phone')?.touched &&
+                  checkoutForm.get('phone')?.invalid
+                "
+              >
+                Enter a valid 10 digit mobile number.
+              </small>
 
             </div>
 
 
-            <!-- =========================
-                 TOTAL
-            ========================== -->
+            <!-- EMAIL -->
 
-            <div class="total-section">
+            <div class="form-group">
 
-                <div>
+              <label for="checkout-email">
+                Email Address
+                <span>*</span>
+              </label>
 
-                    <span>
-                        Total Amount
-                    </span>
+              <div class="input-wrapper">
 
-                    <small>
-                        Inclusive of applicable taxes
-                    </small>
+                <i class="fa-regular fa-envelope"></i>
+
+                <input
+                  id="checkout-email"
+                  type="email"
+                  formControlName="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                >
+
+              </div>
+
+              <small
+                class="field-error"
+                *ngIf="
+                  checkoutForm.get('email')?.touched &&
+                  checkoutForm.get('email')?.errors?.['required']
+                "
+              >
+                Email address is required.
+              </small>
+
+              <small
+                class="field-error"
+                *ngIf="
+                  checkoutForm.get('email')?.touched &&
+                  checkoutForm.get('email')?.errors?.['email']
+                "
+              >
+                Please enter a valid email address.
+              </small>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =================================================
+               SHIPPING ADDRESS
+          ================================================== -->
+
+          <div class="form-section">
+
+            <div class="section-heading">
+
+              <h2>
+                Shipping Address
+              </h2>
+
+            </div>
+
+
+            <!-- ADDRESS -->
+
+            <div class="form-group">
+
+              <label for="checkout-address">
+                Street Address
+                <span>*</span>
+              </label>
+
+              <div class="input-wrapper textarea-wrapper">
+
+                <i class="fa-solid fa-house"></i>
+
+                <textarea
+                  id="checkout-address"
+                  rows="3"
+                  formControlName="address"
+                  placeholder="House / flat number, street, area, landmark"
+                  autocomplete="street-address"
+                ></textarea>
+
+              </div>
+
+              <small
+                class="field-error"
+                *ngIf="
+                  checkoutForm.get('address')?.touched &&
+                  checkoutForm.get('address')?.invalid
+                "
+              >
+                Delivery address is required.
+              </small>
+
+            </div>
+
+
+            <!-- CITY / STATE -->
+
+            <div class="form-grid two-columns">
+
+              <div class="form-group">
+
+                <label for="checkout-city">
+                  City
+                  <span>*</span>
+                </label>
+
+                <div class="input-wrapper">
+
+                  <i class="fa-solid fa-city"></i>
+
+                  <input
+                    id="checkout-city"
+                    type="text"
+                    formControlName="city"
+                    placeholder="Enter city"
+                    autocomplete="address-level2"
+                  >
 
                 </div>
+
+                <small
+                  class="field-error"
+                  *ngIf="
+                    checkoutForm.get('city')?.touched &&
+                    checkoutForm.get('city')?.invalid
+                  "
+                >
+                  City is required.
+                </small>
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label for="checkout-state">
+                  State
+                  <span>*</span>
+                </label>
+
+                <div class="input-wrapper">
+
+                  <i class="fa-solid fa-map"></i>
+
+                  <input
+                    id="checkout-state"
+                    type="text"
+                    formControlName="state"
+                    placeholder="Enter state"
+                    autocomplete="address-level1"
+                  >
+
+                </div>
+
+                <small
+                  class="field-error"
+                  *ngIf="
+                    checkoutForm.get('state')?.touched &&
+                    checkoutForm.get('state')?.invalid
+                  "
+                >
+                  State is required.
+                </small>
+
+              </div>
+
+            </div>
+
+
+            <!-- PIN -->
+
+            <div class="form-group">
+
+              <label for="checkout-pincode">
+                PIN Code
+                <span>*</span>
+              </label>
+
+              <div class="input-wrapper">
+
+                <i class="fa-solid fa-location-crosshairs"></i>
+
+                <input
+                  id="checkout-pincode"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="6"
+                  formControlName="pincode"
+                  placeholder="6 digit PIN code"
+                  autocomplete="postal-code"
+                >
+
+              </div>
+
+              <small
+                class="field-error"
+                *ngIf="
+                  checkoutForm.get('pincode')?.touched &&
+                  checkoutForm.get('pincode')?.invalid
+                "
+              >
+                Enter a valid 6 digit PIN code.
+              </small>
+
+            </div>
+
+          </div>
+
+
+
+          <!-- =================================================
+               SHIPPING METHOD
+          ================================================== -->
+
+          <div class="shipping-method">
+
+            <div class="method-icon">
+              <i class="fa-solid fa-truck-fast"></i>
+            </div>
+
+            <div class="method-content">
+
+              <div>
 
                 <strong>
-                    ₹{{ grandTotal | number }}
+                  Standard Delivery
                 </strong>
 
-            </div>
+                <span>
+                  Delivered in 4–7 business days
+                </span>
 
+              </div>
 
-            <!-- =========================
-                 BENEFITS
-            ========================== -->
-
-            <div class="order-benefits">
-
-                <div>
-                    <span>✓</span>
-                    Secure Payment
-                </div>
-
-                <div>
-                    <span>✓</span>
-                    Easy 7-Day Exchange
-                </div>
-
-                <div>
-                    <span>✓</span>
-                    Order Tracking Available
-                </div>
+              <strong class="free-label">
+                FREE
+              </strong>
 
             </div>
 
-        </aside>
+          </div>
+
+
+
+          <!-- =================================================
+               CONTINUE
+          ================================================== -->
+
+          <button
+            type="button"
+            class="primary-action"
+            (click)="continueToPayment()"
+          >
+
+            <span>
+              Continue to Payment
+            </span>
+
+            <i class="fa-solid fa-arrow-right"></i>
+
+          </button>
+
+
+          <div class="secure-message">
+
+            <i class="fa-solid fa-lock"></i>
+
+            <span>
+              Your information is encrypted and securely protected.
+            </span>
+
+          </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             PAYMENT STEP
+        ================================================== -->
+
+        <section
+          class="checkout-card payment-card"
+          *ngIf="checkoutStep === 'payment'"
+        >
+
+          <div class="card-header">
+
+            <div class="card-icon payment-card-icon">
+              <i class="fa-solid fa-credit-card"></i>
+            </div>
+
+            <div>
+
+              <span class="card-eyebrow">
+                STEP 02
+              </span>
+
+              <h1>
+                Payment Method
+              </h1>
+
+              <p>
+                Choose your preferred secure payment option.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <!-- BACK -->
+
+          <button
+            type="button"
+            class="back-button"
+            (click)="backToDetails()"
+          >
+
+            <i class="fa-solid fa-arrow-left"></i>
+
+            Back to shipping details
+
+          </button>
+
+
+          <!-- RAZORPAY SECURITY -->
+
+          <div class="payment-security">
+
+            <div class="security-icon">
+
+              <i class="fa-solid fa-shield-halved"></i>
+
+            </div>
+
+            <div>
+
+              <strong>
+                Secure payment powered by Razorpay
+              </strong>
+
+              <span>
+                Your payment information is protected by secure encryption.
+              </span>
+
+            </div>
+
+            <strong class="razorpay-text">
+              RAZORPAY
+            </strong>
+
+          </div>
+
+
+          <!-- PAYMENT OPTIONS -->
+
+          <div class="payment-options">
+
+            <!-- UPI -->
+
+            <label
+              class="payment-option"
+              [class.selected]="
+                checkoutForm.get('paymentMethod')?.value === 'UPI'
+              "
+            >
+
+              <input
+                type="radio"
+                value="UPI"
+                formControlName="paymentMethod"
+              >
+
+              <div class="payment-option-icon upi">
+                <span>UPI</span>
+              </div>
+
+              <div class="payment-option-content">
+
+                <div class="payment-option-title">
+
+                  <strong>
+                    UPI Payment
+                  </strong>
+
+                  <span class="recommended">
+                    Recommended
+                  </span>
+
+                </div>
+
+                <span>
+                  Google Pay, PhonePe, Paytm & other UPI apps
+                </span>
+
+              </div>
+
+              <span class="payment-radio">
+                <i class="fa-solid fa-check"></i>
+              </span>
+
+            </label>
+
+
+            <!-- CARD -->
+
+            <label
+              class="payment-option"
+              [class.selected]="
+                checkoutForm.get('paymentMethod')?.value === 'CARD'
+              "
+            >
+
+              <input
+                type="radio"
+                value="CARD"
+                formControlName="paymentMethod"
+              >
+
+              <div class="payment-option-icon">
+                <i class="fa-regular fa-credit-card"></i>
+              </div>
+
+              <div class="payment-option-content">
+
+                <strong>
+                  Credit / Debit Card
+                </strong>
+
+                <span>
+                  Visa, Mastercard, RuPay & more
+                </span>
+
+              </div>
+
+              <span class="payment-radio">
+                <i class="fa-solid fa-check"></i>
+              </span>
+
+            </label>
+
+
+            <!-- NET BANKING -->
+
+            <label
+              class="payment-option"
+              [class.selected]="
+                checkoutForm.get('paymentMethod')?.value === 'NETBANKING'
+              "
+            >
+
+              <input
+                type="radio"
+                value="NETBANKING"
+                formControlName="paymentMethod"
+              >
+
+              <div class="payment-option-icon">
+                <i class="fa-solid fa-building-columns"></i>
+              </div>
+
+              <div class="payment-option-content">
+
+                <strong>
+                  Net Banking
+                </strong>
+
+                <span>
+                  Pay securely using your bank account
+                </span>
+
+              </div>
+
+              <span class="payment-radio">
+                <i class="fa-solid fa-check"></i>
+              </span>
+
+            </label>
+
+
+            <!-- WALLET -->
+
+            <label
+              class="payment-option"
+              [class.selected]="
+                checkoutForm.get('paymentMethod')?.value === 'WALLET'
+              "
+            >
+
+              <input
+                type="radio"
+                value="WALLET"
+                formControlName="paymentMethod"
+              >
+
+              <div class="payment-option-icon">
+                <i class="fa-solid fa-wallet"></i>
+              </div>
+
+              <div class="payment-option-content">
+
+                <strong>
+                  Wallets
+                </strong>
+
+                <span>
+                  Pay using supported digital wallets
+                </span>
+
+              </div>
+
+              <span class="payment-radio">
+                <i class="fa-solid fa-check"></i>
+              </span>
+
+            </label>
+
+          </div>
+
+
+          <!-- PAY -->
+
+          <button
+            type="button"
+            class="primary-action pay-button"
+            (click)="placeOrder()"
+            [disabled]="isPlacingOrder"
+          >
+
+            <span>
+
+              {{
+                isPlacingOrder
+                  ? 'Processing Payment...'
+                  : 'Pay ₹' + (grandTotal | number)
+              }}
+
+            </span>
+
+            <i class="fa-solid fa-lock"></i>
+
+          </button>
+
+
+          <div class="secure-message">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            <span>
+              Secure payment powered by Razorpay
+            </span>
+
+          </div>
+
+        </section>
+
+      </main>
+
+
+
+      <!-- =================================================
+           RIGHT — ORDER SUMMARY
+      ================================================== -->
+
+      <aside class="checkout-summary">
+
+
+        <!-- SUMMARY CARD -->
+
+        <section class="summary-card">
+
+          <div class="summary-header">
+
+            <div>
+
+              <span class="summary-eyebrow">
+                YOUR ORDER
+              </span>
+
+              <h2>
+                Order Summary
+              </h2>
+
+            </div>
+
+            <span class="item-count">
+              {{ cartItems.length }}
+              {{ cartItems.length === 1 ? 'item' : 'items' }}
+            </span>
+
+          </div>
+
+
+          <!-- PRODUCTS -->
+
+          <div class="summary-products">
+
+            <div
+              class="summary-item"
+              *ngFor="let item of cartItems"
+            >
+
+              <div class="summary-image">
+
+                <img
+                  [src]="item.image"
+                  [alt]="item.name"
+                >
+
+                <span class="quantity-badge">
+                  {{ item.quantity }}
+                </span>
+
+              </div>
+
+
+              <div class="summary-product-info">
+
+                <h3>
+                  {{ item.name }}
+                </h3>
+
+                <span *ngIf="item.selectedSize">
+                  Size: {{ item.selectedSize }}
+                </span>
+
+                <span
+                  *ngIf="
+                    item.selectedColor &&
+                    !item.selectedCombination
+                  "
+                >
+                  Color: {{ item.selectedColor }}
+                </span>
+
+                <span *ngIf="item.selectedCombination">
+                  {{ item.selectedCombination }}
+                </span>
+
+                <span *ngIf="item.selectedPack">
+                  {{
+                    item.packQuantity === 1
+                      ? '1 Piece'
+                      : item.packQuantity + ' Pack'
+                  }}
+                </span>
+
+                <strong>
+                  ₹{{ (item.cartPrice ?? item.price) | number }}
+                </strong>
+
+              </div>
+
+
+              <strong class="summary-item-total">
+                ₹{{
+                  ((item.cartPrice ?? item.price) * item.quantity)
+                    | number
+                }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- COUPON -->
+
+          <div class="coupon-section">
+
+            <label>
+              Have a promo code?
+            </label>
+
+            <div class="coupon-row">
+
+              <div class="coupon-input">
+
+                <i class="fa-solid fa-tag"></i>
+
+                <input
+                  type="text"
+                  placeholder="Enter coupon code"
+                  [(ngModel)]="couponCode"
+                  [ngModelOptions]="{ standalone: true }"
+                >
+
+              </div>
+
+              <button
+                type="button"
+                (click)="applyCoupon()"
+              >
+                APPLY
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <!-- PRICE BREAKDOWN -->
+
+          <div class="price-breakdown">
+
+            <div class="price-row">
+
+              <span>
+                Subtotal
+              </span>
+
+              <strong>
+                ₹{{ subtotal | number }}
+              </strong>
+
+            </div>
+
+
+            <div class="price-row">
+
+              <span>
+                Shipping
+              </span>
+
+              <strong
+                [class.free]="shipping === 0"
+              >
+                {{
+                  shipping === 0
+                    ? 'FREE'
+                    : '₹' + (shipping | number)
+                }}
+              </strong>
+
+            </div>
+
+
+            <div class="price-row">
+
+              <span>
+                GST (5%)
+              </span>
+
+              <strong>
+                ₹{{ gst | number }}
+              </strong>
+
+            </div>
+
+
+            <div
+              class="price-row discount-row"
+              *ngIf="discount > 0"
+            >
+
+              <span>
+                Discount ({{ discount }}%)
+              </span>
+
+              <strong>
+                -₹{{ discountAmount | number }}
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <!-- TOTAL -->
+
+          <div class="summary-total">
+
+            <div>
+
+              <strong>
+                Total
+              </strong>
+
+              <span>
+                Inclusive of applicable taxes
+              </span>
+
+            </div>
+
+            <strong>
+              ₹{{ grandTotal | number }}
+            </strong>
+
+          </div>
+
+
+          <!-- BENEFITS -->
+
+          <div class="summary-benefits">
+
+            <div>
+
+              <span class="benefit-icon">
+                <i class="fa-solid fa-shield-halved"></i>
+              </span>
+
+              <span>
+                Secure Payments
+              </span>
+
+            </div>
+
+
+            <div>
+
+              <span class="benefit-icon">
+                <i class="fa-solid fa-rotate-left"></i>
+              </span>
+
+              <span>
+                7-Day Easy Exchange
+              </span>
+
+            </div>
+
+
+            <div>
+
+              <span class="benefit-icon">
+                <i class="fa-solid fa-truck-fast"></i>
+              </span>
+
+              <span>
+                Fast Delivery
+              </span>
+
+            </div>
+
+
+            <div>
+
+              <span class="benefit-icon">
+                <i class="fa-solid fa-medal"></i>
+              </span>
+
+              <span>
+                Premium Quality
+              </span>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- HELP CARD -->
+
+        <section class="checkout-help">
+
+          <div class="help-icon">
+            <i class="fa-solid fa-headset"></i>
+          </div>
+
+          <div class="help-content">
+
+            <strong>
+              Need help?
+            </strong>
+
+            <span>
+              Our support team is here for you.
+            </span>
+
+          </div>
+
+          <a href="mailto:support@trianglesports.in">
+            Contact
+          </a>
+
+        </section>
+
+
+      </aside>
 
     </form>
 
 
+   
 
-    <!-- =====================================================
-         OTP MODAL
-    ====================================================== -->
-
-    <div class="otp-overlay" *ngIf="showOtpModal">
-
-        <div class="otp-modal">
-
-            <button type="button" class="otp-close" (click)="showOtpModal = false">
-                ×
-            </button>
+    
 
 
-            <div class="otp-icon">
-                🔐
-            </div>
+
+  <!-- =====================================================
+       OTP MODAL
+  ====================================================== -->
+
+  <div
+    class="otp-overlay"
+    *ngIf="showOtpModal"
+  >
+
+    <div
+      class="otp-modal"
+      role="dialog"
+      aria-modal="true"
+    >
+
+      <button
+        type="button"
+        class="otp-close"
+        (click)="showOtpModal = false"
+        aria-label="Close"
+      >
+        ×
+      </button>
 
 
-            <span class="otp-label">
-                MOBILE VERIFICATION
-            </span>
+      <div class="otp-icon">
+
+        <i class="fa-solid fa-mobile-screen-button"></i>
+
+      </div>
 
 
-            <h2>
-                Verify your number
-            </h2>
+      <span class="otp-label">
+        MOBILE VERIFICATION
+      </span>
 
 
-            <p>
-                We'll send a verification code to
-            </p>
+      <h2>
+        Verify your number
+      </h2>
 
 
-            <strong class="otp-number">
-                +91 {{ mobileForOtp }}
-            </strong>
+      <p>
+        We'll send a verification code to
+      </p>
 
 
-            <!-- SEND OTP -->
-
-            <div *ngIf="!otpSent">
-
-                <button type="button" class="otp-btn" (click)="sendCheckoutOTP()" [disabled]="otpLoading">
-
-                    {{
-                    otpLoading
-                    ? 'Sending...'
-                    : 'Send OTP'
-                    }}
-
-                </button>
-
-            </div>
+      <strong class="otp-number">
+        +91 {{ mobileForOtp }}
+      </strong>
 
 
-            <!-- VERIFY OTP -->
+      <!-- SEND OTP -->
 
-            <div *ngIf="otpSent">
+      <div *ngIf="!otpSent">
 
-                <input type="text" class="otp-input" placeholder="Enter 6 digit OTP" maxlength="6" inputmode="numeric"
-                    autocomplete="one-time-code" [(ngModel)]="otp" [ngModelOptions]="{standalone: true}">
+        <button
+          type="button"
+          class="otp-primary-button"
+          (click)="sendCheckoutOTP()"
+          [disabled]="otpLoading"
+        >
 
+          {{
+            otpLoading
+              ? 'Sending...'
+              : 'Send OTP'
+          }}
 
-                <button type="button" class="otp-btn" (click)="verifyCheckoutOTP()" [disabled]="otpLoading">
+        </button>
 
-                    {{
-                    otpLoading
-                    ? 'Verifying...'
-                    : 'Verify OTP'
-                    }}
-
-                </button>
-
-
-                <button type="button" class="resend-btn" (click)="sendCheckoutOTP()" [disabled]="otpLoading">
-                    Resend OTP
-                </button>
-
-            </div>
+      </div>
 
 
-            <p class="otp-error" *ngIf="otpError">
-                {{ otpError }}
-            </p>
+      <!-- VERIFY OTP -->
 
+      <div *ngIf="otpSent">
 
-            <p class="otp-success" *ngIf="otpSuccess">
-                {{ otpSuccess }}
-            </p>
+        <div class="otp-input-wrapper">
+
+          <i class="fa-solid fa-key"></i>
+
+          <input
+            type="text"
+            placeholder="Enter 6 digit OTP"
+            maxlength="6"
+            inputmode="numeric"
+            autocomplete="one-time-code"
+            [(ngModel)]="otp"
+            [ngModelOptions]="{ standalone: true }"
+          >
 
         </div>
 
+
+        <button
+          type="button"
+          class="otp-primary-button"
+          (click)="verifyCheckoutOTP()"
+          [disabled]="otpLoading"
+        >
+
+          {{
+            otpLoading
+              ? 'Verifying...'
+              : 'Verify OTP'
+          }}
+
+        </button>
+
+
+        <button
+          type="button"
+          class="resend-button"
+          (click)="sendCheckoutOTP()"
+          [disabled]="otpLoading"
+        >
+          Resend OTP
+        </button>
+
+      </div>
+
+
+      <p
+        class="otp-error"
+        *ngIf="otpError"
+      >
+        <i class="fa-solid fa-circle-exclamation"></i>
+        {{ otpError }}
+      </p>
+
+
+      <p
+        class="otp-success"
+        *ngIf="otpSuccess"
+      >
+        <i class="fa-solid fa-circle-check"></i>
+        {{ otpSuccess }}
+      </p>
+
+
+      <div class="otp-security">
+
+        <i class="fa-solid fa-lock"></i>
+
+        Your phone number is securely verified.
+
+      </div>
+
     </div>
+
+  </div>
 
 </div>

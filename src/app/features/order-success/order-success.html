@@ -1,332 +1,116 @@
-<div class="success-page">
+<div class="order-success-page">
 
-  <!-- Decorative background -->
-  <div class="success-orb success-orb-left"></div>
-  <div class="success-orb success-orb-right"></div>
+  <!-- HEADER -->
+  <header class="success-header">
 
-  <main class="success-wrapper">
+    <div class="brand-logo">
+      TRIANGLE <span>SPORTS</span>
+    </div>
 
-    <section class="success-card">
-
-      <!-- =========================================
-           SUCCESS HEADER
-      ========================================== -->
-
-      <div class="success-header">
-
-        <div class="success-icon">
-          <i class="fa-solid fa-check"></i>
-        </div>
-
-        <span class="success-label">
-          ORDER CONFIRMED
-        </span>
-
-        <h1>
-          Order placed
-          <span>successfully.</span>
-        </h1>
-
-        <p class="success-description">
-          Thank you for shopping with
-          <strong>Triangle Sports</strong>.
-          Your order has been confirmed and we're getting it ready for you.
-        </p>
-
-      </div>
+  </header>
 
 
-      <!-- =========================================
-           ORDER INFORMATION
-      ========================================== -->
+  <!-- THANK YOU -->
+  <section class="thank-you-section">
 
-      <div class="order-info-card">
+    <h1>
+      Thank you, {{ order?.customerName || 'Customer' }}
+    </h1>
 
-        <div class="order-info-content">
+    <p class="confirmation-text">
+      You'll receive a confirmation email soon.
+    </p>
 
-          <span class="info-label">
-            ORDER ID
-          </span>
+    <div class="order-number">
 
-          <strong class="order-id">
-            #{{ orderId }}
-          </strong>
+      <span>
+        Order No. {{ orderId }}
+      </span>
 
-        </div>
+      <button
+        *ngIf="orderId !== 'N/A'"
+        type="button"
+        class="copy-button"
+        (click)="copyOrderId()"
+      >
+        {{ copied ? 'Copied' : 'Copy' }}
+      </button>
 
-        <button
-          type="button"
-          class="copy-btn"
-          (click)="copyOrderId()">
+    </div>
 
-          <i
-            class="fa-solid"
-            [class.fa-copy]="!copied"
-            [class.fa-check]="copied">
-          </i>
-
-          <span>
-            {{ copied ? 'Copied' : 'Copy ID' }}
-          </span>
-
-        </button>
-
-      </div>
+  </section>
 
 
-      <!-- =========================================
-           DELIVERY INFORMATION
-      ========================================== -->
+  <main class="order-content">
 
-      <div class="delivery-card">
+    <!-- =================================
+         PRODUCTS
+    ================================== -->
 
-        <div class="delivery-icon">
-          <i class="fa-solid fa-truck-fast"></i>
-        </div>
+    <section class="product-section">
 
-        <div class="delivery-content">
+      <div
+        class="product-row"
+        *ngFor="let item of order?.items"
+      >
 
-          <span class="delivery-label">
-            ESTIMATED DELIVERY
-          </span>
+        <!-- IMAGE -->
 
-          <strong>
-            {{ deliveryDate }}
-          </strong>
+        <div class="product-image">
 
-          <p>
-            We'll notify you when your order is shipped.
-          </p>
+          <img
+            [src]="item.image"
+            [alt]="item.name"
+          />
 
         </div>
 
-      </div>
 
+        <!-- PRODUCT INFO -->
 
-      <!-- =========================================
-           ORDER JOURNEY
-      ========================================== -->
-
-      <div class="journey-section">
-
-        <div class="section-heading">
-
-          <span>
-            WHAT'S NEXT
-          </span>
+        <div class="product-info">
 
           <h2>
-            Your order journey
+            {{ item.name }}
           </h2>
 
-        </div>
-
-
-        <div class="journey">
-
-          <!-- Connecting line -->
-          <div class="journey-line"></div>
-
-
-          <!-- STEP 1 -->
-
-          <div class="journey-step active">
-
-            <div class="step-circle">
-              <i class="fa-solid fa-check"></i>
-            </div>
-
-            <div class="step-text">
-
-              <strong>
-                Order placed
-              </strong>
-
-              <small>
-                Order confirmed
-              </small>
-
-            </div>
-
-          </div>
-
-
-          <!-- STEP 2 -->
-
-          <div class="journey-step">
-
-            <div class="step-circle">
-              <span>02</span>
-            </div>
-
-            <div class="step-text">
-
-              <strong>
-                Processing
-              </strong>
-
-              <small>
-                Preparing your order
-              </small>
-
-            </div>
-
-          </div>
-
-
-          <!-- STEP 3 -->
-
-          <div class="journey-step">
-
-            <div class="step-circle">
-              <span>03</span>
-            </div>
-
-            <div class="step-text">
-
-              <strong>
-                Shipped
-              </strong>
-
-              <small>
-                On the way to you
-              </small>
-
-            </div>
-
-          </div>
-
-
-          <!-- STEP 4 -->
-
-          <div class="journey-step">
-
-            <div class="step-circle">
-              <span>04</span>
-            </div>
-
-            <div class="step-text">
-
-              <strong>
-                Delivered
-              </strong>
-
-              <small>
-                Enjoy your gear
-              </small>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <!-- =========================================
-           EMAIL NOTICE
-      ========================================== -->
-
-      <div class="email-notice">
-
-        <div class="email-icon">
-
-          <i class="fa-regular fa-envelope"></i>
-
-        </div>
-
-        <div class="email-content">
-
-          <strong>
-            Order updates are on their way
-          </strong>
-
           <p>
-            Your invoice and order updates will be sent
-            to your registered email address.
+            {{ formatPrice(item.price) }}
+          </p>
+
+          <p *ngIf="item.selectedColor">
+            Color: {{ item.selectedColor }}
+          </p>
+
+          <p *ngIf="item.selectedSize">
+            Size: {{ item.selectedSize }}
+          </p>
+
+          <p *ngIf="item.selectedCombination">
+            {{ item.selectedCombination }}
+          </p>
+
+          <p *ngIf="item.selectedPack">
+            {{ item.selectedPack }}
           </p>
 
         </div>
 
-      </div>
 
+        <!-- QUANTITY -->
 
-      <!-- =========================================
-           ACTION BUTTONS
-      ========================================== -->
+        <div class="product-quantity">
 
-      <div class="success-actions">
-
-        <a
-          routerLink="/orders"
-          class="primary-btn">
-
-          <span>
-            My Orders
-          </span>
-
-          <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
-
-
-        <a
-          routerLink="/shop"
-          class="secondary-btn">
-
-          <i class="fa-solid fa-bag-shopping"></i>
-
-          <span>
-            Continue Shopping
-          </span>
-
-        </a>
-
-      </div>
-
-
-      <!-- =========================================
-           TRUST FEATURES
-      ========================================== -->
-
-      <div class="trust-features">
-
-        <div class="trust-item">
-
-          <div class="trust-icon">
-            <i class="fa-solid fa-shield-halved"></i>
-          </div>
-
-          <span>
-            Secure Payment
-          </span>
+          Qty: {{ item.quantity }}
 
         </div>
 
 
-        <div class="trust-item">
+        <!-- PRICE -->
 
-          <div class="trust-icon">
-            <i class="fa-solid fa-rotate-left"></i>
-          </div>
+        <div class="product-price">
 
-          <span>
-            Easy 7-Day Exchange
-          </span>
-
-        </div>
-
-
-        <div class="trust-item">
-
-          <div class="trust-icon">
-            <i class="fa-solid fa-location-dot"></i>
-          </div>
-
-          <span>
-            Order Tracking
-          </span>
+          {{ formatPrice(item.price * item.quantity) }}
 
         </div>
 
@@ -335,22 +119,194 @@
     </section>
 
 
-    <!-- =========================================
-         BRAND FOOTER
-    ========================================== -->
+    <!-- =================================
+         PRICE SUMMARY
+    ================================== -->
 
-    <div class="brand-footer">
+    <section class="price-section">
 
-      <span class="brand-symbol">
-        ▲
-      </span>
+      <div class="price-row">
 
-      <span>
-        Built for movement. Designed for you.
-      </span>
+        <span>
+          Subtotal
+        </span>
+
+        <span>
+          {{ formatPrice(order?.subtotal) }}
+        </span>
+
+      </div>
+
+
+      <div
+        class="price-row"
+        *ngIf="order?.discountAmount"
+      >
+
+        <span>
+          Discount
+        </span>
+
+        <span>
+          -{{ formatPrice(order?.discountAmount) }}
+        </span>
+
+      </div>
+
+
+      <div class="price-row">
+
+        <span>
+          Shipping
+        </span>
+
+        <span>
+          {{
+            order?.shipping
+              ? formatPrice(order?.shipping)
+              : 'FREE'
+          }}
+        </span>
+
+      </div>
+
+
+      <div class="price-divider"></div>
+
+
+      <div class="price-row total-row">
+
+        <span>
+          Total
+        </span>
+
+        <span>
+          {{ formatPrice(order?.total) }}
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         ADDRESS
+    ================================== -->
+
+    <section class="details-section">
+
+      <!-- SHIPPING -->
+
+      <div class="detail-column">
+
+        <h3>
+          Shipping address
+        </h3>
+
+        <p>
+          {{ order?.customerName }}
+        </p>
+
+        <p>
+          {{ order?.address }}
+        </p>
+
+        <p>
+          {{ order?.city }},
+          {{ order?.state }}
+          - {{ order?.pincode }}
+        </p>
+
+        <p>
+          India
+        </p>
+
+        <p>
+          {{ order?.phone }}
+        </p>
+
+      </div>
+
+
+      <!-- BILLING -->
+
+      <div class="detail-column">
+
+        <h3>
+          Billing address
+        </h3>
+
+        <p>
+          {{ order?.customerName }}
+        </p>
+
+        <p>
+          {{ order?.address }}
+        </p>
+
+        <p>
+          {{ order?.city }},
+          {{ order?.state }}
+          - {{ order?.pincode }}
+        </p>
+
+        <p>
+          India
+        </p>
+
+        <p>
+          {{ order?.phone }}
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         PAYMENT / DELIVERY
+    ================================== -->
+
+    <section class="delivery-section">
+
+      <p>
+        Estimated delivery:
+        <strong>
+          {{ deliveryDate }}
+        </strong>
+      </p>
+
+    </section>
+
+
+    <!-- CONTINUE -->
+
+    <div class="continue-section">
+
+      <a
+        routerLink="/shop"
+        class="continue-link"
+      >
+        Continue Browsing
+      </a>
 
     </div>
 
   </main>
+
+
+  <!-- FOOTER -->
+
+  <footer class="success-footer">
+
+    <div class="footer-brand">
+      TRIANGLE SPORTS
+    </div>
+
+    <p>
+      Thank you for shopping with us.
+    </p>
+
+  </footer>
 
 </div>

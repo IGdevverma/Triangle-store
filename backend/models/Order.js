@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-
+const crypto = require("crypto");
 
 const orderSchema = new mongoose.Schema(
   {
@@ -12,6 +12,20 @@ const orderSchema = new mongoose.Schema(
       ref: "User",
       required: true,
       index: true
+    },
+
+
+    // ==========================================
+    // CUSTOMER-FACING ORDER NUMBER
+    // ==========================================
+
+    orderNumber: {
+      type: String,
+      unique: true,
+      index: true,
+      sparse: true,
+      immutable: true,
+      trim: true
     },
 
     // ==========================================
@@ -379,5 +393,42 @@ const orderSchema = new mongoose.Schema(
   }
 );
 orderSchema.index({ createdAt: 1 });
+// ==========================================
+// GENERATE CUSTOMER-FACING ORDER NUMBER
+// ==========================================
+
+orderSchema.pre("validate", function (next) {
+
+  // Existing order already has an order number
+  if (this.orderNumber) {
+    return next();
+  }
+
+  const now = new Date();
+
+  const year = String(
+    now.getFullYear()
+  ).slice(-2);
+
+  const month = String(
+    now.getMonth() + 1
+  ).padStart(2, "0");
+
+  const day = String(
+    now.getDate()
+  ).padStart(2, "0");
+
+
+  const randomNumber =
+    crypto.randomInt(100000, 1000000);
+
+
+  this.orderNumber =
+    `TS-${year}${month}${day}-${randomNumber}`;
+
+
+  next();
+
+});
 
 module.exports = mongoose.model("Order", orderSchema);

@@ -632,8 +632,8 @@ export class Checkout implements OnInit {
                       ['/order-success'],
                       {
                         state: {
-                          orderId:
-                            res.order._id
+                          orderId: res.order.orderNumber,
+                          order: res.order
                         }
                       }
                     );

@@ -1,7 +1,9 @@
 export const environment = {
   production: false,
 
-  apiUrl: 'http://localhost:8000/api',
+  apiUrl: 'https://triangle-store-api-test.onrender.com/api',
+
+  razorpayKeyId: 'rzp_test_TdQnlHFpRwumP6',
 
   msg91: {
     widgetId: '366874664d57383734313131',
