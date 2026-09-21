@@ -1859,6 +1859,8 @@
                             </div>
 
                         </section>
+
+
                         <!-- =============================================
                              SHIPPING DETAILS
                         ============================================== -->
@@ -1866,10 +1868,11 @@
 
                             <div class="shopify-card-header">
 
-                                <h3>Shipping details</h3>
+                                <h3>Single Product Shipping</h3>
 
                                 <p>
-                                    Enter the packed product weight and package dimensions used by Shiprocket.
+                                    Enter the packed weight and package dimensions used by
+                                    Shiprocket when the customer purchases a single unit.
                                 </p>
 
                             </div>
@@ -2339,6 +2342,405 @@
                                                         </span>
 
                                                     </button>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- =====================================================
+     PACK COLOR COMBINATIONS
+====================================================== -->
+
+                                            <div class="pack-subsection pack-combinations-section">
+
+                                                <div class="pack-subsection-title">
+
+                                                    <div>
+
+                                                        <strong>
+                                                            Pack Color Combinations
+                                                        </strong>
+
+                                                        <small>
+                                                            Create colour combinations for this pack.
+                                                            Select exactly {{ pack.quantity }} colour(s).
+                                                        </small>
+
+                                                    </div>
+
+                                                    <button type="button" class="primary-small-btn"
+                                                        (click)="addPackCombination(pack)">
+
+                                                        ＋ Add Combination
+
+                                                    </button>
+
+                                                </div>
+
+
+                                                <!-- =================================================
+         COMBINATION LIST
+    ================================================== -->
+
+                                                <div class="pack-combinations-list" *ngIf="pack.combinations?.length">
+
+                                                    <div class="pack-combination-card" *ngFor="
+                let combination of pack.combinations;
+                let combinationIndex = index
+            ">
+
+                                                        <!-- Combination Header -->
+                                                        <div class="pack-combination-header">
+
+                                                            <div>
+
+                                                                <strong>
+                                                                    Combination {{ combinationIndex + 1 }}
+                                                                </strong>
+
+                                                                <small>
+                                                                    Select {{ pack.quantity }} colour(s)
+                                                                </small>
+
+                                                            </div>
+
+                                                            <button type="button" class="danger-small-btn" (click)="
+                        removePackCombination(
+                            pack,
+                            combinationIndex
+                        )
+                    ">
+
+                                                                🗑 Remove
+
+                                                            </button>
+
+                                                        </div>
+
+
+                                                        <!-- Combination Name -->
+                                                        <div class="form-group">
+
+                                                            <label>
+                                                                Combination Name
+                                                            </label>
+
+                                                            <input type="text" [(ngModel)]="combination.name"
+                                                                [ngModelOptions]="{ standalone: true }" [placeholder]="
+                        pack.quantity === 2
+                            ? 'Example: Black + White'
+                            : 'Example: Black + Grey + White'
+                    ">
+
+                                                        </div>
+
+
+                                                        <!-- Combination Colors -->
+                                                        <div class="pack-subsection">
+
+                                                            <div class="pack-subsection-title">
+
+                                                                <div>
+
+                                                                    <strong>
+                                                                        Combination Colors
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        Select exactly
+                                                                        {{ pack.quantity }}
+                                                                        colors.
+                                                                    </small>
+
+                                                                </div>
+
+                                                                <span class="photo-count">
+
+                                                                    {{ combination.colors?.length || 0 }}
+                                                                    /
+                                                                    {{ pack.quantity }}
+
+                                                                </span>
+
+                                                            </div>
+
+
+                                                            <div class="pack-selection-list">
+
+                                                                <button type="button" class="pack-color-option" *ngFor="
+                            let color of availableColors
+                        " [class.selected]="
+                            combination.colors?.includes(color)
+                        " (click)="
+                            togglePackCombinationColor(
+                                pack,
+                                combination,
+                                color
+                            )
+                        ">
+
+                                                                    <span class="color-dot" [style.background]="
+                                getColorValue(color)
+                            ">
+                                                                    </span>
+
+                                                                    {{ color }}
+
+                                                                    <span *ngIf="
+                                combination.colors?.includes(color)
+                            ">
+
+                                                                        ✓
+
+                                                                    </span>
+
+                                                                </button>
+
+                                                            </div>
+
+                                                        </div>
+
+
+                                                        <!-- Combination Photos -->
+                                                        <div class="pack-subsection">
+
+                                                            <div class="pack-subsection-title">
+
+                                                                <div>
+
+                                                                    <strong>
+                                                                        Combination Photos
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        Add photos for this exact colour combination.
+                                                                    </small>
+
+                                                                </div>
+
+                                                                <span class="photo-count">
+
+                                                                    {{ combination.previews?.length || 0 }}/5
+
+                                                                </span>
+
+                                                            </div>
+
+
+                                                            <div class="pack-photo-grid">
+
+                                                                <div class="pack-photo" *ngFor="
+                            let image of combination.previews;
+                            let imageIndex = index
+                        ">
+
+                                                                    <img [src]="image" alt="Combination Image">
+
+                                                                    <button type="button" (click)="
+                                removePackCombinationImage(
+                                    pack,
+                                    combination,
+                                    imageIndex
+                                )
+                            ">
+
+                                                                        ✕
+
+                                                                    </button>
+
+                                                                </div>
+
+
+                                                                <label class="pack-photo-upload" *ngIf="
+                            (combination.previews?.length || 0) < 5
+                        ">
+
+                                                                    <span>
+                                                                        ＋
+                                                                    </span>
+
+                                                                    <strong>
+                                                                        Add Photo
+                                                                    </strong>
+
+                                                                    <small>
+                                                                        JPG / PNG / WEBP
+                                                                    </small>
+
+                                                                    <input type="file" accept="image/*" multiple
+                                                                        (change)="
+                                onPackCombinationImagesSelected(
+                                    $event,
+                                    pack,
+                                    combination
+                                )
+                            ">
+
+                                                                </label>
+
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <!-- Empty State -->
+                                                <div class="empty-builder" *ngIf="!pack.combinations?.length">
+
+                                                    <div class="empty-icon">
+                                                        🎨
+                                                    </div>
+
+                                                    <h4>
+                                                        No Color Combinations
+                                                    </h4>
+
+                                                    <p>
+                                                        Add combinations such as
+                                                        Black + White for this pack.
+                                                    </p>
+
+                                                    <button type="button" class="primary-small-btn"
+                                                        (click)="addPackCombination(pack)">
+
+                                                        ＋ Add Combination
+
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+
+
+                                            <!-- =====================================================
+                                                 PACK SHIPPING DETAILS
+                                            ====================================================== -->
+
+
+                                            <div class="pack-subsection pack-shipping-section"
+                                                style="grid-column: 1 / -1;">
+
+                                                <div class="pack-subsection-title">
+
+                                                    <div>
+
+                                                        <strong>
+                                                            <i class="fa-solid fa-truck"></i>
+                                                            Shiprocket Package Details
+                                                        </strong>
+
+                                                        <small>
+                                                            Enter the final packed weight and dimensions for this
+                                                            specific pack. Shiprocket will use these values when
+                                                            creating the shipment.
+                                                        </small>
+
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="form-grid">
+
+                                                    <div class="form-group">
+
+                                                        <label>
+                                                            Package Weight *
+                                                        </label>
+
+                                                        <div class="input-with-suffix">
+
+                                                            <input type="number" min="0.001" max="50" step="0.001"
+                                                                [(ngModel)]="pack.weight" placeholder="1.200"
+                                                                inputmode="decimal">
+
+                                                            <span>kg</span>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <div class="form-group">
+
+                                                        <label>
+                                                            Package Length *
+                                                        </label>
+
+                                                        <div class="input-with-suffix">
+
+                                                            <input type="number" min="1" max="200" step="0.1"
+                                                                [(ngModel)]="pack.length" placeholder="30"
+                                                                inputmode="decimal">
+
+                                                            <span>cm</span>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <div class="form-group">
+
+                                                        <label>
+                                                            Package Breadth *
+                                                        </label>
+
+                                                        <div class="input-with-suffix">
+
+                                                            <input type="number" min="1" max="200" step="0.1"
+                                                                [(ngModel)]="pack.breadth" placeholder="25"
+                                                                inputmode="decimal">
+
+                                                            <span>cm</span>
+
+                                                        </div>
+
+                                                    </div>
+
+
+                                                    <div class="form-group">
+
+                                                        <label>
+                                                            Package Height *
+                                                        </label>
+
+                                                        <div class="input-with-suffix">
+
+                                                            <input type="number" min="1" max="200" step="0.1"
+                                                                [(ngModel)]="pack.height" placeholder="8"
+                                                                inputmode="decimal">
+
+                                                            <span>cm</span>
+
+                                                        </div>
+
+                                                    </div>
+
+                                                </div>
+
+
+                                                <div class="shipping-info-box" style="margin-top:12px;">
+
+                                                    <div>
+
+                                                        <strong>
+                                                            <i class="fa-solid fa-box"></i>
+                                                            Pack shipping package
+                                                        </strong>
+
+                                                        <span>
+                                                            {{ pack.weight || 0 }} kg
+                                                            &nbsp;·&nbsp;
+                                                            {{ pack.length || 0 }} ×
+                                                            {{ pack.breadth || 0 }} ×
+                                                            {{ pack.height || 0 }} cm
+                                                        </span>
+
+                                                    </div>
 
                                                 </div>
 
@@ -2965,7 +3367,7 @@
 
                             </div>
 
-                            <div class="summary-row">
+                            <div class="summary-row" *ngIf="newProduct.productMode === 'single'">
 
                                 <span>
                                     Weight
@@ -2978,7 +3380,7 @@
                             </div>
 
 
-                            <div class="summary-row">
+                            <div class="summary-row" *ngIf="newProduct.productMode === 'single'">
 
                                 <span>
                                     Package
@@ -2993,6 +3395,11 @@
                                     cm
                                 </strong>
 
+                            </div>
+
+                            <div class="summary-row" *ngIf="newProduct.productMode === 'pack'">
+                                <span>Pack Shipping</span>
+                                <strong>{{ productPacks.length }} pack(s)</strong>
                             </div>
 
                         </div>

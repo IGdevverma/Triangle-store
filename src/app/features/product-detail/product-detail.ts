@@ -324,14 +324,70 @@ export class ProductDetail implements OnInit {
 
   get availablePacks(): ProductPack[] {
 
-    return this.product?.packs ?? [];
+    if (!this.product) {
+      return [];
+    }
+
+    // ==========================================
+    // SINGLE PRODUCT OPTION
+    // ==========================================
+    const singlePack: ProductPack = {
+      id: 'single',
+      name: 'Single',
+      quantity: 1,
+
+      price: Number(this.product.price ?? 0),
+
+      originalPrice: Number(
+        this.product.originalPrice ??
+        this.product.price ??
+        0
+      ),
+
+      discount: Number(
+        this.product.discount ?? 0
+      ),
+
+      colors: this.product.colors ?? [],
+      sizes: this.product.sizes ?? [],
+
+      images: [],
+      image: this.product.image || ''
+    };
+
+    // ==========================================
+    // ADMIN CREATED PACKS
+    // ==========================================
+    const adminPacks = (this.product.packs ?? [])
+      .filter(pack => Number(pack.quantity) > 1)
+      .sort(
+        (a, b) =>
+          Number(a.quantity) -
+          Number(b.quantity)
+      );
+
+    // ==========================================
+    // FINAL OPTIONS
+    // ==========================================
+    return [
+      singlePack,
+      ...adminPacks
+    ];
 
   }
 
 
+  // =====================================================
+  // AVAILABLE PACK COMBINATIONS
+  // =====================================================
+
   get availableCombinations(): ColorCombination[] {
 
-    return this.product?.colorCombinations ?? [];
+    if (!this.selectedPackData) {
+      return [];
+    }
+
+    return this.selectedPackData.combinations || [];
 
   }
 
@@ -473,32 +529,35 @@ export class ProductDetail implements OnInit {
 
   getPackDisplayImage(pack: ProductPack): string {
 
-    // ==============================
-    // 1 VEST
-    // ==============================
+    // ==========================================
+    // SINGLE PRODUCT
+    // ==========================================
     if (pack.quantity === 1) {
 
-      const colorImage =
-        this.getSelectedColorImage();
+      // Selected colour ki individual image
+      const colorImage = this.getSelectedColorImage();
 
       if (colorImage) {
         return colorImage;
       }
 
-      // Existing colorsData fallback
-      if (this.selectedColorData?.image) {
-        return this.selectedColorData.image;
-      }
+      // Fallback: first product image
+      return (
+        this.product?.images?.[1] ||
+        this.product?.image ||
+        this.product?.images?.[0] ||
+        ''
+      );
     }
 
-    // ==============================
-    // 3 PACK / OTHER PACKS
-    // ==============================
+    // ==========================================
+    // 2 PACK / 3 PACK / FUTURE PACKS
+    // ==========================================
     return (
       pack.images?.[0] ||
       pack.image ||
-      this.product?.images?.[0] ||
       this.product?.image ||
+      this.product?.images?.[0] ||
       ''
     );
   }
@@ -506,40 +565,70 @@ export class ProductDetail implements OnInit {
   // =====================================================
   // PACK
   // =====================================================
-
   selectPack(pack: ProductPack): void {
 
     this.selectedPack = pack.id;
-
     this.selectedPackData = pack;
 
-    // Reset color combination when pack changes
+    // Reset combination
     this.selectedCombination = '';
     this.selectedCombinationData = undefined;
 
-    // Load selected pack images
-    if (pack.quantity === 1 && this.selectedColorData?.image) {
+    // ==========================================
+    // SINGLE
+    // ==========================================
+    if (pack.quantity === 1) {
 
-      // 1 Vest → selected colour ki image
-      this.productImages = [
-        this.selectedColorData.image
-      ];
+      this.productImages =
+        this.product?.images?.length
+          ? [...this.product.images]
+          : this.product?.image
+            ? [this.product.image]
+            : [];
+
+      const colorImage = this.getSelectedColorImage();
 
       this.selectedImage =
-        this.selectedColorData.image;
+        colorImage ||
+        this.productImages[0] ||
+        '';
 
     }
+
+    // ==========================================
+    // 3 PACK
+    // ==========================================
+    else if (pack.quantity === 3) {
+
+      // 3-pack ki apni images ONLY
+      this.productImages =
+        pack.images?.length
+          ? [...pack.images]
+          : pack.image
+            ? [pack.image]
+            : [];
+
+      this.selectedImage =
+        this.productImages[0] ||
+        '';
+
+    }
+
+    // ==========================================
+    // OTHER PACKS — 2 PACK etc.
+    // ==========================================
     else if (pack.images?.length) {
 
-      // 3 Pack → pack images
       this.productImages = [
         ...pack.images
       ];
 
       this.selectedImage =
-        this.productImages[0] ?? '';
+        this.productImages[0] ||
+        '';
 
     }
+
     else if (pack.image) {
 
       this.productImages = [
@@ -550,6 +639,10 @@ export class ProductDetail implements OnInit {
         pack.image;
 
     }
+
+    // ==========================================
+    // FALLBACK
+    // ==========================================
     else {
 
       this.productImages =
@@ -560,18 +653,17 @@ export class ProductDetail implements OnInit {
             : [];
 
       this.selectedImage =
-        this.productImages[0] ?? '';
-
-
+        this.productImages[0] ||
+        '';
 
     }
 
     this.resetZoom();
 
     console.log('Selected Pack:', pack);
+    console.log('Pack Quantity:', pack.quantity);
     console.log('Pack Images:', this.productImages);
   }
-
 
   // =====================================================
   // COLOR COMBINATION
@@ -964,6 +1056,18 @@ export class ProductDetail implements OnInit {
 
           this.product =
             product;
+
+
+
+          console.log(
+            'PACK DATA FROM API:',
+            product.packs?.map(pack => ({
+              id: pack.id,
+              name: pack.name,
+              quantity: pack.quantity,
+              combinations: pack.combinations
+            }))
+          );
 
 
           // ------------------------------------------------

@@ -40,6 +40,12 @@ interface ProductPackEditor {
   colors: string[];
   sizes: string[];
 
+  /** Shiprocket package details for this specific pack */
+  weight: number;
+  length: number;
+  breadth: number;
+  height: number;
+
   /** New files selected from the computer */
   files: File[];
 
@@ -51,6 +57,7 @@ interface ProductPackEditor {
 
   /** Existing images removed by the user */
   removedImages: string[];
+  combinations: ColorCombinationEditor[];
 }
 
 interface ColorCombinationEditor {
@@ -802,7 +809,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (!(order as any).shiprocketShipmentId) {
+    if (!order.shiprocketShipmentId) {
       this.toastr.warning(
         'Create Shiprocket shipment first.',
         'Shiprocket'
@@ -810,7 +817,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if ((order as any).shiprocketAwbCode) {
+    if (order.shiprocketAwbCode) {
       this.toastr.info(
         'AWB is already assigned to this order.',
         'Shiprocket'
@@ -875,7 +882,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (!(order as any).shiprocketShipmentId) {
+    if (!order.shiprocketShipmentId) {
       this.toastr.warning(
         'Create Shiprocket shipment first.',
         'Shiprocket'
@@ -883,7 +890,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    if (!(order as any).shiprocketAwbCode) {
+    if (!order.shiprocketAwbCode) {
       this.toastr.warning(
         'Assign AWB before generating pickup.',
         'Shiprocket'
@@ -1270,7 +1277,10 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
   private resetProductEditor(): void {
     this.newProduct = this.createEmptyProduct();
+    this.clearProductEditorState();
+  }
 
+  private clearProductEditorState(): void {
     this.productPacks = [];
     this.colorCombinations = [];
 
@@ -1301,6 +1311,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     if (!product) {
       return;
     }
+
+    this.clearProductEditorState();
 
     this.editing = true;
     this.showModal = true;
@@ -1384,11 +1396,12 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       ? 'pack'
       : 'single';
   }
-
   private mapExistingPacks(
     packs: any[]
   ): ProductPackEditor[] {
+
     return packs.map((pack: any, index: number) => {
+
       const existingImages =
         Array.isArray(pack?.images)
           ? [...pack.images]
@@ -1397,40 +1410,94 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
             : [];
 
       return {
+
+        // =====================================================
+        // PACK BASIC INFORMATION
+        // =====================================================
+
         id:
           String(pack?.id || '') ||
           `pack-${Date.now()}-${index}`,
 
-        name: String(pack?.name || ''),
+        name:
+          String(pack?.name || ''),
 
-        quantity: Math.max(
-          1,
-          this.toNumber(pack?.quantity) || 1
-        ),
+        quantity:
+          Math.max(
+            1,
+            this.toNumber(pack?.quantity) || 1
+          ),
 
-        price: this.toNumber(pack?.price),
+        // =====================================================
+        // PACK PRICING
+        // =====================================================
 
-        originalPrice: this.toNumber(
-          pack?.originalPrice
-        ),
+        price:
+          this.toNumber(pack?.price),
 
-        discount: this.toNumber(pack?.discount),
+        originalPrice:
+          this.toNumber(pack?.originalPrice),
 
-        colors: this.normalizeStringArray(
-          pack?.colors
-        ),
+        discount:
+          this.toNumber(pack?.discount),
 
-        sizes: this.normalizeStringArray(
-          pack?.sizes
-        ),
+        // =====================================================
+        // PACK OPTIONS
+        // =====================================================
+
+        colors:
+          this.normalizeStringArray(
+            pack?.colors
+          ),
+
+        sizes:
+          this.normalizeStringArray(
+            pack?.sizes
+          ),
+
+        // =====================================================
+        // SHIPROCKET PACKAGE DETAILS
+        //
+        // Old packs may not have these fields.
+        // Therefore safe defaults are used.
+        // =====================================================
+
+        weight:
+          this.toNumber(pack?.weight) || 0.5,
+
+        length:
+          this.toNumber(pack?.length) || 25,
+
+        breadth:
+          this.toNumber(pack?.breadth) || 20,
+
+        height:
+          this.toNumber(pack?.height) || 3,
+
+        // =====================================================
+        // PACK IMAGES
+        // =====================================================
 
         files: [],
 
-        previews: [...existingImages],
+        previews:
+          [...existingImages],
 
-        existingImages: [...existingImages],
+        existingImages:
+          [...existingImages],
 
-        removedImages: []
+        removedImages: [],
+
+        // =====================================================
+        // PACK-SPECIFIC COMBINATIONS
+        // =====================================================
+
+        combinations:
+          this.mapExistingCombinations(
+            Array.isArray(pack?.combinations)
+              ? pack.combinations
+              : []
+          )
       };
     });
   }
@@ -1483,10 +1550,14 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const formData = this.buildProductFormData(false);
 
+    this.spinner.show();
+
     this.productService
       .addProduct(formData)
       .subscribe({
         next: () => {
+          this.spinner.hide();
+
           this.toastr.success(
             'Product added successfully.',
             'Success'
@@ -1497,6 +1568,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           this.loadProducts();
         },
         error: (error) => {
+          this.spinner.hide();
+
           console.error(
             'Add product failed:',
             error
@@ -1528,6 +1601,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
     const formData = this.buildProductFormData(true);
 
+    this.spinner.show();
+
     this.productService
       .updateProduct(
         this.newProduct._id,
@@ -1535,6 +1610,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       )
       .subscribe({
         next: (response: any) => {
+          this.spinner.hide();
+
           const updatedProduct =
             response?.product;
 
@@ -1565,6 +1642,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
           this.loadProducts();
         },
         error: (error) => {
+          this.spinner.hide();
+
           console.error(
             'Update product failed:',
             error
@@ -1594,39 +1673,119 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const sizes = this.normalizeStringArray(
       this.newProduct.sizes
     );
-
     const packs = isPackProduct
       ? this.productPacks.map(pack => ({
         id: pack.id,
-        name: pack.name.trim() || 'Pack',
-        quantity: Math.max(
-          1,
-          this.toNumber(pack.quantity)
-        ),
-        price: this.toNumber(pack.price),
-        originalPrice: this.toNumber(
-          pack.originalPrice
-        ),
-        discount: this.calculateDiscountValue(
-          pack.price,
-          pack.originalPrice
-        ),
-        colors: this.normalizeStringArray(
-          pack.colors
-        ),
-        sizes: this.normalizeStringArray(
-          pack.sizes
-        ),
-        images: isUpdate
-          ? [...pack.existingImages]
-          : [],
-        image: isUpdate
-          ? pack.existingImages[0] || ''
-          : '',
-        imageCount: pack.files.length,
-        removedImages: isUpdate
-          ? [...pack.removedImages]
-          : []
+
+        name:
+          pack.name.trim() || 'Pack',
+
+        quantity:
+          Math.max(
+            1,
+            this.toNumber(pack.quantity)
+          ),
+
+        price:
+          this.toNumber(pack.price),
+
+        originalPrice:
+          this.toNumber(pack.originalPrice),
+
+        discount:
+          this.calculateDiscountValue(
+            pack.price,
+            pack.originalPrice
+          ),
+
+        colors:
+          this.normalizeStringArray(
+            pack.colors
+          ),
+
+        sizes:
+          this.normalizeStringArray(
+            pack.sizes
+          ),
+
+        // =====================================================
+        // SHIPROCKET PACKAGE DETAILS
+        // =====================================================
+
+        weight:
+          this.toNumber(pack.weight),
+
+        length:
+          this.toNumber(pack.length),
+
+        breadth:
+          this.toNumber(pack.breadth),
+
+        height:
+          this.toNumber(pack.height),
+
+        // =====================================================
+        // PACK IMAGES
+        // =====================================================
+
+        images:
+          isUpdate
+            ? [...pack.existingImages]
+            : [],
+
+        image:
+          isUpdate
+            ? pack.existingImages[0] || ''
+            : '',
+
+        imageCount:
+          pack.files.length,
+
+        removedImages:
+          isUpdate
+            ? [...pack.removedImages]
+            : [],
+
+        // =====================================================
+        // PACK-SPECIFIC COMBINATIONS
+        // =====================================================
+
+        combinations:
+          (pack.combinations || []).map(
+            combination => ({
+              id: combination.id,
+
+              name:
+                combination.name.trim() ||
+                'Color Combination',
+
+              colors: combination.colors
+                .map(color => String(color).trim())
+                .filter(
+                  color =>
+                    color &&
+                    color.toLowerCase() !== 'undefined'
+                ),
+
+              images:
+                isUpdate
+                  ? [...combination.existingImages]
+                  : [],
+
+              image:
+                isUpdate
+                  ? combination.existingImages[0] || ''
+                  : '',
+
+              imageCount:
+                combination.files.length,
+
+              removedImages:
+                isUpdate
+                  ? [...combination.removedImages]
+                  : []
+            })
+          )
       }))
       : [];
 
@@ -1871,6 +2030,26 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       });
     }
 
+
+
+
+    /* ========================================================
+   PACK COMBINATION IMAGES
+   ======================================================== */
+
+    if (isPackProduct) {
+      this.productPacks.forEach(pack => {
+        (pack.combinations || []).forEach(combination => {
+          combination.files.forEach(file => {
+            formData.append(
+              'packCombinationImages',
+              file
+            );
+          });
+        });
+      });
+    }
+
     /* ========================================================
        COLOR COMBINATION IMAGES
        ======================================================== */
@@ -1928,12 +2107,15 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       return false;
     }
 
-    if (
-      !this.editing &&
-      this.selectedFiles.length === 0
-    ) {
+    const hasMainProductImage =
+      this.imagePreviews.length > 0 ||
+      this.selectedFiles.length > 0;
+
+    if (!hasMainProductImage) {
       this.showValidation(
-        'Please upload a Main Product Image.'
+        this.editing
+          ? 'Please keep at least one Main Product Image.'
+          : 'Please upload a Main Product Image.'
       );
       return false;
     }
@@ -2079,6 +2261,36 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
         ) {
           this.showValidation(
             `Original Price must be greater than or equal to Selling Price for Pack ${index + 1}.`
+          );
+          return false;
+        }
+
+        // --------------------------------------------------------
+        // SHIPROCKET PACK VALIDATION
+        // Each pack is a separate physical shipment package.
+        // --------------------------------------------------------
+        const packWeight = this.toNumber(pack.weight);
+        const packLength = this.toNumber(pack.length);
+        const packBreadth = this.toNumber(pack.breadth);
+        const packHeight = this.toNumber(pack.height);
+
+        if (packWeight <= 0 || packWeight > 50) {
+          this.showValidation(
+            `Please enter a valid weight between 0.001 and 50 kg for Pack ${index + 1}.`
+          );
+          return false;
+        }
+
+        if (
+          packLength <= 0 ||
+          packBreadth <= 0 ||
+          packHeight <= 0 ||
+          packLength > 200 ||
+          packBreadth > 200 ||
+          packHeight > 200
+        ) {
+          this.showValidation(
+            `Please enter valid dimensions between 0.1 and 200 cm for Pack ${index + 1}.`
           );
           return false;
         }
@@ -2283,9 +2495,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
      ========================================================== */
 
   addPack(): void {
-    if (
-      this.newProduct.productMode !== 'pack'
-    ) {
+    if (this.newProduct.productMode !== 'pack') {
       this.toastr.info(
         'Switch Product Mode to "Pack Product" before adding a pack.',
         'Pack Builder'
@@ -2302,10 +2512,18 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       discount: 0,
       colors: [],
       sizes: [],
+
+      // Shiprocket package defaults for a new pack.
+      weight: 0.5,
+      length: 25,
+      breadth: 20,
+      height: 3,
+
       files: [],
       previews: [],
       existingImages: [],
-      removedImages: []
+      removedImages: [],
+      combinations: []
     });
 
     this.newProduct.packs = this.productPacks;
@@ -2357,6 +2575,110 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     } else {
       pack.sizes.push(size);
     }
+  }
+
+
+
+  // ==========================================================
+  // PACK-SPECIFIC COLOR COMBINATIONS
+  // ==========================================================
+
+  addPackCombination(
+    pack: ProductPackEditor
+  ): void {
+
+    if (!pack) {
+      return;
+    }
+
+    if (!Array.isArray(pack.combinations)) {
+      pack.combinations = [];
+    }
+
+    pack.combinations.push({
+
+      id: this.createEditorId(
+        'pack-combination'
+      ),
+
+      name: '',
+
+      colors: [],
+
+      files: [],
+
+      previews: [],
+
+      existingImages: [],
+
+      removedImages: []
+
+    });
+  }
+
+
+  removePackCombination(
+    pack: ProductPackEditor,
+    combinationIndex: number
+  ): void {
+
+    if (!pack) {
+      return;
+    }
+
+    if (
+      combinationIndex < 0 ||
+      combinationIndex >= pack.combinations.length
+    ) {
+      return;
+    }
+
+    pack.combinations.splice(
+      combinationIndex,
+      1
+    );
+  }
+
+  togglePackCombinationColor(
+    pack: ProductPackEditor,
+    combination: ColorCombinationEditor,
+    color: string
+  ): void {
+
+    if (
+      !pack ||
+      !combination ||
+      !color
+    ) {
+      return;
+    }
+
+    if (!Array.isArray(combination.colors)) {
+      combination.colors = [];
+    }
+
+    const requiredQuantity =
+      Math.max(
+        1,
+        this.toNumber(pack.quantity)
+      );
+
+    // ========================================================
+    // MAX COLORS = PACK QUANTITY
+    // ========================================================
+
+    if (
+      combination.colors.length >=
+      requiredQuantity
+    ) {
+      return;
+    }
+
+    // ========================================================
+    // ADD COLOR
+    // ========================================================
+
+    combination.colors.push(color);
   }
 
   /* ==========================================================
@@ -2675,6 +2997,164 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     );
 
     input.value = '';
+  }
+
+  // ==========================================================
+  // PACK COMBINATION IMAGE MANAGEMENT
+  // ==========================================================
+
+  onPackCombinationImagesSelected(
+    event: Event,
+    pack: ProductPackEditor,
+    combination: ColorCombinationEditor
+  ): void {
+
+    const input =
+      event.target as HTMLInputElement;
+
+    if (
+      !input?.files ||
+      input.files.length === 0 ||
+      !pack ||
+      !combination
+    ) {
+      return;
+    }
+
+
+    const files =
+      Array.from(input.files);
+
+
+    // ========================================================
+    // MAX 5 IMAGES PER COMBINATION
+    // ========================================================
+
+    if (
+      combination.previews.length +
+      files.length >
+      5
+    ) {
+
+      this.toastr.warning(
+        'Maximum 5 photos allowed per combination.',
+        'Image Limit'
+      );
+
+      input.value = '';
+
+      return;
+    }
+
+
+    // ========================================================
+    // PROCESS FILES
+    // ========================================================
+
+    files.forEach(file => {
+
+      if (
+        !this.validateImageFile(file)
+      ) {
+        return;
+      }
+
+
+      combination.files.push(
+        file
+      );
+
+
+      this.readFileAsDataUrl(
+        file
+      ).then(preview => {
+
+        combination.previews.push(
+          preview
+        );
+
+      });
+
+    });
+
+
+    input.value = '';
+  }
+
+
+  removePackCombinationImage(
+    pack: ProductPackEditor,
+    combination: ColorCombinationEditor,
+    imageIndex: number
+  ): void {
+
+    if (
+      !pack ||
+      !combination
+    ) {
+      return;
+    }
+
+
+    const image =
+      combination.previews[
+      imageIndex
+      ];
+
+
+    if (!image) {
+      return;
+    }
+
+
+    // ========================================================
+    // EXISTING CLOUDINARY IMAGE
+    // ========================================================
+
+    if (
+      this.isRemoteImage(image)
+    ) {
+
+      this.removeExistingImage(
+        image,
+        combination.existingImages,
+        combination.removedImages
+      );
+
+    } else {
+
+      // ======================================================
+      // NEWLY SELECTED LOCAL FILE
+      // ======================================================
+
+      const newFileIndex =
+        this.getLocalFileIndex(
+          combination.previews,
+          combination.existingImages,
+          imageIndex
+        );
+
+
+      if (
+        newFileIndex >= 0 &&
+        newFileIndex <
+        combination.files.length
+      ) {
+
+        combination.files.splice(
+          newFileIndex,
+          1
+        );
+
+      }
+
+    }
+
+
+    combination.previews.splice(
+      imageIndex,
+      1
+    );
   }
 
   /**

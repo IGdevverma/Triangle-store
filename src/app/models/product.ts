@@ -59,6 +59,21 @@ export interface ProductPack {
 
   // Sizes available for this pack
   sizes?: string[];
+
+    // =====================================================
+  // PACK COLOR COMBINATIONS
+  // =====================================================
+
+  // Example:
+  //
+  // 2 Pack
+  // Black + Grey
+  // White + Black
+  //
+  // 3 Pack
+  // Black + Grey + White
+
+  combinations?: ColorCombination[];
 }
 
 

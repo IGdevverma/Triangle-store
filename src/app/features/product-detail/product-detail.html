@@ -240,7 +240,7 @@
           </div>
 
           <span class="review-count">
-            {{ reviews.length }} Reviews
+            {{ reviews.length ? reviews.length + " Reviews" : "No reviews yet" }}
           </span>
 
         </div>
@@ -250,7 +250,7 @@
              PRICE
         ================================================== -->
 
-        <div class="price-block">
+        <div class="price-block premium-price-block">
 
           <div class="price-row">
 
@@ -370,11 +370,15 @@
              PACK COMBINATION
         ================================================== -->
 
+        <!-- =================================================
+     PACK COMBINATION
+================================================== -->
+
         <section class="option-section combination-section" *ngIf="
-            selectedPackData &&
-            selectedPackData.quantity > 1 &&
-            availableCombinations.length > 0
-          ">
+    selectedPackData &&
+    selectedPackData.quantity > 1 &&
+    availableCombinations.length > 0
+  ">
 
           <div class="option-header">
 
@@ -397,13 +401,12 @@
 
             <button type="button" class="combination-card" *ngFor="let combination of availableCombinations"
               [class.selected]="
-                selectedCombination === combination.id
-              " (click)="selectCombination(combination)">
-
+        selectedCombination === combination.id
+      " (click)="selectCombination(combination)">
 
               <span class="combination-selected" *ngIf="
-                  selectedCombination === combination.id
-                ">
+          selectedCombination === combination.id
+        ">
                 ✓
               </span>
 
@@ -489,8 +492,10 @@
         <!-- =================================================
              COLOR
         ================================================== -->
-
-        <section class="option-section" *ngIf="availableColors.length > 0">
+        <section class="option-section" *ngIf="
+    availableColors.length > 0 &&
+    (!selectedPackData || selectedPackData.quantity === 1)
+  ">
 
           <div class="option-header">
 
@@ -625,7 +630,7 @@
              ACTION BUTTONS
         ================================================== -->
 
-        <div class="purchase-actions">
+        <div class="purchase-actions premium-purchase-actions">
 
 
           <button type="button" class="add-cart-button" (click)="addToCart()" [disabled]="p.stock <= 0">

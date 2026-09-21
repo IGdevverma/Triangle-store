@@ -27,7 +27,8 @@ router.post(
     upload.fields([
         { name: "images", maxCount: 5 },
         { name: "packImages", maxCount: 50 },
-        { name: "combinationImages", maxCount: 100 }
+        { name: "combinationImages", maxCount: 100 },
+        { name: "packCombinationImages", maxCount: 100 }
     ]),
     createProduct
 );
@@ -53,7 +54,9 @@ router.put(
     upload.fields([
         { name: "images", maxCount: 5 },
         { name: "packImages", maxCount: 50 },
-        { name: "combinationImages", maxCount: 100 }
+        { name: "combinationImages", maxCount: 100 },
+
+        { name: "packCombinationImages", maxCount: 100 }
     ]),
     updateProduct
 );

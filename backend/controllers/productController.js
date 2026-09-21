@@ -179,6 +179,12 @@ const createProduct = asyncHandler(async (req, res) => {
         );
 
 
+
+        const packCombinationFiles = await uploadFilesToCloudinary(
+            getFiles(req.files, "packCombinationImages")
+        );
+
+
         if (productFiles.length === 0) {
 
             return res.status(400).json({
@@ -199,6 +205,13 @@ const createProduct = asyncHandler(async (req, res) => {
 
         const combinationImageUrls =
             combinationFiles.map(
+                file => file.path
+            );
+
+
+
+        const packCombinationImageUrls =
+            packCombinationFiles.map(
                 file => file.path
             );
 
@@ -384,19 +397,22 @@ const createProduct = asyncHandler(async (req, res) => {
 
 
         // =====================================================
-        // PACK-WISE IMAGES
+        // PACK-WISE IMAGES + PACK COMBINATION IMAGES
         // =====================================================
 
         let packImageIndex = 0;
-
+        let packCombinationImageIndex = 0;
 
         packs = packs.map(pack => {
+
+            // =================================================
+            // PACK IMAGES
+            // =================================================
 
             const imageCount = toNumber(
                 pack.imageCount,
                 0
             );
-
 
             const newImages =
                 packImageUrls.slice(
@@ -404,13 +420,7 @@ const createProduct = asyncHandler(async (req, res) => {
                     packImageIndex + imageCount
                 );
 
-
             packImageIndex += imageCount;
-
-
-            /*
-             * Existing images if frontend sends any
-             */
 
             const existingPackImages =
                 Array.isArray(pack.images)
@@ -419,29 +429,105 @@ const createProduct = asyncHandler(async (req, res) => {
                         ? [pack.image]
                         : [];
 
-
             const finalPackImages = [
                 ...existingPackImages,
                 ...newImages
             ];
 
 
+            // =================================================
+            // PACK COMBINATIONS
+            // =================================================
+
+            const combinations =
+                Array.isArray(pack.combinations)
+                    ? pack.combinations
+                    : [];
+
+            const processedCombinations =
+                combinations.map(combination => {
+
+                    const combinationImageCount =
+                        toNumber(
+                            combination.imageCount,
+                            0
+                        );
+
+                    const newCombinationImages =
+                        packCombinationImageUrls.slice(
+                            packCombinationImageIndex,
+                            packCombinationImageIndex +
+                            combinationImageCount
+                        );
+
+                    packCombinationImageIndex +=
+                        combinationImageCount;
+
+
+                    const existingCombinationImages =
+                        Array.isArray(combination.images)
+                            ? combination.images
+                            : combination.image
+                                ? [combination.image]
+                                : [];
+
+
+                    const finalCombinationImages = [
+                        ...existingCombinationImages,
+                        ...newCombinationImages
+                    ];
+
+
+                    // Remove request-only field
+                    const {
+                        imageCount,
+                        ...cleanCombination
+                    } = combination;
+
+
+                    return {
+                        ...cleanCombination,
+
+                        image:
+                            finalCombinationImages[0] || "",
+
+                        images:
+                            finalCombinationImages
+                    };
+
+                });
+
+
+            // =================================================
+            // REMOVE REQUEST-ONLY PACK FIELD
+            // =================================================
+
+            const {
+                imageCount: _imageCount,
+                ...cleanPack
+            } = pack;
+
+
+            // =================================================
+            // FINAL PACK
+            // =================================================
+
             return {
 
-                ...pack,
+                ...cleanPack,
 
                 image:
                     finalPackImages[0] || "",
 
                 images:
-                    finalPackImages
+                    finalPackImages,
+
+                combinations:
+                    processedCombinations
 
             };
 
         });
-
-
-
         // =====================================================
         // COLOR COMBINATION IMAGES
         // =====================================================
@@ -938,9 +1024,28 @@ const updateProduct = asyncHandler(
                 );
 
 
+
+            // =================================================
+            // PACK COMBINATION IMAGES
+            // =================================================
+
+            const packCombinationFiles =
+                await uploadFilesToCloudinary(
+                    getFiles(req.files, "packCombinationImages")
+                );
+
+            const newPackCombinationImages =
+                packCombinationFiles.map(
+                    file => file.path
+                );
             console.log(
                 "NEW COMBINATION IMAGES:",
                 newCombinationImages
+            );
+
+            console.log(
+                "NEW PACK COMBINATION IMAGES:",
+                newPackCombinationImages
             );
 
 
@@ -987,9 +1092,13 @@ const updateProduct = asyncHandler(
             // =================================================
 
             let packImageIndex = 0;
-
+            let packCombinationImageIndex = 0;
 
             packs = packs.map(pack => {
+
+                // =================================================
+                // PACK IMAGES
+                // =================================================
 
                 const imageCount =
                     toNumber(
@@ -998,15 +1107,10 @@ const updateProduct = asyncHandler(
                     );
 
 
-                /*
-                 * Newly uploaded images
-                 */
-
                 const uploadedImages =
                     newPackImages.slice(
                         packImageIndex,
-                        packImageIndex +
-                        imageCount
+                        packImageIndex + imageCount
                     );
 
 
@@ -1014,39 +1118,27 @@ const updateProduct = asyncHandler(
                     imageCount;
 
 
-
-                /*
-                 * Existing pack images
-                 */
+                // =================================================
+                // EXISTING PACK IMAGES
+                // =================================================
 
                 const existingPackImages =
-                    Array.isArray(
-                        pack.images
-                    )
+                    Array.isArray(pack.images)
                         ? pack.images
                         : pack.image
                             ? [pack.image]
                             : [];
 
 
-
-                /*
-                 * Images removed by frontend
-                 */
+                // =================================================
+                // REMOVED PACK IMAGES
+                // =================================================
 
                 const removedPackImages =
-                    Array.isArray(
-                        pack.removedImages
-                    )
+                    Array.isArray(pack.removedImages)
                         ? pack.removedImages
                         : [];
 
-
-
-                /*
-                 * Keep existing images that
-                 * were NOT removed
-                 */
 
                 const filteredExistingPackImages =
                     existingPackImages.filter(
@@ -1057,11 +1149,9 @@ const updateProduct = asyncHandler(
                     );
 
 
-
-                /*
-                 * Existing remaining images
-                 * + newly uploaded images
-                 */
+                // =================================================
+                // FINAL PACK IMAGES
+                // =================================================
 
                 const finalPackImages = [
 
@@ -1072,13 +1162,134 @@ const updateProduct = asyncHandler(
                 ];
 
 
+                // =================================================
+                // PACK COMBINATIONS
+                // =================================================
+
+                const combinations =
+                    Array.isArray(pack.combinations)
+                        ? pack.combinations
+                        : [];
+
+
+                const processedCombinations =
+                    combinations.map(combination => {
+
+                        const combinationImageCount =
+                            toNumber(
+                                combination.imageCount,
+                                0
+                            );
+
+
+                        // =============================================
+                        // NEW COMBINATION IMAGES
+                        // =============================================
+
+                        const uploadedCombinationImages =
+                            newPackCombinationImages.slice(
+                                packCombinationImageIndex,
+                                packCombinationImageIndex +
+                                combinationImageCount
+                            );
+
+
+                        packCombinationImageIndex +=
+                            combinationImageCount;
+
+
+                        // =============================================
+                        // EXISTING COMBINATION IMAGES
+                        // =============================================
+
+                        const existingCombinationImages =
+                            Array.isArray(
+                                combination.images
+                            )
+                                ? combination.images
+                                : combination.image
+                                    ? [combination.image]
+                                    : [];
+
+
+                        // =============================================
+                        // REMOVED COMBINATION IMAGES
+                        // =============================================
+
+                        const removedCombinationImages =
+                            Array.isArray(
+                                combination.removedImages
+                            )
+                                ? combination.removedImages
+                                : [];
+
+
+                        const filteredExistingCombinationImages =
+                            existingCombinationImages.filter(
+                                image =>
+                                    !removedCombinationImages.includes(
+                                        image
+                                    )
+                            );
+
+
+                        // =============================================
+                        // FINAL COMBINATION IMAGES
+                        // =============================================
+
+                        const finalCombinationImages = [
+
+                            ...filteredExistingCombinationImages,
+
+                            ...uploadedCombinationImages
+
+                        ];
+
+
+                        // =============================================
+                        // REMOVE FRONTEND-ONLY FIELDS
+                        // =============================================
+
+                        const {
+                            imageCount: _combinationImageCount,
+                            removedImages: _removedCombinationImages,
+                            ...cleanCombination
+                        } = combination;
+
+
+                        return {
+
+                            ...cleanCombination,
+
+                            image:
+                                finalCombinationImages[0] || "",
+
+                            images:
+                                finalCombinationImages
+
+                        };
+
+                    });
+
+
+                // =================================================
+                // REMOVE FRONTEND-ONLY PACK FIELDS
+                // =================================================
+
+                const {
+                    imageCount: _packImageCount,
+                    removedImages: _removedPackImages,
+                    ...cleanPack
+                } = pack;
+
+
+                // =================================================
+                // FINAL PACK
+                // =================================================
 
                 return {
 
-                    ...pack,
-
-                    imageCount:
-                        finalPackImages.length,
+                    ...cleanPack,
 
                     image:
                         finalPackImages[0] || "",
@@ -1086,13 +1297,8 @@ const updateProduct = asyncHandler(
                     images:
                         finalPackImages,
 
-                    /*
-                     * Don't save frontend-only
-                     * removedImages field
-                     */
-
-                    removedImages:
-                        undefined
+                    combinations:
+                        processedCombinations
 
                 };
 
@@ -1443,7 +1649,9 @@ const updateProduct = asyncHandler(
 
                 "packImages",
 
-                "combinationImages"
+                "combinationImages",
+
+                "packCombinationImages"
 
             ]);
 
