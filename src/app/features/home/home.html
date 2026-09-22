@@ -1,96 +1,46 @@
-<!-- Hero Slider -->
+<!-- =========================================
+             HERO SLIDER
+========================================= -->
+
 <section class="hero-slider">
 
-    <img [src]="sliderImages[currentSlide]" class="slider-image" alt="Triangle Sports Banner">
+    <img
+        [src]="sliderImages[currentSlide]"
+        class="slider-image"
+        alt="Triangle Sports"
+    >
 
-    <div class="overlay">
-
-        <div class="hero-content">
-
-            <span class="hero-tag">
-
-                PERFORMANCE SPORTSWEAR
-
-            </span>
-
-            <h1>
-
-                Performance
-                <br>
-
-                Starts Here
-
-            </h1>
-
-            <p class="description">
-
-                Premium sportswear and complete manufacturing
-                solutions designed for athletes, teams,
-                academies and brands.
-
-            </p>
-
-            <div class="hero-buttons">
-
-                <a routerLink="/shop" class="btn btn-primary">
-
-                    Shop Collection
-
-                </a>
-
-                <a routerLink="/request-quote" class="btn btn-outline hero-outline">
-
-                    Manufacturing
-
-                </a>
-
-            </div>
-
-            <div class="hero-trust">
-
-                <div class="stars">
-
-                    ★★★★★
-
-                </div>
-
-                <div>
-
-                    Trusted by
-
-                    <strong>
-
-                        500+
-
-                    </strong>
-
-                    Teams Across India
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-    <button class="nav prev" (click)="prevSlide()">
-
+    <!-- PREVIOUS -->
+    <button
+        class="nav prev"
+        type="button"
+        aria-label="Previous banner"
+        (click)="prevSlide()"
+    >
         ❮
-
     </button>
 
-    <button class="nav next" (click)="nextSlide()">
-
+    <!-- NEXT -->
+    <button
+        class="nav next"
+        type="button"
+        aria-label="Next banner"
+        (click)="nextSlide()"
+    >
         ❯
-
     </button>
 
+    <!-- DOTS -->
     <div class="dots">
 
-        <span *ngFor="let image of sliderImages; let i = index" [class.active]="i === currentSlide"
-            (click)="goToSlide(i)">
-
-        </span>
+        <button
+            *ngFor="let image of sliderImages; let i = index"
+            type="button"
+            [class.active]="i === currentSlide"
+            [attr.aria-label]="'Go to banner ' + (i + 1)"
+            (click)="goToSlide(i)"
+        >
+        </button>
 
     </div>
 
