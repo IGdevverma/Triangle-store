@@ -292,7 +292,7 @@
 
     overflow: hidden;
 
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 
@@ -305,6 +305,12 @@
     height: 100%;
 }
 
+/* Keep the image itself inside the card without forcing a crop. */
+.product-image-link {
+    overflow: hidden;
+    background: #f7f7f7;
+}
+
 
 /* Product image */
 
@@ -314,13 +320,16 @@
     width: 100%;
     height: 100%;
 
-    object-fit: cover;
+    /* Keep the complete product/model visible.
+       Do not crop faces, heads, shoes or product edges. */
+    object-fit: contain;
+    object-position: center center;
 
     transition: transform 0.5s ease;
 }
 
 .product-card:hover .product-image {
-    transform: scale(1.025);
+    transform: scale(1.01);
 }
 
 
@@ -623,7 +632,7 @@
     height: 100%;
     min-height: 500px;
 
-    background: #f5f5f5;
+    background: #f7f7f7;
 }
 
 .quick-view-image img {
@@ -632,7 +641,9 @@
     width: 100%;
     height: 100%;
 
-    object-fit: cover;
+    /* Never crop the model in quick view either. */
+    object-fit: contain;
+    object-position: center center;
 }
 
 
