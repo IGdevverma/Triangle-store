@@ -473,7 +473,6 @@ export class ProductDetail implements OnInit {
   // =====================================================
   // COLOR
   // =====================================================
-
   selectColor(color: string): void {
 
     this.selectedColor = color;
@@ -489,11 +488,13 @@ export class ProductDetail implements OnInit {
 
     this.selectedColorData = colorData;
 
-    // Selected colour ki main image
-    if (colorData?.image) {
-      this.setProductImage(colorData.image);
-    }
+    const colorImage =
+      colorData?.image ||
+      this.getSelectedColorImage();
 
+    if (colorImage) {
+      this.setProductImage(colorImage);
+    }
   }
 
   getSelectedColorImage(): string {
@@ -828,7 +829,8 @@ export class ProductDetail implements OnInit {
       this.selectedSize,
       this.selectedColor,
       this.selectedPack,
-      this.selectedCombination
+      this.selectedCombination,
+      this.selectedImage
     );
 
 
@@ -878,21 +880,14 @@ export class ProductDetail implements OnInit {
     // ---------------------------------------------------
     // Store exact selected product variant
     // ---------------------------------------------------
-
     this.cartService.setBuyNowItem(
-
       this.product,
-
       this.quantity,
-
       this.selectedSize,
-
       this.selectedColor,
-
       this.selectedPack,
-
-      this.selectedCombination
-
+      this.selectedCombination,
+      this.selectedImage
     );
 
 
@@ -1107,7 +1102,7 @@ export class ProductDetail implements OnInit {
 
           this.seoService.updateSeo(
 
-            `${product.name} | Triangle Sports`,
+            `${product.name} | Triangle Sports®`,
 
             product.description ||
             'Premium sportswear by Triangle Sports.',

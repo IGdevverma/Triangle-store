@@ -59,6 +59,8 @@ export interface CartItem extends Product {
   selectedCombination?: string;
 
 
+
+  selectedImage?: string;
   /**
    * Actual selling price of ONE selected pack.
    *
@@ -485,7 +487,8 @@ export class CartService {
     selectedSize?: string,
     selectedColor?: string,
     selectedPack?: string,
-    selectedCombination?: string
+    selectedCombination?: string,
+    selectedImage?: string
   ): void {
 
     // ---------------------------------------------------
@@ -666,6 +669,15 @@ export class CartService {
       existingItem.packQuantity =
         packQuantity;
 
+      existingItem.image =
+        selectedImage ||
+        existingItem.image ||
+        product.image;
+
+      existingItem.selectedImage =
+        selectedImage ||
+        existingItem.selectedImage;
+
     }
 
 
@@ -674,10 +686,16 @@ export class CartService {
     // ===================================================
 
     else {
-
       const newItem: CartItem = {
 
         ...product,
+
+        // IMPORTANT:
+        // Selected pack / combination image becomes
+        // the cart + checkout image.
+        image:
+          selectedImage ||
+          product.image,
 
         quantity,
 
@@ -688,6 +706,8 @@ export class CartService {
         selectedPack,
 
         selectedCombination,
+
+        selectedImage,
 
         cartPrice,
 
@@ -765,7 +785,8 @@ export class CartService {
     selectedSize?: string,
     selectedColor?: string,
     selectedPack?: string,
-    selectedCombination?: string
+    selectedCombination?: string,
+    selectedImage?: string
   ): void {
 
     const cartItemKey =
@@ -792,7 +813,8 @@ export class CartService {
         selectedSize,
         selectedColor,
         selectedPack,
-        selectedCombination
+        selectedCombination,
+        selectedImage
       );
 
       return;
@@ -832,8 +854,8 @@ export class CartService {
       return;
     }
 
-   
-   
+
+
 
     // Quantity decrease
     existingItem.quantity--;
@@ -1123,7 +1145,8 @@ export class CartService {
     selectedSize?: string,
     selectedColor?: string,
     selectedPack?: string,
-    selectedCombination?: string
+    selectedCombination?: string,
+    selectedImage?: string
   ): void {
 
     // ---------------------------------------------------
@@ -1234,6 +1257,9 @@ export class CartService {
     this.buyNowItem = {
 
       ...product,
+      image:
+        selectedImage ||
+        product.image,
 
       quantity,
 

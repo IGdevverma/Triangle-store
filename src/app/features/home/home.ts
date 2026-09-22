@@ -85,14 +85,14 @@ export class Home implements OnInit {
 
     /* Update SEO */
     this.seoService.updateSeo(
-      'Triangle Sports | Premium Sportswear Manufacturer',
+      ' TriangleSports®',
 
       'Premium Sportswear Manufacturer offering gym wear, jerseys, vests, activewear and custom team kits.',
 
       'Sportswear,Gym Wear,Triangle Sports,Team Jerseys,Vests'
     );
 
-    /* Load Products */
+    
     /* Load Products */
     this.productService.getProducts().subscribe({
 
