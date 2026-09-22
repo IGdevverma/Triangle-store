@@ -1814,7 +1814,12 @@ button {
 
 /* =========================================================
    RECOMMENDATIONS
-========================================================= */
+   =========================================================
+   Important image rule:
+   Product/model images must NEVER be cropped in this section.
+   The card owns the aspect ratio; the image preserves its
+   complete source composition using object-fit: contain.
+   ========================================================= */
 
 .recommendation-section {
   margin-top: 64px;
@@ -1823,12 +1828,17 @@ button {
 .product-card-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 15px;
+  gap: 18px;
+  width: 100%;
 }
 
 .recommendation-card {
   position: relative;
+  min-width: 0;
   overflow: hidden;
+
+  display: flex;
+  flex-direction: column;
 
   border: 1px solid var(--ts-border);
   border-radius: var(--ts-radius-md);
@@ -1844,44 +1854,100 @@ button {
 }
 
 .recommendation-card:hover {
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   border-color: #d4d4d4;
   box-shadow: var(--ts-shadow-md);
 }
 
+/*
+ * Fixed visual ratio instead of a fixed pixel height.
+ * This keeps the cards consistent across desktop/tablet/mobile.
+ */
 .recommendation-image {
+  position: relative;
+
   width: 100%;
-  height: 290px;
+  aspect-ratio: 4 / 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   overflow: hidden;
-  background: #f5f5f5;
+
+  background:
+    linear-gradient(145deg, #fafafa 0%, #f3f3f4 100%);
 }
 
+/*
+ * CRITICAL:
+ * contain = full image visible.
+ * Do NOT change this to cover for product/model photography.
+ */
 .recommendation-image img {
+  display: block;
+
   width: 100%;
   height: 100%;
-  display: block;
-  object-fit: cover;
-  transition: transform 350ms ease;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+  object-position: center center;
+
+  /*
+   * Small breathing room prevents the subject from touching
+   * the card edges and gives the section a premium look.
+   */
+  padding: 0;
+
+  transition: opacity 220ms ease;
 }
 
+/*
+ * Do not scale the image on hover.
+ * Scaling can re-introduce cropping even when object-fit is contain.
+ */
 .recommendation-card:hover .recommendation-image img {
-  transform: scale(1.045);
+  opacity: 0.96;
 }
 
 .recommendation-info {
-  padding: 13px;
+  position: relative;
+
+  min-height: 72px;
+  padding: 13px 13px 14px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  background: var(--ts-white);
 }
 
 .recommendation-info h3 {
   margin: 0 0 6px;
+
   color: #222;
   font-size: 11px;
   line-height: 1.35;
+  font-weight: 700;
+
+  /*
+   * Prevent very long names from making cards uneven.
+   */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .recommendation-info strong {
   color: var(--ts-black);
   font-size: 13px;
+  line-height: 1.2;
+  font-weight: 800;
 }
 
 .recommendation-color {
@@ -1897,42 +1963,160 @@ button {
 .color-dot {
   width: 13px;
   height: 13px;
+  flex: 0 0 13px;
+
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 50%;
 }
 
 /* =========================================================
    QUICK ADD
-========================================================= */
+   ========================================================= */
 
 .quick-add {
   position: absolute;
-  right: 9px;
-  bottom: 9px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 5;
 
-  padding: 7px 10px;
+  min-height: 30px;
+  padding: 6px 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   border: 1px solid var(--ts-black);
   border-radius: 6px;
 
-  background: var(--ts-white);
+  background: rgba(255, 255, 255, 0.97);
   color: var(--ts-black);
 
   font-size: 8px;
+  line-height: 1;
   font-weight: 850;
 
   cursor: pointer;
 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+
   transition:
     background 180ms ease,
     color 180ms ease,
-    transform 180ms ease;
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .quick-add:hover {
   background: var(--ts-black);
   color: var(--ts-white);
   transform: translateY(-1px);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+}
+
+.quick-add:active {
+  transform: translateY(0);
+}
+
+/*
+ * Keep the complete product image visible on every breakpoint.
+ * Only the card width changes; the image ratio remains controlled.
+ */
+@media (max-width: 950px) {
+  .product-card-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .product-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .recommendation-image {
+    aspect-ratio: 4 / 5;
+  }
+
+  .recommendation-info {
+    min-height: 68px;
+    padding: 11px 10px 12px;
+  }
+
+  .recommendation-info h3 {
+    font-size: 10px;
+  }
+
+  .recommendation-info strong {
+    font-size: 12px;
+  }
+
+  .quick-add {
+    right: 8px;
+    bottom: 8px;
+    min-height: 28px;
+    padding: 5px 8px;
+    font-size: 7px;
+  }
+}
+
+@media (max-width: 520px) {
+  .recommendation-section {
+    margin-top: 48px;
+  }
+
+  .product-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .recommendation-image {
+    aspect-ratio: 4 / 5;
+  }
+
+  .recommendation-info {
+    min-height: 64px;
+    padding: 10px 9px 11px;
+  }
+
+  .recommendation-info h3 {
+    margin-bottom: 5px;
+    font-size: 9px;
+  }
+
+  .recommendation-info strong {
+    font-size: 11px;
+  }
+
+  .quick-add {
+    right: 7px;
+    bottom: 7px;
+  }
+}
+
+@media (max-width: 380px) {
+  .product-card-grid {
+    gap: 7px;
+  }
+
+  .recommendation-info {
+    padding: 9px 8px 10px;
+  }
+
+  .recommendation-info h3 {
+    font-size: 8.5px;
+  }
+
+  .recommendation-info strong {
+    font-size: 10px;
+  }
+
+  .quick-add {
+    min-height: 26px;
+    padding: 4px 7px;
+    font-size: 7px;
+  }
 }
 
 /* =========================================================
