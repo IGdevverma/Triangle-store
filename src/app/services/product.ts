@@ -27,6 +27,7 @@ export class ProductService {
 
     return this.products$;
   }
+
   getProductById(id: string): Observable<any> {
 
     return this.http.get<any>(
@@ -36,31 +37,33 @@ export class ProductService {
   }
 
   addProduct(product: FormData): Observable<Product> {
+
     this.products$ = undefined;
+
     return this.http.post<Product>(
-
       this.apiUrl,
-
       product
-
     );
 
   }
 
   updateProduct(id: string, product: FormData) {
+
     this.products$ = undefined;
+
     return this.http.put(
       `${this.apiUrl}/${id}`,
       product
     );
+
   }
 
   deleteProduct(id: string): Observable<void> {
+
     this.products$ = undefined;
+
     return this.http.delete<void>(
-
       `${this.apiUrl}/${id}`
-
     );
 
   }

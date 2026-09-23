@@ -320,7 +320,11 @@ export class ProductDetail implements OnInit {
     return this.product?.colorsData ?? [];
 
   }
-
+  get hasPackOptions(): boolean {
+    return !!this.product?.packs?.some(
+      pack => Number(pack.quantity) > 1
+    );
+  }
 
   get availablePacks(): ProductPack[] {
 
@@ -902,6 +906,32 @@ export class ProductDetail implements OnInit {
   }
 
 
+  getOptimizedImage(
+    imageUrl: string,
+    width: number = 800
+  ): string {
+
+    if (!imageUrl) {
+      return '';
+    }
+
+    // Only optimize Cloudinary images
+    if (!imageUrl.includes('res.cloudinary.com')) {
+      return imageUrl;
+    }
+
+    // Avoid applying transformation twice
+    if (imageUrl.includes('/f_auto,q_auto')) {
+      return imageUrl;
+    }
+
+    return imageUrl.replace(
+      '/image/upload/',
+      `/image/upload/f_auto,q_auto,w_${width}/`
+    );
+  }
+
+
   // =====================================================
   // IMAGE
   // =====================================================
@@ -1124,9 +1154,19 @@ export class ProductDetail implements OnInit {
           // RELATED PRODUCTS
           // ------------------------------------------------
 
-          this.loadRelatedProducts(
-            product
-          );
+          // ------------------------------------------------
+          // MAIN PRODUCT PAGE READY
+          // ------------------------------------------------
+
+          this.loadingService.hide();
+
+
+          // ------------------------------------------------
+          // RELATED PRODUCTS
+          // ------------------------------------------------
+          // Load separately without blocking the page.
+
+          this.loadRelatedProducts(product);
 
         },
 
@@ -2057,135 +2097,106 @@ export class ProductDetail implements OnInit {
 
   private loadRelatedProducts(product: Product): void {
 
-    this.productService.getProducts().subscribe({
+    // Related products are secondary content.
+    // Do not block the main product page while loading them.
+    this.relatedProducts = [];
 
-      next: (response: any) => {
+    const load = () => {
 
-        const products =
-          (response?.products ?? []) as Product[];
-        console.log('CURRENT PRODUCT:', product);
-        console.log(
-          'ALL PRODUCTS:',
-          products.map(p => ({
-            name: p.name,
-            productMode: p.productMode,
-            productGroup: p.productGroup
-          }))
-        );
+      this.productService.getProducts().subscribe({
 
-        const currentProductId =
-          product._id ?? product.id;
+        next: (response: any) => {
 
-        const currentGroup =
-          product.productGroup
-            ?.trim()
-            .toLowerCase()
-            .replace(/[\s_]+/g, '-');
+          const products =
+            (response?.products ?? []) as Product[];
 
-        // ---------------------------------------------------
-        // No product group = no recommendations
-        // ---------------------------------------------------
+          const currentProductId =
+            product._id ?? product.id;
 
-        if (!currentGroup) {
+          const currentGroup =
+            product.productGroup
+              ?.trim()
+              .toLowerCase()
+              .replace(/[\s_]+/g, '-');
+
+          // No product group = no recommendations
+          if (!currentGroup) {
+            this.relatedProducts = [];
+            return;
+          }
+
+          this.relatedProducts = products
+
+            // Same product family
+            .filter(item => {
+
+              const itemId =
+                item._id ?? item.id;
+
+              const itemGroup =
+                item.productGroup
+                  ?.trim()
+                  .toLowerCase()
+                  .replace(/[\s_]+/g, '-');
+
+              const itemMode =
+                item.productMode
+                  ?.trim()
+                  .toLowerCase();
+
+              return (
+                itemGroup === currentGroup &&
+                itemMode === 'single' &&
+                itemId !== currentProductId &&
+                item.status !== 'Hidden'
+              );
+
+            })
+
+            // Remove duplicates
+            .filter(
+              (item, index, array) =>
+                array.findIndex(
+                  x =>
+                    (x._id ?? x.id) ===
+                    (item._id ?? item.id)
+                ) === index
+            )
+
+            // Maximum 4
+            .slice(0, 4);
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Error loading related products:',
+            error
+          );
 
           this.relatedProducts = [];
 
-          this.loadingService.hide();
-
-          return;
         }
 
+      });
 
-        // ---------------------------------------------------
-        // FIND SINGLE PRODUCTS FROM SAME PRODUCT FAMILY
-        // ---------------------------------------------------
+    };
 
-        this.relatedProducts = products
-          .filter(item => {
+    // Give the main product page priority.
+    // Related products can load after the first render.
+    if ('requestIdleCallback' in window) {
 
-            const itemId =
-              item._id ?? item.id;
+      (window as any).requestIdleCallback(
+        load,
+        { timeout: 2000 }
+      );
 
-            const itemGroup =
-              item.productGroup
-                ?.trim()
-                .toLowerCase()
-                .replace(/[\s_]+/g, '-');
+    } else {
 
-            const itemMode =
-              item.productMode
-                ?.trim()
-                .toLowerCase();
-            console.log('CHECK PRODUCT:', {
-              name: item.name,
-              productGroup: itemGroup,
-              productMode: itemMode
-            });
+      setTimeout(load, 1000);
 
-            return (
-
-              // Same product family
-              itemGroup === currentGroup
-
-              &&
-
-              // Only Single Products
-              itemMode === 'single'
-
-              &&
-
-              // Don't show current product
-              itemId !== currentProductId
-
-              &&
-
-              // Don't show hidden products
-              item.status !== 'Hidden'
-
-            );
-
-          })
-
-          // Remove duplicate products
-          .filter(
-            (item, index, array) =>
-
-              array.findIndex(
-                x =>
-                  (x._id ?? x.id) ===
-                  (item._id ?? item.id)
-              ) === index
-
-          )
-
-          // Maximum 4 recommendations
-          .slice(0, 4);
-
-
-        console.log(
-          'YOU MAY ALSO LIKE:',
-          this.relatedProducts
-        );
-
-
-        this.loadingService.hide();
-
-      },
-
-      error: error => {
-
-        console.error(
-          'Error loading related products:',
-          error
-        );
-
-        this.relatedProducts = [];
-
-        this.loadingService.hide();
-
-      }
-
-    });
+    }
 
   }
   previousImage(): void {
