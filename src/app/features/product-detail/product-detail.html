@@ -9,7 +9,7 @@
        PROMO BAR
   ====================================================== -->
 
- 
+
 
 
   <!-- =====================================================
@@ -70,7 +70,7 @@
             <button type="button" class="thumbnail" *ngFor="let image of productImages"
               [class.active]="selectedImage === image" (click)="selectImage(image)">
 
-              <img [src]="image" [alt]="p.name" loading="lazy">
+              <img [src]="getOptimizedImage(image, 200)" [alt]="p.name" loading="lazy" decoding="async">
 
             </button>
 
@@ -99,9 +99,9 @@
 
 
             <!-- IMAGE -->
-
-            <img class="main-product-image" [src]="selectedImage || p.image" [alt]="p.name"
-              [style.transform]="zoomTransform" [style.transform-origin]="zoomOrigin" loading="eager">
+            <img class="main-product-image" [src]="getOptimizedImage(selectedImage || p.image, 1000)" [alt]="p.name"
+              [style.transform]="zoomTransform" [style.transform-origin]="zoomOrigin" loading="eager"
+              fetchpriority="high" decoding="async">
 
 
             <!-- PREVIOUS -->
@@ -267,7 +267,7 @@
              PACK SELECTION
         ================================================== -->
 
-        <section class="option-section" *ngIf="availablePacks.length > 0">
+        <section class="option-section" *ngIf="hasPackOptions">
 
           <div class="option-header">
 
@@ -306,7 +306,8 @@
 
               <div class="pack-image">
 
-                <img [src]="getPackDisplayImage(pack)" [alt]="pack.name || (pack.quantity + ' Pack')" loading="lazy">
+                <img [src]="getOptimizedImage(getPackDisplayImage(pack), 300)"
+                  [alt]="pack.name || (pack.quantity + ' Pack')" loading="lazy" decoding="async">
 
               </div>
 
@@ -396,9 +397,8 @@
               <!-- IMAGE -->
 
               <div class="combination-image">
-
-                <img *ngIf="combination.images?.[0]" [src]="combination.images?.[0]" [alt]="combination.name"
-                  loading="lazy">
+                <img *ngIf="combination.images?.[0]" [src]="getOptimizedImage(combination.images?.[0] || '', 300)"
+                  [alt]="combination.name" loading="lazy" decoding="async">
 
 
                 <!-- FALLBACK -->
@@ -905,7 +905,8 @@
 
           <div class="recommendation-image">
 
-            <img [src]="item.images?.[0] || item.image" [alt]="item.name + ' - ' + item.selectedColor" loading="lazy">
+            <img [src]="getOptimizedImage(item.images?.[0] || item.image, 500)"
+              [alt]="item.name + ' - ' + item.selectedColor" loading="lazy" decoding="async">
 
           </div>
 
