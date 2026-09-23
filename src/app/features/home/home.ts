@@ -37,7 +37,7 @@ export class Home implements OnInit {
     'assets/images/home/training-banner.png',
     'assets/images/home/vest-banner.png',
     'assets/images/home/track-pant-banner.png'
-    
+
   ];
 
   currentSlide = 0;
@@ -337,6 +337,30 @@ export class Home implements OnInit {
     }
 
     return image;
+  }
+
+  formatPrice(value: number | undefined): string {
+    const price = Number(value || 0);
+
+    return price.toLocaleString('en-IN', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  getEmiAmount(price: number): number {
+    if (!price || price <= 0) {
+      return 0;
+    }
+
+    return Math.ceil(price / 6);
+  }
+
+  trackByProduct(
+    index: number,
+    product: Product
+  ): string | number {
+    return product._id || product.id || index;
   }
 }
 

@@ -4,42 +4,23 @@
 
 <section class="hero-slider">
 
-    <img
-        [src]="sliderImages[currentSlide]"
-        class="slider-image"
-        alt="Triangle Sports"
-    >
+    <img [src]="sliderImages[currentSlide]" class="slider-image" alt="Triangle Sports">
 
     <!-- PREVIOUS -->
-    <button
-        class="nav prev"
-        type="button"
-        aria-label="Previous banner"
-        (click)="prevSlide()"
-    >
+    <button class="nav prev" type="button" aria-label="Previous banner" (click)="prevSlide()">
         ❮
     </button>
 
     <!-- NEXT -->
-    <button
-        class="nav next"
-        type="button"
-        aria-label="Next banner"
-        (click)="nextSlide()"
-    >
+    <button class="nav next" type="button" aria-label="Next banner" (click)="nextSlide()">
         ❯
     </button>
 
     <!-- DOTS -->
     <div class="dots">
 
-        <button
-            *ngFor="let image of sliderImages; let i = index"
-            type="button"
-            [class.active]="i === currentSlide"
-            [attr.aria-label]="'Go to banner ' + (i + 1)"
-            (click)="goToSlide(i)"
-        >
+        <button *ngFor="let image of sliderImages; let i = index" type="button" [class.active]="i === currentSlide"
+            [attr.aria-label]="'Go to banner ' + (i + 1)" (click)="goToSlide(i)">
         </button>
 
     </div>
@@ -55,9 +36,12 @@
 
 
 <!-- Featured Products -->
+<!-- =========================================================
+     FEATURED PRODUCTS
+========================================================= -->
+
 <section class="featured-products">
 
-    <!-- HEADER -->
     <div class="featured-header">
 
         <span class="section-label">
@@ -76,46 +60,56 @@
     </div>
 
 
-    <!-- PRODUCTS -->
     <div class="products-grid">
 
-        <div class="product-item" *ngFor="let product of bestSellerProducts" [routerLink]="['/product', product._id]">
+        <article class="product-item" *ngFor="let product of bestSellerProducts; trackBy: trackByProduct"
+            [routerLink]="['/product', product._id || product.id]">
 
             <!-- IMAGE -->
             <div class="product-image-wrapper">
 
-                <!-- DISCOUNT -->
                 <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
                     SAVE {{ product.discount }}%
                 </span>
 
-                <img [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" />
+                <img [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" loading="lazy"
+                    decoding="async" />
 
             </div>
 
 
-            <!-- PRODUCT NAME -->
-            <h3 class="product-name">
-                {{ product.name }}
-            </h3>
+            <!-- INFO -->
+            <div class="product-info">
+
+                <h3 class="product-name">
+                    {{ product.name }}
+                </h3>
 
 
-            <!-- PRICE -->
-            <div class="price-row">
+                <!-- PRICE -->
+                <!-- PRICE -->
+                <div class="price-row">
 
-                <span class="current-price">
-                    ₹{{ product.price }}
-                </span>
+                    <span class="current-price">
+                        From Rs. {{ formatPrice(product.price) }}
+                    </span>
 
-                <span class="old-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
+                    <span class="old-price" *ngIf="
+            product.originalPrice &&
+            product.originalPrice > product.price
+        ">
+                        Rs. {{ formatPrice(product.originalPrice) }}
+                    </span>
 
-                    ₹{{ product.originalPrice }}
+                </div>
 
-                </span>
+
+
+
 
             </div>
 
-        </div>
+        </article>
 
     </div>
 
