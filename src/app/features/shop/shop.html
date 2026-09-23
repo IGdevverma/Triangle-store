@@ -1,37 +1,56 @@
 <div class="shop-page">
 
-    <!-- ============================= -->
-    <!-- SHOP HEADER -->
-    <!-- ============================= -->
+    <!-- =====================================================
+         SHOP HERO
+    ====================================================== -->
 
     <section class="shop-top">
 
-        <h1>SHOP</h1>
+        <div class="shop-heading">
+
+            <span class="shop-eyebrow">
+                TRIANGLE SPORTS
+            </span>
+
+            <h1>SHOP</h1>
+
+        </div>
+
+
+        <!-- =================================================
+             TOOLBAR
+        ================================================== -->
 
         <div class="shop-toolbar">
 
-            <!-- Search -->
+            <!-- SEARCH -->
+
             <div class="search-box">
 
-                <input
-                    type="text"
-                    placeholder="Search products..."
-                    [(ngModel)]="searchTerm"
-                    (input)="filterProducts()"
-                >
+                <span class="search-icon">
+                    ⌕
+                </span>
+
+                <input type="search" placeholder="Search products..." [(ngModel)]="searchTerm"
+                    (input)="filterProducts()" aria-label="Search products">
+
+                <button *ngIf="searchTerm" type="button" class="search-clear"
+                    (click)="searchTerm = ''; filterProducts()" aria-label="Clear search">
+                    ×
+                </button>
 
             </div>
 
 
-            <!-- Sort -->
+            <!-- SORT -->
+
             <div class="sort-box">
 
-                <label>Sort by:</label>
+                <label for="shop-sort">
+                    Sort by
+                </label>
 
-                <select
-                    [(ngModel)]="selectedSort"
-                    (change)="filterProducts()"
-                >
+                <select id="shop-sort" [(ngModel)]="selectedSort" (change)="filterProducts()">
 
                     <option value="latest">
                         Featured
@@ -45,15 +64,26 @@
                         Price: High to Low
                     </option>
 
+                    <option value="nameAsc">
+                        Name: A–Z
+                    </option>
+
                 </select>
 
             </div>
 
 
-            <!-- Product Count -->
+            <!-- COUNT -->
+
             <div class="product-count">
 
-                {{ filteredProducts.length }} products
+                {{ filteredProducts.length }}
+
+                {{
+                filteredProducts.length === 1
+                ? 'product'
+                : 'products'
+                }}
 
             </div>
 
@@ -62,39 +92,44 @@
     </section>
 
 
-    <!-- ============================= -->
-    <!-- SHOP CONTENT -->
-    <!-- ============================= -->
+    <!-- =====================================================
+         SHOP CONTENT
+    ====================================================== -->
 
     <div class="shop-content">
 
 
-        <!-- ============================= -->
-        <!-- FILTER SIDEBAR -->
-        <!-- ============================= -->
+        <!-- =================================================
+             FILTER SIDEBAR
+        ================================================== -->
 
         <aside class="filter-sidebar">
 
-            <div class="filter-title">
+            <div class="filter-header">
 
-                <span>Filter:</span>
+                <span>
+                    FILTER
+                </span>
+
+                <button type="button" (click)="clearFilters()">
+                    Clear all
+                </button>
 
             </div>
 
 
-            <!-- Availability -->
+            <!-- AVAILABILITY -->
 
             <div class="filter-group">
 
-                <h3>Availability</h3>
+                <h3>
+                    Availability
+                </h3>
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="availability"
-                        checked
-                    >
+                    <input type="radio" name="availability" value="all" [(ngModel)]="selectedAvailability"
+                        (change)="filterProducts()">
 
                     <span>All</span>
 
@@ -103,10 +138,8 @@
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="availability"
-                    >
+                    <input type="radio" name="availability" value="inStock" [(ngModel)]="selectedAvailability"
+                        (change)="filterProducts()">
 
                     <span>In Stock</span>
 
@@ -115,10 +148,8 @@
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="availability"
-                    >
+                    <input type="radio" name="availability" value="outOfStock" [(ngModel)]="selectedAvailability"
+                        (change)="filterProducts()">
 
                     <span>Out of Stock</span>
 
@@ -127,26 +158,17 @@
             </div>
 
 
-            <!-- Category -->
-
-          
-
-            <!-- Price -->
+            <!-- PRICE -->
 
             <div class="filter-group">
 
-                <h3>Price</h3>
-
+                <h3>
+                    Price
+                </h3>
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="price"
-                        value=""
-                        [(ngModel)]="selectedPrice"
-                        (change)="filterProducts()"
-                    >
+                    <input type="radio" name="price" value="" [(ngModel)]="selectedPrice" (change)="filterProducts()">
 
                     <span>All</span>
 
@@ -155,45 +177,52 @@
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="price"
-                        value="under1000"
-                        [(ngModel)]="selectedPrice"
-                        (change)="filterProducts()"
-                    >
+                    <input type="radio" name="price" value="under1000" [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()">
 
-                    <span>Under ₹1000</span>
+                    <span>Under Rs. 1,000</span>
 
                 </label>
 
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="price"
-                        value="1000to3000"
-                        [(ngModel)]="selectedPrice"
-                        (change)="filterProducts()"
-                    >
+                    <input type="radio" name="price" value="1000to3000" [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()">
 
-                    <span>₹1000 – ₹3000</span>
+                    <span>Rs. 1,000 – Rs. 3,000</span>
 
                 </label>
 
 
                 <label class="filter-option">
 
-                    <input
-                        type="radio"
-                        name="price"
-                        value="above3000"
-                        [(ngModel)]="selectedPrice"
-                        (change)="filterProducts()"
-                    >
+                    <input type="radio" name="price" value="above3000" [(ngModel)]="selectedPrice"
+                        (change)="filterProducts()">
 
-                    <span>Above ₹3000</span>
+                    <span>Above Rs. 3,000</span>
+
+                </label>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="filter-group">
+
+                <h3>
+                    Category
+                </h3>
+
+                <label class="filter-option" *ngFor="let category of categories">
+
+                    <input type="radio" name="category" [value]="category" [(ngModel)]="selectedCategory"
+                        (change)="filterProducts()">
+
+                    <span>
+                        {{ category }}
+                    </span>
 
                 </label>
 
@@ -202,198 +231,160 @@
         </aside>
 
 
-        <!-- ============================= -->
-        <!-- PRODUCTS AREA -->
-        <!-- ============================= -->
+        <!-- =================================================
+             PRODUCTS
+        ================================================== -->
 
         <main class="products-area">
 
 
-            <!-- Products Grid -->
+            <!-- EMPTY STATE -->
 
-            <div
-                class="products-grid"
-                *ngIf="filteredProducts.length > 0"
-            >
-
-
-                <!-- Product Card -->
-
-                <article
-                    class="product-card"
-                    *ngFor="let product of filteredProducts"
-                >
-
-
-                    <!-- Product Image -->
-
-                    <div class="product-image-wrapper">
-
-                        <a
-                            [routerLink]="['/product', product._id]"
-                            class="product-image-link"
-                        >
-
-                            <img
-                                [src]="getImageUrl(product.image)"
-                                [alt]="product.name"
-                                class="product-image"
-                            >
-
-                        </a>
-
-
-                        <!-- Product Actions -->
-
-                        <div class="product-actions">
-
-
-                            <!-- Wishlist -->
-
-                            <button
-                                type="button"
-                                class="action-btn"
-                                (click)="toggleWishlist(product)"
-                                [attr.aria-label]="
-                                    isWishlisted(product._id!)
-                                    ? 'Remove from wishlist'
-                                    : 'Add to wishlist'
-                                "
-                            >
-
-                                {{ isWishlisted(product._id!) ? '❤️' : '♡' }}
-
-                            </button>
-
-
-                            <!-- Quick View -->
-
-                            <button
-                                type="button"
-                                class="action-btn"
-                                (click)="openQuickView(product)"
-                                aria-label="Quick view"
-                            >
-
-                                👁
-
-                            </button>
-
-
-                            <!-- Cart -->
-
-                            <button
-                                type="button"
-                                class="action-btn"
-                                (click)="addToCart(product)"
-                                [disabled]="product.stock === 0"
-                                aria-label="Add to cart"
-                            >
-
-                                🛒
-
-                            </button>
-
-                        </div>
-
-
-                        <!-- Out Of Stock Badge -->
-
-                        <span
-                            class="sold-out-badge"
-                            *ngIf="product.stock === 0"
-                        >
-
-                            Sold out
-
-                        </span>
-
-                    </div>
-
-
-                    <!-- Product Information -->
-
-                    <div class="product-info">
-
-
-                        <a
-                            [routerLink]="['/product', product._id]"
-                            class="product-name"
-                        >
-
-                            {{ product.name }}
-
-                        </a>
-
-
-                        <!-- Stock -->
-
-                        <p
-                            class="stock-status in-stock"
-                            *ngIf="product.stock > 5"
-                        >
-
-                            In Stock
-
-                        </p>
-
-
-                        <p
-                            class="stock-status low-stock"
-                            *ngIf="
-                                product.stock > 0 &&
-                                product.stock <= 5
-                            "
-                        >
-
-                            Only {{ product.stock }} left
-
-                        </p>
-
-
-                        <p
-                            class="stock-status out-stock"
-                            *ngIf="product.stock === 0"
-                        >
-
-                            Out of Stock
-
-                        </p>
-
-
-                        <!-- Price -->
-
-                        <div class="product-price">
-
-                            ₹{{ product.price }}
-
-                        </div>
-
-                    </div>
-
-                </article>
-
-            </div>
-
-
-            <!-- ============================= -->
-            <!-- EMPTY PRODUCTS -->
-            <!-- ============================= -->
-
-            <div
-                class="empty-products"
-                *ngIf="filteredProducts.length === 0"
-            >
+            <div class="empty-products" *ngIf="!isLoading && filteredProducts.length === 0">
 
                 <div class="empty-icon">
                     ×
                 </div>
 
-                <h2>No products found</h2>
+                <h2>
+                    No products found
+                </h2>
 
                 <p>
-                    Try changing your filters or search term.
+                    Try changing your search or filters.
                 </p>
+
+                <button type="button" class="reset-btn" (click)="clearFilters()">
+                    Clear filters
+                </button>
+
+            </div>
+
+
+            <!-- PRODUCT GRID -->
+
+            <div class="products-grid" *ngIf="filteredProducts.length > 0">
+
+                <article class="product-card" *ngFor="let product of filteredProducts">
+
+                    <!-- IMAGE -->
+
+                    <div class="product-image-wrapper">
+
+                        <a [routerLink]="[
+                                '/product',
+                                getProductId(product)
+                            ]" class="product-image-link">
+
+                            <img [src]="getImageUrl(product.image, 900)" [alt]="product.name" class="product-image"
+                                loading="lazy" decoding="async">
+
+                        </a>
+
+
+                        <!-- DISCOUNT -->
+
+                        <span class="discount-badge" *ngIf="getProductDiscount(product) > 0">
+                            SAVE {{ getProductDiscount(product) }}%
+                        </span>
+
+
+                        <!-- SOLD OUT -->
+
+                        <span class="sold-out-badge" *ngIf="product.stock === 0">
+                            SOLD OUT
+                        </span>
+
+
+                        <!-- ACTIONS -->
+
+                        <div class="product-actions">
+
+                            <!-- WISHLIST -->
+
+                            <button type="button" class="action-btn" [class.active]="
+                                    isWishlisted(getProductId(product))
+                                " (click)="toggleWishlist(product)" [attr.aria-label]="
+                                    isWishlisted(getProductId(product))
+                                        ? 'Remove from wishlist'
+                                        : 'Add to wishlist'
+                                ">
+
+                                {{
+                                isWishlisted(getProductId(product))
+                                ? '♥'
+                                : '♡'
+                                }}
+
+                            </button>
+
+
+                            <!-- QUICK VIEW -->
+
+                            <button type="button" class="action-btn" (click)="openQuickView(product)"
+                                aria-label="Quick view">
+                                ◉
+                            </button>
+
+
+                            <!-- CART -->
+
+                            <button type="button" class="action-btn" [disabled]="product.stock === 0"
+                                (click)="addToCart(product)" aria-label="Add to cart">
+                                +
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- PRODUCT INFORMATION -->
+
+                    <div class="product-info">
+
+                        <a [routerLink]="[
+                                '/product',
+                                getProductId(product)
+                            ]" class="product-name">
+                            {{ product.name }}
+                        </a>
+
+
+                        <!-- PRICE -->
+
+                        <div class="price-row">
+
+                            <span class="current-price">
+                                From Rs. {{ formatPrice(product.price) }}
+                            </span>
+
+                            <span class="old-price" *ngIf="
+                                    product.originalPrice &&
+                                    product.originalPrice > product.price
+                                ">
+                                Rs. {{ formatPrice(product.originalPrice) }}
+                            </span>
+
+                        </div>
+
+
+                        <!-- COLORS -->
+
+                        <div class="color-swatches" *ngIf="getProductColors(product).length">
+
+                            <span class="color-swatch" *ngFor="
+                                    let color of getProductColors(product)
+                                " [style.background]="getColorValue(color)" [attr.title]="color"></span>
+
+                        </div>
+
+
+                     
+
+                    </div>
+
+                </article>
 
             </div>
 
@@ -402,103 +393,92 @@
     </div>
 
 
-    <!-- ============================= -->
-    <!-- QUICK VIEW MODAL -->
-    <!-- ============================= -->
+    <!-- =====================================================
+         QUICK VIEW MODAL
+    ====================================================== -->
 
-    <div
-        class="modal-overlay"
-        *ngIf="selectedProduct"
-        (click)="closeQuickView()"
-    >
+    <div class="modal-overlay" *ngIf="selectedProduct" (click)="closeQuickView()">
 
-        <div
-            class="quick-view-modal"
-            (click)="$event.stopPropagation()"
-        >
+        <div class="quick-view-modal" (click)="$event.stopPropagation()">
 
-
-            <!-- Close -->
-
-            <button
-                type="button"
-                class="close-btn"
-                (click)="closeQuickView()"
-            >
-
+            <button type="button" class="close-btn" (click)="closeQuickView()" aria-label="Close">
                 ×
-
             </button>
 
 
-            <!-- Image -->
+            <!-- IMAGE -->
 
             <div class="quick-view-image">
 
-                <img
-                    [src]="selectedProduct.image"
-                    [alt]="selectedProduct.name"
-                >
+                <img [src]="
+                        getImageUrl(
+                            selectedProduct.image,
+                            1000
+                        )
+                    " [alt]="selectedProduct.name" loading="eager">
 
             </div>
 
 
-            <!-- Details -->
+            <!-- DETAILS -->
 
             <div class="quick-view-details">
 
-                <p class="quick-view-category">
-
+                <span class="quick-category">
                     {{ selectedProduct.category }}
-
-                </p>
-
+                </span>
 
                 <h2>
-
                     {{ selectedProduct.name }}
-
                 </h2>
 
 
-                <div class="quick-view-price">
+                <div class="quick-price">
 
-                    ₹{{ selectedProduct.price }}
+                    From Rs.
+                    {{ formatPrice(selectedProduct.price) }}
 
                 </div>
 
 
-                <p class="quick-view-stock">
+                <div class="quick-old-price" *ngIf="
+                        selectedProduct.originalPrice &&
+                        selectedProduct.originalPrice >
+                        selectedProduct.price
+                    ">
 
-                    <span *ngIf="selectedProduct.stock > 0">
+                    Rs.
+                    {{ formatPrice(selectedProduct.originalPrice) }}
 
-                        In Stock
+                </div>
 
-                    </span>
 
-                    <span
-                        *ngIf="selectedProduct.stock === 0"
-                        class="out-stock"
-                    >
+                <p class="quick-stock" [class.out]="selectedProduct.stock === 0">
 
-                        Out of Stock
-
-                    </span>
+                    {{
+                    selectedProduct.stock > 0
+                    ? 'In Stock'
+                    : 'Out of Stock'
+                    }}
 
                 </p>
 
 
-                <button
-                    type="button"
-                    class="modal-cart-btn"
-                    (click)="addToCart(selectedProduct)"
-                    [disabled]="selectedProduct.stock === 0"
-                >
+                <a class="view-product-btn" [routerLink]="[
+                        '/product',
+                        getProductId(selectedProduct)
+                    ]" (click)="closeQuickView()">
+                    View Product
+                </a>
+
+
+                <button type="button" class="modal-cart-btn" (click)="addToCart(selectedProduct)"
+                    [disabled]="selectedProduct.stock === 0">
 
                     {{
-                        selectedProduct.stock === 0
-                            ? 'Out of Stock'
-                            : 'Add to Cart'
+                    selectedProduct.stock === 0
+                    ? 'Out of Stock'
+                    : 'Add to Cart'
                     }}
 
                 </button>
