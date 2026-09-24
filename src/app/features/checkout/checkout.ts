@@ -421,14 +421,13 @@ export class Checkout implements OnInit {
   }
 
   get gst(): number {
-    return Math.round(this.taxableAmount * 0.05);
+    return 0;
   }
 
   get grandTotal(): number {
     return (
       this.taxableAmount +
-      this.shipping +
-      this.gst
+      this.shipping
     );
   }
   applyCoupon() {

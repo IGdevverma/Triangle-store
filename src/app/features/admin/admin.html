@@ -2075,6 +2075,111 @@
 
                                 </div>
 
+                                <!-- =====================================================
+     COLOR IMAGE MAPPING
+====================================================== -->
+
+                                <div class="color-image-mapping" *ngIf="newProduct.colors?.length">
+
+                                    <div class="color-image-mapping-header">
+
+                                        <div>
+                                            <h4>Color Images</h4>
+
+                                            <p>
+                                                Assign a product image to each selected color.
+                                            </p>
+                                        </div>
+
+                                        <span class="mapping-count">
+                                            {{ newProduct.colors?.length || 0 }} colors
+                                        </span>
+
+                                    </div>
+
+
+                                    <!-- No product images -->
+                                    <div class="color-image-empty" *ngIf="imagePreviews.length === 0">
+                                        <span>🖼️</span>
+
+                                        <div>
+                                            <strong>Upload product images first</strong>
+
+                                            <small>
+                                                Then you can assign an image to each color.
+                                            </small>
+                                        </div>
+                                    </div>
+
+
+                                    <!-- Color rows -->
+                                    <div class="color-image-row" *ngFor="let color of newProduct.colors">
+
+                                        <!-- Color name -->
+                                        <div class="color-image-label">
+
+                                            <span class="color-dot" [style.background]="getColorValue(color)"></span>
+
+                                            <div>
+                                                <strong>{{ color }}</strong>
+
+                                                <small>
+                                                    {{
+                                                    getColorImage(color)
+                                                    ? 'Image selected'
+                                                    : 'Select an image'
+                                                    }}
+                                                </small>
+                                            </div>
+
+                                        </div>
+
+
+                                        <!-- Images -->
+                                        <div class="color-image-options" *ngIf="imagePreviews.length">
+
+                                            <button type="button" class="color-image-option" *ngFor="
+                    let image of imagePreviews;
+                    let imageIndex = index
+                " [class.selected]="
+                    getColorImage(color) === image
+                " (click)="
+                    selectColorImage(
+                        color,
+                        image,
+                        imageIndex
+                    )
+                ">
+
+                                                <img [src]="image" [alt]="color + ' product image'" />
+
+                                                <span class="color-image-check" *ngIf="
+                        getColorImage(color) === image
+                    ">
+                                                    ✓
+                                                </span>
+
+                                            </button>
+
+                                        </div>
+
+
+                                        <!-- Selected image -->
+                                        <div class="selected-color-image" *ngIf="getColorImage(color)">
+
+                                            <span>Selected</span>
+
+                                            <button type="button" (click)="clearColorImage(color)"
+                                                title="Remove color image">
+                                                ×
+                                            </button>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
 
                                 <!-- Sizes -->
                                 <div class="option-block">

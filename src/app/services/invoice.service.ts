@@ -612,7 +612,7 @@ export class InvoiceService {
 
         const shipping = subtotal >= 1999 ? 0 : 99;
 
-        const gst = Math.round(subtotal * 0.18);
+        const gst = 0;
 
         const grandTotal = order.total;
 

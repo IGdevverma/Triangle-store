@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { Chart } from 'chart.js/auto';
 
 import { ProductService } from '../../services/product';
-import { Product } from '../../models/product';
+import { Product, ProductColor } from '../../models/product';
 import { OrderService } from '../../services/order';
 import { Order, OrderStatus } from '../../models/orders';
 import { AdminService } from '../../services/admin';
@@ -71,11 +71,23 @@ interface ColorCombinationEditor {
   removedImages: string[];
 }
 
+interface ProductColorImageEditor extends ProductColor {
+  fileIndex?: number;
+}
+
 interface EditableProduct extends Product {
+
   productMode: ProductMode;
+
   availableColors?: string;
+
+
+
   packs?: ProductPackEditor[];
+
   colorCombinations?: ColorCombinationEditor[];
+  colorsData?: ProductColorImageEditor[];
+
 
   // Shiprocket package details
   weight: number;
@@ -211,7 +223,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     'Blue',
     'Green',
     'Grey',
-    'Navy'
+    'Navy',
+    'Olive'
   ];
 
   selectedSizes: string[] = [];
@@ -288,6 +301,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
 
       showOnHome: true,
       colors: [],
+      colorsData: [],
       sizes: [],
       status: 'Active',
 
@@ -359,6 +373,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+
+
 
   private calculateProductMetrics(): void {
     this.totalProducts = this.products.length;
@@ -1338,6 +1354,9 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       height: this.toNumber((product as any).height) || 3,
 
       colors,
+      colorsData: Array.isArray((product as EditableProduct).colorsData)
+        ? [...(product as EditableProduct).colorsData!]
+        : [],
       sizes,
       availableColors: colors.join(', ')
     } as EditableProduct;
@@ -1949,6 +1968,80 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       colors.join(', ')
     );
 
+    /* ========================================================
+     COLOR IMAGE MAPPINGS
+     ======================================================== */
+    const colorsData =
+      (this.newProduct.colorsData || [])
+        .filter(colorData =>
+          colors.some(
+            selectedColor =>
+              selectedColor.toLowerCase() ===
+              colorData.name?.toLowerCase()
+          )
+        )
+        .map(colorData => {
+
+          let fileIndex:
+            number | undefined = undefined;
+
+          const image =
+            colorData.image || '';
+
+          // ----------------------------------------------------
+          // LOCAL IMAGE
+          // ----------------------------------------------------
+          if (
+            image &&
+            !this.isRemoteImage(image)
+          ) {
+
+            const previewIndex =
+              this.imagePreviews.indexOf(image);
+
+            if (previewIndex >= 0) {
+
+              const localFileIndex =
+                this.getLocalFileIndex(
+                  this.imagePreviews,
+                  this.existingImages,
+                  previewIndex
+                );
+
+              if (localFileIndex >= 0) {
+                fileIndex =
+                  localFileIndex;
+              }
+            }
+          }
+
+          // ----------------------------------------------------
+          // COLOR DATA
+          // ----------------------------------------------------
+          return {
+            name: colorData.name,
+
+            value:
+              colorData.value ||
+              this.getColorValue(
+                colorData.name
+              ),
+
+            image:
+              this.isRemoteImage(image)
+                ? image
+                : '',
+
+            fileIndex
+          };
+        });
+
+    formData.append(
+      'colorsData',
+      JSON.stringify(colorsData)
+    );
+
+
     formData.append(
       'sizes',
       JSON.stringify(sizes)
@@ -2362,8 +2455,8 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
   /* ==========================================================
      COLORS / SIZES
      ========================================================== */
-
   toggleColor(color: string): void {
+
     if (!color) {
       return;
     }
@@ -2377,19 +2470,242 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       colors.indexOf(color);
 
     if (index >= 0) {
+
       colors.splice(index, 1);
+
     } else {
+
       colors.push(color);
+
     }
 
-    this.newProduct.colors = colors;
-    this.selectedColors = [...colors];
+    this.newProduct.colors =
+      colors;
 
-    /*
-     * Keep the legacy backend field synchronized.
-     */
+    this.selectedColors =
+      [...colors];
+
     this.newProduct.availableColors =
       colors.join(', ');
+
+
+    // =====================================================
+    // COLOR IMAGE MAPPINGS
+    // =====================================================
+
+    const existingColorData =
+      Array.isArray(
+        this.newProduct.colorsData
+      )
+        ? this.newProduct.colorsData
+        : [];
+
+
+    this.newProduct.colorsData =
+      colors.map(
+        selectedColor => {
+
+          const existing =
+            existingColorData.find(
+              item =>
+                item.name?.trim().toLowerCase() ===
+                selectedColor.trim().toLowerCase()
+            );
+
+
+          if (existing) {
+            return existing;
+          }
+
+
+          return {
+
+            name: selectedColor,
+
+            value:
+              this.getColorValue(
+                selectedColor
+              ),
+
+            image: '',
+
+            fileIndex:
+              undefined
+
+          };
+
+        }
+      );
+
+  }
+
+
+  getColorImage(color: string): string {
+    const colorData =
+      this.newProduct.colorsData?.find(
+        item =>
+          item.name?.toLowerCase() ===
+          color?.toLowerCase()
+      );
+
+    return colorData?.image || '';
+  }
+
+
+  selectColorImage(
+    color: string,
+    image: string,
+    imageIndex: number
+  ): void {
+
+    if (
+      !color ||
+      !image ||
+      imageIndex < 0
+    ) {
+      return;
+    }
+
+
+    const colorsData =
+      Array.isArray(
+        this.newProduct.colorsData
+      )
+        ? [...this.newProduct.colorsData]
+        : [];
+
+
+    let colorIndex =
+      colorsData.findIndex(
+        item =>
+          item.name?.trim().toLowerCase() ===
+          color.trim().toLowerCase()
+      );
+
+
+    // =====================================================
+    // CREATE MAPPING IF IT DOES NOT EXIST
+    // =====================================================
+
+    if (colorIndex < 0) {
+
+      colorsData.push({
+
+        name: color,
+
+        value:
+          this.getColorValue(color),
+
+        image: '',
+
+        fileIndex:
+          undefined
+
+      });
+
+      colorIndex =
+        colorsData.length - 1;
+    }
+
+
+    const updatedColor = {
+
+      ...colorsData[colorIndex],
+
+      name: color,
+
+      value:
+        colorsData[colorIndex].value ||
+        this.getColorValue(color),
+
+      image,
+
+      fileIndex:
+        undefined as number | undefined
+
+    };
+
+
+    // =====================================================
+    // NEW LOCAL IMAGE
+    // =====================================================
+    // =====================================================
+    // LOCAL IMAGE
+    // =====================================================
+
+    if (
+      !this.isRemoteImage(image)
+    ) {
+
+      const previewIndex =
+        this.imagePreviews.indexOf(image);
+
+      if (previewIndex >= 0) {
+
+        const localFileIndex =
+          this.getLocalFileIndex(
+            this.imagePreviews,
+            this.existingImages,
+            previewIndex
+          );
+
+        if (localFileIndex >= 0) {
+
+          updatedColor.fileIndex =
+            localFileIndex;
+
+        }
+
+      }
+
+    }
+
+
+    // =====================================================
+    // SAVE
+    // =====================================================
+
+    colorsData[colorIndex] =
+      updatedColor;
+
+
+    this.newProduct = {
+
+      ...this.newProduct,
+
+      colorsData:
+        [...colorsData]
+
+    };
+
+  }
+
+  clearColorImage(color: string): void {
+
+    const colorsData =
+      Array.isArray(this.newProduct.colorsData)
+        ? [...this.newProduct.colorsData]
+        : [];
+
+    const colorIndex =
+      colorsData.findIndex(
+        item =>
+          item.name?.toLowerCase() ===
+          color.toLowerCase()
+      );
+
+    if (colorIndex < 0) {
+      return;
+    }
+
+    colorsData[colorIndex] = {
+      ...colorsData[colorIndex],
+      image: '',
+      fileIndex: undefined
+    };
+
+    this.newProduct.colorsData =
+      colorsData;
   }
 
   toggleSize(size: string): void {
@@ -2462,12 +2778,14 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     const colorMap: Record<string, string> = {
       Black: '#000000',
       White: '#ffffff',
+      Olive: '#6B7A1F',
       Grey: '#808080',
       Red: '#dc2626',
       Blue: '#2563eb',
       Green: '#16a34a',
       Navy: '#0f172a',
       Beige: '#d6c3a5'
+
     };
 
     return colorMap[color] || '#e5e7eb';

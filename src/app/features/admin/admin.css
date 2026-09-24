@@ -4089,3 +4089,237 @@ body {
   }
 
 }
+/* =========================================================
+   COLOR IMAGE MAPPING
+========================================================= */
+
+.color-image-mapping {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fafafa;
+}
+
+.color-image-mapping-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.color-image-mapping-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.color-image-mapping-header p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+.mapping-count {
+    padding: 6px 10px;
+    border-radius: 20px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   EMPTY STATE
+========================================================= */
+
+.color-image-empty {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border: 1px dashed #d1d5db;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.color-image-empty > span {
+    font-size: 24px;
+}
+
+.color-image-empty strong {
+    display: block;
+    font-size: 13px;
+    color: #111827;
+}
+
+.color-image-empty small {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   COLOR ROW
+========================================================= */
+
+.color-image-row {
+    padding: 18px 0;
+    border-top: 1px solid #e5e7eb;
+}
+
+.color-image-row:first-of-type {
+    border-top: 0;
+}
+
+.color-image-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.color-image-label .color-dot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid #d1d5db;
+    flex-shrink: 0;
+}
+
+.color-image-label strong {
+    display: block;
+    color: #111827;
+    font-size: 14px;
+}
+
+.color-image-label small {
+    display: block;
+    margin-top: 3px;
+    color: #6b7280;
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   IMAGE OPTIONS
+========================================================= */
+
+.color-image-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.color-image-option {
+    position: relative;
+    width: 82px;
+    height: 82px;
+    padding: 0;
+    overflow: hidden;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.color-image-option:hover {
+    border-color: #9ca3af;
+    transform: translateY(-2px);
+}
+
+.color-image-option.selected {
+    border-color: #111827;
+    box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.08);
+}
+
+.color-image-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* =========================================================
+   CHECK
+========================================================= */
+
+.color-image-check {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #111827;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   SELECTED STATUS
+========================================================= */
+
+.selected-color-image {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 10px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.selected-color-image button {
+    width: 18px;
+    height: 18px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #166534;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.selected-color-image button:hover {
+    background: #dcfce7;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .color-image-mapping {
+        padding: 15px;
+    }
+
+    .color-image-mapping-header {
+        align-items: flex-start;
+    }
+
+    .color-image-option {
+        width: 68px;
+        height: 68px;
+    }
+
+}
