@@ -210,7 +210,7 @@ exports.createOrder = async (req, res) => {
         console.log("Discount:", discountAmount);
         console.log("Taxable:", taxableAmount);
         console.log("Shipping:", shipping);
-        console.log("GST:", gst);
+        
         console.log("Final Total:", total);
         console.log("Amount Paise:", totalInPaise);
         console.log("Coupon:", couponCode);

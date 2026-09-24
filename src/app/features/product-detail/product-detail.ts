@@ -101,7 +101,7 @@ export class ProductDetail implements OnInit {
   selectedSize = '';
 
   selectedColor = '';
-
+  
   selectedPack = 'single';
 
   selectedCombination = '';
@@ -507,18 +507,45 @@ export class ProductDetail implements OnInit {
       return '';
     }
 
-    const color = this.selectedColor?.toLowerCase();
+    const color =
+      this.selectedColor?.trim().toLowerCase();
 
     if (!color) {
       return '';
     }
 
-    // First image is the combined image.
-    // Following images are individual colour images
-    // in the same order as product.colors.
+    /*
+     * =====================================================
+     * PRIMARY SOURCE
+     * Explicit color → image mapping from Admin
+     * =====================================================
+     */
+
+    const colorData =
+      this.product.colorsData?.find(
+        item =>
+          item.name?.trim().toLowerCase() === color &&
+          !!item.image
+      );
+
+    if (colorData?.image) {
+      return colorData.image;
+    }
+
+
+    /*
+     * =====================================================
+     * LEGACY FALLBACK
+     *
+     * Old products may not have colorsData yet.
+     * Keep the old image-order system for them.
+     * =====================================================
+     */
+
     const colorIndex =
       this.product.colors?.findIndex(
-        c => c.toLowerCase() === color
+        c =>
+          c?.trim().toLowerCase() === color
       ) ?? -1;
 
     if (

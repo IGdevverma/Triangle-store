@@ -33,11 +33,9 @@ const calculatePricing = (items, couponCode = '') => {
 
   const shipping = subtotal >= 999 ? 0 : 99;
 
-  const gst = Math.round(
-    taxableAmount * 0.05
-  );
+  const gst = 0;
 
-  const total = taxableAmount + shipping + gst;
+  const total = taxableAmount + shipping;
 
   return {
     subtotal,
