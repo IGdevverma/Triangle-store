@@ -11,30 +11,17 @@
         [attr.fetchpriority]="currentSlide === 0 ? 'high' : 'auto'"
         [attr.loading]="currentSlide === 0 ? 'eager' : 'lazy'" decoding="async">
 
-    <img
-        [src]="sliderImages[currentSlide]"
-        class="slider-image"
-        alt="Triangle Sports"
-    >
 
     <!-- PREVIOUS -->
-    <button
-        class="nav prev"
-        type="button"
-        aria-label="Previous banner"
-        (click)="prevSlide()"
-    >
+
+    <button class="nav prev" type="button" aria-label="Previous banner" (click)="prevSlide()">
         ❮
     </button>
 
 
     <!-- NEXT -->
-    <button
-        class="nav next"
-        type="button"
-        aria-label="Next banner"
-        (click)="nextSlide()"
-    >
+
+    <button class="nav next" type="button" aria-label="Next banner" (click)="nextSlide()">
         ❯
     </button>
 
@@ -43,13 +30,16 @@
 
     <div class="dots" role="tablist" aria-label="Hero banners">
 
-        <button
-            *ngFor="let image of sliderImages; let i = index"
-            type="button"
-            [class.active]="i === currentSlide"
-            [attr.aria-label]="'Go to banner ' + (i + 1)"
-            (click)="goToSlide(i)"
-        >
+        <button *ngFor="
+                let image of sliderImages;
+                let i = index
+            " type="button" [class.active]="
+                i === currentSlide
+            " [attr.aria-label]="
+                'Go to banner ' + (i + 1)
+            " [attr.aria-selected]="
+                i === currentSlide
+            " (click)="goToSlide(i)">
         </button>
 
     </div>
@@ -64,12 +54,9 @@
 
 
 <!-- Featured Products -->
-<!-- =========================================================
-     FEATURED PRODUCTS
-========================================================= -->
-
 <section class="featured-products">
 
+    <!-- HEADER -->
     <div class="featured-header">
 
         <span class="section-label">
@@ -88,55 +75,49 @@
     </div>
 
 
+    <!-- PRODUCTS -->
     <div class="products-grid">
 
-        <article class="product-item" *ngFor="let product of bestSellerProducts; trackBy: trackByProduct"
-            [routerLink]="['/product', product._id || product.id]">
+        <div class="product-item" *ngFor="let product of bestSellerProducts" [routerLink]="['/product', product._id]">
 
             <!-- IMAGE -->
             <div class="product-image-wrapper">
 
+                <!-- DISCOUNT -->
                 <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
                     SAVE {{ product.discount }}%
                 </span>
 
-                <img [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" />
+                <img [src]="getImageUrl(product.image, 480)" [srcset]="getImageSrcSet(product.image)" sizes="(max-width: 520px) 46vw,
+           (max-width: 768px) 42vw,
+           (max-width: 1200px) 30vw,
+           320px" [alt]="product.name" class="product-image" loading="lazy" decoding="async" />
 
             </div>
 
 
-            <!-- INFO -->
-            <div class="product-info">
-
-                <h3 class="product-name">
-                    {{ product.name }}
-                </h3>
+            <!-- PRODUCT NAME -->
+            <h3 class="product-name">
+                {{ product.name }}
+            </h3>
 
 
-                <!-- PRICE -->
-                <!-- PRICE -->
-                <div class="price-row">
+            <!-- PRICE -->
+            <div class="price-row">
 
-                    <span class="current-price">
-                        From Rs. {{ formatPrice(product.price) }}
-                    </span>
+                <span class="current-price">
+                    ₹{{ product.price }}
+                </span>
 
-                    <span class="old-price" *ngIf="
-            product.originalPrice &&
-            product.originalPrice > product.price
-        ">
-                        Rs. {{ formatPrice(product.originalPrice) }}
-                    </span>
+                <span class="old-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
 
-                </div>
+                    ₹{{ product.originalPrice }}
 
-
-
-
+                </span>
 
             </div>
 
-        </article>
+        </div>
 
     </div>
 

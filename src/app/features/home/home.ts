@@ -51,10 +51,9 @@ export class Home implements OnInit, OnDestroy {
   // =====================================================
 
   sliderImages: string[] = [
-    'assets/images/home/training-banner.png',
-    'assets/images/home/vest-banner.png',
-    'assets/images/home/track-pant-banner.png'
-    
+    'assets/images/home/training-banner.webp',
+    'assets/images/home/vest-banner.webp',
+    'assets/images/home/track-pant-banner.webp'
   ];
 
   currentSlide = 0;
@@ -455,17 +454,76 @@ export class Home implements OnInit, OnDestroy {
     if (!image) {
 
       return 'assets/no-image.png';
+
     }
 
-    if (image.includes('res.cloudinary.com')) {
-      return image.replace(
-        '/image/upload/',
-        '/image/upload/w_1600,q_auto,f_auto/'
-      );
+
+    if (
+      !image.includes(
+        'res.cloudinary.com'
+      )
+    ) {
+
+      return image;
+
     }
 
-    return image;
+
+    return image.replace(
+      '/image/upload/',
+      `/image/upload/f_auto,q_auto,w_${width}/`
+    );
+
   }
+
+
+  // =====================================================
+  // RESPONSIVE CLOUDINARY SRCSET
+  // =====================================================
+
+  getImageSrcSet(
+    image: string | undefined
+  ): string {
+
+    if (!image) {
+      return '';
+    }
+
+
+    if (
+      !image.includes(
+        'res.cloudinary.com'
+      )
+    ) {
+
+      return '';
+
+    }
+
+
+    return [
+      `${this.getImageUrl(image, 320)} 320w`,
+      `${this.getImageUrl(image, 480)} 480w`,
+      `${this.getImageUrl(image, 640)} 640w`,
+      `${this.getImageUrl(image, 960)} 960w`
+    ].join(', ');
+
+  }
+
+
+  // =====================================================
+  // HERO IMAGE
+  // =====================================================
+
+  getCurrentHeroImage(): string {
+
+    return (
+      this.sliderImages[
+        this.currentSlide
+      ] ||
+      this.sliderImages[0]
+    );
+
+  }
+
 }
-
-
