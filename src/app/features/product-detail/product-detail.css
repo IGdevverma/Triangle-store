@@ -2559,3 +2559,187 @@ a:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* =========================================================
+   PRODUCTION INTERACTION LAYER
+   Mobile-safe gallery / touch behaviour
+   ========================================================= */
+
+/*
+ * The product image is visual content, not an interactive target.
+ * Keeping pointer-events disabled prevents the image from stealing
+ * touch/click interaction from the gallery controls.
+ */
+.main-product-image {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none;
+}
+
+/*
+ * Gallery controls always sit above the image and receive the touch.
+ */
+.gallery-arrow,
+.wishlist-button {
+  pointer-events: auto;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/*
+ * The gallery itself should allow normal vertical page scrolling
+ * on touch devices. Desktop zoom behaviour remains untouched.
+ */
+.main-image-container {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/*
+ * Hover is a desktop interaction.
+ * Do not let mobile/touch browsers keep a :hover state after tapping.
+ */
+@media (hover: none), (pointer: coarse) {
+
+  .thumbnail:hover,
+  .wishlist-button:hover,
+  .gallery-arrow:hover,
+  .pack-card:hover,
+  .combination-card:hover,
+  .size-options button:hover,
+  .color-option:hover,
+  .size-guide-button:hover,
+  .pincode-row button:hover,
+  .trust-grid > div:hover,
+  .recommendation-card:hover,
+  .quick-add:hover {
+    transform: none;
+  }
+
+  .thumbnail:hover {
+    border-color: var(--ts-border);
+  }
+
+  .wishlist-button:hover {
+    color: var(--ts-black);
+    box-shadow: var(--ts-shadow-sm);
+  }
+
+  .gallery-arrow:hover {
+    color: var(--ts-black);
+    box-shadow: var(--ts-shadow-sm);
+  }
+
+  .pack-card:hover,
+  .combination-card:hover {
+    border-color: var(--ts-border-dark);
+    box-shadow: none;
+  }
+
+  .size-options button:hover {
+    border-color: var(--ts-border-dark);
+    color: var(--ts-text);
+  }
+
+  .color-option:hover {
+    border-color: var(--ts-border);
+  }
+
+  .recommendation-card:hover {
+    transform: none;
+    border-color: var(--ts-border);
+    box-shadow: none;
+  }
+
+  .quick-add:hover {
+    background: rgba(255, 255, 255, 0.97);
+    color: var(--ts-black);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+}
+
+/*
+ * Mobile gallery:
+ * - no mouse-hover zoom
+ * - no image scaling after arrow taps
+ * - arrows remain easy to tap
+ * - normal vertical scrolling remains available
+ */
+@media (max-width: 768px) {
+
+  .main-image-container {
+    touch-action: pan-y;
+    cursor: default;
+    overscroll-behavior: contain;
+  }
+
+  .main-product-image {
+    transform: none !important;
+    transform-origin: center center !important;
+    transition: none !important;
+  }
+
+  .gallery-arrow {
+    z-index: 20;
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .wishlist-button {
+    z-index: 21;
+    touch-action: manipulation;
+  }
+
+  .discount-badge,
+  .image-counter {
+    pointer-events: none;
+  }
+
+  .thumbnail {
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
+/*
+ * Small-screen refinement.
+ */
+@media (max-width: 520px) {
+
+  .main-image-container {
+    touch-action: pan-y;
+  }
+
+  .gallery-arrow {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+/*
+ * Accessibility / keyboard users.
+ */
+.gallery-arrow:focus-visible,
+.wishlist-button:focus-visible,
+.thumbnail:focus-visible {
+  outline: 2px solid var(--ts-purple);
+  outline-offset: 2px;
+}
+
+/*
+ * Prevent accidental text selection while repeatedly tapping
+ * gallery controls on iOS/Android.
+ */
+.gallery-wrapper,
+.thumbnail-column {
+  -webkit-user-select: none;
+  user-select: none;
+}
+

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Product } from '../../models/product';
 import { ProductService } from '../../services/product';
@@ -10,125 +10,174 @@ import { SeoService } from '../../services/seo';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [
+    CommonModule,
+    RouterLink,
+    FormsModule
+  ],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
+export class Home implements OnInit, OnDestroy {
 
+  // =====================================================
+  // PRODUCTS
+  // =====================================================
 
-export class Home implements OnInit {
   bestSellerProducts: Product[] = [];
+
   products: Product[] = [];
+
   filteredProducts: Product[] = [];
 
-  /* Tyka Style Featured Products */
   displayedProducts: Product[] = [];
+
   featuredIndex = 0;
 
+
+  // =====================================================
+  // FILTERS
+  // =====================================================
+
   searchTerm = '';
+
   selectedCategory = 'All';
+
   selectedPrice = '';
 
-  /* Hero Slider */
 
-  /* ================= HERO SLIDER ================= */
+  // =====================================================
+  // HERO SLIDER
+  // =====================================================
 
-  sliderImages = [
+  sliderImages: string[] = [
     'assets/images/home/training-banner.png',
     'assets/images/home/vest-banner.png',
     'assets/images/home/track-pant-banner.png'
-    
   ];
 
   currentSlide = 0;
 
-  /* Brands */
+  private sliderInterval?: ReturnType<typeof setInterval>;
+
+
+  // =====================================================
+  // BRANDS
+  // =====================================================
+
   brands = [
     'Tata 1mg',
     'AJIO',
     'O.P. Jindal Global University',
     'IIT Roorkee'
   ];
-  /* Testimonials */
+
+
+  // =====================================================
+  // TESTIMONIALS
+  // =====================================================
 
   testimonials = [
 
     {
       company: 'Tata 1mg',
-      review: 'Excellent quality and timely delivery. The team exceeded our expectations.',
+      review:
+        'Excellent quality and timely delivery. The team exceeded our expectations.',
       author: 'Corporate Team'
     },
 
     {
       company: 'AJIO',
-      review: 'Professional manufacturing partner with premium finishing.',
+      review:
+        'Professional manufacturing partner with premium finishing.',
       author: 'Brand Team'
     },
 
     {
       company: 'IIT Roorkee',
-      review: 'Our sports jerseys were delivered exactly as promised.',
+      review:
+        'Our sports jerseys were delivered exactly as promised.',
       author: 'Sports Committee'
     },
 
     {
       company: 'O.P. Jindal Global University',
-      review: 'Highly recommended for bulk sportswear production.',
+      review:
+        'Highly recommended for bulk sportswear production.',
       author: 'Administration'
     }
 
   ];
 
+
+  // =====================================================
+  // CONSTRUCTOR
+  // =====================================================
+
   constructor(
     private productService: ProductService,
     private cartService: CartService,
     private seoService: SeoService
-  ) { }
+  ) {}
+
+
+  // =====================================================
+  // INIT
+  // =====================================================
 
   ngOnInit(): void {
 
-    /* Update SEO */
+    // ---------------------------------------------------
+    // SEO
+    // ---------------------------------------------------
+
     this.seoService.updateSeo(
-      ' TriangleSports®',
-
+      'TriangleSports®',
       'Premium Sportswear Manufacturer offering gym wear, jerseys, vests, activewear and custom team kits.',
-
       'Sportswear,Gym Wear,Triangle Sports,Team Jerseys,Vests'
     );
 
 
-    /* Load Products */
+    // ---------------------------------------------------
+    // LOAD PRODUCTS
+    // ---------------------------------------------------
+
     this.productService.getProducts().subscribe({
 
       next: (response: any) => {
 
+        const products: Product[] =
+          Array.isArray(response?.products)
+            ? response.products
+            : [];
 
-        this.products = response.products || [];
 
-        this.filteredProducts = response.products.filter(
-          (product: Product) => product.showOnHome !== false
-        );
+        this.products = products;
 
-        /* ===============================
-   MOST LOVED PRODUCTS
-   =============================== */
 
-        this.bestSellerProducts = response.products
-          .filter((product: Product) => product.showOnHome !== false)
-          .slice(0, 3);
+        this.filteredProducts =
+          products.filter(
+            product =>
+              product.showOnHome !== false
+          );
 
-        console.log(
-          'MOST LOVED PRODUCTS:',
-          this.bestSellerProducts
-        );
 
-        /* ===============================
-           FEATURED PRODUCTS
-           =============================== */
+        // -------------------------------------------------
+        // MOST LOVED PRODUCTS
+        // -------------------------------------------------
+
+        this.bestSellerProducts =
+          this.filteredProducts.slice(0, 3);
+
+
+        // -------------------------------------------------
+        // FEATURED PRODUCTS
+        // -------------------------------------------------
 
         this.updateFeaturedProducts();
 
       },
+
 
       error: (err) => {
 
@@ -141,49 +190,97 @@ export class Home implements OnInit {
 
     });
 
-    /* Auto Hero Slider */
-    setInterval(() => {
 
-      this.nextSlide();
+    // ---------------------------------------------------
+    // HERO SLIDER
+    // ---------------------------------------------------
 
-    }, 4000);
+    this.sliderInterval =
+      setInterval(() => {
+
+        this.nextSlide();
+
+      }, 5000);
 
   }
 
 
+  // =====================================================
+  // DESTROY
+  // =====================================================
 
-  /* ================= HERO SLIDER ================= */
+  ngOnDestroy(): void {
 
-  nextSlide() {
+    if (this.sliderInterval) {
+
+      clearInterval(
+        this.sliderInterval
+      );
+
+    }
+
+  }
+
+
+  // =====================================================
+  // HERO SLIDER
+  // =====================================================
+
+  nextSlide(): void {
+
+    if (
+      !this.sliderImages.length
+    ) {
+      return;
+    }
 
     this.currentSlide =
-      (this.currentSlide + 1) %
+      (
+        this.currentSlide + 1
+      ) %
       this.sliderImages.length;
 
   }
 
-  prevSlide() {
+
+  prevSlide(): void {
+
+    if (
+      !this.sliderImages.length
+    ) {
+      return;
+    }
 
     this.currentSlide =
       (
-        this.currentSlide - 1 +
+        this.currentSlide -
+        1 +
         this.sliderImages.length
       ) %
       this.sliderImages.length;
 
   }
 
-  goToSlide(index: number) {
+
+  goToSlide(index: number): void {
+
+    if (
+      index < 0 ||
+      index >= this.sliderImages.length
+    ) {
+      return;
+    }
 
     this.currentSlide = index;
 
   }
 
 
+  // =====================================================
+  // FEATURED PRODUCTS
+  // =====================================================
 
-  /* ================= FEATURED PRODUCTS ================= */
-
-  updateFeaturedProducts() {
+  updateFeaturedProducts(): void {
 
     this.displayedProducts =
       this.filteredProducts.slice(
@@ -193,7 +290,8 @@ export class Home implements OnInit {
 
   }
 
-  nextFeatured() {
+
+  nextFeatured(): void {
 
     if (
       this.featuredIndex + 3 <
@@ -212,9 +310,12 @@ export class Home implements OnInit {
 
   }
 
-  prevFeatured() {
 
-    if (this.featuredIndex > 0) {
+  prevFeatured(): void {
+
+    if (
+      this.featuredIndex > 0
+    ) {
 
       this.featuredIndex--;
 
@@ -232,91 +333,107 @@ export class Home implements OnInit {
 
   }
 
-  /* ================= CART ================= */
 
-  addToCart(product: Product) {
+  // =====================================================
+  // CART
+  // =====================================================
 
-    this.cartService.addToCart(product);
+  addToCart(product: Product): void {
+
+    this.cartService.addToCart(
+      product
+    );
 
     alert(
-      product.name +
-      ' added to cart'
+      `${product.name} added to cart`
     );
 
   }
 
-  /* ================= FILTERS ================= */
 
-  filterProducts() {
+  // =====================================================
+  // FILTERS
+  // =====================================================
+
+  filterProducts(): void {
+
+    const search =
+      this.searchTerm
+        .trim()
+        .toLowerCase();
+
 
     this.filteredProducts =
-      this.products.filter(product => {
+      this.products.filter(
+        product => {
 
-        const showOnHome =
-          product.showOnHome !== false;
+          const showOnHome =
+            product.showOnHome !== false;
 
-        const matchesSearch =
-          product.name
-            .toLowerCase()
-            .includes(
-              this.searchTerm.toLowerCase()
-            );
 
-        const matchesCategory =
+          const productName =
+            product.name?.toLowerCase() ||
+            '';
 
-          this.selectedCategory === 'All' ||
 
-          product.category ===
-          this.selectedCategory;
+          const matchesSearch =
+            !search ||
+            productName.includes(search);
 
-        let matchesPrice = true;
 
-        if (
-          this.selectedPrice ===
-          'under1000'
-        ) {
+          const matchesCategory =
+            this.selectedCategory === 'All' ||
+            product.category ===
+            this.selectedCategory;
 
-          matchesPrice =
-            product.price < 1000;
+
+          let matchesPrice = true;
+
+
+          if (
+            this.selectedPrice ===
+            'under1000'
+          ) {
+
+            matchesPrice =
+              product.price < 1000;
+
+          }
+
+
+          else if (
+            this.selectedPrice ===
+            '1000to3000'
+          ) {
+
+            matchesPrice =
+              product.price >= 1000 &&
+              product.price <= 3000;
+
+          }
+
+
+          else if (
+            this.selectedPrice ===
+            'above3000'
+          ) {
+
+            matchesPrice =
+              product.price > 3000;
+
+          }
+
+
+          return (
+            showOnHome &&
+            matchesSearch &&
+            matchesCategory &&
+            matchesPrice
+          );
 
         }
+      );
 
-        else if (
-          this.selectedPrice ===
-          '1000to3000'
-        ) {
-
-          matchesPrice =
-
-            product.price >= 1000 &&
-
-            product.price <= 3000;
-
-        }
-
-        else if (
-          this.selectedPrice ===
-          'above3000'
-        ) {
-
-          matchesPrice =
-            product.price > 3000;
-
-        }
-
-        return (
-
-          showOnHome &&
-
-          matchesSearch &&
-
-          matchesCategory &&
-
-          matchesPrice
-
-        );
-
-      });
 
     this.featuredIndex = 0;
 
@@ -324,20 +441,89 @@ export class Home implements OnInit {
 
   }
 
-  getImageUrl(image: string): string {
+
+  // =====================================================
+  // CLOUDINARY IMAGE OPTIMIZATION
+  // =====================================================
+
+  getImageUrl(
+    image: string | undefined,
+    width = 480
+  ): string {
+
     if (!image) {
+
       return 'assets/no-image.png';
+
     }
 
-    if (image.includes('res.cloudinary.com')) {
-      return image.replace(
-        '/image/upload/',
-        '/image/upload/w_1600,q_auto,f_auto/'
-      );
+
+    if (
+      !image.includes(
+        'res.cloudinary.com'
+      )
+    ) {
+
+      return image;
+
     }
 
-    return image;
+
+    return image.replace(
+      '/image/upload/',
+      `/image/upload/f_auto,q_auto,w_${width}/`
+    );
+
   }
+
+
+  // =====================================================
+  // RESPONSIVE CLOUDINARY SRCSET
+  // =====================================================
+
+  getImageSrcSet(
+    image: string | undefined
+  ): string {
+
+    if (!image) {
+      return '';
+    }
+
+
+    if (
+      !image.includes(
+        'res.cloudinary.com'
+      )
+    ) {
+
+      return '';
+
+    }
+
+
+    return [
+      `${this.getImageUrl(image, 320)} 320w`,
+      `${this.getImageUrl(image, 480)} 480w`,
+      `${this.getImageUrl(image, 640)} 640w`,
+      `${this.getImageUrl(image, 960)} 960w`
+    ].join(', ');
+
+  }
+
+
+  // =====================================================
+  // HERO IMAGE
+  // =====================================================
+
+  getCurrentHeroImage(): string {
+
+    return (
+      this.sliderImages[
+        this.currentSlide
+      ] ||
+      this.sliderImages[0]
+    );
+
+  }
+
 }
-
-
