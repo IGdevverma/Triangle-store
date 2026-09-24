@@ -1,32 +1,60 @@
 <!-- =========================================
              HERO SLIDER
 ========================================= -->
+<!-- =========================================
+     HERO SLIDER
+========================================= -->
 
-<section class="hero-slider">
+<section class="hero-slider" aria-label="Triangle Sports promotions">
 
-    <img [src]="sliderImages[currentSlide]" class="slider-image" alt="Triangle Sports">
+    <img [src]="getCurrentHeroImage()" class="slider-image" alt="Triangle Sports sportswear collection"
+        [attr.fetchpriority]="currentSlide === 0 ? 'high' : 'auto'"
+        [attr.loading]="currentSlide === 0 ? 'eager' : 'lazy'" decoding="async">
+
+    <img
+        [src]="sliderImages[currentSlide]"
+        class="slider-image"
+        alt="Triangle Sports"
+    >
 
     <!-- PREVIOUS -->
-    <button class="nav prev" type="button" aria-label="Previous banner" (click)="prevSlide()">
+    <button
+        class="nav prev"
+        type="button"
+        aria-label="Previous banner"
+        (click)="prevSlide()"
+    >
         ❮
     </button>
 
+
     <!-- NEXT -->
-    <button class="nav next" type="button" aria-label="Next banner" (click)="nextSlide()">
+    <button
+        class="nav next"
+        type="button"
+        aria-label="Next banner"
+        (click)="nextSlide()"
+    >
         ❯
     </button>
 
-    <!-- DOTS -->
-    <div class="dots">
 
-        <button *ngFor="let image of sliderImages; let i = index" type="button" [class.active]="i === currentSlide"
-            [attr.aria-label]="'Go to banner ' + (i + 1)" (click)="goToSlide(i)">
+    <!-- DOTS -->
+
+    <div class="dots" role="tablist" aria-label="Hero banners">
+
+        <button
+            *ngFor="let image of sliderImages; let i = index"
+            type="button"
+            [class.active]="i === currentSlide"
+            [attr.aria-label]="'Go to banner ' + (i + 1)"
+            (click)="goToSlide(i)"
+        >
         </button>
 
     </div>
 
 </section>
-
 
 
 
@@ -72,8 +100,7 @@
                     SAVE {{ product.discount }}%
                 </span>
 
-                <img [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" loading="lazy"
-                    decoding="async" />
+                <img [src]="getImageUrl(product.image)" [alt]="product.name" class="product-image" />
 
             </div>
 
@@ -266,7 +293,7 @@
 
     <div class="manufacturing-image">
 
-        <img src="assets/images/manufacturing-1600.webp" alt="Triangle Manufacturing">
+        <img src="assets/images/manufacturing-1600.webp" alt="Triangle Manufacturing" loading="lazy" decoding="async">
 
     </div>
 
