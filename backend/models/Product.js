@@ -174,6 +174,41 @@ const productPackSchema = new mongoose.Schema(
     },
 
 
+
+    /* ========================================================
+   PRODUCT COLOR IMAGES
+
+   Explicit mapping between a product color and its image.
+
+   Example:
+   Black → black image
+   Olive → olive image
+   White → white image
+======================================================== */
+
+    colorsData: [
+      {
+        name: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+
+        value: {
+          type: String,
+          default: "",
+          trim: true,
+        },
+
+        image: {
+          type: String,
+          default: "",
+          trim: true,
+        },
+      },
+    ],
+
+
     /* ========================================================
        PACK SIZES
     ======================================================== */
@@ -422,6 +457,40 @@ const productSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+
+    /* ========================================================
+   PRODUCT COLOR IMAGES
+
+   Explicit mapping between a product color and
+   its corresponding product image.
+
+   Example:
+   Black → black image
+   Olive → olive image
+   White → white image
+======================================================== */
+
+    colorsData: [
+      {
+        name: {
+          type: String,
+          required: true,
+          trim: true,
+        },
+
+        value: {
+          type: String,
+          default: "",
+          trim: true,
+        },
+
+        image: {
+          type: String,
+          default: "",
+          trim: true,
+        },
+      },
+    ],
 
 
     /* ========================================================

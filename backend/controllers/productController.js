@@ -330,6 +330,68 @@ const createProduct = asyncHandler(async (req, res) => {
         }
 
         colors = cleanStringArray(colors);
+        // =====================================================
+        // COLOR IMAGE MAPPINGS
+        // =====================================================
+
+        let colorsData = parseJSON(
+            req.body.colorsData,
+            []
+        );
+
+        if (!Array.isArray(colorsData)) {
+            colorsData = [];
+        }
+
+        colorsData = colorsData
+            .filter(item =>
+                item &&
+                typeof item.name === "string"
+            )
+            .map(item => {
+
+                const fileIndex =
+                    Number.isInteger(
+                        Number(item.fileIndex)
+                    )
+                        ? Number(item.fileIndex)
+                        : -1;
+
+                let image = "";
+
+                /*
+                 * Newly uploaded image:
+                 * fileIndex points to the same order
+                 * as imageUrls.
+                 */
+                if (
+                    fileIndex >= 0 &&
+                    fileIndex < imageUrls.length
+                ) {
+                    image = imageUrls[fileIndex];
+                }
+
+                /*
+                 * Existing remote image fallback.
+                 */
+                if (
+                    !image &&
+                    typeof item.image === "string" &&
+                    imageUrls.includes(item.image)
+                ) {
+                    image = item.image;
+                }
+
+                return {
+                    name: item.name.trim(),
+                    value:
+                        typeof item.value === "string"
+                            ? item.value.trim()
+                            : "",
+                    image
+                };
+
+            });
 
 
 
@@ -622,12 +684,14 @@ const createProduct = asyncHandler(async (req, res) => {
          */
 
         delete productData.colors;
+        delete productData.colorsData;
         delete productData.sizes;
         delete productData.packs;
         delete productData.colorCombinations;
 
 
         productData.colors = colors;
+        productData.colorsData = colorsData;
         productData.sizes = sizes;
         productData.packs = packs;
         productData.colorCombinations =
@@ -1346,6 +1410,78 @@ const updateProduct = asyncHandler(
                 cleanStringArray(
                     colors
                 );
+            // =================================================
+            // COLOR IMAGE MAPPINGS
+            // =================================================
+
+            let colorsData = Array.isArray(product.colorsData)
+                ? product.colorsData
+                : [];
+
+            if (req.body.colorsData !== undefined) {
+
+                colorsData = parseJSON(
+                    req.body.colorsData,
+                    []
+                );
+
+                if (!Array.isArray(colorsData)) {
+                    colorsData = [];
+                }
+            }
+
+            colorsData = colorsData
+                .filter(item =>
+                    item &&
+                    typeof item.name === "string"
+                )
+                .map(item => {
+
+                    const fileIndex =
+                        Number.isInteger(
+                            Number(item.fileIndex)
+                        )
+                            ? Number(item.fileIndex)
+                            : -1;
+
+                    let image = "";
+
+                    /*
+                     * Existing Cloudinary image
+                     */
+                    if (
+                        typeof item.image === "string" &&
+                        finalImages.includes(item.image)
+                    ) {
+                        image = item.image;
+                    }
+
+                    /*
+                     * Newly uploaded image
+                     *
+                     * fileIndex belongs to newImages,
+                     * which follows the same order as
+                     * frontend selectedFiles.
+                     */
+                    if (
+                        !image &&
+                        fileIndex >= 0 &&
+                        fileIndex < newImages.length
+                    ) {
+                        image = newImages[fileIndex];
+                    }
+
+                    return {
+                        name: item.name.trim(),
+
+                        value:
+                            typeof item.value === "string"
+                                ? item.value.trim()
+                                : "",
+
+                        image
+                    };
+                });
 
 
 
@@ -1644,6 +1780,7 @@ const updateProduct = asyncHandler(
                 "packs",
 
                 "colorCombinations",
+                "colorsData",
 
                 "removedImages",
 
@@ -1704,18 +1841,21 @@ const updateProduct = asyncHandler(
             // =================================================
             // SAVE ARRAYS
             // =================================================
-
             product.colors =
                 colors;
 
+            product.colorsData =
+                colorsData;
+            console.log(
+                "FINAL COLORS DATA:",
+                JSON.stringify(colorsData, null, 2)
+            );
 
             product.sizes =
                 sizes;
 
-
             product.packs =
                 packs;
-
 
             product.colorCombinations =
                 colorCombinations;
