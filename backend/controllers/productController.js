@@ -832,7 +832,7 @@ const getProductById = asyncHandler(
         const product =
             await Product.findById(
                 req.params.id
-            );
+            ).lean();
 
 
         if (!product) {
