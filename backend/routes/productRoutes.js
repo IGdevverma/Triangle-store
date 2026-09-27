@@ -11,6 +11,7 @@ const {
     createProduct,
     getProducts,
     getProductById,
+    getRelatedProducts,
     updateProduct,
     deleteProduct,
 } = require("../controllers/productController");
@@ -39,6 +40,8 @@ router.post(
 ========================= */
 
 router.get("/", getProducts);
+
+router.get("/related", getRelatedProducts);
 
 router.get("/:id", getProductById);
 

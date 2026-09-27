@@ -101,7 +101,7 @@ export class ProductDetail implements OnInit {
   selectedSize = '';
 
   selectedColor = '';
-  
+
   selectedPack = 'single';
 
   selectedCombination = '';
@@ -2128,85 +2128,64 @@ export class ProductDetail implements OnInit {
     // Do not block the main product page while loading them.
     this.relatedProducts = [];
 
+    const currentProductId =
+      product._id ?? product.id;
+
+    const currentGroup =
+      product.productGroup
+        ?.trim()
+        .toLowerCase()
+        .replace(/[\s_]+/g, '-');
+
+    // No product group or product ID = no recommendations
+    if (!currentGroup || !currentProductId) {
+      this.relatedProducts = [];
+      return;
+    }
+
     const load = () => {
 
-      this.productService.getProducts().subscribe({
+      this.productService
+        .getRelatedProducts(
+          currentGroup,
+          currentProductId
+        )
+        .subscribe({
 
-        next: (response: any) => {
+          next: (response: any) => {
 
-          const products =
-            (response?.products ?? []) as Product[];
+            const products =
+              (response?.products ?? []) as Product[];
 
-          const currentProductId =
-            product._id ?? product.id;
+            this.relatedProducts = products
 
-          const currentGroup =
-            product.productGroup
-              ?.trim()
-              .toLowerCase()
-              .replace(/[\s_]+/g, '-');
+              // Remove duplicates defensively
+              .filter(
+                (item, index, array) =>
+                  array.findIndex(
+                    x =>
+                      (x._id ?? x.id) ===
+                      (item._id ?? item.id)
+                  ) === index
+              )
 
-          // No product group = no recommendations
-          if (!currentGroup) {
+              // Maximum 4
+              .slice(0, 4);
+
+          },
+
+          error: error => {
+
+            console.error(
+              'Error loading related products:',
+              error
+            );
+
             this.relatedProducts = [];
-            return;
+
           }
 
-          this.relatedProducts = products
-
-            // Same product family
-            .filter(item => {
-
-              const itemId =
-                item._id ?? item.id;
-
-              const itemGroup =
-                item.productGroup
-                  ?.trim()
-                  .toLowerCase()
-                  .replace(/[\s_]+/g, '-');
-
-              const itemMode =
-                item.productMode
-                  ?.trim()
-                  .toLowerCase();
-
-              return (
-                itemGroup === currentGroup &&
-                itemMode === 'single' &&
-                itemId !== currentProductId &&
-                item.status !== 'Hidden'
-              );
-
-            })
-
-            // Remove duplicates
-            .filter(
-              (item, index, array) =>
-                array.findIndex(
-                  x =>
-                    (x._id ?? x.id) ===
-                    (item._id ?? item.id)
-                ) === index
-            )
-
-            // Maximum 4
-            .slice(0, 4);
-
-        },
-
-        error: error => {
-
-          console.error(
-            'Error loading related products:',
-            error
-          );
-
-          this.relatedProducts = [];
-
-        }
-
-      });
+        });
 
     };
 
@@ -2221,7 +2200,10 @@ export class ProductDetail implements OnInit {
 
     } else {
 
-      setTimeout(load, 1000);
+      setTimeout(
+        load,
+        1000
+      );
 
     }
 

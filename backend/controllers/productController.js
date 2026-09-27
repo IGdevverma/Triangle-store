@@ -861,6 +861,99 @@ const getProductById = asyncHandler(
 
 
 // ============================================================
+// GET RELATED PRODUCTS
+// ============================================================
+
+const getRelatedProducts = asyncHandler(async (req, res) => {
+
+    const {
+        productGroup,
+        excludeId
+    } = req.query;
+
+    if (!productGroup) {
+
+        return res.status(200).json({
+            success: true,
+            products: []
+        });
+
+    }
+
+    const normalizedGroup =
+        String(productGroup)
+            .trim()
+            .toLowerCase()
+            .replace(/[\s_]+/g, '-');
+
+    const escapedGroup =
+        normalizedGroup.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            '\\$&'
+        );
+
+    const productGroupRegex =
+        new RegExp(
+            `^${escapedGroup.replace(
+                /-/g,
+                '[\\s_-]+'
+            )}$`,
+            'i'
+        );
+
+    const products = await Product.find(
+        {
+            productGroup: {
+                $regex: productGroupRegex
+            },
+
+            productMode: "single",
+
+            status: {
+                $ne: "Hidden"
+            },
+
+            ...(excludeId
+                ? {
+                    _id: {
+                        $ne: excludeId
+                    }
+                }
+                : {})
+        },
+
+        {
+            _id: 1,
+            id: 1,
+            name: 1,
+            price: 1,
+            originalPrice: 1,
+            discount: 1,
+            image: 1,
+            images: 1,
+            stock: 1,
+            category: 1,
+            productGroup: 1,
+            productMode: 1,
+            colors: 1,
+            sizes: 1,
+            status: 1
+        }
+    )
+        .limit(4)
+        .lean();
+
+    return res.status(200).json({
+        success: true,
+        count: products.length,
+        products
+    });
+
+});
+
+
+
+// ============================================================
 // UPDATE PRODUCT
 // ============================================================
 
@@ -2050,6 +2143,8 @@ module.exports = {
     getProducts,
 
     getProductById,
+
+    getRelatedProducts,
 
     updateProduct,
 
