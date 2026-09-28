@@ -1,103 +1,232 @@
 import { Injectable } from '@angular/core';
-import { Title, Meta } from '@angular/platform-browser';
+import { Meta, Title } from '@angular/platform-browser';
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class SeoService {
 
-    constructor(
-        private title: Title,
-        private meta: Meta
-    ) { }
+  private readonly siteName = 'Triangle Sports';
+  private readonly siteUrl = 'https://www.trianglesports.in';
 
-    updateSeo(
-        pageTitle: string,
-        description: string,
-        keywords: string = '',
-        image: string = '',
-        url: string = window.location.href
-    ) {
+  constructor(
+    private title: Title,
+    private meta: Meta
+  ) {}
 
-        this.title.setTitle(pageTitle);
+  updateSeo(
+    pageTitle: string,
+    description: string,
+    keywords: string = '',
+    image: string = '',
+    url: string = this.siteUrl
+  ): void {
 
-        this.meta.updateTag({
-            name: 'description',
-            content: description
-        });
+    const cleanTitle = this.cleanText(pageTitle);
+    const cleanDescription = this.cleanText(description);
+    const canonicalUrl = this.normalizeUrl(url);
+    const imageUrl = image ? this.normalizeUrl(image) : '';
 
-        this.meta.updateTag({
-            name: 'keywords',
-            content: keywords
-        });
+    // =====================================================
+    // BASIC SEO
+    // =====================================================
 
-        this.meta.updateTag({
-            property: 'og:title',
-            content: pageTitle
-        });
+    this.title.setTitle(cleanTitle);
 
-        this.meta.updateTag({
-            property: 'og:description',
-            content: description
-        });
+    this.updateMeta(
+      'name',
+      'description',
+      cleanDescription
+    );
 
-        this.meta.updateTag({
-            name: 'twitter:title',
-            content: pageTitle
-        });
+    if (keywords.trim()) {
+      this.updateMeta(
+        'name',
+        'keywords',
+        this.cleanText(keywords)
+      );
+    }
 
-        this.meta.updateTag({
-            name: 'twitter:description',
-            content: description
-        });
-
-
-        let link: HTMLLinkElement | null =
-            document.querySelector("link[rel='canonical']");
-
-        if (!link) {
-
-            link = document.createElement('link');
-
-            link.setAttribute('rel', 'canonical');
-
-            document.head.appendChild(link);
-
-        }
-
-        link.setAttribute('href', url);
+    this.updateMeta(
+      'name',
+      'robots',
+      'index, follow, max-image-preview:large'
+    );
 
 
+    // =====================================================
+    // OPEN GRAPH
+    // =====================================================
 
-        this.meta.updateTag({
+    this.updateMeta(
+      'property',
+      'og:type',
+      'product'
+    );
 
-            property: 'og:url',
+    this.updateMeta(
+      'property',
+      'og:title',
+      cleanTitle
+    );
 
-            content: url
+    this.updateMeta(
+      'property',
+      'og:description',
+      cleanDescription
+    );
 
-        });
+    this.updateMeta(
+      'property',
+      'og:url',
+      canonicalUrl
+    );
 
+    this.updateMeta(
+      'property',
+      'og:site_name',
+      this.siteName
+    );
 
-        if (image) {
+    if (imageUrl) {
+      this.updateMeta(
+        'property',
+        'og:image',
+        imageUrl
+      );
 
-            this.meta.updateTag({
-
-                property: 'og:image',
-
-                content: image
-
-            });
-
-            this.meta.updateTag({
-
-                name: 'twitter:image',
-
-                content: image
-
-            });
-
-        }
+      this.updateMeta(
+        'property',
+        'og:image:alt',
+        cleanTitle
+      );
     }
 
 
+    // =====================================================
+    // TWITTER / X
+    // =====================================================
+
+    this.updateMeta(
+      'name',
+      'twitter:card',
+      'summary_large_image'
+    );
+
+    this.updateMeta(
+      'name',
+      'twitter:title',
+      cleanTitle
+    );
+
+    this.updateMeta(
+      'name',
+      'twitter:description',
+      cleanDescription
+    );
+
+    if (imageUrl) {
+      this.updateMeta(
+        'name',
+        'twitter:image',
+        imageUrl
+      );
+
+      this.updateMeta(
+        'name',
+        'twitter:image:alt',
+        cleanTitle
+      );
+    }
+
+
+    // =====================================================
+    // CANONICAL URL
+    // =====================================================
+
+    this.updateCanonical(canonicalUrl);
+  }
+
+
+  // =====================================================
+  // META TAG HELPER
+  // =====================================================
+
+  private updateMeta(
+    attribute: 'name' | 'property',
+    key: string,
+    content: string
+  ): void {
+
+    this.meta.updateTag(
+      {
+        [attribute]: key,
+        content
+      },
+      `${attribute}="${key}"`
+    );
+  }
+
+
+  // =====================================================
+  // CANONICAL HELPER
+  // =====================================================
+
+  private updateCanonical(url: string): void {
+
+    let canonical =
+      document.querySelector(
+        'link[rel="canonical"]'
+      ) as HTMLLinkElement | null;
+
+    if (!canonical) {
+
+      canonical =
+        document.createElement('link');
+
+      canonical.setAttribute(
+        'rel',
+        'canonical'
+      );
+
+      document.head.appendChild(canonical);
+    }
+
+    canonical.setAttribute(
+      'href',
+      url
+    );
+  }
+
+
+  // =====================================================
+  // URL NORMALIZATION
+  // =====================================================
+
+  private normalizeUrl(url: string): string {
+
+    try {
+
+      return new URL(
+        url,
+        this.siteUrl
+      ).href;
+
+    } catch {
+
+      return this.siteUrl;
+    }
+  }
+
+
+  // =====================================================
+  // TEXT CLEANUP
+  // =====================================================
+
+  private cleanText(value: string): string {
+
+    return String(value || '')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
 }

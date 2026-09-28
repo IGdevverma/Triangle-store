@@ -1205,9 +1205,53 @@ export class ProductDetail implements OnInit, AfterViewInit {
 
             return;
           }
+          this.product = product;
 
-          this.product =
-            product;
+          // =====================================================
+          // DYNAMIC PRODUCT SEO
+          // =====================================================
+
+          const productName =
+            product.name?.trim() ||
+            'Sportswear Product';
+
+          const productDescription =
+            product.description?.trim() ||
+            `Shop ${productName} from Triangle Sports. Explore premium sportswear designed for comfort, performance and everyday training.`;
+
+          const productKeywords = [
+            productName,
+            'Triangle Sports',
+            product.category,
+            'sportswear',
+            'gym wear',
+            'fitness wear',
+            'activewear',
+            'sports clothing'
+          ]
+            .filter(Boolean)
+            .join(', ');
+
+          const productId =
+            product._id ||
+            product.id ||
+            id;
+
+          const productUrl =
+            `https://www.trianglesports.in/product/${productId}`;
+
+          const productImage =
+            product.image ||
+            product.images?.[0] ||
+            '';
+
+          this.seoService.updateSeo(
+            `${productName} | Triangle Sports`,
+            productDescription.substring(0, 160),
+            productKeywords,
+            productImage,
+            productUrl
+          );
 
 
 
@@ -1253,33 +1297,13 @@ export class ProductDetail implements OnInit, AfterViewInit {
           this.loadReviews(product);
 
 
-          // ------------------------------------------------
-          // SEO
-          // ------------------------------------------------
+         
 
-          this.seoService.updateSeo(
+         
 
-            `${product.name} | Triangle Sports®`,
-
-            product.description ||
-            'Premium sportswear by Triangle Sports.',
-
-            [
-              product.category,
-              product.brand,
-              product.type,
-              'Sportswear',
-              'Gym Wear'
-            ]
-              .filter(Boolean)
-              .join(', ')
-
-          );
+          
 
 
-          // ------------------------------------------------
-          // RELATED PRODUCTS
-          // ------------------------------------------------
 
           // ------------------------------------------------
           // MAIN PRODUCT PAGE READY
