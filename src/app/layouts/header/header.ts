@@ -60,6 +60,8 @@ export class Header implements OnInit {
   searchResults: Product[] = [];
   allProducts: Product[] = [];
 
+  private headerProductsLoading = false;
+
   user: { name: string; role: string } | null = null;
   isUserMenuOpen = false;
   showComingSoonModal = false;
@@ -135,11 +137,44 @@ export class Header implements OnInit {
 
     });
 
+  }
+
+  private loadHeaderProducts(): void {
+
+    // Already loaded
+    if (this.allProducts.length) {
+      return;
+    }
+
+    // Prevent multiple API calls while loading
+    if (this.headerProductsLoading) {
+      return;
+    }
+
+    this.headerProductsLoading = true;
+
     this.productService.getProducts().subscribe({
 
       next: (response: any) => {
 
-        this.allProducts = response.products;
+        this.allProducts =
+          response?.products ?? [];
+
+        this.headerProductsLoading = false;
+
+        // Run search again after products arrive
+        this.filterSearch();
+
+      },
+
+      error: (error) => {
+
+        console.error(
+          'Failed to load header products:',
+          error
+        );
+
+        this.headerProductsLoading = false;
 
       }
 
@@ -257,10 +292,12 @@ export class Header implements OnInit {
   toggleSearch() {
     this.isSearchOpen = !this.isSearchOpen;
   }
-  filterSearch() {
+  filterSearch(): void {
 
-    const keyword = this.searchTerm.trim().toLowerCase();
+    const keyword =
+      this.searchTerm.trim().toLowerCase();
 
+    // Empty search
     if (!keyword) {
 
       this.searchResults = [];
@@ -269,15 +306,31 @@ export class Header implements OnInit {
 
     }
 
-    this.searchResults = this.allProducts
-      .filter(product =>
+    // Products not loaded yet
+    // Load them only when user actually searches
+    if (!this.allProducts.length) {
 
-        product.name.toLowerCase().includes(keyword) ||
+      this.loadHeaderProducts();
 
-        product.category.toLowerCase().includes(keyword)
+      return;
 
-      )
-      .slice(0, 5);
+    }
+
+    // Filter loaded products
+    this.searchResults =
+      this.allProducts
+        .filter(product =>
+
+          product.name
+            ?.toLowerCase()
+            .includes(keyword) ||
+
+          product.category
+            ?.toLowerCase()
+            .includes(keyword)
+
+        )
+        .slice(0, 5);
 
   }
   searchProducts() {

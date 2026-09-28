@@ -1940,6 +1940,7 @@ button {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   overflow: hidden;
 }
 
@@ -2743,3 +2744,8 @@ a:focus-visible {
   user-select: none;
 }
 
+.related-products-sentinel {
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+}

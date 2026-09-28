@@ -934,7 +934,7 @@
                 </span>
 
                 <strong>
-                  ₹{{ (item.cartPrice ?? item.price) | number }}
+                  ₹{{ item.cartPrice | number }}
                 </strong>
 
               </div>
@@ -942,7 +942,7 @@
 
               <strong class="summary-item-total">
                 ₹{{
-                  ((item.cartPrice ?? item.price) * item.quantity)
+                  (item.cartPrice * item.quantity)
                     | number
                 }}
               </strong>

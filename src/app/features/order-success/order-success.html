@@ -148,7 +148,7 @@
         </span>
 
         <span>
-          -{{ formatPrice(order?.discountAmount) }}
+        -{{ formatPrice(order?.discountAmount ?? 0) }}
         </span>
 
       </div>
@@ -163,7 +163,7 @@
         <span>
           {{
             order?.shipping
-              ? formatPrice(order?.shipping)
+             ? formatPrice(order?.shipping ?? 0)
               : 'FREE'
           }}
         </span>

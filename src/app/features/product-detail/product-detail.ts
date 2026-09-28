@@ -1,8 +1,10 @@
 import {
   Component,
-  OnInit
+  OnInit,
+  AfterViewInit,
+  ViewChild,
+  ElementRef
 } from '@angular/core';
-
 import {
   CommonModule
 } from '@angular/common';
@@ -72,7 +74,7 @@ import {
 
   styleUrl: './product-detail.css'
 })
-export class ProductDetail implements OnInit {
+export class ProductDetail implements OnInit, AfterViewInit {
 
   // =====================================================
   // PRODUCT
@@ -178,6 +180,15 @@ export class ProductDetail implements OnInit {
   // =====================================================
 
   relatedProducts: Product[] = [];
+
+  @ViewChild('relatedProductsSection')
+  relatedProductsSection?: ElementRef<HTMLElement>;
+
+  private relatedProductsObserver?: IntersectionObserver;
+
+  private relatedProductsLoaded = false;
+
+  private pendingRelatedProduct?: Product;
 
 
 
@@ -294,6 +305,95 @@ export class ProductDetail implements OnInit {
     });
 
     this.loadSavedPincode();
+  }
+
+
+
+
+  // =====================================================
+  // RELATED PRODUCTS LAZY LOAD OBSERVER
+  // =====================================================
+  ngAfterViewInit(): void {
+    this.observeRelatedProducts();
+  }
+
+
+  // =====================================================
+  // START RELATED PRODUCTS OBSERVER
+  // =====================================================
+  private observeRelatedProducts(): void {
+
+    console.log('🔍 RELATED OBSERVER START');
+
+    console.log(
+      'Sentinel exists:',
+      !!this.relatedProductsSection
+    );
+
+    console.log(
+      'Pending product exists:',
+      !!this.pendingRelatedProduct
+    );
+
+    if (!this.relatedProductsSection) {
+      console.log('❌ RELATED SENTINEL NOT FOUND');
+      return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      console.log('❌ IntersectionObserver NOT SUPPORTED');
+      return;
+    }
+
+    console.log('✅ Creating IntersectionObserver');
+
+    this.relatedProductsObserver?.disconnect();
+
+    this.relatedProductsObserver =
+      new IntersectionObserver(
+        entries => {
+
+          console.log(
+            '👀 RELATED OBSERVER FIRED',
+            entries[0]?.isIntersecting
+          );
+
+          const entry = entries[0];
+
+          if (
+            entry?.isIntersecting &&
+            this.pendingRelatedProduct &&
+            !this.relatedProductsLoaded
+          ) {
+
+            console.log(
+              '🚀 LOADING RELATED PRODUCTS'
+            );
+
+            this.relatedProductsLoaded = true;
+
+            const product =
+              this.pendingRelatedProduct;
+
+            this.pendingRelatedProduct =
+              undefined;
+
+            this.relatedProductsObserver?.disconnect();
+
+            this.loadRelatedProducts(product);
+          }
+        },
+        {
+          rootMargin: '500px 0px',
+          threshold: 0
+        }
+      );
+
+    this.relatedProductsObserver.observe(
+      this.relatedProductsSection.nativeElement
+    );
+
+    console.log('✅ RELATED OBSERVER OBSERVING');
   }
 
 
@@ -1191,9 +1291,19 @@ export class ProductDetail implements OnInit {
           // ------------------------------------------------
           // RELATED PRODUCTS
           // ------------------------------------------------
-          // Load separately without blocking the page.
+          // Wait until the Related Products section
+          // approaches the viewport.
 
-          this.loadRelatedProducts(product);
+          this.pendingRelatedProduct = product;
+
+          console.log(
+            '📦 PRODUCT READY FOR RELATED:',
+            product.name
+          );
+
+          setTimeout(() => {
+            this.observeRelatedProducts();
+          }, 0);
 
         },
 
@@ -2121,11 +2231,12 @@ export class ProductDetail implements OnInit {
   // =====================================================
   // LOAD RELATED PRODUCTS
   // =====================================================
+  // =====================================================
+  // LOAD RELATED PRODUCTS
+  // =====================================================
 
   private loadRelatedProducts(product: Product): void {
 
-    // Related products are secondary content.
-    // Do not block the main product page while loading them.
     this.relatedProducts = [];
 
     const currentProductId =
@@ -2137,75 +2248,53 @@ export class ProductDetail implements OnInit {
         .toLowerCase()
         .replace(/[\s_]+/g, '-');
 
-    // No product group or product ID = no recommendations
+    // No product group or product ID
     if (!currentGroup || !currentProductId) {
       this.relatedProducts = [];
       return;
     }
 
-    const load = () => {
+    this.productService
+      .getRelatedProducts(
+        currentGroup,
+        currentProductId
+      )
+      .subscribe({
 
-      this.productService
-        .getRelatedProducts(
-          currentGroup,
-          currentProductId
-        )
-        .subscribe({
+        next: (response: any) => {
 
-          next: (response: any) => {
+          const products =
+            (response?.products ?? []) as Product[];
 
-            const products =
-              (response?.products ?? []) as Product[];
+          this.relatedProducts = products
 
-            this.relatedProducts = products
+            // Remove duplicates defensively
+            .filter(
+              (item, index, array) =>
+                array.findIndex(
+                  x =>
+                    (x._id ?? x.id) ===
+                    (item._id ?? item.id)
+                ) === index
+            )
 
-              // Remove duplicates defensively
-              .filter(
-                (item, index, array) =>
-                  array.findIndex(
-                    x =>
-                      (x._id ?? x.id) ===
-                      (item._id ?? item.id)
-                  ) === index
-              )
+            // Maximum 4
+            .slice(0, 4);
 
-              // Maximum 4
-              .slice(0, 4);
+        },
 
-          },
+        error: error => {
 
-          error: error => {
+          console.error(
+            'Error loading related products:',
+            error
+          );
 
-            console.error(
-              'Error loading related products:',
-              error
-            );
+          this.relatedProducts = [];
 
-            this.relatedProducts = [];
+        }
 
-          }
-
-        });
-
-    };
-
-    // Give the main product page priority.
-    // Related products can load after the first render.
-    if ('requestIdleCallback' in window) {
-
-      (window as any).requestIdleCallback(
-        load,
-        { timeout: 2000 }
-      );
-
-    } else {
-
-      setTimeout(
-        load,
-        1000
-      );
-
-    }
+      });
 
   }
   previousImage(): void {

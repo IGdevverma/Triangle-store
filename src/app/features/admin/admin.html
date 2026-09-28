@@ -696,8 +696,8 @@
                             <!-- ITEMS -->
                             <td>
                                 <span class="items-count">
-                                    {{ order.items?.length || 0 }}
-                                    {{ (order.items?.length || 0) === 1 ? 'Item' : 'Items' }}
+                                    {{ order.items.length || 0 }}
+                                    {{ (order.items.length || 0) === 1 ? 'Item' : 'Items' }}
                                 </span>
                             </td>
 
@@ -982,7 +982,7 @@
                     <h3>
                         Products
                         <span>
-                            ({{ order.items?.length || 0 }})
+                            ({{ order.items.length || 0 }})
                         </span>
                     </h3>
 
@@ -2393,7 +2393,7 @@
 
                                                     <button type="button" class="pack-color-option"
                                                         *ngFor="let color of availableColors"
-                                                        [class.selected]="pack.colors?.includes(color)"
+                                                        [class.selected]="pack.colors.includes(color)"
                                                         (click)="togglePackColor(pack, color)">
 
                                                         <span class="color-dot"
@@ -2402,7 +2402,7 @@
 
                                                         {{ color }}
 
-                                                        <span *ngIf="pack.colors?.includes(color)">
+                                                        <span *ngIf="pack.colors.includes(color)">
 
                                                             ✓
 
@@ -2435,12 +2435,12 @@
 
                                                     <button type="button" class="pack-size-option"
                                                         *ngFor="let size of availableSizes"
-                                                        [class.selected]="pack.sizes?.includes(size)"
+                                                        [class.selected]="pack.sizes.includes(size)"
                                                         (click)="togglePackSize(pack, size)">
 
                                                         {{ size }}
 
-                                                        <span *ngIf="pack.sizes?.includes(size)">
+                                                        <span *ngIf="pack.sizes.includes(size)">
 
                                                             ✓
 
@@ -2488,7 +2488,7 @@
          COMBINATION LIST
     ================================================== -->
 
-                                                <div class="pack-combinations-list" *ngIf="pack.combinations?.length">
+                                                <div class="pack-combinations-list" *ngIf="pack.combinations.length">
 
                                                     <div class="pack-combination-card" *ngFor="
                 let combination of pack.combinations;
@@ -2562,7 +2562,7 @@
 
                                                                 <span class="photo-count">
 
-                                                                    {{ combination.colors?.length || 0 }}
+                                                                    {{ combination.colors.length || 0 }}
                                                                     /
                                                                     {{ pack.quantity }}
 
@@ -2576,7 +2576,7 @@
                                                                 <button type="button" class="pack-color-option" *ngFor="
                             let color of availableColors
                         " [class.selected]="
-                            combination.colors?.includes(color)
+                            combination.colors.includes(color)
                         " (click)="
                             togglePackCombinationColor(
                                 pack,
@@ -2593,7 +2593,7 @@
                                                                     {{ color }}
 
                                                                     <span *ngIf="
-                                combination.colors?.includes(color)
+                                combination.colors.includes(color)
                             ">
 
                                                                         ✓
@@ -2626,7 +2626,7 @@
 
                                                                 <span class="photo-count">
 
-                                                                    {{ combination.previews?.length || 0 }}/5
+                                                                    {{ combination.previews.length || 0 }}/5
 
                                                                 </span>
 
@@ -2658,7 +2658,7 @@
 
 
                                                                 <label class="pack-photo-upload" *ngIf="
-                            (combination.previews?.length || 0) < 5
+                            (combination.previews.length || 0) < 5
                         ">
 
                                                                     <span>
@@ -2694,7 +2694,7 @@
 
 
                                                 <!-- Empty State -->
-                                                <div class="empty-builder" *ngIf="!pack.combinations?.length">
+                                                <div class="empty-builder" *ngIf="!pack.combinations.length">
 
                                                     <div class="empty-icon">
                                                         🎨
@@ -3067,7 +3067,7 @@
 
                                                 <button type="button" class="pack-color-option"
                                                     *ngFor="let color of availableColors"
-                                                    [class.selected]="combination.colors?.includes(color)"
+                                                    [class.selected]="combination.colors.includes(color)"
                                                     (click)="toggleCombinationColor(combination, color)">
 
                                                     <span class="color-dot" [style.background]="getColorValue(color)">

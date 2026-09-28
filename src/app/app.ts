@@ -19,9 +19,7 @@ import { LoadingSpinner } from './shared/loading-spinner/loading-spinner';
     RouterOutlet,
     Header,
     Footer,
-    Notification,
-    LoadingSpinner,
-    NgxSpinnerComponent
+    
   ],
 
   templateUrl: './app.html',

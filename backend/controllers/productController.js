@@ -760,8 +760,43 @@ const createProduct = asyncHandler(async (req, res) => {
 
 const getProducts = asyncHandler(async (req, res) => {
 
-    const products =
-        await Product.find();
+
+    const startTime = Date.now();
+    const products = await Product.find(
+        {},
+        {
+            _id: 1,
+            id: 1,
+            name: 1,
+            price: 1,
+            originalPrice: 1,
+            discount: 1,
+            image: 1,
+            images: 1,
+            stock: 1,
+            category: 1,
+            status: 1,
+            showOnHome: 1,
+            productGroup: 1,
+            productMode: 1,
+            colors: 1,
+            sizes: 1,
+            availableColors: 1,
+            colorsData: 1,
+            packs: 1,
+            colorCombinations: 1
+        }
+    ).lean();
+    console.log(
+        "GET PRODUCTS DB TIME:",
+        Date.now() - startTime,
+        "ms"
+    );
+
+
+
+
+
 
 
     console.log(
