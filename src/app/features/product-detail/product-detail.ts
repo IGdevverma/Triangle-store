@@ -46,6 +46,9 @@ import {
 import {
   SeoService
 } from '../../services/seo';
+import {
+  ProductSchemaService
+} from '../../services/product-schema';
 
 import {
   OtpService
@@ -276,7 +279,8 @@ export class ProductDetail implements OnInit, AfterViewInit {
     private http: HttpClient,
     private otpService: OtpService,
     private ngZone: NgZone,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private productSchemaService: ProductSchemaService
   ) { }
 
 
@@ -1252,6 +1256,10 @@ export class ProductDetail implements OnInit, AfterViewInit {
             productImage,
             productUrl
           );
+          this.productSchemaService.updateProductSchema(
+            product,
+            productUrl
+          );
 
 
 
@@ -1297,11 +1305,11 @@ export class ProductDetail implements OnInit, AfterViewInit {
           this.loadReviews(product);
 
 
-         
 
-         
 
-          
+
+
+
 
 
 

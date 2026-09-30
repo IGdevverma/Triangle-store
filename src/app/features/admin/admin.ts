@@ -299,7 +299,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       breadth: 20,
       height: 3,
 
-      showOnHome: true,
+      showOnHome: false,
       colors: [],
       colorsData: [],
       sizes: [],
@@ -1328,6 +1328,11 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+
+
+    console.log('EDIT PRODUCT:', product);
+    console.log('DESCRIPTION:', product.description);
+
     this.clearProductEditorState();
 
     this.editing = true;
@@ -1948,7 +1953,7 @@ export class Admin implements OnInit, AfterViewInit, OnDestroy {
     formData.append(
       'showOnHome',
       String(
-        this.newProduct.showOnHome ?? true
+        this.newProduct.showOnHome ?? false
       )
     );
 
