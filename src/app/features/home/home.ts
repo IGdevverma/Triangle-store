@@ -118,7 +118,7 @@ export class Home implements OnInit, OnDestroy {
     private productService: ProductService,
     private cartService: CartService,
     private seoService: SeoService
-  ) {}
+  ) { }
 
 
   // =====================================================
@@ -141,8 +141,7 @@ export class Home implements OnInit, OnDestroy {
     // ---------------------------------------------------
     // LOAD PRODUCTS
     // ---------------------------------------------------
-
-    this.productService.getProducts().subscribe({
+    this.productService.getHomeProducts().subscribe({
 
       next: (response: any) => {
 
@@ -151,38 +150,25 @@ export class Home implements OnInit, OnDestroy {
             ? response.products
             : [];
 
-
+        // Store home products
         this.products = products;
 
+        // Home API already returns only
+        // products which should appear on home
+        this.filteredProducts = products;
 
-        this.filteredProducts =
-          products.filter(
-            product =>
-              product.showOnHome !== false
-          );
+        // First 3 products
+        this.bestSellerProducts = products.slice(0, 3);
 
-
-        // -------------------------------------------------
-        // MOST LOVED PRODUCTS
-        // -------------------------------------------------
-
-        this.bestSellerProducts =
-          this.filteredProducts.slice(0, 3);
-
-
-        // -------------------------------------------------
-        // FEATURED PRODUCTS
-        // -------------------------------------------------
-
+        // Featured slider/list
         this.updateFeaturedProducts();
 
       },
 
-
       error: (err) => {
 
         console.error(
-          'Error fetching products:',
+          'Error fetching home products:',
           err
         );
 
@@ -519,7 +505,7 @@ export class Home implements OnInit, OnDestroy {
 
     return (
       this.sliderImages[
-        this.currentSlide
+      this.currentSlide
       ] ||
       this.sliderImages[0]
     );

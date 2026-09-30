@@ -78,7 +78,8 @@
     <!-- PRODUCTS -->
     <div class="products-grid">
 
-        <div class="product-item" *ngFor="let product of bestSellerProducts" [routerLink]="['/product', product._id]">
+        <div class="product-item" *ngFor="let product of bestSellerProducts; let i = index"
+            [routerLink]="['/product', product._id]">
 
             <!-- IMAGE -->
             <div class="product-image-wrapper">
@@ -89,9 +90,10 @@
                 </span>
 
                 <img [src]="getImageUrl(product.image, 480)" [srcset]="getImageSrcSet(product.image)" sizes="(max-width: 520px) 46vw,
-           (max-width: 768px) 42vw,
-           (max-width: 1200px) 30vw,
-           320px" [alt]="product.name" class="product-image" loading="lazy" decoding="async" />
+         (max-width: 768px) 42vw,
+         (max-width: 1200px) 30vw,
+         320px" [alt]="product.name" class="product-image" loading="eager" [attr.fetchpriority]="'high'"
+                    decoding="async" />
 
             </div>
 

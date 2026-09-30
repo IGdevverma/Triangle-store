@@ -856,6 +856,79 @@ const getProducts = asyncHandler(async (req, res) => {
 });
 
 
+const getHomeProducts = asyncHandler(async (req, res) => {
+
+    try {
+
+        console.log("==========================================");
+        console.log("GET HOME PRODUCTS");
+        console.log("==========================================");
+
+        const startTime = Date.now();
+
+        console.log("Product model:", !!Product);
+
+        const products = await Product.find(
+            {
+                showOnHome: { $ne: false }
+            },
+            {
+                _id: 1,
+                name: 1,
+                price: 1,
+                originalPrice: 1,
+                discount: 1,
+                image: 1,
+                showOnHome: 1
+            }
+        )
+            .sort({ _id: 1 })
+            .limit(3)
+            .lean();
+
+        console.log(
+            "GET HOME PRODUCTS DB TIME:",
+            Date.now() - startTime,
+            "ms"
+        );
+
+        console.log(
+            "HOME PRODUCT COUNT:",
+            products.length
+        );
+
+        return res.status(200).json({
+            success: true,
+            count: products.length,
+            products
+        });
+
+    } catch (error) {
+
+        console.error(
+            "=========================================="
+        );
+
+        console.error(
+            "GET HOME PRODUCTS ERROR:"
+        );
+
+        console.error(error);
+
+        console.error(
+            "=========================================="
+        );
+
+        return res.status(500).json({
+            success: false,
+            message: error.message || "Failed to load home products"
+        });
+
+    }
+
+});
+
+
 
 // ============================================================
 // GET SINGLE PRODUCT
@@ -1900,6 +1973,7 @@ const updateProduct = asyncHandler(
                 "originalPrice",
 
                 "discount",
+                "sku",
 
                 "colors",
 
@@ -1919,6 +1993,14 @@ const updateProduct = asyncHandler(
                 "packCombinationImages"
 
             ]);
+            // =================================================
+            // SKU
+            // =================================================
+
+            // Never allow frontend to overwrite SKU with empty string
+            if (!product.sku || !String(product.sku).trim()) {
+                product.sku = `TRI-${product._id.toString().slice(-8).toUpperCase()}`;
+            }
 
 
 
@@ -2176,6 +2258,7 @@ module.exports = {
     createProduct,
 
     getProducts,
+    getHomeProducts,
 
     getProductById,
 
