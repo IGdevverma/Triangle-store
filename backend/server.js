@@ -98,8 +98,9 @@ app.use(
 
     allowedHeaders: [
       "Content-Type",
-      "Authorization"
-    ]
+      "Authorization",
+      "X-Guest-Verification-Token"
+    ],
   })
 );
 
