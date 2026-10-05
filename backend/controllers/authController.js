@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const otpService = require("../services/otpService");
 const EmailService = require("../services/emailService");
-
+const jwt = require("jsonwebtoken");
 // ============================================================
 // REGISTER USER
 // ============================================================
@@ -706,6 +706,7 @@ const verifyWidgetToken = async (req, res) => {
         // ----------------------------------------------------
 
         const verifiedPhone =
+            data?.message ||
             data?.data?.mobile ||
             data?.mobile ||
             data?.data?.phone ||
@@ -829,6 +830,17 @@ const verifyWidgetToken = async (req, res) => {
         // We simply confirm that MSG91 verified the phone.
         // ----------------------------------------------------
 
+        const guestVerificationToken = jwt.sign(
+            {
+                type: "guest_phone_verification",
+                phone: normalizedPhone
+            },
+            process.env.JWT_SECRET,
+            {
+                expiresIn: "15m"
+            }
+        );
+
         return res.status(200).json({
 
             success: true,
@@ -840,7 +852,9 @@ const verifyWidgetToken = async (req, res) => {
                 normalizedPhone,
 
             phoneVerified:
-                true
+                true,
+
+            guestVerificationToken
 
         });
 
