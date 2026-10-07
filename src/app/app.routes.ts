@@ -158,8 +158,7 @@ export const routes: Routes = [
   },
   {
     path: 'order-success',
-    component: OrderSuccess,
-    canActivate: [authGuard]
+    component: OrderSuccess
   },
   {
     path: 'contact',
