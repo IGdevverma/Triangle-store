@@ -941,10 +941,9 @@ const createOrder = async (req, res) => {
                                 ? "Pending"
                                 : "Paid",
 
-                        razorpayOrderId:
-                            paymentMethod === "COD"
-                                ? null
-                                : razorpayOrderId,
+                        ...(paymentMethod !== "COD" && {
+                            razorpayOrderId
+                        }),
 
                         razorpayPaymentId:
                             paymentMethod === "COD"
