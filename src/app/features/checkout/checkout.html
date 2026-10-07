@@ -4,7 +4,7 @@
        CHECKOUT HEADER
   ====================================================== -->
 
- 
+
 
 
 
@@ -24,11 +24,8 @@
 
       <!-- STEP 1 -->
 
-      <div
-        class="progress-step"
-        [class.active]="checkoutStep === 'details'"
-        [class.completed]="checkoutStep === 'payment'"
-      >
+      <div class="progress-step" [class.active]="checkoutStep === 'details'"
+        [class.completed]="checkoutStep === 'payment'">
 
         <span class="progress-circle">
 
@@ -60,10 +57,7 @@
 
       <!-- STEP 2 -->
 
-      <div
-        class="progress-step"
-        [class.active]="checkoutStep === 'payment'"
-      >
+      <div class="progress-step" [class.active]="checkoutStep === 'payment'">
 
         <span class="progress-circle">
           2
@@ -113,10 +107,7 @@
          CHECKOUT GRID
     ==================================================== -->
 
-    <form
-      [formGroup]="checkoutForm"
-      class="checkout-layout"
-    >
+    <form [formGroup]="checkoutForm" class="checkout-layout">
 
 
       <!-- =================================================
@@ -130,10 +121,7 @@
              DELIVERY STEP
         ================================================== -->
 
-        <section
-          class="checkout-card"
-          *ngIf="checkoutStep === 'details'"
-        >
+        <section class="checkout-card" *ngIf="checkoutStep === 'details'">
 
           <!-- CARD HEADER -->
 
@@ -194,23 +182,15 @@
 
                 <i class="fa-regular fa-user"></i>
 
-                <input
-                  id="checkout-name"
-                  type="text"
-                  formControlName="name"
-                  placeholder="Enter your full name"
-                  autocomplete="name"
-                >
+                <input id="checkout-name" type="text" formControlName="name" placeholder="Enter your full name"
+                  autocomplete="name">
 
               </div>
 
-              <small
-                class="field-error"
-                *ngIf="
+              <small class="field-error" *ngIf="
                   checkoutForm.get('name')?.touched &&
                   checkoutForm.get('name')?.invalid
-                "
-              >
+                ">
                 Please enter your full name.
               </small>
 
@@ -234,21 +214,10 @@
                     +91
                   </span>
 
-                  <input
-                    id="checkout-phone"
-                    type="tel"
-                    inputmode="numeric"
-                    maxlength="10"
-                    formControlName="phone"
-                    placeholder="10 digit mobile number"
-                    autocomplete="tel"
-                    [readonly]="otpVerified"
-                  >
+                  <input id="checkout-phone" type="tel" inputmode="numeric" maxlength="10" formControlName="phone"
+                    placeholder="10 digit mobile number" autocomplete="tel" [readonly]="otpVerified">
 
-                  <span
-                    class="verified-status"
-                    *ngIf="otpVerified"
-                  >
+                  <span class="verified-status" *ngIf="otpVerified">
                     <i class="fa-solid fa-circle-check"></i>
                     Verified
                   </span>
@@ -256,24 +225,16 @@
                 </div>
 
 
-                <button
-                  type="button"
-                  class="verify-button"
-                  *ngIf="!otpVerified"
-                  (click)="openPhoneVerification()"
-                >
+                <button type="button" class="verify-button" *ngIf="!otpVerified" (click)="openPhoneVerification()">
                   Verify
                 </button>
 
               </div>
 
-              <small
-                class="field-error"
-                *ngIf="
+              <small class="field-error" *ngIf="
                   checkoutForm.get('phone')?.touched &&
                   checkoutForm.get('phone')?.invalid
-                "
-              >
+                ">
                 Enter a valid 10 digit mobile number.
               </small>
 
@@ -293,33 +254,22 @@
 
                 <i class="fa-regular fa-envelope"></i>
 
-                <input
-                  id="checkout-email"
-                  type="email"
-                  formControlName="email"
-                  placeholder="you@example.com"
-                  autocomplete="email"
-                >
+                <input id="checkout-email" type="email" formControlName="email" placeholder="you@example.com"
+                  autocomplete="email">
 
               </div>
 
-              <small
-                class="field-error"
-                *ngIf="
+              <small class="field-error" *ngIf="
                   checkoutForm.get('email')?.touched &&
                   checkoutForm.get('email')?.errors?.['required']
-                "
-              >
+                ">
                 Email address is required.
               </small>
 
-              <small
-                class="field-error"
-                *ngIf="
+              <small class="field-error" *ngIf="
                   checkoutForm.get('email')?.touched &&
                   checkoutForm.get('email')?.errors?.['email']
-                "
-              >
+                ">
                 Please enter a valid email address.
               </small>
 
@@ -357,23 +307,15 @@
 
                 <i class="fa-solid fa-house"></i>
 
-                <textarea
-                  id="checkout-address"
-                  rows="3"
-                  formControlName="address"
-                  placeholder="House / flat number, street, area, landmark"
-                  autocomplete="street-address"
-                ></textarea>
+                <textarea id="checkout-address" rows="3" formControlName="address"
+                  placeholder="House / flat number, street, area, landmark" autocomplete="street-address"></textarea>
 
               </div>
 
-              <small
-                class="field-error"
-                *ngIf="
+              <small class="field-error" *ngIf="
                   checkoutForm.get('address')?.touched &&
                   checkoutForm.get('address')?.invalid
-                "
-              >
+                ">
                 Delivery address is required.
               </small>
 
@@ -395,23 +337,15 @@
 
                   <i class="fa-solid fa-city"></i>
 
-                  <input
-                    id="checkout-city"
-                    type="text"
-                    formControlName="city"
-                    placeholder="Enter city"
-                    autocomplete="address-level2"
-                  >
+                  <input id="checkout-city" type="text" formControlName="city" placeholder="Enter city"
+                    autocomplete="address-level2">
 
                 </div>
 
-                <small
-                  class="field-error"
-                  *ngIf="
+                <small class="field-error" *ngIf="
                     checkoutForm.get('city')?.touched &&
                     checkoutForm.get('city')?.invalid
-                  "
-                >
+                  ">
                   City is required.
                 </small>
 
@@ -429,23 +363,15 @@
 
                   <i class="fa-solid fa-map"></i>
 
-                  <input
-                    id="checkout-state"
-                    type="text"
-                    formControlName="state"
-                    placeholder="Enter state"
-                    autocomplete="address-level1"
-                  >
+                  <input id="checkout-state" type="text" formControlName="state" placeholder="Enter state"
+                    autocomplete="address-level1">
 
                 </div>
 
-                <small
-                  class="field-error"
-                  *ngIf="
+                <small class="field-error" *ngIf="
                     checkoutForm.get('state')?.touched &&
                     checkoutForm.get('state')?.invalid
-                  "
-                >
+                  ">
                   State is required.
                 </small>
 
@@ -467,25 +393,15 @@
 
                 <i class="fa-solid fa-location-crosshairs"></i>
 
-                <input
-                  id="checkout-pincode"
-                  type="text"
-                  inputmode="numeric"
-                  maxlength="6"
-                  formControlName="pincode"
-                  placeholder="4 digit PIN code"
-                  autocomplete="postal-code"
-                >
+                <input id="checkout-pincode" type="text" inputmode="numeric" maxlength="6" formControlName="pincode"
+                  placeholder="4 digit PIN code" autocomplete="postal-code">
 
               </div>
 
-              <small
-                class="field-error"
-                *ngIf="
+              <small class="field-error" *ngIf="
                   checkoutForm.get('pincode')?.touched &&
                   checkoutForm.get('pincode')?.invalid
-                "
-              >
+                ">
                 Enter a valid 4 digit PIN code.
               </small>
 
@@ -533,11 +449,7 @@
                CONTINUE
           ================================================== -->
 
-          <button
-            type="button"
-            class="primary-action"
-            (click)="continueToPayment()"
-          >
+          <button type="button" class="primary-action" (click)="continueToPayment()">
 
             <span>
               Continue to Payment
@@ -566,10 +478,7 @@
              PAYMENT STEP
         ================================================== -->
 
-        <section
-          class="checkout-card payment-card"
-          *ngIf="checkoutStep === 'payment'"
-        >
+        <section class="checkout-card payment-card" *ngIf="checkoutStep === 'payment'">
 
           <div class="card-header">
 
@@ -598,11 +507,7 @@
 
           <!-- BACK -->
 
-          <button
-            type="button"
-            class="back-button"
-            (click)="backToDetails()"
-          >
+          <button type="button" class="back-button" (click)="backToDetails()">
 
             <i class="fa-solid fa-arrow-left"></i>
 
@@ -646,18 +551,11 @@
 
             <!-- UPI -->
 
-            <label
-              class="payment-option"
-              [class.selected]="
+            <label class="payment-option" [class.selected]="
                 checkoutForm.get('paymentMethod')?.value === 'UPI'
-              "
-            >
+              ">
 
-              <input
-                type="radio"
-                value="UPI"
-                formControlName="paymentMethod"
-              >
+              <input type="radio" value="UPI" formControlName="paymentMethod">
 
               <div class="payment-option-icon upi">
                 <span>UPI</span>
@@ -690,20 +588,44 @@
             </label>
 
 
+            <!-- CASH ON DELIVERY -->
+
+            <label class="payment-option" [class.selected]="
+    checkoutForm.get('paymentMethod')?.value === 'COD'
+  ">
+
+              <input type="radio" value="COD" formControlName="paymentMethod">
+
+              <div class="payment-option-icon">
+                <i class="fa-solid fa-money-bill-wave"></i>
+              </div>
+
+              <div class="payment-option-content">
+
+                <strong>
+                  Cash on Delivery
+                </strong>
+
+                <span>
+                  Pay when your order is delivered
+                </span>
+
+              </div>
+
+              <span class="payment-radio">
+                <i class="fa-solid fa-check"></i>
+              </span>
+
+            </label>
+
+
             <!-- CARD -->
 
-            <label
-              class="payment-option"
-              [class.selected]="
+            <label class="payment-option" [class.selected]="
                 checkoutForm.get('paymentMethod')?.value === 'CARD'
-              "
-            >
+              ">
 
-              <input
-                type="radio"
-                value="CARD"
-                formControlName="paymentMethod"
-              >
+              <input type="radio" value="CARD" formControlName="paymentMethod">
 
               <div class="payment-option-icon">
                 <i class="fa-regular fa-credit-card"></i>
@@ -730,18 +652,11 @@
 
             <!-- NET BANKING -->
 
-            <label
-              class="payment-option"
-              [class.selected]="
+            <label class="payment-option" [class.selected]="
                 checkoutForm.get('paymentMethod')?.value === 'NETBANKING'
-              "
-            >
+              ">
 
-              <input
-                type="radio"
-                value="NETBANKING"
-                formControlName="paymentMethod"
-              >
+              <input type="radio" value="NETBANKING" formControlName="paymentMethod">
 
               <div class="payment-option-icon">
                 <i class="fa-solid fa-building-columns"></i>
@@ -768,18 +683,11 @@
 
             <!-- WALLET -->
 
-            <label
-              class="payment-option"
-              [class.selected]="
+            <label class="payment-option" [class.selected]="
                 checkoutForm.get('paymentMethod')?.value === 'WALLET'
-              "
-            >
+              ">
 
-              <input
-                type="radio"
-                value="WALLET"
-                formControlName="paymentMethod"
-              >
+              <input type="radio" value="WALLET" formControlName="paymentMethod">
 
               <div class="payment-option-icon">
                 <i class="fa-solid fa-wallet"></i>
@@ -808,19 +716,14 @@
 
           <!-- PAY -->
 
-          <button
-            type="button"
-            class="primary-action pay-button"
-            (click)="placeOrder()"
-            [disabled]="isPlacingOrder"
-          >
+          <button type="button" class="primary-action pay-button" (click)="placeOrder()" [disabled]="isPlacingOrder">
 
             <span>
 
               {{
-                isPlacingOrder
-                  ? 'Processing Payment...'
-                  : 'Pay ₹' + (grandTotal | number)
+              isPlacingOrder
+              ? 'Processing Payment...'
+              : 'Pay ₹' + (grandTotal | number)
               }}
 
             </span>
@@ -883,17 +786,11 @@
 
           <div class="summary-products">
 
-            <div
-              class="summary-item"
-              *ngFor="let item of cartItems"
-            >
+            <div class="summary-item" *ngFor="let item of cartItems">
 
               <div class="summary-image">
 
-                <img
-                  [src]="item.image"
-                  [alt]="item.name"
-                >
+                <img [src]="item.image" [alt]="item.name">
 
                 <span class="quantity-badge">
                   {{ item.quantity }}
@@ -912,12 +809,10 @@
                   Size: {{ item.selectedSize }}
                 </span>
 
-                <span
-                  *ngIf="
+                <span *ngIf="
                     item.selectedColor &&
                     !item.selectedCombination
-                  "
-                >
+                  ">
                   Color: {{ item.selectedColor }}
                 </span>
 
@@ -927,9 +822,9 @@
 
                 <span *ngIf="item.selectedPack">
                   {{
-                    item.packQuantity === 1
-                      ? '1 Piece'
-                      : item.packQuantity + ' Pack'
+                  item.packQuantity === 1
+                  ? '1 Piece'
+                  : item.packQuantity + ' Pack'
                   }}
                 </span>
 
@@ -942,8 +837,8 @@
 
               <strong class="summary-item-total">
                 ₹{{
-                  (item.cartPrice * item.quantity)
-                    | number
+                (item.cartPrice * item.quantity)
+                | number
                 }}
               </strong>
 
@@ -966,19 +861,12 @@
 
                 <i class="fa-solid fa-tag"></i>
 
-                <input
-                  type="text"
-                  placeholder="Enter coupon code"
-                  [(ngModel)]="couponCode"
-                  [ngModelOptions]="{ standalone: true }"
-                >
+                <input type="text" placeholder="Enter coupon code" [(ngModel)]="couponCode"
+                  [ngModelOptions]="{ standalone: true }">
 
               </div>
 
-              <button
-                type="button"
-                (click)="applyCoupon()"
-              >
+              <button type="button" (click)="applyCoupon()">
                 APPLY
               </button>
 
@@ -1010,13 +898,11 @@
                 Shipping
               </span>
 
-              <strong
-                [class.free]="shipping === 0"
-              >
+              <strong [class.free]="shipping === 0">
                 {{
-                  shipping === 0
-                    ? 'FREE'
-                    : '₹' + (shipping | number)
+                shipping === 0
+                ? 'FREE'
+                : '₹' + (shipping | number)
                 }}
               </strong>
 
@@ -1036,10 +922,7 @@
             </div>
 
 
-            <div
-              class="price-row discount-row"
-              *ngIf="discount > 0"
-            >
+            <div class="price-row discount-row" *ngIf="discount > 0">
 
               <span>
                 Discount ({{ discount }}%)
@@ -1169,163 +1052,123 @@
     </form>
 
 
-   
-
-    
 
 
 
-  <!-- =====================================================
+
+
+
+    <!-- =====================================================
        OTP MODAL
   ====================================================== -->
 
-  <div
-    class="otp-overlay"
-    *ngIf="showOtpModal"
-  >
+    <div class="otp-overlay" *ngIf="showOtpModal">
 
-    <div
-      class="otp-modal"
-      role="dialog"
-      aria-modal="true"
-    >
+      <div class="otp-modal" role="dialog" aria-modal="true">
 
-      <button
-        type="button"
-        class="otp-close"
-        (click)="showOtpModal = false"
-        aria-label="Close"
-      >
-        ×
-      </button>
-
-
-      <div class="otp-icon">
-
-        <i class="fa-solid fa-mobile-screen-button"></i>
-
-      </div>
-
-
-      <span class="otp-label">
-        MOBILE VERIFICATION
-      </span>
-
-
-      <h2>
-        Verify your number
-      </h2>
-
-
-      <p>
-        We'll send a verification code to
-      </p>
-
-
-      <strong class="otp-number">
-        +91 {{ mobileForOtp }}
-      </strong>
-
-
-      <!-- SEND OTP -->
-
-      <div *ngIf="!otpSent">
-
-        <button
-          type="button"
-          class="otp-primary-button"
-          (click)="sendCheckoutOTP()"
-          [disabled]="otpLoading"
-        >
-
-          {{
-            otpLoading
-              ? 'Sending...'
-              : 'Send OTP'
-          }}
-
+        <button type="button" class="otp-close" (click)="showOtpModal = false" aria-label="Close">
+          ×
         </button>
 
-      </div>
 
+        <div class="otp-icon">
 
-      <!-- VERIFY OTP -->
-
-      <div *ngIf="otpSent">
-
-        <div class="otp-input-wrapper">
-
-          <i class="fa-solid fa-key"></i>
-
-          <input
-            type="text"
-            placeholder="Enter 4 digit OTP"
-            maxlength="6"
-            inputmode="numeric"
-            autocomplete="one-time-code"
-            [(ngModel)]="otp"
-            [ngModelOptions]="{ standalone: true }"
-          >
+          <i class="fa-solid fa-mobile-screen-button"></i>
 
         </div>
 
 
-        <button
-          type="button"
-          class="otp-primary-button"
-          (click)="verifyCheckoutOTP()"
-          [disabled]="otpLoading"
-        >
+        <span class="otp-label">
+          MOBILE VERIFICATION
+        </span>
 
-          {{
+
+        <h2>
+          Verify your number
+        </h2>
+
+
+        <p>
+          We'll send a verification code to
+        </p>
+
+
+        <strong class="otp-number">
+          +91 {{ mobileForOtp }}
+        </strong>
+
+
+        <!-- SEND OTP -->
+
+        <div *ngIf="!otpSent">
+
+          <button type="button" class="otp-primary-button" (click)="sendCheckoutOTP()" [disabled]="otpLoading">
+
+            {{
             otpLoading
-              ? 'Verifying...'
-              : 'Verify OTP'
-          }}
+            ? 'Sending...'
+            : 'Send OTP'
+            }}
 
-        </button>
+          </button>
 
-
-        <button
-          type="button"
-          class="resend-button"
-          (click)="sendCheckoutOTP()"
-          [disabled]="otpLoading"
-        >
-          Resend OTP
-        </button>
-
-      </div>
+        </div>
 
 
-      <p
-        class="otp-error"
-        *ngIf="otpError"
-      >
-        <i class="fa-solid fa-circle-exclamation"></i>
-        {{ otpError }}
-      </p>
+        <!-- VERIFY OTP -->
+
+        <div *ngIf="otpSent">
+
+          <div class="otp-input-wrapper">
+
+            <i class="fa-solid fa-key"></i>
+
+            <input type="text" placeholder="Enter 4 digit OTP" maxlength="6" inputmode="numeric"
+              autocomplete="one-time-code" [(ngModel)]="otp" [ngModelOptions]="{ standalone: true }">
+
+          </div>
 
 
-      <p
-        class="otp-success"
-        *ngIf="otpSuccess"
-      >
-        <i class="fa-solid fa-circle-check"></i>
-        {{ otpSuccess }}
-      </p>
+          <button type="button" class="otp-primary-button" (click)="verifyCheckoutOTP()" [disabled]="otpLoading">
+
+            {{
+            otpLoading
+            ? 'Verifying...'
+            : 'Verify OTP'
+            }}
+
+          </button>
 
 
-      <div class="otp-security">
+          <button type="button" class="resend-button" (click)="sendCheckoutOTP()" [disabled]="otpLoading">
+            Resend OTP
+          </button>
 
-        <i class="fa-solid fa-lock"></i>
+        </div>
 
-        Your phone number is securely verified.
+
+        <p class="otp-error" *ngIf="otpError">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          {{ otpError }}
+        </p>
+
+
+        <p class="otp-success" *ngIf="otpSuccess">
+          <i class="fa-solid fa-circle-check"></i>
+          {{ otpSuccess }}
+        </p>
+
+
+        <div class="otp-security">
+
+          <i class="fa-solid fa-lock"></i>
+
+          Your phone number is securely verified.
+
+        </div>
 
       </div>
 
     </div>
 
   </div>
-
-</div>

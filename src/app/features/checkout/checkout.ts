@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CartService } from '../../services/cart';
-import { RouterLink } from '@angular/router';
 import { OrderService } from '../../services/order';
 import { Order } from '../../models/orders';
 import { Router } from '@angular/router';
 import { Payment } from '../../services/payment';
 import { ChangeDetectorRef } from '@angular/core';
+import { AuthService } from '../../services/auth';
 import { CartItem } from '../../services/cart';
+
 
 declare global {
   interface Window {
@@ -53,7 +54,7 @@ import {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    
+
     FormsModule,
 
   ],
@@ -79,6 +80,7 @@ export class Checkout implements OnInit {
 
   otpSent = false;
   otpVerified = false;
+  guestVerificationToken: string | null = null;
 
   otpLoading = false;
 
@@ -103,6 +105,7 @@ export class Checkout implements OnInit {
     private router: Router,
     private orderService: OrderService,
     private paymentService: Payment,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef
 
   ) {
@@ -201,16 +204,23 @@ export class Checkout implements OnInit {
 
   continueToPayment(): void {
 
-    // 1. Validate delivery details
+    // ---------------------------------------------
+    // 1. Validate checkout details
+    // ---------------------------------------------
+
     if (this.checkoutForm.invalid) {
-
       this.checkoutForm.markAllAsTouched();
-
       return;
     }
 
-    // 2. Phone OTP verification
-    if (!this.otpVerified) {
+    // ---------------------------------------------
+    // 2. OTP verification is mandatory
+    // ---------------------------------------------
+
+    if (
+      !this.otpVerified ||
+      !this.guestVerificationToken
+    ) {
 
       this.otpError =
         'Please verify your mobile number before continuing.';
@@ -220,29 +230,57 @@ export class Checkout implements OnInit {
       return;
     }
 
-    // 3. Ensure verified number is same as checkout number
-    const checkoutPhone =
-      this.checkoutForm.get('phone')?.value;
+    // ---------------------------------------------
+    // 3. Server-side verification proof
+    // ---------------------------------------------
+    // Guest checkout must have a server-issued token.
+    // Logged-in users are allowed to use their authenticated
+    // session instead; the backend will handle that path.
 
-    if (this.mobileForOtp !== checkoutPhone) {
+    const isLoggedIn =
+      this.authService.isLoggedIn();
 
+    if (!isLoggedIn && !this.guestVerificationToken) {
       this.otpVerified = false;
-
       this.otpError =
-        'Mobile number changed. Please verify it again.';
-
+        'Your mobile verification has expired. Please verify again.';
       this.openPhoneVerification();
-
       return;
     }
 
-    // 4. Save delivery information
+    // ---------------------------------------------
+    // 4. Ensure the verified phone is unchanged
+    // ---------------------------------------------
+
+    const checkoutPhone =
+      String(
+        this.checkoutForm.get('phone')?.value || ''
+      ).trim();
+
+    if (
+      checkoutPhone !== this.mobileForOtp
+    ) {
+      this.invalidatePhoneVerification();
+
+      this.otpError =
+        'Mobile number changed. Please verify it again.';
+      this.openPhoneVerification();
+      return;
+    }
+
+    // ---------------------------------------------
+    // 5. Save checkout information
+    // ---------------------------------------------
+
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)
     );
 
-    // 5. Move to payment step
+    // ---------------------------------------------
+    // 6. Move to payment
+    // ---------------------------------------------
+
     this.checkoutStep = 'payment';
 
     window.scrollTo({
@@ -250,6 +288,7 @@ export class Checkout implements OnInit {
       behavior: 'smooth'
     });
   }
+
 
   backToDetails(): void {
 
@@ -268,34 +307,73 @@ export class Checkout implements OnInit {
 
   placeOrder(): void {
 
-    // Payment step se hi order place hoga
+    // Payment step se hi order place hoga.
     if (this.checkoutStep !== 'payment') {
       return;
     }
 
-    // Prevent double click
+    // Prevent duplicate clicks / duplicate Razorpay orders.
     if (this.isPlacingOrder) {
       return;
     }
 
-    // OTP safety check
-    if (!this.otpVerified) {
+    // OTP verification is mandatory.
+    if (
+      !this.otpVerified ||
+      !this.guestVerificationToken
+    ) {
 
       this.otpError =
-        'Please verify your mobile number first.';
+        'Please verify your mobile number before payment.';
 
       this.openPhoneVerification();
 
       return;
     }
 
+    // For guests, frontend state alone is never trusted.
+    // The guestVerificationToken must have been issued by our backend.
+    const isLoggedIn =
+      this.authService.isLoggedIn();
+
+    if (!isLoggedIn && !this.guestVerificationToken) {
+      this.otpVerified = false;
+      this.otpError =
+        'Your mobile verification has expired. Please verify again.';
+      this.openPhoneVerification();
+      return;
+    }
+
+    // Make sure the checkout phone is still the verified phone.
+    const checkoutPhone =
+      String(
+        this.checkoutForm.get('phone')?.value || ''
+      ).trim();
+
+    if (
+      !checkoutPhone ||
+      checkoutPhone !== this.mobileForOtp
+    ) {
+      this.invalidatePhoneVerification();
+
+      this.otpError =
+        'Mobile number changed. Please verify it again.';
+      this.openPhoneVerification();
+      return;
+    }
+
     this.isPlacingOrder = true;
 
-    // Save latest customer information
+    // Save latest customer information.
     localStorage.setItem(
       'customerInfo',
       JSON.stringify(this.checkoutForm.value)
     );
+
+    const items =
+      this.isBuyNow
+        ? this.cartItems
+        : this.cartService.getCartItems();
 
     const order: Order = {
 
@@ -306,7 +384,7 @@ export class Checkout implements OnInit {
         this.checkoutForm.value.email,
 
       phone:
-        this.checkoutForm.value.phone,
+        checkoutPhone,
 
       address:
         this.checkoutForm.value.address,
@@ -329,12 +407,7 @@ export class Checkout implements OnInit {
       orderStatus:
         'Processing',
 
-      items:
-        this.isBuyNow
-          ? this.cartItems
-          : this.cartService.getCartItems(),
-
-
+      items,
 
       total:
         this.grandTotal,
@@ -347,15 +420,96 @@ export class Checkout implements OnInit {
 
     };
 
+    // =============================================
+    // COD ORDER
+    // =============================================
+
+    if (
+      this.checkoutForm.value.paymentMethod === 'COD'
+    ) {
+
+      this.orderService
+        .addOrder(
+          order,
+          this.guestVerificationToken
+        )
+        .subscribe({
+
+          next: (res: any) => {
+
+            console.log(
+              'COD order created successfully:',
+              res
+            );
+
+            this.generatedOrderId =
+              res.order._id;
+
+            // Clear cart
+            if (this.isBuyNow) {
+              this.cartService.clearBuyNow();
+            } else {
+              this.cartService.clearCart();
+            }
+
+            this.isPlacingOrder = false;
+
+            localStorage.removeItem(
+              'customerInfo'
+            );
+
+            this.couponCode = '';
+            this.discount = 0;
+            this.discountAmount = 0;
+
+            // Go to success page
+            this.router.navigate(
+              ['/order-success'],
+              {
+                state: {
+                  orderId: res.order.orderNumber,
+                  order: res.order
+                }
+              }
+            );
+
+          },
+
+          error: (err: any) => {
+
+            console.error(
+              'COD ORDER ERROR:',
+              err
+            );
+
+            this.isPlacingOrder = false;
+
+            alert(
+              err?.error?.message ||
+              'Unable to place COD order. Please try again.'
+            );
+
+          }
+
+        });
+
+      return;
+    }
 
 
-    // Create Razorpay order
+
+    // ---------------------------------------------
+    // IMPORTANT
+    // ---------------------------------------------
+    // The Payment service/backend will be updated in the
+    // next step to accept guestVerificationToken.
+    // Do not trust this token on the client itself.
+    // It must be sent to the backend and verified there.
     this.paymentService
       .createOrder(
         this.couponCode,
-        this.isBuyNow
-          ? this.cartItems
-          : this.cartService.getCartItems()
+        items,
+        this.guestVerificationToken
       )
       .subscribe({
 
@@ -377,11 +531,17 @@ export class Checkout implements OnInit {
 
           this.isPlacingOrder = false;
 
+          alert(
+            error?.error?.message ||
+            'Unable to start payment. Please try again.'
+          );
+
         }
 
       });
-
   }
+
+
   get paymentMethod() {
 
     return this.checkoutForm.get('paymentMethod')?.value;
@@ -520,9 +680,11 @@ export class Checkout implements OnInit {
         // ----------------------------------------
         // Verify payment from BACKEND
         // ----------------------------------------
-
         this.paymentService
-          .verifyPayment(paymentResponse)
+          .verifyPayment(
+            paymentResponse,
+            this.guestVerificationToken
+          )
           .subscribe({
 
             // ====================================
@@ -579,7 +741,10 @@ export class Checkout implements OnInit {
               // ==================================
 
               this.orderService
-                .addOrder(paidOrder)
+                .addOrder(
+                  paidOrder,
+                  this.guestVerificationToken
+                )
                 .subscribe({
 
                   // ==============================
@@ -740,19 +905,25 @@ export class Checkout implements OnInit {
   }
 
 
-  sendCheckoutOTP() {
+  sendCheckoutOTP(): void {
 
     this.otpError = '';
     this.otpSuccess = '';
 
-    const phone = this.mobileForOtp.trim();
+    const phone =
+      String(this.mobileForOtp || '').trim();
 
     if (!/^[0-9]{10}$/.test(phone)) {
-      this.otpError = 'Please enter a valid 10 digit mobile number';
+      this.otpError =
+        'Please enter a valid 10 digit mobile number';
       return;
     }
 
-    const identifier = '91' + phone;
+    // Any new OTP attempt invalidates the previous
+    // server-side verification proof.
+    this.invalidatePhoneVerification(false);
+
+    const identifier = `91${phone}`;
 
     this.otpLoading = true;
 
@@ -761,45 +932,62 @@ export class Checkout implements OnInit {
 
       (data: any) => {
 
-        console.log('OTP sent successfully:', data);
+        console.log(
+          'OTP sent successfully:',
+          data
+        );
 
         this.otpSent = true;
         this.otpLoading = false;
 
         this.otpSuccess =
-          'OTP sent successfully to +91 ' + phone;
+          `OTP sent successfully to +91 ${phone}`;
 
-        // IMPORTANT
         this.cdr.detectChanges();
-
       },
 
       (error: any) => {
 
-        console.error('OTP send error:', error);
+        console.error(
+          'OTP send error:',
+          error
+        );
 
         this.otpLoading = false;
 
         this.otpError =
           'Unable to send OTP. Please try again';
 
-        // IMPORTANT
         this.cdr.detectChanges();
-
       }
     );
   }
 
 
-  verifyCheckoutOTP() {
+  verifyCheckoutOTP(): void {
 
     this.otpError = '';
     this.otpSuccess = '';
 
-    if (!this.otp) {
+    const otpValue =
+      String(this.otp || '').trim();
 
-      this.otpError = 'Please enter OTP';
+    if (!/^[0-9]{4}$/.test(otpValue)) {
+      this.otpError =
+        'Please enter a valid 4 digit OTP';
+      return;
+    }
 
+    const phone =
+      String(this.mobileForOtp || '').trim();
+
+    if (!/^\d{10}$/.test(phone)) {
+      this.otpError =
+        'Please enter a valid 10 digit mobile number';
+      return;
+    }
+
+    if (this.otpLoading) {
       return;
     }
 
@@ -807,88 +995,217 @@ export class Checkout implements OnInit {
 
     window.verifyOtp(
 
-      this.otp,
+      otpValue,
 
       (data: any) => {
 
-        console.log('OTP VERIFIED:', data);
+        // Never log the MSG91 access token.
+        console.log(
+          'MSG91 OTP verification succeeded.'
+        );
 
-        this.otpLoading = false;
-        this.otpVerified = true;
+        // MSG91 widget returns its access token in `message`
+        // in the integration currently used by this checkout.
+        const msg91AccessToken =
+          typeof data?.message === 'string'
+            ? data.message
+            : '';
 
-        this.otpSuccess =
-          'Mobile number verified successfully';
+        if (!msg91AccessToken) {
 
-        this.checkoutForm.patchValue({
-          phone: this.mobileForOtp
-        });
+          console.error(
+            'MSG91 access token was not returned.'
+          );
 
-        this.cdr.detectChanges();
+          this.setOtpVerificationError(
+            'OTP verification failed. Please try again.'
+          );
 
-        setTimeout(() => {
+          return;
+        }
 
-          this.showOtpModal = false;
+        // ---------------------------------------------
+        // SERVER-SIDE PHONE VERIFICATION
+        // ---------------------------------------------
+        // The frontend does NOT decide that OTP is verified.
+        // Our backend verifies the MSG91 token with MSG91 and,
+        // for guests, returns a short-lived signed token.
 
-          this.cdr.detectChanges();
+        this.authService
+          .verifyWidgetToken(
+            msg91AccessToken,
+            phone
+          )
+          .subscribe({
 
-        }, 800);
+            next: (response: any) => {
 
+              console.log(
+                'Backend phone verification succeeded:',
+                {
+                  success: response?.success,
+                  phone: response?.phone,
+                  hasGuestVerificationToken:
+                    !!response?.guestVerificationToken
+                }
+              );
+
+              if (!response?.success) {
+
+                this.setOtpVerificationError(
+                  response?.message ||
+                  'Phone verification failed. Please try again.'
+                );
+
+                return;
+              }
+
+              const isLoggedIn =
+                this.authService.isLoggedIn();
+
+              // Guest must receive a server-issued token.
+              if (
+                !isLoggedIn &&
+                !response?.guestVerificationToken
+              ) {
+
+                console.error(
+                  'Guest verification token missing from backend response.'
+                );
+
+                this.setOtpVerificationError(
+                  'Phone verification could not be completed. Please try again.'
+                );
+
+                return;
+              }
+
+              // Store the server-issued proof only in memory.
+              // Do not put it into localStorage.
+              this.guestVerificationToken =
+                response?.guestVerificationToken || null;
+
+              this.mobileForOtp = phone;
+
+              this.checkoutForm.patchValue({
+                phone
+              });
+
+              this.otpVerified = true;
+              this.otpLoading = false;
+              this.otpSuccess =
+                'Mobile number verified successfully';
+
+              this.cdr.detectChanges();
+
+              setTimeout(() => {
+
+                this.showOtpModal = false;
+
+                this.cdr.detectChanges();
+
+              }, 800);
+            },
+
+            error: (error: any) => {
+
+              console.error(
+                'Backend phone verification failed:',
+                error
+              );
+
+              this.setOtpVerificationError(
+                error?.error?.message ||
+                'Phone verification failed. Please try again.'
+              );
+            }
+
+          });
       },
 
       (error: any) => {
 
         console.error(
-          'OTP verification failed:',
+          'MSG91 OTP verification failed:',
           error
         );
 
-        this.otpLoading = false;
-
-        this.otpError =
-          'Invalid OTP. Please enter the correct OTP';
-
-        this.cdr.detectChanges();
-
+        this.setOtpVerificationError(
+          'Invalid OTP. Please enter the correct OTP'
+        );
       }
     );
   }
 
 
-  openPhoneVerification() {
+  /**
+   * Clears all client-side OTP state.
+   *
+   * The server-issued guest token is intentionally kept
+   * only in memory and is removed whenever the phone number
+   * needs to be verified again.
+   */
+  private invalidatePhoneVerification(
+    resetOtpInput = true
+  ): void {
 
-    const phone = this.checkoutForm.get('phone')?.value;
+    this.otpVerified = false;
+    this.guestVerificationToken = null;
+    this.otpSent = false;
+
+    if (resetOtpInput) {
+      this.otp = '';
+    }
+  }
+
+
+  private setOtpVerificationError(
+    message: string
+  ): void {
+
+    this.otpLoading = false;
+    this.otpVerified = false;
+    this.guestVerificationToken = null;
+    this.otpError = message;
+    this.otpSuccess = '';
+
+    this.cdr.detectChanges();
+  }
+
+
+  openPhoneVerification(): void {
+
+
+    const phone =
+      String(
+        this.checkoutForm.get('phone')?.value || ''
+      ).trim();
 
     if (!phone) {
 
-      this.otpError = 'Please enter mobile number';
+      this.otpError =
+        'Please enter mobile number';
 
       return;
-
     }
 
-    if (!/^[0-9]{10}$/.test(phone)) {
+    if (!/^\d{10}$/.test(phone)) {
 
       this.otpError =
         'Please enter a valid 10 digit mobile number';
 
       return;
-
     }
 
+    // Opening verification for a phone means the previous
+    // verification proof must not remain valid on the client.
     this.mobileForOtp = phone;
 
-    this.otp = '';
-
-    this.otpSent = false;
-
-    this.otpVerified = false;
+    this.invalidatePhoneVerification();
 
     this.otpError = '';
-
     this.otpSuccess = '';
-
     this.showOtpModal = true;
-
   }
 
 }

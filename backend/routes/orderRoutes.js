@@ -14,13 +14,15 @@ const {
 } = require("../controllers/orderController");
 const {
     isAuthenticatedUser,
+    optionalAuthentication,
     authorizeRoles
 } = require("../middleware/auth");
 
 router.route("/")
-    .post(isAuthenticatedUser, createOrder)
-    .get(isAuthenticatedUser, getOrders);
 
+    .post(optionalAuthentication, createOrder)
+
+    .get(isAuthenticatedUser, getOrders);
 
 // ==========================================================
 // SHIPROCKET — ADMIN ONLY

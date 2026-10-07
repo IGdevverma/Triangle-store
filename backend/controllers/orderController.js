@@ -16,24 +16,176 @@ const {
     generateShiprocketPickup,
     trackShiprocketAwb
 } = require("../services/shiprocketService");
+const jwt = require("jsonwebtoken");
 
 
 
+// ============================================================
+// RESOLVE ORDER ACTOR
+// ============================================================
+//
+// Supports:
+// 1. Logged-in users
+// 2. OTP-verified guests
+//
+// Guest must provide:
+// X-Guest-Verification-Token
+//
+// ============================================================
+
+const resolveOrderActor = (req) => {
+
+    // ========================================================
+    // LOGGED-IN USER
+    // ========================================================
+
+    if (req.user) {
+
+        return {
+            type: "user",
+
+            userId:
+                req.user._id,
+
+            verifiedPhone:
+                req.user.phone || null
+        };
+    }
 
 
-// Create Order
-// Create Order
-const createOrder = async (req, res) => {
+    // ========================================================
+    // GUEST USER
+    // ========================================================
 
-    const session = await mongoose.startSession();
+    const guestToken =
+        req.headers["x-guest-verification-token"];
+
+
+    if (
+        !guestToken ||
+        typeof guestToken !== "string"
+    ) {
+
+        const error =
+            new Error(
+                "Phone verification is required"
+            );
+
+        error.statusCode = 401;
+
+        throw error;
+    }
+
+
+    // ========================================================
+    // VERIFY SERVER-SIGNED TOKEN
+    // ========================================================
+
+    let decoded;
 
     try {
 
+        decoded =
+            jwt.verify(
+                guestToken.trim(),
+                process.env.JWT_SECRET
+            );
+
+    } catch (error) {
+
+        const authError =
+            new Error(
+                "Guest phone verification has expired. Please verify your mobile number again."
+            );
+
+        authError.statusCode = 401;
+
+        throw authError;
+    }
+
+
+    // ========================================================
+    // VALIDATE TOKEN
+    // ========================================================
+
+    if (
+        !decoded ||
+        decoded.type !==
+        "guest_phone_verification" ||
+        !decoded.phone
+    ) {
+
+        const error =
+            new Error(
+                "Invalid guest verification token"
+            );
+
+        error.statusCode = 401;
+
+        throw error;
+    }
+
+
+    // ========================================================
+    // RETURN GUEST ACTOR
+    // ========================================================
+
+    return {
+
+        type: "guest",
+
+        userId: null,
+
+        verifiedPhone:
+            decoded.phone
+    };
+};
+
+
+// ============================================================
+// CREATE ORDER
+// ============================================================
+
+const createOrder = async (req, res) => {
+
+    const session =
+        await mongoose.startSession();
+
+    try {
+
+        // ======================================================
+        // 1. RESOLVE USER / GUEST
+        // ======================================================
+
+        const orderActor =
+            resolveOrderActor(req);
+
+
+        console.log(
+            "CREATE ORDER REQUEST:",
+            {
+                type:
+                    orderActor.type,
+
+                userId:
+                    orderActor.userId || null,
+
+                verifiedPhone:
+                    orderActor.verifiedPhone || null
+            }
+        );
+
+
+        // ======================================================
+        // START TRANSACTION
+        // ======================================================
+
         session.startTransaction();
 
-        // ==========================================
-        // 1. GET CUSTOMER DATA
-        // ==========================================
+
+        // ======================================================
+        // 2. GET CUSTOMER DATA
+        // ======================================================
 
         const {
             customerName,
@@ -50,12 +202,9 @@ const createOrder = async (req, res) => {
         } = req.body;
 
 
-
-
-
-        // ==========================================
-        // 2. BASIC VALIDATION
-        // ==========================================
+        // ======================================================
+        // 3. BASIC VALIDATION
+        // ======================================================
 
         if (
             !customerName ||
@@ -71,244 +220,478 @@ const createOrder = async (req, res) => {
             await session.abortTransaction();
 
             return res.status(400).json({
+
                 success: false,
+
                 message:
                     "Complete customer and delivery details are required"
             });
         }
 
-        // ==========================================
-        // 3. PAYMENT VALIDATION
-        // ==========================================
+
+        // ======================================================
+        // 4. NORMALIZE PHONE
+        // ======================================================
+
+        const normalizedCustomerPhone =
+            String(phone)
+                .replace(/\D/g, "")
+                .replace(/^91/, "")
+                .slice(-10);
+
+
+        if (
+            normalizedCustomerPhone.length !== 10
+        ) {
+
+            await session.abortTransaction();
+
+            return res.status(400).json({
+
+                success: false,
+
+                message:
+                    "Invalid mobile number"
+            });
+        }
+
+
+        // ======================================================
+        // 5. GUEST PHONE MUST MATCH VERIFIED PHONE
+        // ======================================================
+
+        if (
+            orderActor.type === "guest"
+        ) {
+
+            const verifiedPhoneDigits =
+                String(
+                    orderActor.verifiedPhone
+                )
+                    .replace(/\D/g, "")
+                    .replace(/^91/, "")
+                    .slice(-10);
+
+
+            if (
+                verifiedPhoneDigits !==
+                normalizedCustomerPhone
+            ) {
+
+                await session.abortTransaction();
+
+                return res.status(401).json({
+
+                    success: false,
+
+                    message:
+                        "Mobile number does not match the verified phone number"
+                });
+            }
+        }
+
+
+        // ======================================================
+        // 6. PAYMENT METHOD VALIDATION
+        // ======================================================
 
         if (
             paymentMethod !== "UPI" &&
             paymentMethod !== "CARD" &&
             paymentMethod !== "NETBANKING" &&
-            paymentMethod !== "WALLET"
+            paymentMethod !== "WALLET" &&
+            paymentMethod !== "COD"
         ) {
 
             await session.abortTransaction();
 
             return res.status(400).json({
+
                 success: false,
+
                 message:
                     "Invalid payment method"
             });
         }
+        // ======================================================
+        // 7-12. PAYMENT VERIFICATION
+        // ======================================================
 
-        if (
-            !razorpayOrderId ||
-            !razorpayPaymentId
-        ) {
+        let verifiedPayment = null;
 
-            await session.abortTransaction();
+        // ======================================================
+        // COD
+        // ======================================================
 
-            return res.status(400).json({
-                success: false,
-                message:
-                    "Payment information is missing"
-            });
+        if (paymentMethod === "COD") {
+
+            console.log(
+                "COD ORDER - Razorpay verification skipped"
+            );
+
+        } else {
+
+            // ======================================================
+            // 7. RAZORPAY PAYMENT DATA
+            // ======================================================
+
+            if (
+                !razorpayOrderId ||
+                !razorpayPaymentId
+            ) {
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Payment information is missing"
+                });
+            }
+
+            // ======================================================
+            // 8. VERIFY SERVER-SIDE PAYMENT RECORD
+            // ======================================================
+
+            if (
+                orderActor.type === "user"
+            ) {
+
+                verifiedPayment =
+                    await PaymentVerification.findOne({
+
+                        razorpayOrderId,
+
+                        razorpayPaymentId,
+
+                        user:
+                            orderActor.userId
+
+                    }).session(session);
+
+            } else {
+
+                verifiedPayment =
+                    await PaymentVerification.findOne({
+
+                        razorpayOrderId,
+
+                        razorpayPaymentId,
+
+                        user: null,
+
+                        verifiedPhone:
+                            orderActor.verifiedPhone
+
+                    }).session(session);
+            }
+
+            // ======================================================
+            // PAYMENT VERIFICATION NOT FOUND
+            // ======================================================
+
+            if (!verifiedPayment) {
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+                    success: false,
+                    message: "Payment has not been verified"
+                });
+            }
+
+            // ======================================================
+            // 9. VERIFY PAYMENT PHONE
+            // ======================================================
+
+            if (
+                orderActor.type === "guest"
+            ) {
+
+                const paymentPhone =
+                    String(
+                        verifiedPayment.verifiedPhone || ""
+                    )
+                        .replace(/\D/g, "")
+                        .replace(/^91/, "")
+                        .slice(-10);
+
+                if (
+                    paymentPhone !==
+                    normalizedCustomerPhone
+                ) {
+
+                    await session.abortTransaction();
+
+                    return res.status(401).json({
+                        success: false,
+                        message:
+                            "Payment verification phone does not match order phone"
+                    });
+                }
+            }
+
+            // ======================================================
+            // 10. PAYMENT VERIFICATION EXPIRY
+            // ======================================================
+
+            if (
+                !verifiedPayment.expiresAt ||
+                new Date() >
+                verifiedPayment.expiresAt
+            ) {
+
+                await PaymentVerification.deleteOne({
+                    _id:
+                        verifiedPayment._id
+                }).session(session);
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Payment verification has expired. Please try again."
+                });
+            }
+
+            // ======================================================
+            // 11. PREVENT PAYMENT REUSE
+            // ======================================================
+
+            const existingPaidOrder =
+                await Order.findOne({
+
+                    razorpayOrderId,
+
+                    razorpayPaymentId,
+
+                    paymentStatus: "Paid"
+
+                }).session(session);
+
+            if (existingPaidOrder) {
+
+                await session.abortTransaction();
+
+                return res.status(409).json({
+                    success: false,
+                    message:
+                        "This payment has already been used for an order"
+                });
+            }
+
+            // ======================================================
+            // 12. PREVENT DUPLICATE RAZORPAY ORDER
+            // ======================================================
+
+            const existingOrder =
+                await Order.findOne({
+
+                    razorpayOrderId
+
+                }).session(session);
+
+            if (existingOrder) {
+
+                await session.abortTransaction();
+
+                return res.status(200).json({
+                    success: true,
+                    message:
+                        "Order already exists",
+                    order:
+                        existingOrder
+                });
+            }
         }
 
-        // ==========================================
-        // 3.1 VERIFY SERVER-SIDE PAYMENT RECORD
-        // ==========================================
-
-        const verifiedPayment =
-            await PaymentVerification.findOne({
-                razorpayOrderId,
-                razorpayPaymentId,
-                user: req.user._id
-            });
-
-        if (!verifiedPayment) {
-
-            await session.abortTransaction();
-
-            return res.status(400).json({
-                success: false,
-                message: "Payment has not been verified"
-            });
-        }
-
-        // Make sure the verification record has not expired
-        if (new Date() > verifiedPayment.expiresAt) {
-
-            await PaymentVerification.deleteOne({
-                _id: verifiedPayment._id
-            });
-
-            await session.abortTransaction();
-
-            return res.status(400).json({
-                success: false,
-                message: "Payment verification has expired. Please try again."
-            });
-        }
-
-
-
-        // ==========================================
-        // 3.2 PREVENT REUSE OF VERIFIED PAYMENT
-        // ==========================================
-
-        const existingPaidOrder = await Order.findOne({
-            razorpayOrderId,
-            razorpayPaymentId,
-            paymentStatus: "Paid"
-        }).session(session);
-
-        if (existingPaidOrder) {
-
-            await session.abortTransaction();
-
-            return res.status(409).json({
-                success: false,
-                message: "This payment has already been used for an order"
-            });
-        }
-
-        // ==========================================
-        // 4. PREVENT DUPLICATE RAZORPAY ORDER
-        // ==========================================
-
-        const existingOrder =
-            await Order.findOne({
-                razorpayOrderId
-            }).session(session);
-
-        if (existingOrder) {
-
-            await session.abortTransaction();
-
-            return res.status(200).json({
-                success: true,
-                message:
-                    "Order already exists",
-                order: existingOrder
-            });
-        }
-
-        // ==========================================
-        // 5. GET PRODUCTS FROM DATABASE
-        // ==========================================
+        // ======================================================
+        // 13. GET PRODUCTS FROM DATABASE
+        // ======================================================
 
         const items = [];
 
-        for (const item of req.body.items || []) {
+
+        for (
+            const item of
+            req.body.items || []
+        ) {
 
             const productId =
                 item.productId ||
                 item._id ||
                 item.id;
 
+
+            if (!productId) {
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "Product ID is missing"
+                });
+            }
+
+
             const product =
                 await Product.findById(
                     productId
                 ).session(session);
+
 
             if (!product) {
 
                 await session.abortTransaction();
 
                 return res.status(404).json({
+
                     success: false,
+
                     message:
                         `${item.name || "Product"} not found`
                 });
             }
 
-            const quantity = Number(item.quantity);
+
+            // --------------------------------------------------
+            // QUANTITY
+            // --------------------------------------------------
+
+            const quantity =
+                Number(item.quantity);
+
 
             if (
                 !Number.isInteger(quantity) ||
                 quantity < 1
             ) {
+
                 await session.abortTransaction();
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
                         `Invalid quantity for ${product.name}`
                 });
             }
 
 
-            // ==========================================
+            // ==================================================
             // PACK INFORMATION
-            // ==========================================
+            // ==================================================
 
             const selectedPack =
-                item.selectedPack || "single";
+                item.selectedPack ||
+                "single";
+
 
             let packQuantity = 1;
-            let packPrice = Number(product.price || 0);
 
-            // ------------------------------------------
-            // SINGLE PIECE
-            // ------------------------------------------
+            let packPrice =
+                Number(
+                    product.price || 0
+                );
 
-            if (selectedPack === "single") {
+
+            // --------------------------------------------------
+            // SINGLE
+            // --------------------------------------------------
+
+            if (
+                selectedPack === "single"
+            ) {
 
                 packQuantity = 1;
 
                 packPrice =
-                    Number(product.price || 0);
-
+                    Number(
+                        product.price || 0
+                    );
             }
 
-            // ------------------------------------------
-            // PACK PRODUCT
-            // ------------------------------------------
+
+            // --------------------------------------------------
+            // PACK
+            // --------------------------------------------------
 
             else {
 
                 const pack =
                     product.packs?.find(
-                        p => p.id === selectedPack
+                        p =>
+                            p.id ===
+                            selectedPack
                     );
+
 
                 if (!pack) {
 
                     await session.abortTransaction();
 
                     return res.status(400).json({
+
                         success: false,
+
                         message:
                             `Selected pack is not available for ${product.name}`
                     });
-
                 }
 
+
                 packQuantity =
-                    Number(pack.quantity || 1);
+                    Number(
+                        pack.quantity || 1
+                    );
+
 
                 packPrice =
-                    Number(pack.price ?? product.price ?? 0);
+                    Number(
+                        pack.price ??
+                        product.price ??
+                        0
+                    );
             }
 
-            // ==========================================
+
+            // ==================================================
             // TOTAL PHYSICAL UNITS
-            // ==========================================
+            // ==================================================
 
             const totalUnits =
-                quantity * packQuantity;
+                quantity *
+                packQuantity;
 
-            // ==========================================
+
+            // ==================================================
             // STOCK CHECK
-            // ==========================================
+            // ==================================================
 
-            if (product.stock < totalUnits) {
+            if (
+                Number(product.stock) <
+                totalUnits
+            ) {
 
                 await session.abortTransaction();
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
                         `Only ${product.stock} pieces of ${product.name} are available`
                 });
             }
+
+
+            // ==================================================
+            // SAVE VERIFIED ITEM
+            // ==================================================
 
             items.push({
 
@@ -334,54 +717,74 @@ const createOrder = async (req, res) => {
                 selectedColor:
                     item.selectedColor || "",
 
-                selectedPack:
-                    selectedPack,
+                selectedPack,
 
                 selectedCombination:
                     item.selectedCombination || "",
 
                 totalUnits
-
             });
         }
 
-        // ==========================================
-        // 6. CART EMPTY CHECK
-        // ==========================================
 
-        if (!items.length) {
+        // ======================================================
+        // 14. CART EMPTY CHECK
+        // ======================================================
+
+        if (
+            !items.length
+        ) {
 
             await session.abortTransaction();
 
             return res.status(400).json({
+
                 success: false,
-                message: "Cart is empty"
+
+                message:
+                    "Cart is empty"
             });
         }
 
-        // ==========================================
-        // CALCULATE PRICING
-        // ==========================================
+
+        // ======================================================
+        // 15. SERVER-SIDE PRICING
+        // ======================================================
 
         let pricing;
 
+
         try {
-            pricing = calculatePricing(
-                items.map(item => ({
-                    packPrice: item.price,
-                    quantity: item.quantity
-                })),
-                couponCode
-            );
+
+            pricing =
+                calculatePricing(
+
+                    items.map(item => ({
+
+                        packPrice:
+                            item.price,
+
+                        quantity:
+                            item.quantity
+
+                    })),
+
+                    couponCode
+                );
+
         } catch (error) {
 
             await session.abortTransaction();
 
             return res.status(400).json({
+
                 success: false,
-                message: error.message
+
+                message:
+                    error.message
             });
         }
+
 
         const {
             subtotal,
@@ -393,31 +796,53 @@ const createOrder = async (req, res) => {
         } = pricing;
 
 
+        // ======================================================
+        // 16. VERIFY PAYMENT AMOUNT
+        // ======================================================
 
-        // ==========================================
-        // 7.1 VERIFY PAYMENT AMOUNT
-        // ==========================================
+        // ======================================================
+        // 16. VERIFY PAYMENT AMOUNT
+        // ======================================================
 
-        const expectedPaymentAmount = Math.round(Number(total) * 100);
+        // COD orders do not have a Razorpay payment record.
+        // Therefore payment amount verification is only required
+        // for online payments.
 
-        if (
-            verifiedPayment.amount !== expectedPaymentAmount ||
-            verifiedPayment.currency !== "INR"
-        ) {
+        if (paymentMethod !== "COD") {
 
-            await session.abortTransaction();
+            const expectedPaymentAmount =
+                Math.round(
+                    Number(total) * 100
+                );
 
-            return res.status(400).json({
-                success: false,
-                message: "Payment amount does not match order total"
-            });
+            if (
+                Number(
+                    verifiedPayment.amount
+                ) !==
+                expectedPaymentAmount ||
+
+                verifiedPayment.currency !==
+                "INR"
+            ) {
+
+                await session.abortTransaction();
+
+                return res.status(400).json({
+                    success: false,
+                    message:
+                        "Payment amount does not match order total"
+                });
+            }
         }
 
-        // ==========================================
-        // 8. ATOMIC STOCK DEDUCTION
-        // ==========================================
 
-        for (const item of items) {
+        // ======================================================
+        // 17. ATOMIC STOCK DEDUCTION
+        // ======================================================
+
+        for (
+            const item of items
+        ) {
 
             const updatedProduct =
                 await Product.findOneAndUpdate(
@@ -434,206 +859,358 @@ const createOrder = async (req, res) => {
 
                     {
                         $inc: {
+
                             stock:
                                 -item.totalUnits
                         }
                     },
 
                     {
-                        returnDocument: "after",
+                        returnDocument:
+                            "after",
+
                         session
                     }
                 );
+
 
             if (!updatedProduct) {
 
                 await session.abortTransaction();
 
                 return res.status(400).json({
+
                     success: false,
+
                     message:
                         `${item.name} is no longer available in the requested quantity`
                 });
             }
         }
 
-        // ==========================================
-        // 9. CREATE ORDER
-        // ==========================================
+
+        // ======================================================
+        // 18. CREATE ORDER
+        // ======================================================
 
         const [order] =
             await Order.create(
+
                 [
                     {
-                        user: req.user._id,
+
+                        // --------------------------------------
+                        // USER
+                        // --------------------------------------
+                        //
+                        // Logged-in user -> ObjectId
+                        // Guest -> null
+                        //
+                        user:
+                            orderActor.userId || null,
+
+
+                        // --------------------------------------
+                        // CUSTOMER DETAILS
+                        // --------------------------------------
 
                         customerName,
+
                         email,
-                        phone,
+
+                        phone:
+                            normalizedCustomerPhone,
+
                         address,
+
                         city,
+
                         state,
+
                         pincode,
+
+
+                        // --------------------------------------
+                        // PAYMENT
+                        // --------------------------------------
 
                         paymentMethod,
 
-                        paymentStatus: "Paid",
+                        paymentStatus:
+                            paymentMethod === "COD"
+                                ? "Pending"
+                                : "Paid",
 
-                        razorpayOrderId,
-                        razorpayPaymentId,
+                        razorpayOrderId:
+                            paymentMethod === "COD"
+                                ? null
+                                : razorpayOrderId,
 
-                        paymentVerifiedAt: new Date(),
+                        razorpayPaymentId:
+                            paymentMethod === "COD"
+                                ? null
+                                : razorpayPaymentId,
+
+                        paymentVerifiedAt:
+                            paymentMethod === "COD"
+                                ? null
+                                : new Date(),
+
+
+                        // --------------------------------------
+                        // ITEMS
+                        // --------------------------------------
 
                         items,
+
+
+                        // --------------------------------------
+                        // PRICING
+                        // --------------------------------------
+
                         subtotal,
+
                         discountAmount,
+
                         shipping,
+
                         gst,
+
                         couponCode,
 
                         total,
 
-                        orderStatus: "Processing",
+
+                        // --------------------------------------
+                        // ORDER STATUS
+                        // --------------------------------------
+
+                        orderStatus:
+                            "Processing",
 
                         trackingHistory: [
+
                             {
-                                status: "Processing",
-                                date: new Date()
+
+                                status:
+                                    "Processing",
+
+                                date:
+                                    new Date()
                             }
                         ]
                     }
                 ],
+
                 {
                     session
                 }
             );
 
-        // ==========================================
-        // 9.1 CONSUME VERIFIED PAYMENT ATOMICALLY
-        // ==========================================
 
-        const consumedPayment =
-            await PaymentVerification.findOneAndDelete(
-                {
-                    _id: verifiedPayment._id,
-                    user: req.user._id,
-                    razorpayOrderId,
-                    razorpayPaymentId
-                },
-                {
-                    session
-                }
-            );
+        // ======================================================
+        // 19. CONSUME PAYMENT VERIFICATION
+        // ======================================================
 
-        if (!consumedPayment) {
+        if (paymentMethod !== "COD") {
 
-            await session.abortTransaction();
+            let consumedPayment;
 
-            return res.status(409).json({
-                success: false,
-                message: "Payment verification could not be consumed"
-            });
-        }
-        // ==========================================
-        // 10. COMMIT
-        // ==========================================
+
+            if (
+                orderActor.type === "user"
+            ) {
+
+                consumedPayment =
+                    await PaymentVerification.findOneAndDelete(
+
+                        {
+
+                            _id:
+                                verifiedPayment._id,
+
+                            user:
+                                orderActor.userId,
+
+                            razorpayOrderId,
+
+                            razorpayPaymentId
+
+                        },
+
+                        {
+                            session
+                        }
+                    );
+
+            } else {
+
+                consumedPayment =
+                    await PaymentVerification.findOneAndDelete(
+
+                        {
+
+                            _id:
+                                verifiedPayment._id,
+
+                            user: null,
+
+                            verifiedPhone:
+                                orderActor.verifiedPhone,
+
+                            razorpayOrderId,
+
+                            razorpayPaymentId
+
+                        },
+
+                        {
+                            session
+                        }
+                    );
+            }
+
+
+            // ======================================================
+            // PAYMENT CONSUMPTION FAILED
+            // ======================================================
+
+            if (!consumedPayment) {
+
+                await session.abortTransaction();
+
+                return res.status(409).json({
+
+                    success: false,
+
+                    message:
+                        "Payment verification could not be consumed"
+                });
+            }
+
+        } // ✅ COD wrapper close
+
+
+
+        // ======================================================
+        // 20. COMMIT TRANSACTION
+        // ======================================================
 
         await session.commitTransaction();
 
 
-        // ==========================================
-        // 10.1 RECONCILE RAZORPAY WEBHOOK EVENTS
-        // ==========================================
 
-        try {
 
-            const reconciliationResult =
-                await RazorpayWebhookEvent.updateMany(
-                    {
-                        razorpayOrderId: razorpayOrderId,
-                        processed: false
-                    },
-                    {
-                        $set: {
-                            processed: true,
-                            processedAt: new Date()
+        // ======================================================
+        // 21. RECONCILE RAZORPAY WEBHOOK EVENTS
+        // ======================================================
+
+        if (paymentMethod !== "COD") {
+
+            try {
+
+                const reconciliationResult =
+                    await RazorpayWebhookEvent.updateMany(
+
+                        {
+                            razorpayOrderId:
+                                razorpayOrderId,
+
+                            processed:
+                                false
+                        },
+
+                        {
+                            $set: {
+
+                                processed:
+                                    true,
+
+                                processedAt:
+                                    new Date()
+                            }
                         }
-                    }
+                    );
+
+
+                if (
+                    reconciliationResult.modifiedCount >
+                    0
+                ) {
+
+                    console.log(
+                        "Razorpay webhook event(s) reconciled:",
+                        razorpayOrderId,
+                        reconciliationResult.modifiedCount
+                    );
+                }
+
+            } catch (
+            webhookReconciliationError
+            ) {
+
+                console.error(
+                    "Webhook reconciliation failed:",
+                    webhookReconciliationError.message
                 );
-
-            if (reconciliationResult.modifiedCount > 0) {
-
-                console.log(
-                    "✅ Razorpay webhook event(s) reconciled:",
-                    razorpayOrderId,
-                    reconciliationResult.modifiedCount
-                );
-
             }
-
-        } catch (webhookReconciliationError) {
-
-            console.error(
-                "⚠️ Webhook reconciliation failed:",
-                webhookReconciliationError.message
-            );
 
         }
 
 
-
-        // ==========================================
-        // 11. SEND ORDER EMAILS
-        // ==========================================
-
-        // ------------------------------------------
-        // CUSTOMER ORDER CONFIRMATION
-        // ------------------------------------------
+        // ======================================================
+        // 22. CUSTOMER ORDER EMAIL
+        // ======================================================
 
         try {
 
             await EmailService
                 .sendOrderPlaced(order);
 
+
             console.log(
-                "✅ Customer order confirmation email sent."
+                "Customer order confirmation email sent."
             );
 
-        } catch (customerMailError) {
+        } catch (
+        customerMailError
+        ) {
 
             console.error(
-                "❌ Customer order confirmation email failed:",
+                "Customer order confirmation email failed:",
                 customerMailError
             );
-
         }
 
 
-        // ------------------------------------------
-        // ADMIN NEW ORDER NOTIFICATION
-        // ------------------------------------------
+        // ======================================================
+        // 23. ADMIN ORDER EMAIL
+        // ======================================================
 
         try {
 
             await EmailService
                 .sendAdminNewOrder(order);
 
+
             console.log(
-                "✅ Admin order notification email sent."
+                "Admin order notification email sent."
             );
 
-        } catch (adminMailError) {
+        } catch (
+        adminMailError
+        ) {
 
             console.error(
-                "❌ Admin order notification email failed:",
+                "Admin order notification email failed:",
                 adminMailError
             );
-
         }
 
-        // ==========================================
-        // 12. RESPONSE
-        // ==========================================
+
+        // ======================================================
+        // 24. FINAL RESPONSE
+        // ======================================================
 
         return res.status(201).json({
 
@@ -643,31 +1220,44 @@ const createOrder = async (req, res) => {
                 "Order Placed Successfully",
 
             order
-
         });
+
 
     } catch (error) {
 
-        await session.abortTransaction();
+        // ------------------------------------------------------
+        // ABORT ONLY IF TRANSACTION IS ACTIVE
+        // ------------------------------------------------------
+
+        if (
+            session.inTransaction()
+        ) {
+
+            await session.abortTransaction();
+        }
+
 
         console.error(
             "ORDER ERROR:",
             error
         );
 
-        return res.status(500).json({
+
+        return res.status(
+            error.statusCode || 500
+        ).json({
 
             success: false,
 
             message:
-                error.message
-
+                error.statusCode
+                    ? error.message
+                    : "Unable to create order"
         });
 
     } finally {
 
         session.endSession();
-
     }
 };
 
@@ -805,14 +1395,16 @@ const createShipment = async (req, res) => {
         // 3. PAYMENT CHECK
         // ==========================================
 
-        if (order.paymentStatus !== "Paid") {
+        if (
+            order.paymentStatus !== "Paid" &&
+            order.paymentMethod !== "COD"
+        ) {
 
             return res.status(400).json({
                 success: false,
                 message:
                     "Shipment can only be created for a paid order"
             });
-
         }
 
         // ==========================================
@@ -1088,7 +1680,9 @@ const createShipment = async (req, res) => {
                 shiprocketItems,
 
             payment_method:
-                "Prepaid",
+                order.paymentMethod === "COD"
+                    ? "COD"
+                    : "Prepaid",
 
             shipping_charges:
                 Number(order.shipping || 0),

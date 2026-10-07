@@ -1210,7 +1210,6 @@ export class ProductDetail implements OnInit, AfterViewInit {
             return;
           }
           this.product = product;
-
           // =====================================================
           // DYNAMIC PRODUCT SEO
           // =====================================================
@@ -1221,13 +1220,21 @@ export class ProductDetail implements OnInit, AfterViewInit {
 
           const productDescription =
             product.description?.trim() ||
-            `Shop ${productName} from Triangle Sports. Explore premium sportswear designed for comfort, performance and everyday training.`;
+            `Shop ${productName} from Triangle Sports. Explore premium sportswear for gym, training, fitness and everyday wear.`;
 
+          const category =
+            product.category?.trim() || '';
+
+          /*
+           * Product-specific SEO keywords
+           */
           const productKeywords = [
             productName,
+            `${productName} for men`,
+            category,
             'Triangle Sports',
-            product.category,
             'sportswear',
+            'men sportswear',
             'gym wear',
             'fitness wear',
             'activewear',
@@ -1249,28 +1256,38 @@ export class ProductDetail implements OnInit, AfterViewInit {
             product.images?.[0] ||
             '';
 
+          /*
+           * SEO title
+           */
+          const seoTitle =
+            `${productName} for Men | Triangle Sports`;
+
+          /*
+           * Google search description
+           *
+           * Keep it concise and remove accidental
+           * line breaks / excessive spaces.
+           */
+          const seoDescription =
+            productDescription
+              .replace(/\s+/g, ' ')
+              .trim()
+              .substring(0, 160);
+
           this.seoService.updateSeo(
-            `${productName} | Triangle Sports`,
-            productDescription.substring(0, 160),
+            seoTitle,
+            seoDescription,
             productKeywords,
             productImage,
             productUrl
           );
+
+          /*
+           * Product structured data
+           */
           this.productSchemaService.updateProductSchema(
             product,
             productUrl
-          );
-
-
-
-          console.log(
-            'PACK DATA FROM API:',
-            product.packs?.map(pack => ({
-              id: pack.id,
-              name: pack.name,
-              quantity: pack.quantity,
-              combinations: pack.combinations
-            }))
           );
 
 

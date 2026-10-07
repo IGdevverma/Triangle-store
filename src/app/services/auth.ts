@@ -104,21 +104,17 @@ export class AuthService {
 
   }
 
-  verifyWidgetToken(accessToken: string, phone: string) {
-
-    const token = localStorage.getItem('token');
-
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
+  verifyWidgetToken(
+    accessToken: string,
+    phone: string
+  ): Observable<any> {
 
     return this.http.post<any>(
       `${this.apiUrl}/verify-widget-token`,
       {
         accessToken,
         phone
-      },
-      { headers }
+      }
     );
 
   }

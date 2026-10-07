@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { Order } from '../models/orders';
 
@@ -54,18 +54,30 @@ export class OrderService {
   // ====================================================
   // CREATE ORDER
   // ====================================================
-
   addOrder(
-    order: Order
+    order: Order,
+    guestVerificationToken?: string | null
   ): Observable<OrderResponse> {
+
+    let headers = new HttpHeaders();
+
+    if (
+      guestVerificationToken &&
+      guestVerificationToken.trim()
+    ) {
+      headers = headers.set(
+        'X-Guest-Verification-Token',
+        guestVerificationToken.trim()
+      );
+    }
 
     return this.http.post<OrderResponse>(
       this.apiUrl,
-      order
+      order,
+      { headers }
     );
 
   }
-
 
   // ====================================================
   // GET USER ORDERS
@@ -189,9 +201,9 @@ export class OrderService {
 
 
   trackShipment(orderId: string): Observable<any> {
-  return this.http.get<any>(
-    `${this.apiUrl}/${orderId}/shiprocket/tracking`
-  );
-}
+    return this.http.get<any>(
+      `${this.apiUrl}/${orderId}/shiprocket/tracking`
+    );
+  }
 
 }

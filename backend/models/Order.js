@@ -89,7 +89,8 @@ const orderSchema = new mongoose.Schema(
         "UPI",
         "CARD",
         "NETBANKING",
-        "WALLET"
+        "WALLET",
+        "COD"
       ],
       required: true
     },
