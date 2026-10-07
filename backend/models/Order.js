@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      default: null,
       index: true
     },
 
@@ -393,15 +393,16 @@ const orderSchema = new mongoose.Schema(
   }
 );
 orderSchema.index({ createdAt: 1 });
+
 // ==========================================
 // GENERATE CUSTOMER-FACING ORDER NUMBER
 // ==========================================
 
-orderSchema.pre("validate", function (next) {
+orderSchema.pre("validate", function () {
 
   // Existing order already has an order number
   if (this.orderNumber) {
-    return next();
+    return;
   }
 
   const now = new Date();
@@ -418,16 +419,11 @@ orderSchema.pre("validate", function (next) {
     now.getDate()
   ).padStart(2, "0");
 
-
   const randomNumber =
     crypto.randomInt(100000, 1000000);
 
-
   this.orderNumber =
     `TS-${year}${month}${day}-${randomNumber}`;
-
-
-  next();
 
 });
 
