@@ -108,9 +108,9 @@ const orderSchema = new mongoose.Schema(
     },
 
     // Razorpay Order ID
+    // Razorpay Order ID
     razorpayOrderId: {
       type: String,
-      default: null,
       unique: true,
       sparse: true
     },
