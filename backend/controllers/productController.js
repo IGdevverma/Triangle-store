@@ -4,6 +4,15 @@ const ErrorHandler = require("../utils/errorHandler");
 const cloudinary = require("../config/cloudinary");
 
 
+
+// ============================================================
+// HOME PRODUCTS CACHE
+// ============================================================
+
+let homeProductsCache = null;
+let homeProductsCacheTime = 0;
+const HOME_CACHE_TTL = 60 * 1000;
+
 // ============================================================
 // CLOUDINARY BUFFER UPLOAD
 // ============================================================
@@ -705,6 +714,8 @@ const createProduct = asyncHandler(async (req, res) => {
 
         const product =
             await Product.create(productData);
+        homeProductsCache = null;
+        homeProductsCacheTime = 0;
 
 
         console.log(
@@ -860,13 +871,28 @@ const getHomeProducts = asyncHandler(async (req, res) => {
 
     try {
 
-        console.log("==========================================");
-        console.log("GET HOME PRODUCTS");
-        console.log("==========================================");
+        const now = Date.now();
 
-        const startTime = Date.now();
+        // ==============================
+        // RETURN CACHE
+        // ==============================
 
-        console.log("Product model:", !!Product);
+        if (
+            homeProductsCache &&
+            now - homeProductsCacheTime < HOME_CACHE_TTL
+        ) {
+
+            return res.status(200).json({
+                success: true,
+                count: homeProductsCache.length,
+                products: homeProductsCache
+            });
+
+        }
+
+        // ==============================
+        // DATABASE
+        // ==============================
 
         const products = await Product.find(
             {
@@ -886,16 +912,12 @@ const getHomeProducts = asyncHandler(async (req, res) => {
             .limit(3)
             .lean();
 
-        console.log(
-            "GET HOME PRODUCTS DB TIME:",
-            Date.now() - startTime,
-            "ms"
-        );
+        // ==============================
+        // SAVE CACHE
+        // ==============================
 
-        console.log(
-            "HOME PRODUCT COUNT:",
-            products.length
-        );
+        homeProductsCache = products;
+        homeProductsCacheTime = now;
 
         return res.status(200).json({
             success: true,
@@ -906,28 +928,20 @@ const getHomeProducts = asyncHandler(async (req, res) => {
     } catch (error) {
 
         console.error(
-            "=========================================="
-        );
-
-        console.error(
-            "GET HOME PRODUCTS ERROR:"
-        );
-
-        console.error(error);
-
-        console.error(
-            "=========================================="
+            "GET HOME PRODUCTS ERROR:",
+            error
         );
 
         return res.status(500).json({
             success: false,
-            message: error.message || "Failed to load home products"
+            message:
+                error.message ||
+                "Failed to load home products"
         });
 
     }
 
 });
-
 
 
 // ============================================================
@@ -2136,6 +2150,8 @@ const updateProduct = asyncHandler(
 
             const updatedProduct =
                 await product.save();
+            homeProductsCache = null;
+            homeProductsCacheTime = 0;
 
 
 
@@ -2233,6 +2249,9 @@ const deleteProduct = asyncHandler(
         await Product.findByIdAndDelete(
             req.params.id
         );
+
+        homeProductsCache = null;
+        homeProductsCacheTime = 0;
 
 
         return res.status(200).json({

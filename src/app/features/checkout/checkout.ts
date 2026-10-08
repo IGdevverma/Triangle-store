@@ -913,9 +913,11 @@ export class Checkout implements OnInit {
     const phone =
       String(this.mobileForOtp || '').trim();
 
-    if (!/^[0-9]{10}$/.test(phone)) {
+    if (!/^\d{10}$/.test(phone)) {
+
       this.otpError =
         'Please enter a valid 10 digit mobile number';
+
       return;
     }
 
@@ -963,7 +965,6 @@ export class Checkout implements OnInit {
     );
   }
 
-
   verifyCheckoutOTP(): void {
 
     this.otpError = '';
@@ -972,7 +973,7 @@ export class Checkout implements OnInit {
     const otpValue =
       String(this.otp || '').trim();
 
-    if (!/^[0-9]{4}$/.test(otpValue)) {
+    if (!/^\d{4}$/.test(otpValue)) {
       this.otpError =
         'Please enter a valid 4 digit OTP';
       return;
@@ -994,7 +995,6 @@ export class Checkout implements OnInit {
     this.otpLoading = true;
 
     window.verifyOtp(
-
       otpValue,
 
       (data: any) => {
@@ -1135,6 +1135,7 @@ export class Checkout implements OnInit {
         );
       }
     );
+
   }
 
 
@@ -1146,66 +1147,69 @@ export class Checkout implements OnInit {
    * needs to be verified again.
    */
   private invalidatePhoneVerification(
-    resetOtpInput = true
-  ): void {
+  resetOtpInput = true
+): void {
 
-    this.otpVerified = false;
-    this.guestVerificationToken = null;
-    this.otpSent = false;
+  this.otpVerified = false;
+  this.guestVerificationToken = null;
+  this.otpSent = false;
 
-    if (resetOtpInput) {
-      this.otp = '';
-    }
+  if(resetOtpInput) {
+    this.otp = '';
   }
+}
 
 
   private setOtpVerificationError(
-    message: string
-  ): void {
+  message: string
+): void {
 
-    this.otpLoading = false;
-    this.otpVerified = false;
-    this.guestVerificationToken = null;
-    this.otpError = message;
-    this.otpSuccess = '';
+  this.otpLoading = false;
+  this.otpVerified = false;
+  this.guestVerificationToken = null;
+  this.otpError = message;
+  this.otpSuccess = '';
 
-    this.cdr.detectChanges();
+  this.cdr.detectChanges();
+}
+
+
+
+
+
+openPhoneVerification(): void {
+
+
+  const phone =
+    String(
+      this.checkoutForm.get('phone')?.value || ''
+    ).trim();
+
+  if(!phone) {
+
+    this.otpError =
+      'Please enter mobile number';
+
+    return;
   }
 
+    if(!/^\d{ 10 } $ /.test(phone)) {
 
-  openPhoneVerification(): void {
+  this.otpError =
+    'Please enter a valid 10 digit mobile number';
 
+  return;
+}
 
-    const phone =
-      String(
-        this.checkoutForm.get('phone')?.value || ''
-      ).trim();
+// Opening verification for a phone means the previous
+// verification proof must not remain valid on the client.
+this.mobileForOtp = phone;
 
-    if (!phone) {
+this.invalidatePhoneVerification();
 
-      this.otpError =
-        'Please enter mobile number';
-
-      return;
-    }
-
-    if (!/^\d{10}$/.test(phone)) {
-
-      this.otpError =
-        'Please enter a valid 10 digit mobile number';
-
-      return;
-    }
-
-    // Opening verification for a phone means the previous
-    // verification proof must not remain valid on the client.
-    this.mobileForOtp = phone;
-
-    this.invalidatePhoneVerification();
-
-    this.otpError = '';
-    this.otpSuccess = '';
-    this.showOtpModal = true;
+this.otpError = '';
+this.otpSuccess = '';
+this.showOtpModal = true;
   }
 
 }

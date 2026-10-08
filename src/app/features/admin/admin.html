@@ -1202,7 +1202,7 @@
                         <!-- CREATE SHIPMENT -->
 
                         <button type="button" class="view-order-btn" *ngIf="!order.shiprocketOrderId"
-                            [disabled]="order.paymentStatus !== 'Paid'" (click)="createShiprocketShipment(order)">
+                            [disabled]="order.paymentStatus !== 'Paid' && order.paymentMethod !== 'COD'" (click)="createShiprocketShipment(order)">
 
                             <i class="fa-solid fa-box"></i>
 

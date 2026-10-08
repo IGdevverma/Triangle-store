@@ -92,8 +92,8 @@
                 <img [src]="getImageUrl(product.image, 480)" [srcset]="getImageSrcSet(product.image)" sizes="(max-width: 520px) 46vw,
          (max-width: 768px) 42vw,
          (max-width: 1200px) 30vw,
-         320px" [alt]="product.name" class="product-image" loading="eager" [attr.fetchpriority]="'high'"
-                    decoding="async" />
+         320px" [alt]="product.name" class="product-image" [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                    [attr.fetchpriority]="i === 0 ? 'high' : 'auto'" decoding="async" />
 
             </div>
 
@@ -354,7 +354,7 @@
 
             </a>
 
-            
+
 
         </div>
 

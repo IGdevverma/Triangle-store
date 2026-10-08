@@ -12,12 +12,12 @@ export class ProductService {
 
   private readonly apiUrl =
     `${environment.apiUrl}/products`;
-
   private products$?: Observable<any>;
+  private homeProducts$?: Observable<any>;
 
   constructor(
     private readonly http: HttpClient
-  ) {}
+  ) { }
 
   // ============================================================
   // GET ALL PRODUCTS
@@ -45,11 +45,26 @@ export class ProductService {
   // GET HOME PRODUCTS
   // ============================================================
 
-  getHomeProducts(): Observable<any> {
+  getHomeProducts(
+    forceRefresh: boolean = false
+  ): Observable<any> {
 
-    return this.http.get<any>(
-      `${this.apiUrl}/home`
-    );
+    if (forceRefresh || !this.homeProducts$) {
+
+      this.homeProducts$ = this.http
+        .get<any>(
+          `${this.apiUrl}/home`
+        )
+        .pipe(
+          shareReplay({
+            bufferSize: 1,
+            refCount: true
+          })
+        );
+
+    }
+
+    return this.homeProducts$;
 
   }
 
@@ -97,6 +112,7 @@ export class ProductService {
   ): Observable<Product> {
 
     this.products$ = undefined;
+    this.homeProducts$ = undefined;
 
     return this.http.post<Product>(
       this.apiUrl,
@@ -115,7 +131,7 @@ export class ProductService {
   ): Observable<any> {
 
     this.products$ = undefined;
-
+    this.homeProducts$ = undefined;
     return this.http.put(
       `${this.apiUrl}/${id}`,
       product
@@ -132,7 +148,7 @@ export class ProductService {
   ): Observable<void> {
 
     this.products$ = undefined;
-
+    this.homeProducts$ = undefined;
     return this.http.delete<void>(
       `${this.apiUrl}/${id}`
     );
