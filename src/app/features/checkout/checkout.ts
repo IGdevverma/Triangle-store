@@ -1193,7 +1193,7 @@ openPhoneVerification(): void {
     return;
   }
 
-    if(!/^\d{ 10 } $ /.test(phone)) {
+    if (!/^\d{10}$/.test(phone)) {
 
   this.otpError =
     'Please enter a valid 10 digit mobile number';
