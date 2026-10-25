@@ -114,6 +114,12 @@ export class Shop implements OnInit {
               ? params['search']
               : '';
 
+          if (typeof params['category'] === 'string' && params['category'].trim()) {
+            this.selectedCategory = params['category'].trim();
+          } else if (!params['category']) {
+            this.selectedCategory = 'All';
+          }
+
           this.filterProducts();
 
         });
@@ -172,7 +178,10 @@ export class Shop implements OnInit {
 
       const matchesCategory =
         this.selectedCategory === 'All' ||
-        product.category === this.selectedCategory;
+        product.category === this.selectedCategory ||
+        (Boolean(product.category) &&
+         String(product.category).toLowerCase().replace(/[\s-_]+/g, '') ===
+         this.selectedCategory.toLowerCase().replace(/[\s-_]+/g, ''));
 
 
       /* SEARCH */

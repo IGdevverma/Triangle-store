@@ -1,447 +1,643 @@
-<nav class="navbar" [class.scrolled]="isScrolled">
+<!-- =========================================================
+     TRIANGLE SPORTS — OPTION 4: PREMIUM MEGA MENU HEADER
+     ========================================================= -->
 
-  <!-- Logo -->
-  <div class="logo" routerLink="/">
-
-    <img src="assets/images/trianglepng.png" alt="Triangle Sports">
-
-    <div class="logo-text">
-
-
-
-    </div>
-
+<!-- 1. COMPACT ANNOUNCEMENT BAR -->
+<aside class="announcement-bar" role="region" aria-label="Store announcement">
+  <div class="announcement-content">
+    <i class="fa-solid fa-truck-fast announcement-icon" aria-hidden="true"></i>
+    <span class="announcement-text">
+      FREE SHIPPING ON ELIGIBLE PREPAID ORDERS &bull; PAN-INDIA DELIVERY &bull; HASSLE-FREE EXCHANGES
+    </span>
   </div>
-
-  <!-- Mobile Hamburger -->
-
-  <div class="hamburger" (click)="toggleMenu()">
-    ☰
-  </div>
-
-  <!-- Center Menu -->
-
-  <ul class="nav-menu" [class.active]="isMenuOpen">
-
-
-
-
-
-    <!-- ================= MEN ================= -->
-    <!-- ================= MEN ================= -->
-
-    <li class="dropdown mega-small">
-
-      <span class="menu-title">
-        MEN
-        <i class="fa-solid fa-chevron-down arrow"></i>
-      </span>
-
-      <div class="mega-menu">
-
-        <!-- TOPWEAR -->
-        <div class="mega-column">
-
-          <h4>Topwear</h4>
-
-          <a routerLink="/shop" [queryParams]="{ category: 'Vest' }">
-            Vests
-          </a>
-
-        </div>
-
-
-        <!-- BOTTOMWEAR -->
-        <div class="mega-column">
-
-          <h4>Bottomwear</h4>
-
-          <a routerLink="/shop" [queryParams]="{ category: 'Track Pant' }">
-            Track Pants
-          </a>
-
-        </div>
-
-
-        <!-- ACCESSORIES -->
-        <div class="mega-column">
-
-          <h4>Accessories</h4>
-
-          <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }">
-            Arm Sleeves
-          </a>
-
-        </div>
-
-      </div>
-
-    </li>
-
-    <!-- ================= WOMEN ================= -->
-    <li class="coming-soon-menu" (click)="showComingSoon('Women')">
-
-      <span class="menu-title">
-        WOMEN
-        <i class="fa-solid fa-chevron-down arrow"></i>
-      </span>
-
-    </li>
-
-    <!-- ================= ACCESSORIES ================= -->
-
-    <li class="coming-soon-menu" (click)="showComingSoon('Accessories')">
-
-      <span class="menu-title">
-        ACCESSORIES
-        <i class="fa-solid fa-chevron-down arrow"></i>
-      </span>
-
-    </li>
-
-    <!-- ================= DESIGN ================= -->
-    <li class="design-link coming-soon-link" (click)="showComingSoon('Design Your Own')">
-
-      DESIGN YOUR OWN
-
-    </li>
-
-  </ul>
-
-  <!-- Right Icons -->
-
-  <div class="nav-icons">
-
-    <!-- User Menu -->
-
-    <div class="user-menu" (click)="toggleUserMenu()">
-
-      <i class="fa-solid fa-user"></i>
-
-      <span>
-
-        {{ isLoggedIn() ? getUserName() : 'Sign In' }}
-
-      </span>
-
-      <i class="fa-solid fa-chevron-down"></i>
-
-      <div class="user-dropdown" *ngIf="isUserMenuOpen">
-
-        <!-- Guest -->
-
-        <ng-container *ngIf="!isLoggedIn()">
-
-          <a routerLink="/login">
-            <i class="fa-solid fa-right-to-bracket"></i>
-            <span>Login</span>
-          </a>
-
-
-
-          <a routerLink="/register">
-
-            <i class="fa-solid fa-user-plus"></i>
-
-            Signup
-
-          </a>
-
-        </ng-container>
-
-        <!-- Logged In -->
-
-        <ng-container *ngIf="isLoggedIn()">
-
-          <!-- Admin -->
-
-          <ng-container *ngIf="isAdmin(); else userMenu">
-
-            <a routerLink="/admin">
-              <i class="fa-solid fa-gauge"></i>
-              <span>Dashboard</span>
-            </a>
-
-
-
-          </ng-container>
-
-          <!-- User -->
-
-          <ng-template #userMenu>
-
-
-
-
-            <a routerLink="/profile/edit">
-              <i class="fa-solid fa-user-pen"></i>
-              <span> Profile</span>
-            </a>
-
-            <a routerLink="/orders">
-              <i class="fa-solid fa-bag-shopping"></i>
-              <span>My Orders</span>
-            </a>
-
-            <a routerLink="/dashboard">
-
-              <i class="fa-solid fa-gauge-high"></i>
-
-              <span>Dashboard</span>
-
-            </a>
-
-          </ng-template>
-
-          <hr>
-
-          <a (click)="logout()">
-            <i class="fa-solid fa-right-from-bracket"></i>
-            <span>Logout</span>
-          </a>
-
-        </ng-container>
-
-      </div>
-
-    </div>
-
-    <!--Search-->
-    <div class="search-container">
-      <i class="fa-solid fa-magnifying-glass" (click)="toggleSearch()"></i>
-      <div class="search-dropdown" *ngIf="isSearchOpen">
-
-        <div class="search-input">
-
-          <i class="fa-solid fa-magnifying-glass"></i>
-          <input type="text" placeholder="Search products..." [(ngModel)]="searchTerm" (input)="filterSearch()"
-            (keyup.enter)="searchProducts()">
-
-          <div class="search-results" *ngIf="searchResults.length > 0">
-
-            <div class="search-item" *ngFor="let product of searchResults" [routerLink]="['/product', product._id]"
-              (click)="isSearchOpen = false">
-
-              <img [src]="product.image" [alt]="product.name">
-
-              <div>
-
-                <strong>{{ product.name }}</strong>
-
-                <p>₹{{ product.price }}</p>
-
-              </div>
-
+</aside>
+
+<!-- 2. MAIN HEADER -->
+<header class="site-header" [class.scrolled]="isScrolled">
+  <nav class="navbar" aria-label="Main navigation">
+
+    <!-- Mobile Hamburger Button (hidden on desktop) -->
+    <button class="hamburger" type="button" [class.active]="isMenuOpen" aria-label="Toggle navigation menu"
+      [attr.aria-expanded]="isMenuOpen" (click)="toggleMenu()">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- Logo — Far Left on Desktop, Col 2 on Mobile (after hamburger) -->
+    <a class="logo" routerLink="/" aria-label="Triangle Sports home">
+      <img src="assets/images/trianglepng.png" alt="Triangle Sports" class="logo-img">
+    </a>
+
+    <!-- Desktop Navigation Menu — Immediately Right of Logo -->
+    <ul class="nav-menu" role="menubar">
+
+      <!-- MEN Mega Menu -->
+      <li class="nav-item mega-item" role="none" (mouseenter)="openMegaMenu('men')"
+        (mouseleave)="scheduleMegaMenuClose()">
+        <button class="nav-link menu-title" type="button" role="menuitem" aria-haspopup="true"
+          [attr.aria-expanded]="activeMegaMenu === 'men'" (click)="toggleMegaMenu('men')" (focus)="openMegaMenu('men')">
+          MEN
+          <i class="fa-solid fa-chevron-down arrow" [class.open]="activeMegaMenu === 'men'" aria-hidden="true"></i>
+        </button>
+
+        <!-- MEN Mega Panel -->
+        <div class="mega-panel" role="menu" [class.active]="activeMegaMenu === 'men'" (mouseenter)="openMegaMenu('men')"
+          (mouseleave)="scheduleMegaMenuClose()">
+          <div class="mega-inner">
+
+            <!-- Col 1: Topwear -->
+            <div class="mega-col">
+              <span class="mega-col-heading">TOPWEAR</span>
+              <a routerLink="/shop" [queryParams]="{ category: 'Vest' }" class="mega-link" role="menuitem"
+                (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-shirt"></i> Vests &amp; Tanks
+              </a>
+              <a routerLink="/shop" class="mega-link" role="menuitem" (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-store"></i> View All Topwear
+              </a>
+            </div>
+
+            <!-- Col 2: Bottomwear -->
+            <div class="mega-col">
+              <span class="mega-col-heading">BOTTOMWEAR</span>
+              <a routerLink="/shop" [queryParams]="{ category: 'Track Pant' }" class="mega-link" role="menuitem"
+                (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-person-running"></i> Track Pants &amp; Joggers
+              </a>
+              <a routerLink="/shop" class="mega-link" role="menuitem" (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-store"></i> View All Bottomwear
+              </a>
+            </div>
+
+            <!-- Col 3: Performance -->
+            <div class="mega-col">
+              <span class="mega-col-heading">PERFORMANCE</span>
+              <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }" class="mega-link" role="menuitem"
+                (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-hand-fist"></i> Arm Sleeves &amp; Compression
+              </a>
+              <a routerLink="/team-kit-designer" class="mega-link highlight" role="menuitem"
+                (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-palette"></i> Design Custom Kit
+              </a>
+            </div>
+
+            <!-- Col 4: Featured product card -->
+            <div class="mega-featured">
+              <span class="mega-col-heading">FEATURED</span>
+              <a routerLink="/shop" [queryParams]="{ category: 'Track Pant' }" class="mega-product-card"
+                (click)="closeMegaMenu(); closeMenu()">
+                <div class="mega-product-img-wrap">
+                  <img src="assets/products/IMG_7779.jpg" alt="TriCore TrackPant" loading="lazy">
+                </div>
+                <div class="mega-product-info">
+                  <span class="mega-product-name">TriCore Track Pants</span>
+                  <span class="mega-product-cta">Shop Now &rarr;</span>
+                </div>
+              </a>
             </div>
 
           </div>
 
-          <span (click)="toggleSearch(); $event.stopPropagation()">
-            ✕
-          </span>
+          <!-- Mega Panel Footer -->
+          <div class="mega-panel-footer">
+            <a routerLink="/shop" class="mega-footer-all" (click)="closeMegaMenu(); closeMenu()">
+              View All Men's Sportswear <i class="fa-solid fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </li>
+
+      <!-- WOMEN (Coming Soon with Mega Panel) -->
+      <li class="nav-item mega-item" role="none" (mouseenter)="openMegaMenu('women')"
+        (mouseleave)="scheduleMegaMenuClose()">
+        <button class="nav-link menu-title" type="button" role="menuitem" aria-haspopup="true"
+          [attr.aria-expanded]="activeMegaMenu === 'women'" (click)="toggleMegaMenu('women')"
+          (focus)="openMegaMenu('women')">
+          WOMEN
+          <span class="nav-badge soon">SOON</span>
+          <i class="fa-solid fa-chevron-down arrow" [class.open]="activeMegaMenu === 'women'" aria-hidden="true"></i>
+        </button>
+
+        <!-- WOMEN Mega Panel -->
+        <div class="mega-panel compact" role="menu" [class.active]="activeMegaMenu === 'women'"
+          (mouseenter)="openMegaMenu('women')" (mouseleave)="scheduleMegaMenuClose()">
+          <div class="mega-inner">
+            <div class="mega-col">
+              <span class="mega-col-heading">COMING SOON</span>
+              <p class="mega-coming-desc">
+                We're engineering a dedicated Women's Activewear collection for peak athletic performance.
+              </p>
+            
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- ACCESSORIES Mega Menu -->
+      <li class="nav-item mega-item" role="none" (mouseenter)="openMegaMenu('accessories')"
+        (mouseleave)="scheduleMegaMenuClose()">
+        <button class="nav-link menu-title" type="button" role="menuitem" aria-haspopup="true"
+          [attr.aria-expanded]="activeMegaMenu === 'accessories'" (click)="toggleMegaMenu('accessories')"
+          (focus)="openMegaMenu('accessories')">
+          ACCESSORIES
+          <i class="fa-solid fa-chevron-down arrow" [class.open]="activeMegaMenu === 'accessories'"
+            aria-hidden="true"></i>
+        </button>
+
+        <!-- ACCESSORIES Mega Panel -->
+        <div class="mega-panel compact" role="menu" [class.active]="activeMegaMenu === 'accessories'"
+          (mouseenter)="openMegaMenu('accessories')" (mouseleave)="scheduleMegaMenuClose()">
+          <div class="mega-inner">
+            <div class="mega-col">
+              <span class="mega-col-heading">ACTIVE ACCESSORIES</span>
+              <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }" class="mega-link" role="menuitem"
+                (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-hand-fist"></i> Compression Arm Sleeves
+              </a>
+              <a routerLink="/shop" class="mega-link" role="menuitem" (click)="closeMegaMenu(); closeMenu()">
+                <i class="fa-solid fa-store"></i> View All Gear
+              </a>
+            </div>
+
+            <!-- Featured Accessories Card -->
+            <div class="mega-featured">
+              <span class="mega-col-heading">FEATURED</span>
+              <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }" class="mega-product-card"
+                (click)="closeMegaMenu(); closeMenu()">
+                <div class="mega-product-img-wrap">
+                  <img src="assets/images/compression.jpg" alt="Compression Arm Sleeves" loading="lazy">
+                </div>
+                <div class="mega-product-info">
+                  <span class="mega-product-name">Core Compression Sleeves</span>
+                  <span class="mega-product-cta">Shop Now &rarr;</span>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+
+      <!-- DESIGN YOUR OWN -->
+      <li class="nav-item" role="none">
+        <button type="button" class="nav-link design-link" role="menuitem" (click)="openComingSoon('Design Your Own')">
+          DESIGN YOUR OWN
+          <span class="nav-badge soon">SOON</span>
+        </button>
+      </li>
+
+    </ul>
+
+    <!-- Right-Side Action Controls -->
+    <div class="nav-icons">
+
+      <!-- Dynamic Search Box & Dropdown -->
+      <div class="search-container">
+        <button class="icon-button search-trigger" type="button" aria-label="Search sportswear"
+          [attr.aria-expanded]="isSearchOpen" (click)="toggleSearch()">
+          <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        </button>
+
+        <!-- Floating Search Panel -->
+        <div class="search-panel" *ngIf="isSearchOpen" (click)="$event.stopPropagation()" role="dialog"
+          aria-label="Product search">
+
+          <!-- Input Bar -->
+          <div class="search-input-wrapper">
+            <i class="fa-solid fa-magnifying-glass search-field-icon" aria-hidden="true"></i>
+
+            <input id="header-search-input" class="search-input-field" type="search"
+              placeholder="Search track pants, vests, sleeves..." aria-label="Search sportswear" autocomplete="off"
+              [ngModel]="searchTerm" (input)="onSearchInput($any($event.target).value)"
+              (keydown)="onSearchKeyDown($event)">
+
+            <button class="search-clear-btn" type="button" *ngIf="searchTerm" aria-label="Clear search input"
+              (click)="clearSearch()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <button class="search-close-btn" type="button" aria-label="Close search" (click)="closeSearch()">
+              ESC
+            </button>
+          </div>
+
+          <!-- Quick Category Suggestions (When Input is Empty) -->
+
+
+          <!-- Loading State -->
+          <div class="search-status-bar" *ngIf="isSearching">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span>Searching sportswear...</span>
+          </div>
+
+          <!-- Matching Results Dropdown List -->
+          <div class="search-results-list" *ngIf="searchResults.length > 0" role="listbox">
+            <a class="search-result-card" *ngFor="let product of searchResults; let i = index"
+              [class.highlighted]="i === selectedIndex" [routerLink]="['/product', product._id]"
+              (click)="selectProduct(product)" role="option" [attr.aria-selected]="i === selectedIndex">
+
+              <div class="result-thumb-wrapper">
+                <img [src]="getImageUrl(product.image, 100)" [alt]="product.name" class="result-thumb" loading="lazy">
+              </div>
+
+              <div class="result-info">
+                <div class="result-top-line">
+                  <span class="result-category" *ngIf="product.category">{{ product.category }}</span>
+                  <span class="result-discount" *ngIf="product.discount && product.discount > 0">
+                    SAVE {{ product.discount }}%
+                  </span>
+                </div>
+                <h4 class="result-name">{{ product.name }}</h4>
+                <div class="result-price-row">
+                  <span class="result-price">&#8377;{{ product.price }}</span>
+                  <span class="result-old-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
+                    &#8377;{{ product.originalPrice }}
+                  </span>
+                </div>
+              </div>
+
+              <i class="fa-solid fa-chevron-right result-arrow" aria-hidden="true"></i>
+            </a>
+
+            <!-- Search All Footer Link -->
+            <button type="button" class="search-view-all-btn" (click)="searchProducts()">
+              View all results in Shop &rarr;
+            </button>
+          </div>
+
+          <!-- Empty State -->
+          <div class="search-empty-state" *ngIf="searchTerm && !isSearching && searchResults.length === 0">
+            <i class="fa-solid fa-box-open empty-icon" aria-hidden="true"></i>
+            <p class="empty-title">No products found for "<strong>{{ searchTerm }}</strong>"</p>
+            <p class="empty-subtitle">Check spelling or search for Vests, Track Pants, or Sleeves.</p>
+            <button type="button" class="empty-action-btn" (click)="searchProducts()">
+              Search all products in Shop
+            </button>
+          </div>
 
         </div>
-
       </div>
 
-    </div>
-    <!-- Wishlist -->
-    <div routerLink="/wishlist" class="wishlist-icon">
+      <!-- User Account Menu -->
+      <div class="user-menu-container">
+        <button class="user-trigger icon-button" type="button" (click)="toggleUserMenu()"
+          [attr.aria-expanded]="isUserMenuOpen" aria-label="User account menu">
+          <i class="fa-regular fa-user" aria-hidden="true"></i>
+          <span class="user-label">
+            {{ isLoggedIn() ? getUserName() : 'LOGIN' }}
+          </span>
+          <i class="fa-solid fa-chevron-down user-arrow" aria-hidden="true"></i>
+        </button>
 
-      <i class="fa-regular fa-heart"></i>
+        <div class="user-dropdown" *ngIf="isUserMenuOpen" role="menu">
 
-      <span class="wishlist-badge" *ngIf="wishlistCount > 0">
+          <!-- Guest Options -->
+          <ng-container *ngIf="!isLoggedIn()">
+            <a routerLink="/login" role="menuitem" (click)="isUserMenuOpen = false">
+              <i class="fa-solid fa-right-to-bracket"></i>
+              <span>Login</span>
+            </a>
+            <a routerLink="/register" role="menuitem" (click)="isUserMenuOpen = false">
+              <i class="fa-solid fa-user-plus"></i>
+              <span>Sign Up</span>
+            </a>
+          </ng-container>
 
-        {{ wishlistCount }}
+          <!-- Logged-In User Options -->
+          <ng-container *ngIf="isLoggedIn()">
+            <div class="user-badge-header">
+              <span class="user-signed-in">Signed in as</span>
+              <strong class="user-full-name">{{ getUserName() }}</strong>
+            </div>
 
-      </span>
+            <!-- Admin Shortcut -->
+            <ng-container *ngIf="isAdmin()">
+              <a routerLink="/admin" role="menuitem" class="admin-link" (click)="isUserMenuOpen = false">
+                <i class="fa-solid fa-gauge"></i>
+                <span>Admin Dashboard</span>
+              </a>
+            </ng-container>
 
-      <span>Wishlist</span>
+            <!-- Customer Links -->
+            <a routerLink="/orders" role="menuitem" (click)="isUserMenuOpen = false">
+              <i class="fa-solid fa-bag-shopping"></i>
+              <span>My Orders</span>
+            </a>
+            <a routerLink="/profile/edit" role="menuitem" (click)="isUserMenuOpen = false">
+              <i class="fa-solid fa-user-pen"></i>
+              <span>Profile Settings</span>
+            </a>
+            <a routerLink="/dashboard" role="menuitem" (click)="isUserMenuOpen = false">
+              <i class="fa-solid fa-gauge-high"></i>
+              <span>Account Dashboard</span>
+            </a>
 
-    </div>
+            <div class="dropdown-divider"></div>
 
-    <!-- Cart -->
-    <div class="cart-icon" (click)="toggleCart()">
+            <button type="button" class="logout-btn" role="menuitem" (click)="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i>
+              <span>Logout</span>
+            </button>
+          </ng-container>
+        </div>
+      </div>
 
-      <div class="cart-wrapper">
-
-        <i class="fa-solid fa-cart-shopping"></i>
-
-        <span class="cart-badge">
-
-          {{ cartCount }}
-
+      <!-- Wishlist Action -->
+      <a routerLink="/wishlist" class="icon-button wishlist-button" aria-label="Wishlist">
+        <span class="icon-badge-wrapper">
+          <i class="fa-regular fa-heart" aria-hidden="true"></i>
+          <span class="action-badge wishlist-badge" *ngIf="wishlistCount > 0">
+            {{ wishlistCount }}
+          </span>
         </span>
+        <span class="action-label">Wishlist</span>
+      </a>
 
+      <!-- Cart Action -->
+      <button class="icon-button cart-button" type="button" (click)="toggleCart()" aria-label="Open shopping cart">
+        <span class="icon-badge-wrapper">
+          <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+          <span class="action-badge cart-badge" *ngIf="cartCount > 0">
+            {{ cartCount }}
+          </span>
+        </span>
+        <span class="action-label">Cart</span>
+      </button>
+
+    </div>
+  </nav>
+</header>
+
+<!-- 3. MOBILE OFF-CANVAS SLIDE-OUT DRAWER -->
+<div class="mobile-backdrop" [class.visible]="isMenuOpen" (click)="closeMenu()" aria-hidden="true">
+</div>
+
+<nav class="mobile-drawer" [class.open]="isMenuOpen" aria-label="Mobile Navigation Drawer">
+
+  <!-- Mobile Drawer Header -->
+  <div class="mobile-drawer-header">
+    <a routerLink="/" class="mobile-drawer-logo" (click)="closeMenu()">
+      <img src="assets/images/trianglepng.png" alt="Triangle Sports">
+    </a>
+    <button class="mobile-drawer-close" type="button" aria-label="Close navigation" (click)="closeMenu()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Drawer Body -->
+  <div class="mobile-drawer-body">
+
+    <!-- Mobile Search Quick Button -->
+    <div class="mobile-drawer-search">
+      <button type="button" class="mobile-search-btn" (click)="closeMenu(); toggleSearch()">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span>Search products...</span>
+      </button>
+    </div>
+
+    <!-- Main Navigation List -->
+    <ul class="mobile-nav-list">
+
+      <!-- MEN Accordion -->
+      <li class="mobile-nav-item">
+        <button type="button" class="mobile-nav-row" (click)="toggleMobileSection('men', $event)"
+          [attr.aria-expanded]="mobileMenExpanded">
+          <span class="mobile-nav-title">MEN</span>
+          <i class="fa-solid fa-chevron-down mobile-chevron" [class.rotate]="mobileMenExpanded" aria-hidden="true">
+          </i>
+        </button>
+
+        <div class="mobile-subnav" *ngIf="mobileMenExpanded">
+          <span class="mobile-subnav-heading">TOPWEAR</span>
+          <a routerLink="/shop" [queryParams]="{ category: 'Vest' }" (click)="closeMenu()" class="mobile-subnav-link">
+            Vests &amp; Tanks
+          </a>
+          <span class="mobile-subnav-heading">BOTTOMWEAR</span>
+          <a routerLink="/shop" [queryParams]="{ category: 'Track Pant' }" (click)="closeMenu()"
+            class="mobile-subnav-link">
+            Track Pants &amp; Joggers
+          </a>
+          <span class="mobile-subnav-heading">PERFORMANCE</span>
+          <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }" (click)="closeMenu()"
+            class="mobile-subnav-link">
+            Arm Sleeves &amp; Compression
+          </a>
+          <a routerLink="/shop" (click)="closeMenu()" class="mobile-subnav-link highlight">
+            Shop All Men &rarr;
+          </a>
+        </div>
+      </li>
+
+      <!-- WOMEN Accordion -->
+      <li class="mobile-nav-item">
+        <button type="button" class="mobile-nav-row" (click)="toggleMobileSection('women', $event)"
+          [attr.aria-expanded]="mobileWomenExpanded">
+          <span class="mobile-nav-title">WOMEN</span>
+          <div class="mobile-nav-row-end">
+            <span class="nav-badge soon">SOON</span>
+            <i class="fa-solid fa-chevron-down mobile-chevron" [class.rotate]="mobileWomenExpanded" aria-hidden="true">
+            </i>
+          </div>
+        </button>
+
+        <div class="mobile-subnav" *ngIf="mobileWomenExpanded">
+          <p class="mobile-coming-desc">
+            Women's Activewear is launching soon. In the meantime, design your custom kit.
+          </p>
+         
+        </div>
+      </li>
+
+      <!-- ACCESSORIES Accordion -->
+      <li class="mobile-nav-item">
+        <button type="button" class="mobile-nav-row" (click)="toggleMobileSection('accessories', $event)"
+          [attr.aria-expanded]="mobileAccessoriesExpanded">
+          <span class="mobile-nav-title">ACCESSORIES</span>
+          <i class="fa-solid fa-chevron-down mobile-chevron" [class.rotate]="mobileAccessoriesExpanded"
+            aria-hidden="true">
+          </i>
+        </button>
+
+        <div class="mobile-subnav" *ngIf="mobileAccessoriesExpanded">
+          <a routerLink="/shop" [queryParams]="{ category: 'Arm Sleeves' }" (click)="closeMenu()"
+            class="mobile-subnav-link">
+            Compression Arm Sleeves
+          </a>
+          <a routerLink="/shop" (click)="closeMenu()" class="mobile-subnav-link highlight">
+            View All Gear &rarr;
+          </a>
+        </div>
+      </li>
+
+      <!-- DESIGN YOUR OWN -->
+
+
+    </ul>
+
+    <!-- Mobile Account & Support Section -->
+    <div class="mobile-drawer-footer">
+      <div class="mobile-account-block">
+        <ng-container *ngIf="!isLoggedIn()">
+          <div class="mobile-auth-buttons">
+            <a routerLink="/login" class="mobile-btn primary" (click)="closeMenu()">
+              <i class="fa-solid fa-right-to-bracket"></i> Login
+            </a>
+            <a routerLink="/register" class="mobile-btn outline" (click)="closeMenu()">
+              <i class="fa-solid fa-user-plus"></i> Sign Up
+            </a>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="isLoggedIn()">
+          <div class="mobile-user-greeting">
+            <i class="fa-regular fa-user"></i>
+            <div>
+              <span class="greeting-sub">Welcome back,</span>
+              <strong>{{ getUserName() }}</strong>
+            </div>
+          </div>
+
+          <div class="mobile-user-links">
+            <a *ngIf="isAdmin()" routerLink="/admin" class="mobile-subnav-link admin-highlight" (click)="closeMenu()">
+              <i class="fa-solid fa-gauge"></i> Admin Dashboard
+            </a>
+            <a routerLink="/orders" class="mobile-subnav-link" (click)="closeMenu()">
+              <i class="fa-solid fa-bag-shopping"></i> My Orders
+            </a>
+            <a routerLink="/dashboard" class="mobile-subnav-link" (click)="closeMenu()">
+              <i class="fa-solid fa-gauge-high"></i> Dashboard
+            </a>
+            <button type="button" class="mobile-logout-btn" (click)="logout()">
+              <i class="fa-solid fa-right-from-bracket"></i> Logout
+            </button>
+          </div>
+        </ng-container>
       </div>
 
-      <span>Cart</span>
-
+      <!-- Quick Wishlist & Policy Note -->
+      <div class="mobile-bottom-links">
+        <a routerLink="/wishlist" class="mobile-quick-link" (click)="closeMenu()">
+          <i class="fa-regular fa-heart"></i>
+          <span>Wishlist ({{ wishlistCount }})</span>
+        </a>
+        <a routerLink="/shipping-policy" class="mobile-quick-link" (click)="closeMenu()">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Shipping &amp; Delivery</span>
+        </a>
+      </div>
     </div>
 
   </div>
-
 </nav>
 
+<!-- 4. CART BACKDROP & SLIDE-OUT DRAWER -->
+<div class="cart-backdrop" [class.visible]="isCartOpen" (click)="toggleCart()" aria-hidden="true">
+</div>
 
-
-<!-- ================= CART DRAWER ================= -->
-
-<div class="cart-drawer" [class.open]="isCartOpen">
-
-  <!-- Header -->
+<aside class="cart-drawer" [class.open]="isCartOpen" [attr.aria-hidden]="!isCartOpen" aria-label="Shopping cart">
 
   <div class="drawer-header">
-
-    <h3>
-
-      Your Cart
-
-    </h3>
-
-    <button (click)="toggleCart()">
-
-      ✕
-
-    </button>
-
-  </div>
-
-  <!-- Body -->
-
-  <div class="drawer-body">
-
-    <!-- Empty -->
-
-    <div class="empty-cart" *ngIf="cartItems.length === 0">
-
-      <p>
-
-        🛒 Your cart is empty
-
-      </p>
-
+    <div>
+      <p class="drawer-eyebrow">TRIANGLE SPORTS</p>
+      <h3>Your Cart <span>({{ cartCount }})</span></h3>
     </div>
 
-    <!-- Items -->
+    <button class="drawer-close" type="button" aria-label="Close cart" (click)="toggleCart()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
 
+  <div class="drawer-body">
+    <!-- Empty Cart -->
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
+      <div class="empty-cart-icon">
+        <i class="fa-solid fa-bag-shopping"></i>
+      </div>
+      <h4>Your cart is empty</h4>
+      <p>Discover high-performance sportswear essentials.</p>
+      <a routerLink="/shop" class="continue-shopping" (click)="toggleCart()">
+        Explore Shop &rarr;
+      </a>
+    </div>
+
+    <!-- Cart Items -->
     <div class="cart-item" *ngFor="let item of cartItems">
-
-      <img [src]="item.image" [alt]="item.name">
+      <img [src]="getImageUrl(item.image, 140)" [alt]="item.name">
 
       <div class="item-details">
-
-        <h4>
-
-          {{ item.name }}
-
-        </h4>
-
-
+        <h4>{{ item.name }}</h4>
 
         <p class="variant" *ngIf="getVariantLabel(item)">
           {{ getVariantLabel(item) }}
         </p>
 
-
-
-        <p class="price">
-          ₹{{ item.cartPrice }}
-        </p>
+        <p class="price">&#8377;{{ getItemPrice(item) }}</p>
 
         <div class="quantity-controls">
-
-          <button (click)="decrease(item)">
-
-            −
-
+          <button type="button" (click)="decrease(item)" [attr.aria-label]="'Decrease ' + item.name">
+            &minus;
           </button>
-
-          <span>
-
-            {{ item.quantity }}
-
-          </span>
-
-          <button (click)="increase(item)">
-
+          <span>{{ item.quantity }}</span>
+          <button type="button" (click)="increase(item)" [attr.aria-label]="'Increase ' + item.name">
             +
-
           </button>
-
         </div>
-
       </div>
 
-      <button class="remove-btn" (click)="removeItem(item)">
-
-        ✕
-
+      <button class="remove-btn" type="button" (click)="removeItem(item)" [attr.aria-label]="'Remove ' + item.name">
+        <i class="fa-solid fa-xmark"></i>
       </button>
-
     </div>
-
   </div>
 
-  <!-- Footer -->
-
+  <!-- Cart Footer -->
   <div class="drawer-footer" *ngIf="cartItems.length > 0">
+    <div class="shipping-note">
+      <i class="fa-solid fa-truck-fast"></i>
+      <span>Shipping &amp; taxes calculated at checkout</span>
+    </div>
 
     <div class="total-row">
-
-      <span>
-
-        Total
-
-      </span>
-
-      <strong>
-
-        ₹{{ total }}
-
-      </strong>
-
+      <span>Subtotal</span>
+      <strong>&#8377;{{ total }}</strong>
     </div>
 
-    <button class="checkout-btn" (click)="goToCheckout()">
-
-      Proceed to Checkout
-
+    <button class="checkout-btn" type="button" (click)="goToCheckout()">
+      Proceed to checkout
+      <i class="fa-solid fa-arrow-right"></i>
     </button>
 
+    <p class="secure-checkout">
+      <i class="fa-solid fa-lock"></i>
+      Secure 256-bit SSL encrypted checkout
+    </p>
   </div>
+</aside>
 
-</div>
-
-
-<!-- ================= COMING SOON MODAL ================= -->
-
+<!-- 5. COMING SOON MODAL -->
 <div class="coming-soon-overlay" *ngIf="showComingSoonModal" (click)="closeComingSoon()">
 
-  <div class="coming-soon-modal" (click)="$event.stopPropagation()">
+  <section class="coming-soon-modal" role="dialog" aria-modal="true" aria-labelledby="coming-soon-title"
+    (click)="$event.stopPropagation()">
 
-    <button class="coming-soon-close" type="button" (click)="closeComingSoon()">
-      ×
+    <button class="coming-soon-close" type="button" aria-label="Close dialog" (click)="closeComingSoon()">
+      <i class="fa-solid fa-xmark"></i>
     </button>
 
     <div class="coming-soon-icon">
-      <i class="fa-solid fa-hourglass-half"></i>
+      <i class="fa-solid fa-bolt"></i>
     </div>
 
-    <h2>Coming Soon</h2>
-
-    <p>
-      {{ comingSoonSection }} is coming soon.
-    </p>
-
-    <span>
-      We're working hard to bring you something amazing.
+    <p class="modal-eyebrow">TRIANGLE SPORTS</p>
+    <h2 id="coming-soon-title">Under Development</h2>
+    <p class="coming-soon-target">{{ comingSoonSection }} is launching soon.</p>
+    <span class="coming-soon-desc">
+      We are currently engineering this collection for peak athletic performance.
     </span>
 
     <button type="button" class="coming-soon-btn" (click)="closeComingSoon()">
       GOT IT
     </button>
-
-  </div>
-
+  </section>
 </div>

@@ -898,6 +898,7 @@ const getHomeProducts = asyncHandler(async (req, res) => {
             {
                 showOnHome: { $ne: false }
             },
+
             {
                 _id: 1,
                 name: 1,
@@ -905,8 +906,10 @@ const getHomeProducts = asyncHandler(async (req, res) => {
                 originalPrice: 1,
                 discount: 1,
                 image: 1,
+                images: 1,
                 showOnHome: 1
             }
+
         )
             .sort({ _id: 1 })
             .limit(3)

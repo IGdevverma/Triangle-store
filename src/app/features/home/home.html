@@ -1,114 +1,165 @@
 <!-- =========================================
+
              HERO SLIDER
+
 ========================================= -->
+
 <!-- =========================================
+
      HERO SLIDER
+
 ========================================= -->
 
 <section class="hero-slider" aria-label="Triangle Sports promotions">
 
     <img [src]="getCurrentHeroImage()" class="slider-image" alt="Triangle Sports sportswear collection"
-        [attr.fetchpriority]="currentSlide === 0 ? 'high' : 'auto'"
-        [attr.loading]="currentSlide === 0 ? 'eager' : 'lazy'" decoding="async">
 
+        [attr.fetchpriority]="currentSlide === 0 ? 'high' : 'auto'"
+
+        [attr.loading]="currentSlide === 0 ? 'eager' : 'lazy'" decoding="async">
 
     <!-- PREVIOUS -->
 
     <button class="nav prev" type="button" aria-label="Previous banner" (click)="prevSlide()">
-        ❮
-    </button>
 
+        ❮
+
+    </button>
 
     <!-- NEXT -->
 
     <button class="nav next" type="button" aria-label="Next banner" (click)="nextSlide()">
-        ❯
-    </button>
 
+        ❯
+
+    </button>
 
     <!-- DOTS -->
 
     <div class="dots" role="tablist" aria-label="Hero banners">
 
         <button *ngFor="
+
                 let image of sliderImages;
+
                 let i = index
+
             " type="button" [class.active]="
+
                 i === currentSlide
+
             " [attr.aria-label]="
+
                 'Go to banner ' + (i + 1)
+
             " [attr.aria-selected]="
+
                 i === currentSlide
+
             " (click)="goToSlide(i)">
+
         </button>
 
     </div>
 
 </section>
 
-
-
-
-
-
-
-
 <!-- Featured Products -->
+
 <section class="featured-products">
 
     <!-- HEADER -->
+
     <div class="featured-header">
 
         <span class="section-label">
+
             FEATURED COLLECTION
+
         </span>
 
         <h2>
+
             Most Loved Products
+
         </h2>
 
         <p>
+
             Discover our most popular sportswear chosen by athletes,
+
             teams and fitness enthusiasts.
+
         </p>
 
     </div>
 
-
     <!-- PRODUCTS -->
+
     <div class="products-grid">
 
         <div class="product-item" *ngFor="let product of bestSellerProducts; let i = index"
+            [class.has-secondary-image]="!!getSecondaryProductImage(product)"
             [routerLink]="['/product', product._id]">
 
             <!-- IMAGE -->
+
             <div class="product-image-wrapper">
 
-                <!-- DISCOUNT -->
+                <!-- DISCOUNT BADGE -->
+
                 <span class="discount-badge" *ngIf="product.discount && product.discount > 0">
+
                     SAVE {{ product.discount }}%
+
                 </span>
 
+                <!-- PRIMARY PRODUCT IMAGE -->
+
                 <img [src]="getImageUrl(product.image, 480)" [srcset]="getImageSrcSet(product.image)" sizes="(max-width: 520px) 46vw,
-         (max-width: 768px) 42vw,
-         (max-width: 1200px) 30vw,
-         320px" [alt]="product.name" class="product-image" [attr.loading]="i === 0 ? 'eager' : 'lazy'"
-                    [attr.fetchpriority]="i === 0 ? 'high' : 'auto'" decoding="async" />
+
+           (max-width: 768px) 42vw,
+
+           (max-width: 1200px) 30vw,
+
+           320px" [alt]="product.name" class="product-image product-image-primary"
+
+                    [attr.loading]="i === 0 ? 'eager' : 'lazy'" [attr.fetchpriority]="i === 0 ? 'high' : 'auto'"
+
+                    decoding="async" />
+
+                <!-- ALTERNATE IMAGE: SAME PRODUCT -->
+
+                <img *ngIf="getSecondaryProductImage(product) as secondaryImage"
+
+                    [src]="getImageUrl(secondaryImage, 480)" [srcset]="getImageSrcSet(secondaryImage)" sizes="(max-width: 520px) 46vw,
+
+           (max-width: 768px) 42vw,
+
+           (max-width: 1200px) 30vw,
+
+           320px" [alt]="product.name + ' alternate view'"
+
+                    class="product-image product-image-secondary" loading="lazy" decoding="async" draggable="false" />
 
             </div>
 
-
             <!-- PRODUCT NAME -->
+
             <h3 class="product-name">
+
                 {{ product.name }}
+
             </h3>
 
-
             <!-- PRICE -->
+
             <div class="price-row">
 
                 <span class="current-price">
+
                     ₹{{ product.price }}
+
                 </span>
 
                 <span class="old-price" *ngIf="product.originalPrice && product.originalPrice > product.price">
@@ -123,61 +174,84 @@
 
     </div>
 
-
     <!-- VIEW ALL -->
+
     <div class="view-all-wrapper">
 
         <a routerLink="/shop" class="view-all-btn">
+
             View all
+
         </a>
 
     </div>
 
 </section>
 
-
 <section class="services-section">
 
     <div class="service-item">
+
         <i class="fa-solid fa-box"></i>
 
         <div>
+
             <h3>Free Shipping</h3>
+
             <p>Free Shipping for prepaid orders</p>
+
         </div>
+
     </div>
 
     <div class="service-item">
+
         <i class="fa-solid fa-arrow-rotate-right"></i>
 
         <div>
+
             <h3>Easy Exchange</h3>
+
             <p>Hassle-free exchange process for your convenience.</p>
+
         </div>
+
     </div>
 
     <div class="service-item">
+
         <i class="fa-solid fa-headphones"></i>
 
         <div>
+
             <h3>Full Support</h3>
+
             <p>We provide complete support until your product is delivered.</p>
+
         </div>
+
     </div>
 
     <div class="service-item">
+
         <i class="fa-regular fa-credit-card"></i>
 
         <div>
+
             <h3>Flexible Payment</h3>
+
             <p>Pay with Multiple Credit Cards.</p>
+
         </div>
+
     </div>
 
 </section>
 
 <!--=========================================
+
             TRUSTED BY
+
 ==========================================-->
 
 <section class="trusted-section">
@@ -189,7 +263,9 @@
         <h2>
 
             Brands, Teams & Institutions
+
             <br>
+
             That Trust Triangle Sports
 
         </h2>
@@ -197,7 +273,9 @@
         <p>
 
             We proudly manufacture premium sportswear for
+
             academies, schools, colleges, gyms and corporate
+
             organizations across India.
 
         </p>
@@ -215,6 +293,7 @@
             <p>
 
                 Premium uniforms and sports kits
+
                 for leading schools.
 
             </p>
@@ -230,6 +309,7 @@
             <p>
 
                 Cricket, Football, Kabaddi,
+
                 Volleyball and more.
 
             </p>
@@ -245,6 +325,7 @@
             <p>
 
                 Custom gym apparel
+
                 and activewear.
 
             </p>
@@ -260,6 +341,7 @@
             <p>
 
                 Branded T-shirts,
+
                 Caps and Event Kits.
 
             </p>
@@ -269,8 +351,6 @@
     </div>
 
 </section>
-
-
 
 <section class="manufacturing">
 
@@ -297,7 +377,9 @@
         <p>
 
             Triangle Sports manufactures premium sportswear
+
             for brands, schools, colleges, academies,
+
             gyms and corporate teams.
 
         </p>
@@ -354,15 +436,16 @@
 
             </a>
 
-
-
         </div>
 
     </div>
 
 </section>
+
 <!-- ===========================================
+
                 BRAND STORY
+
 ============================================ -->
 
 <section class="brand-story">
@@ -384,7 +467,9 @@
         <h2>
 
             Built By Passion.
+
             <br>
+
             Designed For Champions.
 
         </h2>
@@ -392,7 +477,9 @@
         <p>
 
             Triangle Sports started with one vision —
+
             to manufacture premium quality sportswear
+
             that empowers athletes, academies and brands.
 
         </p>
@@ -400,7 +487,9 @@
         <p>
 
             Today we manufacture jerseys, tracksuits,
+
             gym wear and custom apparel for hundreds
+
             of teams across India.
 
         </p>
@@ -414,6 +503,9 @@
     </div>
 
 </section>
+
 <!--=========================================
+
             INSTAGRAM GALLERY
+
 ==========================================-->

@@ -141,7 +141,7 @@ export class Home implements OnInit, OnDestroy {
     // ---------------------------------------------------
     // LOAD PRODUCTS
     // ---------------------------------------------------
-    this.productService.getHomeProducts().subscribe({
+    this.productService.getHomeProducts(true).subscribe({
 
       next: (response: any) => {
 
@@ -162,6 +162,46 @@ export class Home implements OnInit, OnDestroy {
 
         // Featured slider/list
         this.updateFeaturedProducts();
+
+        // Resilient fallback: if the home endpoint was deployed without projecting
+        // `images`, enrich the home products using the catalog in the background.
+        const hasGalleryImages = products.some(
+          p => Array.isArray(p.images) && p.images.length > 1
+        );
+
+        if (!hasGalleryImages) {
+          this.productService.getProducts().subscribe({
+            next: (fullResponse: any) => {
+              const catalog: Product[] =
+                Array.isArray(fullResponse?.products)
+                  ? fullResponse.products
+                  : [];
+
+              if (catalog.length) {
+                const catalogMap = new Map(
+                  catalog.map(p => [String(p._id || p.id), p])
+                );
+
+                let updated = false;
+                for (const p of this.products) {
+                  const match = catalogMap.get(String(p._id || p.id));
+                  if (match?.images?.length && (!p.images || p.images.length <= 1)) {
+                    p.images = match.images;
+                    updated = true;
+                  }
+                }
+
+                if (updated) {
+                  this.bestSellerProducts = this.products.slice(0, 3);
+                  this.updateFeaturedProducts();
+                }
+              }
+            },
+            error: () => {
+              // Primary image is already safely displayed; fallback silently
+            }
+          });
+        }
 
       },
 
@@ -426,6 +466,45 @@ export class Home implements OnInit, OnDestroy {
     this.updateFeaturedProducts();
 
   }
+
+
+
+
+
+
+  getSecondaryProductImage(product: any): string | undefined {
+    if (!product) {
+      return undefined;
+    }
+
+    const mainImage = product.image?.trim();
+
+    const images: string[] = Array.isArray(product.images)
+      ? product.images.filter(
+        (image: unknown): image is string =>
+          typeof image === 'string' && image.trim().length > 0
+      )
+      : [];
+
+    // Prefer a valid alternate image different from the primary image
+    let secondaryImage = images.find(
+      image => image.trim() !== mainImage
+    );
+
+    // Fallback: check colorsData if images array doesn't have an alternate view
+    if (!secondaryImage && Array.isArray(product.colorsData)) {
+      const colorOption = product.colorsData.find(
+        (c: any) => typeof c?.image === 'string' && c.image.trim().length > 0 && c.image.trim() !== mainImage
+      );
+      if (colorOption) {
+        secondaryImage = colorOption.image.trim();
+      }
+    }
+
+    return secondaryImage;
+  }
+
+
 
 
   // =====================================================
