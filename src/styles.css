@@ -47,17 +47,19 @@ html {
     overflow-x: hidden;
 }
 
+
 body {
     margin: 0;
-    padding: 88px 0 0;
+    padding: 0;
 
-    background: var(--background);
+    background: #ffffff;
     color: var(--text);
 
     font-family: 'Montserrat', sans-serif;
 
-    overflow-x: hidden;
+    overflow-x: clip;
 }
+
 
 body.dark-mode {
 
@@ -216,22 +218,89 @@ select {
 
 }
 
-/* =========================================================
-   GLOBAL FIXED HEADER OFFSET
-========================================================= */
-
-@media (max-width: 768px) {
-
-    body {
-        padding-top: 70px;
-    }
-
+/* TEMPORARY TEST: remove dark edge effects */
+app-home,
+app-home * {
+  box-shadow: none !important;
+  filter: none !important;
 }
 
-@media (max-width: 480px) {
+app-home::before,
+app-home::after,
+app-home *::before,
+app-home *::after {
+  box-shadow: none !important;
+  filter: none !important;
+  background-image: none !important;
+}
 
-    body {
-        padding-top: 64px;
-    }
 
+
+/* FIX: Remove unwanted dark shading on homepage edges */
+app-root,
+app-home {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  background: #fff !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+app-root::before,
+app-root::after,
+app-home::before,
+app-home::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+app-home .featured-products {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  margin-inline: 0;
+  border: 0;
+  border-radius: 0;
+  background: #fff !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+app-home .featured-products::before,
+app-home .featured-products::after {
+  content: none !important;
+  display: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Keep page content below the fixed announcement bar and header */
+:root {
+  --announcement-height: 32px;
+  --main-header-height: 72px;
+  --header-total-height: calc(
+    var(--announcement-height) + var(--main-header-height)
+  );
+}
+
+/* Reserve space for the fixed header */
+body {
+  padding-top: var(--header-total-height);
+}
+
+/* Header component should not add extra top margin */
+app-header {
+  display: block;
+  width: 100%;
+}
+
+/* Avoid extra spacing above the homepage hero */
+app-home .hero-slider {
+  margin-top: 0;
 }

@@ -13,9 +13,7 @@
 <section class="hero-slider" aria-label="Triangle Sports promotions">
 
     <img [src]="getCurrentHeroImage()" class="slider-image" alt="Triangle Sports sportswear collection"
-
         [attr.fetchpriority]="currentSlide === 0 ? 'high' : 'auto'"
-
         [attr.loading]="currentSlide === 0 ? 'eager' : 'lazy'" decoding="async">
 
     <!-- PREVIOUS -->
@@ -99,8 +97,7 @@
     <div class="products-grid">
 
         <div class="product-item" *ngFor="let product of bestSellerProducts; let i = index"
-            [class.has-secondary-image]="!!getSecondaryProductImage(product)"
-            [routerLink]="['/product', product._id]">
+            [class.has-secondary-image]="!!getSecondaryProductImage(product)" [routerLink]="['/product', product._id]">
 
             <!-- IMAGE -->
 
@@ -117,30 +114,23 @@
                 <!-- PRIMARY PRODUCT IMAGE -->
 
                 <img [src]="getImageUrl(product.image, 480)" [srcset]="getImageSrcSet(product.image)" sizes="(max-width: 520px) 46vw,
-
-           (max-width: 768px) 42vw,
-
-           (max-width: 1200px) 30vw,
-
-           320px" [alt]="product.name" class="product-image product-image-primary"
-
-                    [attr.loading]="i === 0 ? 'eager' : 'lazy'" [attr.fetchpriority]="i === 0 ? 'high' : 'auto'"
-
+         (max-width: 768px) 42vw,
+         (max-width: 1200px) 30vw,
+         320px" [alt]="product.name" class="product-image product-image-primary"
+                    [attr.loading]="i < 3 ? 'eager' : 'lazy'" [attr.fetchpriority]="i < 3 ? 'high' : 'auto'"
                     decoding="async" />
 
                 <!-- ALTERNATE IMAGE: SAME PRODUCT -->
 
                 <img *ngIf="getSecondaryProductImage(product) as secondaryImage"
-
                     [src]="getImageUrl(secondaryImage, 480)" [srcset]="getImageSrcSet(secondaryImage)" sizes="(max-width: 520px) 46vw,
 
            (max-width: 768px) 42vw,
 
            (max-width: 1200px) 30vw,
 
-           320px" [alt]="product.name + ' alternate view'"
-
-                    class="product-image product-image-secondary" loading="lazy" decoding="async" draggable="false" />
+           320px" [alt]="product.name + ' alternate view'" class="product-image product-image-secondary" loading="lazy"
+                    decoding="async" draggable="false" />
 
             </div>
 

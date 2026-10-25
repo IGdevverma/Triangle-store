@@ -53,7 +53,7 @@ export class Home implements OnInit, OnDestroy {
   sliderImages: string[] = [
     'assets/images/home/training-banner.webp',
     'assets/images/home/vest-banner.webp',
-    'assets/images/home/track-pant-banner.webp'
+    
   ];
 
   currentSlide = 0;
