@@ -840,6 +840,11 @@ const verifyWidgetToken = async (req, res) => {
                 expiresIn: "15m"
             }
         );
+        console.log('GUEST VERIFICATION RESPONSE:', {
+            success: true,
+            phone: normalizedPhone,
+            hasGuestVerificationToken: !!guestVerificationToken
+        });
 
         return res.status(200).json({
 
